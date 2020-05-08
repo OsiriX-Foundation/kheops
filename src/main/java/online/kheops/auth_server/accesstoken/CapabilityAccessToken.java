@@ -73,7 +73,7 @@ final class CapabilityAccessToken implements AccessToken {
     public Optional<String> getScope() {
         List<String> scopes = new ArrayList<>(4);
 
-        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+        if (capability.getScopeType().equals(ScopeType.ALBUM)) {
             if (capability.hasReadPermission()) {
                 scopes.add("read");
             }
@@ -99,9 +99,9 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public TokenType getTokenType() {
-        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+        if (capability.getScopeType().equals(ScopeType.ALBUM)) {
             return TokenType.ALBUM_CAPABILITY_TOKEN;
-        } else if (capability.getScopeType().equalsIgnoreCase(ScopeType.USER.name())) {
+        } else if (capability.getScopeType().equals(ScopeType.USER)) {
             return TokenType.USER_CAPABILITY_TOKEN;
         } else {
             throw new IllegalStateException("unknown scope type");
@@ -110,7 +110,7 @@ final class CapabilityAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
+        if (capability.getScopeType().equals(ScopeType.ALBUM)) {
             return new AlbumCapabilityPrincipal(capability, user, token);
         } else {
             return new UserCapabilityPrincipal(capability, user, token);

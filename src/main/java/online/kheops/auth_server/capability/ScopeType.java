@@ -39,7 +39,7 @@ public enum ScopeType {
 
         @Override
         public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) {
-            capability.setScopeType(this.name().toLowerCase());
+            capability.setScopeType(this);
             capability.getUser().getCapabilities().add(capability);
         }
     },
@@ -84,7 +84,7 @@ public enum ScopeType {
                 throw new BadQueryParametersException(errorResponse);
             }
             capability.setAlbum(album);
-            capability.setScopeType(this.name().toLowerCase());
+            capability.setScopeType(this);
             album.addCapability(capability);
         }
     };

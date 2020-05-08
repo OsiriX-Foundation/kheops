@@ -107,7 +107,8 @@ public class Capability {
 
     @Basic(optional = false)
     @Column(name = "scope_type ", updatable = false)
-    private String scopeType ;
+    @Enumerated(value = EnumType.STRING)
+    private ScopeType scopeType ;
 
     @ManyToOne
     @JoinColumn(name = "album_fk ", insertable = true, updatable=false)
@@ -218,11 +219,11 @@ public class Capability {
 
     public boolean hasDownloadButtonPermission() { return downloadPermission; }
 
-    public String getScopeType() { return scopeType; }
+    public ScopeType getScopeType() { return scopeType; }
 
     public Album getAlbum() { return album; }
 
-    public void setScopeType(String scopeType) { this.scopeType = scopeType; }
+    public void setScopeType(ScopeType scopeType) { this.scopeType = scopeType; }
 
     public void setAlbum(Album album) { this.album = album; }
 

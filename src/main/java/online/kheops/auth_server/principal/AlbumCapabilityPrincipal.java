@@ -247,7 +247,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public ScopeType getScope() {
-        return ScopeType.valueOf(capability.getScopeType().toUpperCase());
+        return capability.getScopeType();
     }
 
     @Override
