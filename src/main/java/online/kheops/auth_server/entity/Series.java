@@ -105,7 +105,7 @@ public class Series {
     //@OneToMany(mappedBy = "series")
     //private Set<EventSeries> eventSeries = new HashSet<>();
 
-    @ManyToMany(mappedBy = "series")
+    @ManyToMany(mappedBy = "seriesLst")
     private Set<Event> events = new HashSet<>();
 
     public Series() {}
