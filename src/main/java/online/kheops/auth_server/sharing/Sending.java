@@ -133,10 +133,6 @@ public class Sending {
                 throw new SeriesNotFoundException(errorResponse);
             }
 
-            for (Series series: availableSeries) {
-                callingAlbum.removeSeries(series, em);
-                kheopsLogBuilder.series(series.getSeriesInstanceUID());
-            }
 
             final Study study = availableSeries.get(0).getStudy();
             final Mutation mutation;
@@ -146,8 +142,17 @@ public class Sending {
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
             }
-            callingAlbum.updateLastEventTime();
+
             em.persist(mutation);
+
+            for(Series series : availableSeries) {
+                callingAlbum.removeSeries(series, em);
+                kheopsLogBuilder.series(series.getSeriesInstanceUID());
+                final EventSeries eventSeries = new EventSeries(mutation, series);
+                em.persist(eventSeries);
+            }
+
+            callingAlbum.updateLastEventTime();
 
             tx.commit();
             kheopsLogBuilder.action(ActionType.REMOVE_STUDY)
