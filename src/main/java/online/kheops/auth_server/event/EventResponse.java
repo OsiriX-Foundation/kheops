@@ -50,14 +50,12 @@ public class EventResponse {
     //Mutation
     @XmlElement(name = "mutation_type")
     private String mutationType;
-    @XmlElement(name = "series")
-    private SeriesResponse series;
     @XmlElement(name = "study")
     private StudyResponse study;
     @XmlElement(name = "report_provider")
     private ReportProviderResponse reportProvider;
-    @XmlElement(name = "debug")
-    private List<String> uidlst;
+    @XmlElement(name = "series")
+    private List<SeriesResponse> seriesResponses;
 
     private EventResponse() { /*empty*/ }
 
@@ -126,10 +124,12 @@ public class EventResponse {
         }
         if (mutationType_.equals(Events.MutationType.IMPORT_SERIES) ||
                 mutationType_.equals(Events.MutationType.REMOVE_SERIES)) {
-            series = new SeriesResponse();
+            seriesResponses = new ArrayList<>();
+            SeriesResponse seriesResponse = new SeriesResponse();
             study = new StudyResponse();
-            series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
-            series.seriesDescription = mutation.getSeries().getSeriesDescription();
+            seriesResponse.seriesUID = mutation.getSeries().getSeriesInstanceUID();
+            seriesResponse.seriesDescription = mutation.getSeries().getSeriesDescription();
+            seriesResponses.add(seriesResponse);
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
             mutation.getReportProvider().ifPresent(mutationReportProvider ->
@@ -138,9 +138,11 @@ public class EventResponse {
         if (mutationType_.equals(Events.MutationType.ADD_FAV) ||
                 mutationType_.equals(Events.MutationType.REMOVE_FAV)) {
             if (mutation.getSeries() != null) {
-                series = new SeriesResponse();
-                series.seriesUID = mutation.getSeries().getSeriesInstanceUID();
-                series.seriesDescription = mutation.getSeries().getSeriesDescription();
+                seriesResponses = new ArrayList<>();
+                SeriesResponse seriesResponse = new SeriesResponse();
+                seriesResponse.seriesUID = mutation.getSeries().getSeriesInstanceUID();
+                seriesResponse.seriesDescription = mutation.getSeries().getSeriesDescription();
+                seriesResponses.add(seriesResponse);
             }
             study = new StudyResponse();
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
@@ -151,9 +153,12 @@ public class EventResponse {
             study = new StudyResponse();
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
-            uidlst = new ArrayList<>();
+            seriesResponses = new ArrayList<>();
             for(EventSeries eventSeries : mutation.getEventSeries()) {
-                uidlst.add(eventSeries.getSeries().getSeriesInstanceUID());
+                SeriesResponse seriesResponse = new SeriesResponse();
+                seriesResponse.seriesUID = eventSeries.getSeries().getSeriesInstanceUID();
+                seriesResponse.seriesDescription = eventSeries.getSeries().getSeriesDescription();
+                seriesResponses.add(seriesResponse);
             }
         }
 
