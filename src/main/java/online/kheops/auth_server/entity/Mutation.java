@@ -21,10 +21,6 @@ public class Mutation extends Event{
     private User toUser;
 
     @ManyToOne
-    @JoinColumn(name = "series_fk", nullable=true, insertable = true, updatable = false)
-    private Series series;
-
-    @ManyToOne
     @JoinColumn(name = "capability_fk", nullable=true, insertable = true, updatable = false)
     private Capability capability;
 
@@ -38,8 +34,6 @@ public class Mutation extends Event{
     private Events.MutationType mutationType;
 
     public User getToUser() { return toUser; }
-
-    public Series getSeries() { return series; }
 
     public Events.MutationType getMutationType() { return mutationType; }
 
@@ -80,7 +74,7 @@ public class Mutation extends Event{
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Series series) {
         super(callingUser, album, series.getStudy());
         this.mutationType = mutationType;
-        this.series = series;
+        this.getSeries().add(series);
 
         series.addMutation(this);
     }
@@ -101,7 +95,7 @@ public class Mutation extends Event{
     public Mutation (Capability capability, Album album, Events.MutationType mutationType, Series series) {
         super(capability.getUser(), album, series.getStudy());
         this.mutationType = mutationType;
-        this.series = series;
+        this.getSeries().add(series);
         this.capability = capability;
 
         capability.addMutation(this);

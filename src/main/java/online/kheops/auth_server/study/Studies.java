@@ -560,6 +560,9 @@ public class Studies {
                 kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
             }
             final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
+            for(Series series: seriesList) {
+                favAlbumMutation.addSeries(series);
+            }
             em.persist(favAlbumMutation);
             album.updateLastEventTime();
             tx.commit();
