@@ -100,9 +100,15 @@ public abstract class Event {
 
     public void setPrivateTargetUser(User privateTargetUser) { this.privateTargetUser = privateTargetUser; }
 
-    public void addSeries(Series series) { this.series.add(series); }
+    public void addSeries(Series series) {
+        this.series.add(series);
+        series.addEvent(this);
+    }
 
-    public void removeSeries(Series series) {this.series.remove(series); }
+    public void removeSeries(Series series) {
+        this.series.remove(series);
+        series.removeEvent(this);
+    }
 
     public Set<Series> getSeriesLst() { return series; }
 
