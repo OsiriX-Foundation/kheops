@@ -139,6 +139,7 @@ public class Events {
                 userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }
 
+            List<Event> eventlist = EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em);
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
                 eventResponses.add(new EventResponse(e, userMember));
             }

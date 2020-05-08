@@ -21,5 +21,5 @@ public class EventSeries {
     private Series series;
 
     public EventSeries() {}
-    
+
 }
