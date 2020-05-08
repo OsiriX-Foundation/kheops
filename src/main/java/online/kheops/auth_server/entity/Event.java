@@ -43,8 +43,13 @@ public abstract class Event {
     @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = true, updatable = false)
     private User privateTargetUser;
 
-    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
-    private Set<EventSeries> eventSeries = new HashSet<>();
+    //@OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
+    //private Set<EventSeries> eventSeries = new HashSet<>();
+    @ManyToMany()
+    @JoinTable(name = "event_series",
+            joinColumns = @JoinColumn(name = "event_fk"),
+            inverseJoinColumns = @JoinColumn(name = "series_fk"))
+    private Set<Series> series = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -95,7 +100,12 @@ public abstract class Event {
 
     public void setPrivateTargetUser(User privateTargetUser) { this.privateTargetUser = privateTargetUser; }
 
-    public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
+    public void addSeries(Series series) { this.series.add(series); }
 
-    public Set<EventSeries> getEventSeries() { return eventSeries; }
+    public void removeSeries(Series series) {this.series.remove(series); }
+
+    public Set<Series> getSeriesLst() { return series; }
+
+    //public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
+    //public Set<EventSeries> getEventSeries() { return eventSeries; }
 }

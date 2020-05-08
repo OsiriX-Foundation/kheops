@@ -143,14 +143,15 @@ public class Sending {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
             }
 
-            em.persist(mutation);
-
             for(Series series : availableSeries) {
                 callingAlbum.removeSeries(series, em);
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
-                final EventSeries eventSeries = new EventSeries(mutation, series);
-                em.persist(eventSeries);
+                //final EventSeries eventSeries = new EventSeries(mutation, series);
+                mutation.addSeries(series);
+                //em.persist(eventSeries);
             }
+
+            em.persist(mutation);
 
             callingAlbum.updateLastEventTime();
 
@@ -336,13 +337,13 @@ public class Sending {
                 mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
             }
 
-            em.persist(mutation);
-
             for(Series series : seriesListEvent) {
-                final EventSeries eventSeries = new EventSeries(mutation, series);
-                em.persist(eventSeries);
+                //final EventSeries eventSeries = new EventSeries(mutation, series);
+                //em.persist(eventSeries);
+                mutation.addSeries(series);
             }
 
+            em.persist(mutation);
 
             targetAlbum.updateLastEventTime();
 

@@ -102,8 +102,14 @@ public class Series {
     @OneToMany(mappedBy = "series")
     private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
-    @OneToMany(mappedBy = "series")
-    private Set<EventSeries> eventSeries = new HashSet<>();
+    //@OneToMany(mappedBy = "series")
+    //private Set<EventSeries> eventSeries = new HashSet<>();
+
+    @ManyToMany()
+    @JoinTable(name = "event_series",
+            joinColumns = @JoinColumn(name = "series_fk"),
+            inverseJoinColumns = @JoinColumn(name = "event_fk"))
+    private Set<Event> events = new HashSet<>();
 
     public Series() {}
 
@@ -236,7 +242,8 @@ public class Series {
 
     public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
 
-    public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
+    //public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
+    public void addEvent(Event event) { this.events.add(event); }
 
     public String getBodyPartExamined() { return bodyPartExamined; }
 

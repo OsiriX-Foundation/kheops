@@ -1,9 +1,6 @@
 package online.kheops.auth_server.event;
 
-import online.kheops.auth_server.entity.Comment;
-import online.kheops.auth_server.entity.Event;
-import online.kheops.auth_server.entity.EventSeries;
-import online.kheops.auth_server.entity.Mutation;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
@@ -154,10 +151,10 @@ public class EventResponse {
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
             seriesResponses = new ArrayList<>();
-            for(EventSeries eventSeries : mutation.getEventSeries()) {
+            for(Series eventSeries : mutation.getSeriesLst()) {
                 SeriesResponse seriesResponse = new SeriesResponse();
-                seriesResponse.seriesUID = eventSeries.getSeries().getSeriesInstanceUID();
-                seriesResponse.seriesDescription = eventSeries.getSeries().getSeriesDescription();
+                seriesResponse.seriesUID = eventSeries.getSeriesInstanceUID();
+                seriesResponse.seriesDescription = eventSeries.getSeriesDescription();
                 seriesResponses.add(seriesResponse);
             }
         }
