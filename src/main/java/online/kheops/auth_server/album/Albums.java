@@ -144,9 +144,7 @@ public class Albums {
             }
 
             for (Event event:album.getEvents()) {
-                for (Series series : event.getSeriesLst()) {
-                    event.removeSeries(series);
-                }
+                event.removeAllSeries();
                 em.remove(event);
             }
 

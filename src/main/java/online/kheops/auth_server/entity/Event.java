@@ -102,12 +102,14 @@ public abstract class Event {
 
     public void addSeries(Series series) {
         this.seriesLst.add(series);
-        series.addEvent(this);
     }
 
     public void removeSeries(Series series) {
         this.seriesLst.remove(series);
-        series.removeEvent(this);
+    }
+
+    public void removeAllSeries() {
+        this.seriesLst.clear();
     }
 
     public Set<Series> getSeriesLst() { return seriesLst; }
