@@ -138,17 +138,14 @@ public class Sending {
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                mutation = Events.albumPostStudyMutation(capability, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
+                mutation = Events.albumPostStudyMutation(capability, callingAlbum, Events.MutationType.REMOVE_STUDY, study, availableSeries);
             } else {
-                mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study);
+                mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, Events.MutationType.REMOVE_STUDY, study, availableSeries);
             }
 
             for(Series series : availableSeries) {
                 callingAlbum.removeSeries(series, em);
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
-                //final EventSeries eventSeries = new EventSeries(mutation, series);
-                mutation.addSeries(series);
-                //em.persist(eventSeries);
             }
 
             em.persist(mutation);
@@ -331,16 +328,10 @@ public class Sending {
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                mutation = Events.albumPostStudyMutation(capability, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
+                mutation = Events.albumPostStudyMutation(capability, targetAlbum, Events.MutationType.IMPORT_STUDY, study, seriesListEvent);
                 newSeriesWebhook.setCapabilityToken(capability);
             } else {
-                mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study);
-            }
-
-            for(Series series : seriesListEvent) {
-                //final EventSeries eventSeries = new EventSeries(mutation, series);
-                //em.persist(eventSeries);
-                mutation.addSeries(series);
+                mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_STUDY, study, seriesListEvent);
             }
 
             em.persist(mutation);

@@ -3,6 +3,7 @@ package online.kheops.auth_server.entity;
 import online.kheops.auth_server.event.Events;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Optional;
 
 @NamedQueries({
@@ -77,17 +78,24 @@ public class Mutation extends Event{
         this.getSeries().add(series);
     }
 
-    public Mutation(User callingUser, Album album, Events.MutationType mutationType, Study study) {
+    public Mutation(User callingUser, Album album, Events.MutationType mutationType, Study study, List<Series> seriesList) {
         super(callingUser, album, study);
         this.mutationType = mutationType;
+        for (Series series :seriesList) {
+            this.addSeries(series);
+        }
     }
 
-    public Mutation(Capability capability, Album album, Events.MutationType mutationType, Study study) {
+    public Mutation(Capability capability, Album album, Events.MutationType mutationType, Study study, List<Series> seriesList) {
         super(capability.getUser(), album, study);
         this.mutationType = mutationType;
         this.capability = capability;
 
         capability.addMutation(this);
+
+        for (Series series :seriesList) {
+            this.addSeries(series);
+        }
     }
 
     public Mutation (Capability capability, Album album, Events.MutationType mutationType, Series series) {
