@@ -97,9 +97,6 @@ public class Series {
     private Set<AlbumSeries> albumsSeries = new HashSet<>();
 
     @OneToMany(mappedBy = "series")
-    private Set<Mutation> mutations = new HashSet<>();
-
-    @OneToMany(mappedBy = "series")
     private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
 
     public Series() {}
@@ -224,12 +221,6 @@ public class Series {
     public void addAlbumSeries(AlbumSeries albumSeries) { albumsSeries.add(albumSeries); }
 
     public void removeAlbumSeries(AlbumSeries albumSeries) { albumsSeries.remove(albumSeries); }
-
-    public Set<Mutation> getMutations() { return mutations; }
-
-    public void setMutations(Set<Mutation> mutations) { this.mutations = mutations; }
-
-    public void addMutation(Mutation mutation) { this.mutations.add(mutation); }
 
     public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
 

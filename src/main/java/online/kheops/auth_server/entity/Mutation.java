@@ -75,8 +75,6 @@ public class Mutation extends Event{
         super(callingUser, album, series.getStudy());
         this.mutationType = mutationType;
         this.getSeries().add(series);
-
-        series.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, Events.MutationType mutationType, Study study) {
@@ -99,6 +97,5 @@ public class Mutation extends Event{
         this.capability = capability;
 
         capability.addMutation(this);
-        series.addMutation(this);
     }
 }
