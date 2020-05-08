@@ -49,7 +49,7 @@ public abstract class Event {
     @JoinTable(name = "event_series",
             joinColumns = @JoinColumn(name = "event_fk"),
             inverseJoinColumns = @JoinColumn(name = "series_fk"))
-    private Set<Series> series = new HashSet<>();
+    private Set<Series> seriesLst = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -101,16 +101,16 @@ public abstract class Event {
     public void setPrivateTargetUser(User privateTargetUser) { this.privateTargetUser = privateTargetUser; }
 
     public void addSeries(Series series) {
-        this.series.add(series);
+        this.seriesLst.add(series);
         series.addEvent(this);
     }
 
     public void removeSeries(Series series) {
-        this.series.remove(series);
+        this.seriesLst.remove(series);
         series.removeEvent(this);
     }
 
-    public Set<Series> getSeriesLst() { return series; }
+    public Set<Series> getSeriesLst() { return seriesLst; }
 
     //public void addEventSeries(EventSeries eventSeries) { this.eventSeries.add(eventSeries); }
     //public Set<EventSeries> getEventSeries() { return eventSeries; }
