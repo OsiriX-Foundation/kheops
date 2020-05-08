@@ -86,19 +86,19 @@ public class Capability {
     private String secret;
 
     @Basic(optional = false)
-    @Column(name = "read_permission ", updatable = false)
+    @Column(name = "read_permission", updatable = false)
     private boolean readPermission ;
 
     @Basic
-    @Column(name = "appropriate_permission ", updatable = false)
+    @Column(name = "appropriate_permission", updatable = false)
     private boolean appropriatePermission ;
 
     @Basic
-    @Column(name = "download_permission ", updatable = false)
+    @Column(name = "download_permission", updatable = false)
     private boolean downloadPermission ;
 
     @Basic(optional = false)
-    @Column(name = "write_permission ", updatable = false)
+    @Column(name = "write_permission", updatable = false)
     private boolean writePermission ;
 
     @ManyToOne
@@ -106,12 +106,12 @@ public class Capability {
     private User user;
 
     @Basic(optional = false)
-    @Column(name = "scope_type ", updatable = false)
+    @Column(name = "scope_type", updatable = false)
     @Enumerated(value = EnumType.STRING)
     private ScopeType scopeType ;
 
     @ManyToOne
-    @JoinColumn(name = "album_fk ", insertable = true, updatable=false)
+    @JoinColumn(name = "album_fk", insertable = true, updatable=false)
     private Album album;
 
     @OneToMany(mappedBy = "capability")
