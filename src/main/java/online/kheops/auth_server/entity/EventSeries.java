@@ -4,10 +4,10 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-@Entity
-@Table(name = "event_series")
+/*@Entity
+@Table(name = "event_series")*/
 public class EventSeries {
-    @Id
+   /* @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")
     private long pk;
@@ -18,7 +18,7 @@ public class EventSeries {
 
     @ManyToOne
     @JoinColumn (name = "series_fk", nullable=false, insertable = true, updatable = false)
-    private Series series;
+    private Series series;*/
 
     public EventSeries() {}
 

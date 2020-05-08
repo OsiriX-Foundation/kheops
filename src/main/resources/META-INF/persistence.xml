@@ -14,7 +14,7 @@
         <class>online.kheops.auth_server.entity.Event</class>
         <class>online.kheops.auth_server.entity.Comment</class>
         <class>online.kheops.auth_server.entity.Mutation</class>
-        <class>online.kheops.auth_server.entity.EventSeries</class>
+
         <class>online.kheops.auth_server.entity.ReportProvider</class>
         <class>online.kheops.auth_server.entity.Webhook</class>
         <class>online.kheops.auth_server.entity.WebhookTrigger</class>
