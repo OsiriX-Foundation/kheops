@@ -90,12 +90,12 @@ public class MetricResponse {
             numberOfPrivateStudyComments = getNumberOfCommentsPrivate(em);
             numberOfPublicStudyComments = getNumberOfCommentsPublic(em);
 
-            numberOfActiveUserCapabilityTokens = getNumberOfActiveToken(ScopeType.USER.name().toLowerCase(), em);
-            numberOfIactiveUserCapabilityTokens = getNumberOfUnactiveToken(ScopeType.USER.name().toLowerCase(), em);
-            numberOfUserCapabilityTokens = getNumberOfToken(ScopeType.USER.name().toLowerCase(), em);
-            numberOfActiveAlbumCapabilityTokens = getNumberOfActiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
-            numberOfInactiveAlbumCapabilityTokens = getNumberOfUnactiveToken(ScopeType.ALBUM.name().toLowerCase(), em);
-            numberOfAlbumCapabilityTokens = getNumberOfToken(ScopeType.ALBUM.name().toLowerCase(), em);
+            numberOfActiveUserCapabilityTokens = getNumberOfActiveToken(ScopeType.USER, em);
+            numberOfIactiveUserCapabilityTokens = getNumberOfUnactiveToken(ScopeType.USER, em);
+            numberOfUserCapabilityTokens = getNumberOfToken(ScopeType.USER, em);
+            numberOfActiveAlbumCapabilityTokens = getNumberOfActiveToken(ScopeType.ALBUM, em);
+            numberOfInactiveAlbumCapabilityTokens = getNumberOfUnactiveToken(ScopeType.ALBUM, em);
+            numberOfAlbumCapabilityTokens = getNumberOfToken(ScopeType.ALBUM, em);
             numberOfCapabilityTokens = getNumberOfToken(em);
             usersInAlbumHistogram = getAlbumUserHistogram(em);
             seriesInStudyHistogram = getStudySeriesHistogram(em);

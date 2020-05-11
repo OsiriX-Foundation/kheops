@@ -151,7 +151,7 @@ public class SeriesQueries {
             throws SeriesNotFoundException {
 
         try {
-            TypedQuery<Series> query = em.createNamedQuery("Series.xxx", Series.class);
+            TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesAndUserWithSharePermission", Series.class);
             query.setParameter("series", series);
             query.setParameter("callingUser", callingUser);
             return query.getSingleResult();

@@ -1,5 +1,7 @@
 package online.kheops.auth_server.metric;
 
+import online.kheops.auth_server.capability.ScopeType;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -82,20 +84,20 @@ class MetricsQueries {
                 .getSingleResult();
     }
 
-    static Long getNumberOfToken(String scopeType, EntityManager em) {
+    static Long getNumberOfToken(ScopeType scopeType, EntityManager em) {
         return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType", Long.class)
                 .setParameter("scopeType", scopeType)
                 .getSingleResult();
     }
 
-    static Long getNumberOfActiveToken(String scopeType, EntityManager em) {
+    static Long getNumberOfActiveToken(ScopeType scopeType, EntityManager em) {
         return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType AND c.revokedTime = NULL AND c.expirationTime > :now AND c.notBeforeTime < :now", Long.class)
                 .setParameter("now", LocalDateTime.now(ZoneOffset.UTC))
                 .setParameter("scopeType", scopeType)
                 .getSingleResult();
     }
 
-    static Long getNumberOfUnactiveToken(String scopeType, EntityManager em) {
+    static Long getNumberOfUnactiveToken(ScopeType scopeType, EntityManager em) {
         return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType AND (c.revokedTime <> NULL OR c.expirationTime < :now OR c.notBeforeTime > :now)", Long.class)
                 .setParameter("now", LocalDateTime.now(ZoneOffset.UTC))
                 .setParameter("scopeType", scopeType)
