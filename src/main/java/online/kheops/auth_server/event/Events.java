@@ -141,7 +141,7 @@ public class Events {
 
             List<Event> eventlist = EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em);
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(e, userMember));
+                eventResponses.add(new EventResponse(e, userMember, em));
             }
 
             XTotalCount = EventQueries.getTotalEventsByAlbum(callingUser, album, em);
@@ -167,7 +167,7 @@ public class Events {
             }
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(m, userMember));
+                eventResponses.add(new EventResponse(m, userMember, em));
             }
 
             XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
@@ -195,7 +195,7 @@ public class Events {
             }
 
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(c, userMember));
+                eventResponses.add(new EventResponse(c, userMember, em));
             }
             XTotalCount = EventQueries.getTotalCommentsByAlbum(callingUser, album, em);
         } finally {
@@ -233,7 +233,7 @@ public class Events {
                 if (c.getPrivateTargetUser() != null && !isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub()) && canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em)) {
                     userMember.put(c.getPrivateTargetUser().getSub(), null);
                 }
-                eventResponses.add(new EventResponse(c, userMember));
+                eventResponses.add(new EventResponse(c, userMember, em));
             }
 
         } finally {

@@ -13,7 +13,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 
-import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;

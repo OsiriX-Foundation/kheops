@@ -107,7 +107,7 @@ public class Album {
 
     public boolean containsSeries(Series series, EntityManager em) {
         try {
-            em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
+            em.createNamedQuery("AlbumSeries.findByAlbumAndSeries", AlbumSeries.class)
                     .setParameter("series", series)
                     .setParameter("album", this)
                     .getSingleResult();

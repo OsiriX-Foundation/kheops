@@ -5,6 +5,7 @@ import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UserResponseBuilder;
 
+import javax.persistence.EntityManager;
 import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,8 @@ public class EventResponse {
         private String seriesUID;
         @XmlElement(name = "description")
         private String seriesDescription;
+        @XmlElement(name = "is_present_in_album")
+        private Boolean isPresentInAlbum;
     }
 
     private static class StudyResponse {
@@ -57,11 +60,11 @@ public class EventResponse {
 
     private EventResponse() { /*empty*/ }
 
-    public EventResponse(Event event, Map<String, Boolean> userMember) {
+    public EventResponse(Event event, Map<String, Boolean> userMember, EntityManager em) {
         if (event instanceof Comment) {
             this.commentEventResponse((Comment)event, userMember);
         } else if (event instanceof Mutation) {
-            this.mutationEventResponse((Mutation) event, userMember);
+            this.mutationEventResponse((Mutation) event, userMember, em);
         }
     }
 
@@ -91,7 +94,7 @@ public class EventResponse {
         }
     }
 
-    private void mutationEventResponse(Mutation mutation, Map<String, Boolean> userMember) {
+    private void mutationEventResponse(Mutation mutation, Map<String, Boolean> userMember, EntityManager em) {
 
         eventType = "Mutation";
 
@@ -129,6 +132,7 @@ public class EventResponse {
                 seriesResponse.seriesUID = eventSeries.getSeriesInstanceUID();
                 seriesResponse.seriesDescription = eventSeries.getSeriesDescription();
                 study.seriesResponses.add(seriesResponse);
+                seriesResponse.isPresentInAlbum = mutation.getAlbum().containsSeries(eventSeries, em);
             }
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
             study.studyDescription = mutation.getStudy().getStudyDescription();
@@ -144,6 +148,7 @@ public class EventResponse {
                 seriesResponse.seriesUID = eventSeries.getSeriesInstanceUID();
                 seriesResponse.seriesDescription = eventSeries.getSeriesDescription();
                 study.seriesResponses.add(seriesResponse);
+                seriesResponse.isPresentInAlbum = mutation.getAlbum().containsSeries(eventSeries, em);
             }
 
             study.studyUID = mutation.getStudy().getStudyInstanceUID();
@@ -160,6 +165,7 @@ public class EventResponse {
                 seriesResponse.seriesUID = eventSeries.getSeriesInstanceUID();
                 seriesResponse.seriesDescription = eventSeries.getSeriesDescription();
                 study.seriesResponses.add(seriesResponse);
+                seriesResponse.isPresentInAlbum = mutation.getAlbum().containsSeries(eventSeries, em);
             }
         }
 

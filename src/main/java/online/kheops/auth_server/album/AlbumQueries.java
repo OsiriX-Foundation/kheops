@@ -69,22 +69,6 @@ public class AlbumQueries {
         }
     }
 
-    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em)
-            throws SeriesNotFoundException {
-        try {
-            return em.createNamedQuery("AlbumSeries.findByAlbumIdAndSeriesUID", AlbumSeries.class)
-                    .setParameter("seriesUID", seriesUID)
-                    .setParameter("albumID", albumID)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(SERIES_NOT_FOUND)
-                    .detail("The series does not exist in the album")
-                    .build();
-            throw new SeriesNotFoundException(errorResponse);
-        }
-    }
-
     @FunctionalInterface
     private interface ThrowingConsumer<T> {
         void accept(T t) throws BadQueryParametersException;

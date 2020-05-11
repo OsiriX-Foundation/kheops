@@ -5,8 +5,9 @@ import javax.persistence.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @NamedQueries({
-        @NamedQuery(name = "AlbumSeries.findByAlbumIdAndSeriesUID",
-                query = "SELECT aSeries FROM Album a JOIN a.albumSeries aSeries JOIN aSeries.series s WHERE :seriesUID = s.seriesInstanceUID AND :albumID = a.id")
+
+        @NamedQuery(name = "AlbumSeries.findByAlbumAndSeries",
+                query = "SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album")
 })
 
 @Entity
