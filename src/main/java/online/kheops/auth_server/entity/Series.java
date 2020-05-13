@@ -96,9 +96,6 @@ public class Series {
     @OneToMany(mappedBy = "series")
     private Set<AlbumSeries> albumsSeries = new HashSet<>();
 
-    @OneToMany(mappedBy = "series")
-    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
-
     public Series() {}
 
     public Series(String newSeriesInstanceUID) {
@@ -221,8 +218,6 @@ public class Series {
     public void addAlbumSeries(AlbumSeries albumSeries) { albumsSeries.add(albumSeries); }
 
     public void removeAlbumSeries(AlbumSeries albumSeries) { albumsSeries.remove(albumSeries); }
-
-    public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
 
     public String getBodyPartExamined() { return bodyPartExamined; }
 

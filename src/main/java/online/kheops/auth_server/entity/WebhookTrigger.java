@@ -42,8 +42,11 @@ public class WebhookTrigger {
     @OrderBy("attempt desc")
     private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
 
-    @OneToMany(mappedBy = "webhookTrigger")
-    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
+    @ManyToMany()
+    @JoinTable(name = "webhook_trigger_series",
+            joinColumns = @JoinColumn(name = "webhook_trigger_fk"),
+            inverseJoinColumns = @JoinColumn(name = "series_fk"))
+    private Set<Series> series = new HashSet<>();
 
     @ManyToOne
     @JoinColumn (name = "webhook_fk", nullable=false, insertable = true, updatable = false)
@@ -96,11 +99,19 @@ public class WebhookTrigger {
         return false;
     }
 
-    public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
-
-    public Set<WebhookTriggerSeries> getWebhookTriggersSeries() {
-        return webhookTriggersSeries;
+    public void addSeries(Series series) {
+        this.series.add(series);
     }
+
+    public void removeSeries(Series series) {
+        this.series.remove(series);
+    }
+
+    public void removeAllSeries() {
+        this.series.clear();
+    }
+
+    public Set<Series> getSeries() { return series; }
 
     public Webhook getWebhook() {
         return webhook;

@@ -17,7 +17,6 @@
         <class>online.kheops.auth_server.entity.ReportProvider</class>
         <class>online.kheops.auth_server.entity.Webhook</class>
         <class>online.kheops.auth_server.entity.WebhookTrigger</class>
-        <class>online.kheops.auth_server.entity.WebhookTriggerSeries</class>
         <class>online.kheops.auth_server.metric.AlbumUserHistogram</class>
         <class>online.kheops.auth_server.metric.StudySeriesHistogram</class>
         <class>online.kheops.auth_server.metric.AlbumSeriesHistogram</class>

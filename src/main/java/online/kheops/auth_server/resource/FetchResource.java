@@ -156,8 +156,7 @@ public class FetchResource {
                             final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
                             em.persist(webhookTrigger);
                             for (Series series : seriesListWebhook) {
-                                final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
-                                em.persist(webhookTriggerSeries);
+                                webhookTrigger.addSeries(series);
                             }
                             webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
                         }

@@ -172,9 +172,7 @@ public class Webhooks {
             for(WebhookAttempt webhookAttempt:webhookTrigger.getWebhookAttempts()) {
                 em.remove(webhookAttempt);
             }
-            for(WebhookTriggerSeries webhookTriggerSeries:webhookTrigger.getWebhookTriggersSeries()) {
-                em.remove(webhookTriggerSeries);
-            }
+            webhookTrigger.removeAllSeries();
             em.remove(webhookTrigger);
         }
         em.remove(webhook);
@@ -285,9 +283,8 @@ public class Webhooks {
             for (String seriesUID : seriesInstanceUID) {
                 final Series series = getSeries(studyInstanceUID, seriesUID, em);
                 if (album.containsSeries(series, em)) {
+                    webhookTrigger.addSeries(series);
                     newSeriesWebhook.addSeries(series);
-                    final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
-                    em.persist(webhookTriggerSeries);
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(SERIES_NOT_FOUND)
