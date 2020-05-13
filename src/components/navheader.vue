@@ -11,20 +11,24 @@
   >
     <b-navbar-toggle target="nav_collapse" />
     <b-navbar-nav>
-      <div class="d-flex">
-        <div style="padding-right: 5px">
-          <kheops-pyramid
-            width="12.2696mm"
-            height="7.41195mm"
-          />
+      <router-link
+        to="/inbox"
+      >
+        <div class="d-flex">
+          <div style="padding-right: 5px">
+            <kheops-pyramid
+              width="12.2696mm"
+              height="7.41195mm"
+            />
+          </div>
+          <div class="align-self-end">
+            <kheops-font
+              width="16.5968mm"
+              height="3.70944mm"
+            />
+          </div>
         </div>
-        <div class="align-self-end">
-          <kheops-font
-            width="16.5968mm"
-            height="3.70944mm"
-          />
-        </div>
-      </div>
+      </router-link>
     </b-navbar-nav>
     <b-collapse
       id="nav_collapse"
