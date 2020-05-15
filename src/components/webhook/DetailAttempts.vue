@@ -1,5 +1,7 @@
 <template>
-  <span>
+  <span
+    v-if="trigger.attempts !== undefined && trigger.attempts.length > 0"
+  >
     <p
       v-if="trigger.is_manual_trigger === true"
     >
@@ -15,6 +17,7 @@
         >
           -
           <router-link
+            v-if="trigger.study !== undefined && trigger.study.study_uid !== undefined"
             :to="{ name: 'album', query: { StudyInstanceUID: trigger.study.study_uid }}"
             taget="_blank"
             active-class="active"
@@ -99,6 +102,12 @@
         </button>
       </div>
     </b-modal>
+  </span>
+  <span
+    v-else
+    class="text-warning"
+  >
+    {{ $t("webhook.noattempts") }}
   </span>
 </template>
 
