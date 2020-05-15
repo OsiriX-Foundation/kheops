@@ -62,6 +62,11 @@ public class LiquibaseContextListener implements ServletContextListener {
                 Liquibase liquibase = new Liquibase(CHANGE_LOG_FILE, new ClassLoaderResourceAccessor(), database);
                 final String version = DB_VERSION;
 
+                if(liquibase.tagExists("v1.0") && !liquibase.tagExists("v3.0")) {
+                    LOG.log(Level.SEVERE, "WARNING before installing this version of KHEOPS, install the version v0.9.3");
+                    exit(1);
+                }
+
                 if (liquibase.tagExists(version)) {
                     liquibase.rollback(version, "");
                     liquibase.update(version, "");
