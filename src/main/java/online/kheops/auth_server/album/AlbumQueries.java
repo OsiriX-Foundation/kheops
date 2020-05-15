@@ -1,5 +1,6 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
@@ -29,7 +30,6 @@ import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
-import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
@@ -93,7 +93,7 @@ public class AlbumQueries {
 
     public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             SelectQuery<Record> query = create.selectQuery();
@@ -208,7 +208,7 @@ public class AlbumQueries {
 
     public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user)
             throws JOOQException {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             final long userPK = user.getPk();
 
@@ -271,7 +271,7 @@ public class AlbumQueries {
 
     public static AlbumResponse findAlbumByAlbumId(String albumId)
             throws JOOQException {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();

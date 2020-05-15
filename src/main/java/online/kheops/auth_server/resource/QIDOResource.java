@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
@@ -48,7 +49,6 @@ import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.USER_IN_ROLE.VIEWER_TOKEN;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
-import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 
 @Path("/")
 public class QIDOResource {
@@ -96,7 +96,7 @@ public class QIDOResource {
 
         final PairListXTotalCount<Attributes> pair;
         final StudyQIDOParams qidoParams;
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
             qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
         } catch (BadRequestException e) {

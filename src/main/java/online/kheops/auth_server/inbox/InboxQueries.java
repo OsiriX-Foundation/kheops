@@ -1,5 +1,6 @@
 package online.kheops.auth_server.inbox;
 
+import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.JOOQException;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -12,7 +13,6 @@ import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIE
 import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
-import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
 
 public class InboxQueries {
@@ -23,7 +23,7 @@ public class InboxQueries {
 
     public static InboxInfoResponse getInboxInfo(long userPk) throws JOOQException {
 
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
