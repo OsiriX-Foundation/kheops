@@ -141,7 +141,7 @@ public abstract class JOOQTools {
         }
 
         DataSource dataSource = (DataSource) iterator.next();
-        /*if (iterator.hasNext()) {
+        if (iterator.hasNext()) {
             LOG.log(Level.SEVERE, () -> {
                 StringBuilder logMessage = new StringBuilder("More than one C3P0 Datasource present, picked the first one\n");
 
@@ -157,7 +157,7 @@ public abstract class JOOQTools {
 
                 return logMessage.toString();
             });
-        }*/
+        }
 
         return dataSource;
     }
