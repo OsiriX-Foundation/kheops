@@ -31,7 +31,10 @@
           - {{ trigger.user.email }}
         </span>
       </div>
-      <div class="ml-auto">
+      <div
+        v-if="disabledRedeliver === true"
+        class="ml-auto"
+      >
         <button
           class="btn btn-sm btn-primary"
           :disabled="disabledTrigger"
@@ -79,13 +82,13 @@
         {{ $t('webhook.manualtrigger') }}
       </template>
       <trigger-serie
-        v-if="trigger.event === 'new_series'"
+        v-if="trigger.event === 'new_series' && trigger.study !== undefined && trigger.study.study_uid !== undefined"
         :trigger="trigger"
         :url="webhook.url"
         @missingseries="missingSeries"
       />
       <trigger-user
-        v-if="trigger.event === 'new_user'"
+        v-if="trigger.event === 'new_user' && trigger.user !== undefined && trigger.user.sub !== undefined"
         :trigger="trigger"
         :url="webhook.url"
         @missinguser="errorTrigger = true"
@@ -144,6 +147,15 @@ export default {
     },
     webhookId() {
       return this.$route.params.id;
+    },
+    disabledRedeliver() {
+      if (this.trigger.event === 'new_series') {
+        return this.trigger.study !== undefined && this.trigger.study.study_uid !== undefined;
+      }
+      if (this.trigger.event === 'new_user') {
+        return this.trigger.user !== undefined && this.trigger.user.sub !== undefined;
+      }
+      return false;
     },
   },
   created() {
