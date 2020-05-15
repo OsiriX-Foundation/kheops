@@ -1,11 +1,16 @@
 package online.kheops.auth_server;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,4 +40,13 @@ public class EntityManagerListener implements ServletContextListener {
         }
         return emf.createEntityManager();
     }
+
+    public static Connection getConnection() throws SQLException {
+        return emf.unwrap(SessionFactory.class).
+                getSessionFactoryOptions().
+                getServiceRegistry().
+                getService(ConnectionProvider.class).
+                getConnection();
+    }
+
 }

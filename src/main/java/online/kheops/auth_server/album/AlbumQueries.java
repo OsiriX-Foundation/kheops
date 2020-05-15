@@ -1,23 +1,17 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.entity.Album;
+import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import org.hibernate.dialect.PostgreSQL9Dialect;
-import org.hibernate.dialect.PostgreSQLDialect;
-import org.hibernate.dialect.function.SQLFunctionTemplate;
-import org.hibernate.type.StandardBasicTypes;
 import org.jooq.*;
 import org.jooq.JoinType;
 import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Tuple;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,9 +27,7 @@ import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
-import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
-import static online.kheops.auth_server.util.JOOQTools.getDataSource;
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
@@ -83,7 +75,7 @@ public class AlbumQueries {
 
     public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             SelectQuery<Record> query = create.selectQuery();
@@ -198,7 +190,7 @@ public class AlbumQueries {
 
     public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user)
             throws JOOQException {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             final long userPK = user.getPk();
 
@@ -261,7 +253,7 @@ public class AlbumQueries {
 
     public static AlbumResponse findAlbumByAlbumId(String albumId)
             throws JOOQException {
-        try (Connection connection = getDataSource().getConnection()) {
+        try (Connection connection = EntityManagerListener.getConnection()) {
 
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
