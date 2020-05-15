@@ -1,7 +1,5 @@
 <template>
-  <span
-    v-if="trigger.attempts !== undefined && trigger.attempts.length > 0"
-  >
+  <span>
     <p
       v-if="trigger.is_manual_trigger === true"
     >
@@ -13,11 +11,10 @@
       >
         {{ $t('webhook.activate', {event: $t(`webhook.event_${trigger.event}`)}) }}
         <span
-          v-if="trigger.event === 'new_series'"
+          v-if="trigger.event === 'new_series' && trigger.study !== undefined && trigger.study.study_uid !== undefined"
         >
           -
           <router-link
-            v-if="trigger.study !== undefined && trigger.study.study_uid !== undefined"
             :to="{ name: 'album', query: { StudyInstanceUID: trigger.study.study_uid }}"
             taget="_blank"
             active-class="active"
@@ -26,7 +23,7 @@
           </router-link>
         </span>
         <span
-          v-if="trigger.event === 'new_user'"
+          v-if="trigger.event === 'new_user' && trigger.user !== undefined && trigger.user.email !== undefined"
         >
           - {{ trigger.user.email }}
         </span>
@@ -47,6 +44,12 @@
     <span
       class="d-flex flex-wrap flex-row bd-highlight mb-3"
     >
+      <span
+        v-if="trigger.attempts === undefined || trigger.attempts.length === 0"
+        class="text-warning"
+      >
+        {{ $t("webhook.noattempts") }}
+      </span>
       <span
         v-for="attempt in trigger.attempts"
         :key="attempt.id"
@@ -105,12 +108,6 @@
         </button>
       </div>
     </b-modal>
-  </span>
-  <span
-    v-else
-    class="text-warning"
-  >
-    {{ $t("webhook.noattempts") }}
   </span>
 </template>
 
