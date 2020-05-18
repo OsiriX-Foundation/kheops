@@ -11,7 +11,7 @@
       >
         {{ $t('webhook.activate', {event: $t(`webhook.event_${trigger.event}`)}) }}
         <span
-          v-if="trigger.event === 'new_series'"
+          v-if="trigger.event === 'new_series' && trigger.study !== undefined && trigger.study.study_uid !== undefined"
         >
           -
           <router-link
@@ -23,12 +23,15 @@
           </router-link>
         </span>
         <span
-          v-if="trigger.event === 'new_user'"
+          v-if="trigger.event === 'new_user' && trigger.user !== undefined && trigger.user.email !== undefined"
         >
           - {{ trigger.user.email }}
         </span>
       </div>
-      <div class="ml-auto">
+      <div
+        v-if="disabledRedeliver === true"
+        class="ml-auto"
+      >
         <button
           class="btn btn-sm btn-primary"
           :disabled="disabledTrigger"
@@ -41,6 +44,12 @@
     <span
       class="d-flex flex-wrap flex-row bd-highlight mb-3"
     >
+      <span
+        v-if="trigger.attempts === undefined || trigger.attempts.length === 0"
+        class="text-warning"
+      >
+        {{ $t("webhook.noattempts") }}
+      </span>
       <span
         v-for="attempt in trigger.attempts"
         :key="attempt.id"
@@ -76,13 +85,13 @@
         {{ $t('webhook.manualtrigger') }}
       </template>
       <trigger-serie
-        v-if="trigger.event === 'new_series'"
+        v-if="trigger.event === 'new_series' && trigger.study !== undefined && trigger.study.study_uid !== undefined"
         :trigger="trigger"
         :url="webhook.url"
         @missingseries="missingSeries"
       />
       <trigger-user
-        v-if="trigger.event === 'new_user'"
+        v-if="trigger.event === 'new_user' && trigger.user !== undefined && trigger.user.sub !== undefined"
         :trigger="trigger"
         :url="webhook.url"
         @missinguser="errorTrigger = true"
@@ -135,6 +144,15 @@ export default {
     },
     webhookId() {
       return this.$route.params.id;
+    },
+    disabledRedeliver() {
+      if (this.trigger.event === 'new_series') {
+        return this.trigger.study !== undefined && this.trigger.study.study_uid !== undefined;
+      }
+      if (this.trigger.event === 'new_user') {
+        return this.trigger.user !== undefined && this.trigger.user.sub !== undefined;
+      }
+      return false;
     },
   },
   created() {

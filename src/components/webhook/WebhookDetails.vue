@@ -89,7 +89,7 @@
       class-row="mb-2"
       class-col="offset-md-5 offset-lg-4 col-xs-12 col-sm-12 col-md-5 col-lg-4"
       class-col-warning-remove="offset-md-5 offset-lg-4 col-sm-12 col-md-6 col-lg-7"
-      :text-warning-remove="$t('warningremove')"
+      :text-warning-remove="$t('webhook.warningremove')"
       :text-button-done="$t('edit')"
       :loading="onLoading"
       @done="edit"
