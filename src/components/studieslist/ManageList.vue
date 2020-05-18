@@ -23,6 +23,7 @@
     />
     <studies-list
       v-if="topstyle !== null && firstLoading === false"
+      :key="studiesListRender"
       :permissions="permissions"
       :can-upload="canUpload"
       :topstyle="topstyle"
@@ -98,6 +99,7 @@ export default {
   data() {
     return {
       infiniteId: 0,
+      studiesListRender: 0,
       statusList: 200,
       firstLoading: true,
       studiesParams: {
@@ -149,6 +151,15 @@ export default {
   },
   mounted() {
     this.setTopstyle();
+    // https://stackoverflow.com/questions/12452349/mobile-viewport-height-after-orientation-change
+    window.addEventListener('orientationchange', () => {
+      const afterOrientationChange = () => {
+        this.setTopstyle();
+        this.studiesListRender += 1;
+        window.removeEventListener('resize', afterOrientationChange);
+      };
+      window.addEventListener('resize', afterOrientationChange);
+    }, false);
   },
   created() {
     this.initData();
