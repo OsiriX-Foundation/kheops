@@ -78,13 +78,12 @@
 <script>
 import { mapGetters } from 'vuex';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
-import List from '@/components/studieslist/List';
 import ManageList from '@/components/studieslist/ManageList';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
   name: 'ComponentDragAndDrop',
-  components: { KheopsClipLoader, List, ManageList },
+  components: { KheopsClipLoader, ManageList },
   props: {
     permissions: {
       type: Object,

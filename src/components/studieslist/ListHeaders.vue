@@ -96,7 +96,7 @@
           </button>
         </div>
         <div
-          class="align-self-center ml-auto text-right col-12 col-sm-auto"
+          class="align-self-center ml-auto text-right"
         >
           <dropdown-import-study
             v-if="showImportButton === true"
