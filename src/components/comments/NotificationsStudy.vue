@@ -42,7 +42,7 @@
               :key="serie.id"
               class="text-warning"
             >
-              <br>{{ $t('comment.theserienotpresentinalbum', {serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID}) }}
+              <br>{{ $t('comment.theserienotpresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
             </span>
           </template>
         </show-hide>
@@ -90,7 +90,7 @@
               :key="serie.id"
               class="text-warning"
             >
-              <br>{{ $t('comment.theseriepresentinalbum', {serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID}) }}
+              <br>{{ $t('comment.theseriepresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
             </span>
           </template>
         </show-hide>
