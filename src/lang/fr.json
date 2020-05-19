@@ -227,10 +227,10 @@
 	},
 	"token": {
 		"active": "actif",
-		"album": "album",
+		"album": "Album",
 		"appropriate": "partager",
 		"createdby": "Créé par",
-		"creationdate": "date de création",
+		"creationdate": "Date de création",
 		"description": "Description",
 		"download": "montrer le bouton de téléchargement",
 		"expirationdate": "Date d'expiration",
