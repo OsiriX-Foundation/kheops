@@ -250,7 +250,7 @@
 		"tokenvalue": "Valeur du token",
 		"urlvalue": "Url d'accès aux données",
 		"user": "utilisateur",
-		"warning": "ATTENTION: Vous ne voyez qu'une seule fois la valeur du token !",
+		"warning": "ATTENTION: Vous ne verrez qu'une seule fois la valeur du token !",
 		"warningpermissions": "SVP choississez minimum une permission",
 		"warningrevoke": "Etes-vous sûr de vouloir revoquer ce token ?",
 		"write": "écriture"
