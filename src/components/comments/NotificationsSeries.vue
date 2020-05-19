@@ -12,6 +12,11 @@
       <span
         v-else-if="comment.source.capability_token !== undefined"
       >
+        <div
+          class="text-warning font-large"
+        >
+          {{ $t('comment.bycapabilitytoken') }}
+        </div>
         {{ $t('comment.importserietoken', {user: getName(comment.source), serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
       </span>
       <span
@@ -31,8 +36,18 @@
       class=" flex-grow-1 bd-highlight"
     >
       <span
-        v-if="comment.source.capability_token !== undefined"
+        v-if="comment.source.report_provider !== undefined"
       >
+        {{ $t('comment.removereport', {user: getName(comment.source), reportname: comment.source.report_provider.name, serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+      </span>
+      <span
+        v-else-if="comment.source.capability_token !== undefined"
+      >
+        <div
+          class="text-warning font-large"
+        >
+          {{ $t('comment.bycapabilitytoken') }}
+        </div>
         {{ $t('comment.removeserietoken', {user: getName(comment.source), serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
       </span>
       <span

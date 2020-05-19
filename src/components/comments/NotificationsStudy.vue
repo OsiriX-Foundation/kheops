@@ -4,46 +4,96 @@
       v-if="comment.mutation_type === 'IMPORT_STUDY'"
       class="flex-grow-1 bd-highlight"
     >
-      <i>{{ comment.source|getUsername }}</i> {{ $t('comment.imported') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
       <span
-        v-if="lengthNotPresent(comment.study.series) === comment.study.series.length"
-        class="text-warning"
+        v-if="comment.source.report_provider !== undefined"
       >
-        <br>{{ $t('comment.nomoreseriesinstudy', {study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        {{ $t('comment.newreportstudy', {user: getName(comment.source), reportname: comment.source.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+      </span>
+      <span
+        v-else-if="comment.source.capability_token !== undefined"
+      >
+        <div
+          class="text-warning font-large"
+        >
+          {{ $t('comment.bycapabilitytoken') }}
+        </div>
+        {{ $t('comment.importstudytoken', {user: getName(comment.source), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
       </span>
       <span
         v-else
       >
-        <span
-          v-for="serie in isNotPresent(comment.study.series)"
-          :key="serie.id"
-          class="text-warning"
+        <i>{{ comment.source|getUsername }}</i> {{ $t('comment.imported') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+      </span>
+      <span
+        v-if="comment.study.series !== undefined && lengthNotPresent(comment.study.series) > 0"
+        class="text-warning"
+      >
+        <br> {{ $t('comment.nbnoseriesinstudy', {nbseries: lengthNotPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        <show-hide
+          class-show-hide="font-white"
+          :text-show="$t('comment.showseries')"
+          :text-hide="$t('comment.hideseries')"
         >
-          <br>{{ $t('comment.theserienotpresentinalbum', {serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID}) }}
-        </span>
+          <template
+            slot="value-toshow"
+          >
+            <span
+              v-for="serie in isNotPresent(comment.study.series)"
+              :key="serie.id"
+              class="text-warning"
+            >
+              <br>{{ $t('comment.theserienotpresentinalbum', {serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID}) }}
+            </span>
+          </template>
+        </show-hide>
       </span>
     </div>
     <div
       v-if="comment.mutation_type === 'REMOVE_STUDY'"
       class="flex-grow-1 bd-highlight"
     >
-      <i>{{ comment.source|getUsername }}</i> {{ $t('comment.removed') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
       <span
-        v-if="lengthPresent(comment.study.series) === comment.study.series.length"
-        class="text-warning"
+        v-if="comment.source.report_provider !== undefined"
       >
-        <br>{{ $t('comment.allseriesinstudy', {study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        {{ $t('comment.removereportstudy', {user: getName(comment.source), reportname: comment.source.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+      </span>
+      <span
+        v-else-if="comment.source.capability_token !== undefined"
+      >
+        <div
+          class="text-warning font-large"
+        >
+          {{ $t('comment.bycapabilitytoken') }}
+        </div>
+        {{ $t('comment.removestudytoken', {user: getName(comment.source), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
       </span>
       <span
         v-else
       >
-        <span
-          v-for="serie in isPresent(comment.study.series)"
-          :key="serie.id"
-          class="text-warning"
+        <i>{{ comment.source|getUsername }}</i> {{ $t('comment.removed') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
+      </span>
+      <span
+        v-if="comment.study.series !== undefined && lengthPresent(comment.study.series) > 0"
+        class="text-warning"
+      >
+        <br> {{ $t('comment.nbseriesinstudy', {nbseries: lengthPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        <show-hide
+          class-show-hide="font-white"
+          :text-show="$t('comment.showseries')"
+          :text-hide="$t('comment.hideseries')"
         >
-          <br>{{ $t('comment.theseriepresentinalbum', {serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID}) }}
-        </span>
+          <template
+            slot="value-toshow"
+          >
+            <span
+              v-for="serie in isPresent(comment.study.series)"
+              :key="serie.id"
+              class="text-warning"
+            >
+              <br>{{ $t('comment.theseriepresentinalbum', {serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID}) }}
+            </span>
+          </template>
+        </show-hide>
       </span>
     </div>
     <div
@@ -61,8 +111,11 @@
   </span>
 </template>
 <script>
+import ShowHide from '@/components/globals/ShowHide';
+
 export default {
   name: 'NotificationsStudy',
+  components: { ShowHide },
   props: {
     comment: {
       type: Object,
@@ -72,18 +125,33 @@ export default {
   },
   methods: {
     lengthNotPresent(series) {
-      const seriesNotPresent = this.isNotPresent(series);
-      return seriesNotPresent.length;
+      if (series !== undefined) {
+        const seriesNotPresent = this.isNotPresent(series);
+        return seriesNotPresent.length;
+      }
+      return 0;
     },
     isNotPresent(series) {
-      return series.filter((serie) => serie.is_present_in_album === false);
+      if (series !== undefined) {
+        return series.filter((serie) => serie.is_present_in_album === false);
+      }
+      return [];
     },
     lengthPresent(series) {
-      const seriesPresent = this.isPresent(series);
-      return seriesPresent.length;
+      if (series !== undefined) {
+        const seriesPresent = this.isPresent(series);
+        return seriesPresent.length;
+      }
+      return 0;
     },
     isPresent(series) {
-      return series.filter((serie) => serie.is_present_in_album === true);
+      if (series !== undefined) {
+        return series.filter((serie) => serie.is_present_in_album === true);
+      }
+      return [];
+    },
+    getName(user) {
+      return this.$options.filters.getUsername(user);
     },
   },
 };
