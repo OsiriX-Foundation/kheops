@@ -60,6 +60,7 @@ export default {
       required: false,
       default: () => ({
         canAddSeries: true,
+        sort: '-last_event_time',
       }),
     },
     albumsKey: {
