@@ -29,8 +29,7 @@ import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStu
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 
 public class ViewerPrincipal implements KheopsPrincipal {
-
-    private EntityManager em;
+    
     private final ViewerAccessToken viewerAccessToken;
     private final KheopsPrincipal kheopsPrincipal;
     private final String originalToken;
@@ -73,7 +72,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
         if (!viewerAccessToken.isInbox() && viewerAccessToken.getSourceId() == null) {
             return studyInstanceUID.equals(viewerAccessToken.getStudyInstanceUID());
         } else {
-            this.em = EntityManagerListener.createEntityManager();
+            final EntityManager em = EntityManagerListener.createEntityManager();
             try {
                 final List<Series> seriesList;
                 if (viewerAccessToken.isInbox()) {
@@ -119,7 +118,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
         if (!kheopsPrincipal.hasAlbumPermission(usersPermission, albumId)) {
             return false;
         } else {
-            this.em = EntityManagerListener.createEntityManager();
+            final EntityManager em = EntityManagerListener.createEntityManager();
             try {
                 final User userMerge = em.merge(getUser());
                 final Album album;

@@ -30,12 +30,10 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    private EntityManager em;
 
     public UserCapabilityPrincipal(Capability capability, User user, String originalToken) {
         this.capability = capability;
         this.user = user;
-        this.em = EntityManagerListener.createEntityManager();
         this.originalToken = originalToken;
 
         kheopsLogBuilder = new KheopsLogBuilder()
@@ -54,7 +52,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
@@ -64,7 +62,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasStudyViewAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
@@ -77,7 +75,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
@@ -87,7 +85,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasStudyDeleteAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
@@ -100,7 +98,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
@@ -110,7 +108,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasStudyShareAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
@@ -123,7 +121,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         final User mergeUser = em.merge(user);
 
         try {
@@ -166,7 +164,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Album album = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(album, user, em);
@@ -187,7 +185,7 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasAlbumAccess(String albumId) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
 
         if (albumId == null) {
             return false;

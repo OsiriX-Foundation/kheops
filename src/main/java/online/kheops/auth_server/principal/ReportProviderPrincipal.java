@@ -20,8 +20,7 @@ import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
 public class ReportProviderPrincipal implements KheopsPrincipal {
-
-    private EntityManager em;
+    
     private final User user;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;
@@ -67,7 +66,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
              album = em.merge(album);
 
@@ -92,7 +91,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             album = em.merge(album);
             return canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em);
@@ -121,7 +120,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
 
             if (!canAccessStudy(album, studyInstanceUID)) {
@@ -160,7 +159,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasAlbumAccess(String albumId){
+    public boolean hasAlbumAccess(String albumId) {
         return albumId.equals(album.getId());
     }
 

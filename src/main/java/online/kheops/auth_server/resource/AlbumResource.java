@@ -83,7 +83,7 @@ public class AlbumResource {
 
         if (addUser != null) { usersPermission.setAddUser(addUser); }
         if (downloadSeries != null) { usersPermission.setDownloadSeries(downloadSeries); }
-        if (sendSeries != null){ usersPermission.setSendSeries(sendSeries); }
+        if (sendSeries != null) { usersPermission.setSendSeries(sendSeries); }
         if (deleteSeries != null) { usersPermission.setDeleteSeries(deleteSeries); }
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }

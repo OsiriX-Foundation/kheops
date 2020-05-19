@@ -432,7 +432,7 @@ public class QIDOResource {
         final StreamingOutput stream = os -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);
                  final JsonParser parser = Json.createParser(inputStream);
-                 final JsonGenerator generator = Json.createGenerator(os)){
+                 final JsonGenerator generator = Json.createGenerator(os)) {
 
                 final JSONReader jsonReader = new JSONReader(parser);
                 final JSONWriter jsonWriter = new JSONWriter(generator);

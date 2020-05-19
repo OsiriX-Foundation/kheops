@@ -83,7 +83,7 @@ public class Albums {
                 callingAlbumUser.setNewSeriesNotifications(notificationNewSeries);
             }
 
-            if (callingAlbumUser.isAdmin()){
+            if (callingAlbumUser.isAdmin()) {
 
                 if (name != null) {
                     editAlbum.setName(name);
@@ -322,7 +322,7 @@ public class Albums {
 
                 if (callingUser.getPk() == removedUser.getPk()) {
                     mutationType = Events.MutationType.LEAVE_ALBUM;
-                } else if (callingAlbumUser.isAdmin()){
+                } else if (callingAlbumUser.isAdmin()) {
                     mutationType = Events.MutationType.REMOVE_USER;
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()

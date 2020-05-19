@@ -133,7 +133,7 @@ public class TokenResource
             } catch (ReportProviderUriNotValidException e) {
                 LOG.log(WARNING, "Unable to get the Report Provider's redirect_uri", e);
                 return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
-            } catch (NoResultException e){
+            } catch (NoResultException e) {
                 LOG.log(WARNING, "ClientId: "+ clientId + " Not Found", e);
                 return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
             } finally {

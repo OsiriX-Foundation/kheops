@@ -25,7 +25,6 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 
 public class UserPrincipal implements KheopsPrincipal {
 
-    private EntityManager em;
     private final User user;
     private final String actingParty;
     private final String originalToken;
@@ -50,7 +49,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
@@ -60,7 +59,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasStudyViewAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
@@ -73,7 +72,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
@@ -83,7 +82,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasStudyDeleteAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
@@ -96,7 +95,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             return canAccessSeries(user, studyInstanceUID, seriesInstanceUID, em);
         } finally {
@@ -106,7 +105,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasStudyShareAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             return canAccessStudy(user, study, em);
@@ -119,7 +118,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             //find if the series exist
             final Series series;
@@ -155,7 +154,7 @@ public class UserPrincipal implements KheopsPrincipal {
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final User userMerge = em.merge(user);
             final Album album = getAlbum(albumId, em);
@@ -178,8 +177,8 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasAlbumAccess(String albumId){
-        this.em = EntityManagerListener.createEntityManager();
+    public boolean hasAlbumAccess(String albumId) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final User userMerge = em.merge(user);
             final Album album = getAlbum(albumId, em);

@@ -29,7 +29,7 @@ public class LiquibaseContextListener implements ServletContextListener {
         LOG.log(Level.INFO, "Start initializing the DB with Liquibase. Database version : " + DB_VERSION);
 
         JdbcConnection jdbcCon = null;
-        try (Connection con = EntityManagerListener.getConnection()){
+        try (Connection con = EntityManagerListener.getConnection()) {
             try {
                 jdbcCon = new JdbcConnection(con);
 
