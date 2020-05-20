@@ -313,7 +313,7 @@ public class SendingResource
         }
 
         try {
-            if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
                     Sending.putStudyInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
@@ -345,7 +345,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 request.getRequestDispatcher("/studies/" + studyInstanceUID + "/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
@@ -373,24 +373,6 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            try {
-                String albumId = kheopsPrincipal.getAlbumID();
-                if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
-                    Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-                    return Response.status(NO_CONTENT).build();
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(AUTHORIZATION_ERROR)
-                            .detail("The token not allow you to delete a study")
-                            .build();
-                    return Response.status(FORBIDDEN).entity(errorResponse).build();
-                }
-            } catch (NotAlbumScopeTypeException e) {
-                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
-            }
-        }
-
         Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
@@ -407,7 +389,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 request.getRequestDispatcher("/studies/" + studyInstanceUID + "/series/" + seriesInstanceUID + "/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
@@ -433,24 +415,6 @@ public class SendingResource
                     .detail("The token not allow you to delete a series")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
-        }
-
-        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            try {
-                String albumId = kheopsPrincipal.getAlbumID();
-                if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
-                    Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-                    return Response.status(NO_CONTENT).build();
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(AUTHORIZATION_ERROR)
-                            .detail("The token not allow you to delete a study")
-                            .build();
-                    return Response.status(FORBIDDEN).entity(errorResponse).build();
-                }
-            } catch (NotAlbumScopeTypeException e) {
-                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
-            }
         }
 
         Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
