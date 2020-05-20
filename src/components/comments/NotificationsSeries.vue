@@ -13,11 +13,11 @@
         v-else-if="comment.source.capability_token !== undefined"
       >
         <div
-          class="text-warning font-large"
+          class="text-warning"
         >
           {{ $t('comment.bycapabilitytoken') }}
         </div>
-        {{ $t('comment.importserietoken', {user: getName(comment.source), serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        {{ $t('comment.importserietoken', {user: getName(comment.source), serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID, title: comment.source.capability_token.title}) }}
       </span>
       <span
         v-else
@@ -44,11 +44,11 @@
         v-else-if="comment.source.capability_token !== undefined"
       >
         <div
-          class="text-warning font-large"
+          class="text-warning"
         >
           {{ $t('comment.bycapabilitytoken') }}
         </div>
-        {{ $t('comment.removeserietoken', {user: getName(comment.source), serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        {{ $t('comment.removeserietoken', {user: getName(comment.source), serie: comment.study.series[0].description ? comment.study.series[0].description : comment.study.series[0].UID, study: comment.study.description ? comment.study.description : comment.study.UID, title: comment.source.capability_token.title}) }}
       </span>
       <span
         v-else

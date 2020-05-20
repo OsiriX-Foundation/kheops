@@ -13,40 +13,56 @@
         v-else-if="comment.source.capability_token !== undefined"
       >
         <div
-          class="text-warning font-large"
+          class="text-warning"
         >
           {{ $t('comment.bycapabilitytoken') }}
         </div>
-        {{ $t('comment.importstudytoken', {user: getName(comment.source), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        {{ $t('comment.importstudytoken', {user: getName(comment.source), study: comment.study.description ? comment.study.description : comment.study.UID, title: comment.source.capability_token.title}) }}
       </span>
       <span
         v-else
       >
         <i>{{ comment.source|getUsername }}</i> {{ $t('comment.imported') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
       </span>
-      <span
-        v-if="comment.study.series !== undefined && lengthNotPresent(comment.study.series) > 0"
-        class="text-warning"
+      <div
+        v-if="comment.study.series !== undefined"
       >
-        <br> {{ $t('comment.nbnoseriesinstudy', {nbseries: lengthNotPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
-        <show-hide
-          class-show-hide="font-white"
-          :text-show="$t('comment.showseries')"
-          :text-hide="$t('comment.hideseries')"
+        <br> {{ $t('comment.nbseriesinstudy', {nbseries: lengthPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        <span
+          v-if="lengthNotPresent(comment.study.series) > 0"
+          class="text-warning"
         >
-          <template
-            slot="value-toshow"
+          <br> {{ $t('comment.nbnoseriesinstudy', {nbseries: lengthNotPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        </span>
+        <div>
+          <show-hide
+            class-show-hide="font-white"
+            :text-show="$t('comment.showseries')"
+            :text-hide="$t('comment.hideseries')"
           >
-            <span
-              v-for="serie in isNotPresent(comment.study.series)"
-              :key="serie.id"
-              class="text-warning"
+            <template
+              slot="value-toshow"
             >
-              <br>{{ $t('comment.theserienotpresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
-            </span>
-          </template>
-        </show-hide>
-      </span>
+              <span
+                v-for="serie in comment.study.series"
+                :key="serie.id"
+              >
+                <span
+                  v-if="serie.is_present_in_album === false"
+                  class="text-warning"
+                >
+                  <br>{{ $t('comment.theserienotpresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
+                </span>
+                <span
+                  v-else
+                >
+                  <br>{{ $t('comment.theseriepresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
+                </span>
+              </span>
+            </template>
+          </show-hide>
+        </div>
+      </div>
     </div>
     <div
       v-if="comment.mutation_type === 'REMOVE_STUDY'"
@@ -61,40 +77,57 @@
         v-else-if="comment.source.capability_token !== undefined"
       >
         <div
-          class="text-warning font-large"
+          class="text-warning"
         >
           {{ $t('comment.bycapabilitytoken') }}
         </div>
-        {{ $t('comment.removestudytoken', {user: getName(comment.source), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        {{ $t('comment.removestudytoken', {user: getName(comment.source), study: comment.study.description ? comment.study.description : comment.study.UID, title: comment.source.capability_token.title}) }}
       </span>
       <span
         v-else
       >
         <i>{{ comment.source|getUsername }}</i> {{ $t('comment.removed') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
       </span>
-      <span
-        v-if="comment.study.series !== undefined && lengthPresent(comment.study.series) > 0"
-        class="text-warning"
+      <div
+        v-if="comment.study.series !== undefined"
       >
-        <br> {{ $t('comment.nbseriesinstudy', {nbseries: lengthPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
-        <show-hide
-          class-show-hide="font-white"
-          :text-show="$t('comment.showseries')"
-          :text-hide="$t('comment.hideseries')"
+        <br> {{ $t('comment.nbnoseriesinstudy', {nbseries: lengthNotPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        <span
+          v-if="lengthPresent(comment.study.series) > 0"
+          class="text-warning"
         >
-          <template
-            slot="value-toshow"
+          <br> {{ $t('comment.nbseriesinstudy', {nbseries: lengthPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+        </span>
+        <div>
+          <show-hide
+            class-show-hide="font-white"
+            :text-show="$t('comment.showseries')"
+            :text-hide="$t('comment.hideseries')"
           >
-            <span
-              v-for="serie in isPresent(comment.study.series)"
-              :key="serie.id"
-              class="text-warning"
+            <template
+              slot="value-toshow"
             >
-              <br>{{ $t('comment.theseriepresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
-            </span>
-          </template>
-        </show-hide>
-      </span>
+              <span
+                v-for="serie in isPresent(comment.study.series)"
+                :key="serie.id"
+                class="text-warning"
+              >
+                <span
+                  v-if="serie.is_present_in_album === true"
+                  class="text_warning"
+                >
+                  <br>{{ $t('comment.theseriepresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
+                </span>
+                <span
+                  v-else
+                >
+                  <br>{{ $t('comment.theserienotpresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
+                </span>
+              </span>
+            </template>
+          </show-hide>
+        </div>
+      </div>
     </div>
     <div
       v-if="comment.mutation_type === 'ADD_FAV' && comment.study"
