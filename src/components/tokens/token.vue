@@ -60,6 +60,7 @@
         </div>
       </div>
       <div
+        v-if="token.scope_type=='album'"
         class="row"
       >
         <div class="col-xs-12 col-sm-3">

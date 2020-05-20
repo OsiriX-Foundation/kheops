@@ -108,7 +108,6 @@ export default {
           key: 'name',
           label: this.$t('provider.name_provider'),
           sortable: true,
-          tdClass: 'word-break',
         },
         {
           key: 'url',
