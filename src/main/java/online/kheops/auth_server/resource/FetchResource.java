@@ -95,32 +95,25 @@ public class FetchResource {
         try {
             tx.begin();
 
-            List<Webhook> webhookList = em.createNamedQuery("Webhook.findAllEnabledAndForNewSeriesByStudyUID", Webhook.class)
-                    .setParameter(StudyInstanceUID, studyInstanceUID)
-                    .getResultList();
-
             String albumId = null;
             if(albumIdParam != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-
-                String albumIdScope;
                 try {
-                    albumIdScope = kheopsPrincipal.getAlbumID();
+                    final String albumIdScope = kheopsPrincipal.getAlbumID();
+                    if (albumIdParam != null && albumIdScope.compareTo(albumIdParam) == 0) {
+                        albumId = albumIdParam;
+                    } else if (albumIdParam == null) {
+                        albumId = albumIdScope;
+                    } else if (albumIdParam != null && albumIdScope.compareTo(albumIdParam) != 0) {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message(ALBUM_NOT_FOUND)
+                                .detail("The album does not exist or you don't have access")
+                                .build();
+                        return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+                    }
                 } catch (NotAlbumScopeTypeException e) {
-                    albumIdScope = null;
-                }
-
-                if (albumIdParam != null && albumIdScope != null && albumIdScope.compareTo(albumIdParam) == 0) {
-                    albumId = albumIdParam;
-                } else if (albumIdParam != null && albumIdScope == null) {
-                    albumId = albumIdParam;
-                } else if (albumIdParam == null && albumIdScope != null) {
-                    albumId = albumIdScope;
-                } else if (albumIdParam != null && albumIdScope != null && albumIdScope.compareTo(albumIdParam) != 0) {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(ALBUM_NOT_FOUND)
-                            .detail("The album does not exist or you don't have access")
-                            .build();
-                    return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+                    if (albumIdParam != null) {
+                        albumId = albumIdParam;
+                    }
                 }
             }
 
@@ -149,6 +142,10 @@ public class FetchResource {
                 }
 
                 final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
+
+                List<Webhook> webhookList = em.createNamedQuery("Webhook.findAllEnabledAndForNewSeriesByStudyUID", Webhook.class)
+                        .setParameter(StudyInstanceUID, studyInstanceUID)
+                        .getResultList();
 
                 for (Webhook webhook : webhookList) {
 
