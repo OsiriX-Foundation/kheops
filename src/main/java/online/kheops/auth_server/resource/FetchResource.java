@@ -95,9 +95,9 @@ public class FetchResource {
         try {
             tx.begin();
 
-            TypedQuery<Webhook> query = em.createQuery("SELECT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :studyUID AND w.enabled = true AND w.newSeries = true", Webhook.class);
-            query.setParameter("studyUID", studyInstanceUID);
-            List<Webhook> webhookFomAlbumsContainStudyandEnabledNewSeriesWebhook = query.getResultList();
+            List<Webhook> webhookList = em.createNamedQuery("Webhook.findAllEnabledAndForNewSeriesByStudyUID", Webhook.class)
+                    .setParameter(StudyInstanceUID, studyInstanceUID)
+                    .getResultList();
 
             String albumId = null;
             if(albumIdParam != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
@@ -150,8 +150,7 @@ public class FetchResource {
 
                 final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
 
-
-                for (Webhook webhook : webhookFomAlbumsContainStudyandEnabledNewSeriesWebhook) {
+                for (Webhook webhook : webhookList) {
 
                     final List<Series> seriesInWebhook = new ArrayList<>();
                     final NewSeriesWebhook newSeriesWebhook;
@@ -170,10 +169,10 @@ public class FetchResource {
                         }
                     } else {
                         newSeriesWebhook = new NewSeriesWebhook(webhook.getAlbum().getId(), callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
-                        TypedQuery<Series> query2 = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class);
-                        query2.setParameter(StudyInstanceUID, studyInstanceUID);
-                        query2.setParameter("album", webhook.getAlbum());
-                        List<Series> seriesInStudy = query2.getResultList();
+                        List<Series> seriesInStudy = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class)
+                                .setParameter(StudyInstanceUID, studyInstanceUID)
+                                .setParameter("album", webhook.getAlbum())
+                                .getResultList();
 
                         for (Series series : seriesListWebhook) {
                             if (seriesInStudy.contains(series)) {
@@ -184,7 +183,7 @@ public class FetchResource {
                     }
                     newSeriesWebhook.setFetch();
 
-                    if (study.isPopulated() && !seriesInWebhook.isEmpty()) {
+                    if (!seriesInWebhook.isEmpty()) {
                         final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
                         em.persist(webhookTrigger);
                         for (Series series : seriesInWebhook) {
