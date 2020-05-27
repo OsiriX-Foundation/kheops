@@ -21,6 +21,7 @@ import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -141,6 +142,42 @@ public class FetchResource {
                     }
                 }
 
+                final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
+
+                /******************/
+                final NewSeriesWebhook newSeriesWebhook2 = new NewSeriesWebhook(albumId, callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                newSeriesWebhook2.setFetch();
+
+                TypedQuery<Album> query = em.createQuery("SELECT a FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st WHERE st.studyInstanceUID = :studyUID and a <> :album", Album.class);
+                query.setParameter("studyUID", studyInstanceUID);
+                query.setParameter("album", targetAlbum);
+                List<Album> albumsContainStudy = query.getResultList();
+                for (Album album : albumsContainStudy) {
+                    TypedQuery<Series> query2 = em.createQuery("SELECT s FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st WHERE st.studyInstanceUID = :studyUID and a <> :album", Series.class);
+                    query2.setParameter("studyUID", studyInstanceUID);
+                    query2.setParameter("album", album);
+                    List<Series> seriesInStudy = query2.getResultList();
+
+                    for(Series series: seriesListWebhook) {
+                        if(seriesInStudy.contains(series)) {
+                            newSeriesWebhook2.addSeries(series);
+                        }
+                    }
+
+                    if (study.isPopulated() && newSeriesWebhook2.containSeries()) {
+                        for (Webhook webhook : album.getWebhooks()) {
+                            if (webhook.getNewSeries() && webhook.isEnabled()) {
+                                final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
+                                em.persist(webhookTrigger);
+                                for (Series series : seriesListWebhook) {
+                                    webhookTrigger.addSeries(series);
+                                }
+                                webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook2, webhookTrigger));
+                            }
+                        }
+                    }
+                }
+                /*************************/
                 if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                     final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
                     newSeriesWebhook.setCapabilityToken(capability);
@@ -149,7 +186,6 @@ public class FetchResource {
                     newSeriesWebhook.setReportProvider(reportProvider);
                 }
 
-                final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
                 if (study.isPopulated() && newSeriesWebhook.containSeries()) {
                     for (Webhook webhook : targetAlbum.getWebhooks()) {
                         if (webhook.getNewSeries() && webhook.isEnabled()) {

@@ -1,9 +1,6 @@
 package online.kheops.auth_server.webhook;
 
-import online.kheops.auth_server.entity.AlbumUser;
-import online.kheops.auth_server.entity.Capability;
-import online.kheops.auth_server.entity.ReportProvider;
-import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
@@ -43,6 +40,15 @@ public class NewSeriesWebhook implements WebhookResult{
         this.albumId = albumId;
         this.eventTime = LocalDateTime.now();
         this.sourceUser = new UserResponse(sourceUser);
+        this.isManualTrigger = isManualTrigger;
+        importSource = "send";
+    }
+
+    public NewSeriesWebhook(String albumId, User user, String instance, boolean isManualTrigger) {
+        this.instance = instance;
+        this.albumId = albumId;
+        this.eventTime = LocalDateTime.now();
+        this.sourceUser = new UserResponse(user);
         this.isManualTrigger = isManualTrigger;
         importSource = "send";
     }
