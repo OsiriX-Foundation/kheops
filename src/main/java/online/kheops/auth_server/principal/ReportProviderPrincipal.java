@@ -145,20 +145,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyAddAccess(String studyInstanceUID) {
-        if (!hasWriteAccess) {
-            return false;
-        }
-        if (!studyUids.contains(studyInstanceUID)) {
-            return false;
-        }
-        if (!canAccessStudy(album, studyInstanceUID)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     public boolean hasAlbumAccess(String albumId) {
         return albumId.equals(album.getId());
     }

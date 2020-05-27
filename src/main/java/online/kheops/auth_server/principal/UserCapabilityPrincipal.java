@@ -153,11 +153,6 @@ public class UserCapabilityPrincipal implements KheopsPrincipal, CapabilityPrinc
     }
 
     @Override
-    public boolean hasStudyAddAccess(String studyInstanceUID) {
-        return true;
-    }
-
-    @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {

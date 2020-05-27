@@ -199,14 +199,6 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     }
 
     @Override
-    public boolean hasStudyAddAccess(String studyInstanceUID) {
-        if (!canAccessStudy(capability.getAlbum(), studyInstanceUID)) {
-            return capability.hasWritePermission();
-        }
-        return capability.hasAppropriatePermission();
-    }
-
-    @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {

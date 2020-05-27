@@ -148,11 +148,6 @@ public class UserPrincipal implements KheopsPrincipal {
     }
 
     @Override
-    public boolean hasStudyAddAccess(String studyInstanceUID) {
-        return true;
-    }
-
-    @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
