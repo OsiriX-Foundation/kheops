@@ -155,7 +155,7 @@ public class FetchResource {
 
                     final List<Series> seriesInWebhook = new ArrayList<>();
                     final NewSeriesWebhook newSeriesWebhook;
-                    if (webhook.getAlbum().getId().compareTo(albumId) == 0) {
+                    if (albumId != null && webhook.getAlbum().getId().compareTo(albumId) == 0) {
                         newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
                         for (Series series : seriesListWebhook) {
                             newSeriesWebhook.addSeries(series);
