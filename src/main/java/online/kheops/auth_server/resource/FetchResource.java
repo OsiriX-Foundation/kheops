@@ -172,6 +172,7 @@ public class FetchResource {
                         newSeriesWebhook = new NewSeriesWebhook(albumId, callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
                         TypedQuery<Series> query2 = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class);
                         query2.setParameter(StudyInstanceUID, studyInstanceUID);
+                        query2.setParameter("album", webhook.getAlbum());
                         List<Series> seriesInStudy = query2.getResultList();
 
                         for (Series series : seriesListWebhook) {
