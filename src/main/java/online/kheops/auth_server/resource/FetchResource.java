@@ -169,7 +169,7 @@ public class FetchResource {
                             newSeriesWebhook.setReportProvider(reportProvider);
                         }
                     } else {
-                        newSeriesWebhook = new NewSeriesWebhook(albumId, callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                        newSeriesWebhook = new NewSeriesWebhook(webhook.getAlbum().getId(), callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
                         TypedQuery<Series> query2 = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class);
                         query2.setParameter(StudyInstanceUID, studyInstanceUID);
                         query2.setParameter("album", webhook.getAlbum());
