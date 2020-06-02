@@ -2,9 +2,17 @@ package online.kheops.auth_server.report_provider;
 
 
 import online.kheops.auth_server.entity.ReportProvider;
+import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
+
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.REPORT_PROVIDER_NOT_FOUND;
 
 public class ReportProviderQueries {
 
@@ -17,6 +25,23 @@ public class ReportProviderQueries {
         return em.createNamedQuery("ReportProvider.findByClientId", ReportProvider.class)
                 .setParameter("clientId", clientId)
                 .getSingleResult();
+    }
+
+    public static ReportProvider getReportProviderWithClientIdAndAlbumId(String clientId, String albumId, EntityManager em)
+        throws ReportProviderNotFoundException{
+
+        TypedQuery<ReportProvider> q = em.createNamedQuery("ReportProvider.findByClientIdAndAlbumId", ReportProvider.class)
+                .setParameter("clientId", clientId)
+                .setParameter("albumId", albumId);
+        try {
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(REPORT_PROVIDER_NOT_FOUND)
+                    .detail("The report provider does not exist or not present in this album")
+                    .build();
+            throw new ReportProviderNotFoundException(errorResponse);
+        }
     }
 
     public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, Integer limit, Integer offset, EntityManager em) {

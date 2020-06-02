@@ -12,6 +12,8 @@ import java.util.Set;
 @NamedQueries({
         @NamedQuery(name = "ReportProvider.findByClientId",
                 query = "SELECT dsr FROM ReportProvider dsr WHERE :clientId = dsr.clientId AND dsr.removed = false"),
+        @NamedQuery(name = "ReportProvider.findByClientIdAndAlbumId",
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :clientId = dsr.clientId AND :albumId = a.id"),
         @NamedQuery(name = "ReportProvider.findAllByAlbumId",
                 query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
         @NamedQuery(name = "ReportProvider.countAllByAlbumId",

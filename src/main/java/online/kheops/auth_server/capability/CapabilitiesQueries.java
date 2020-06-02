@@ -64,6 +64,22 @@ public class CapabilitiesQueries {
             throw new CapabilityNotFoundException(errorResponse);
         }
     }
+    public static Capability findCapabilityByCapabilityIDAndAlbumId(String capabilityId, String albumId, EntityManager em)
+            throws CapabilityNotFoundException {
+
+        try {
+            TypedQuery<Capability> query = em.createNamedQuery("Capability.findByIdAndAlbumId", Capability.class);
+            query.setParameter("capabilityId", capabilityId);
+            query.setParameter("albumId", albumId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Not Found")
+                    .detail("Capability token not found")
+                    .build();
+            throw new CapabilityNotFoundException(errorResponse);
+        }
+    }
 
 
     public static List<Capability> findAllCapabilitiesByUser(User user, Integer limit, Integer offset, EntityManager em) {
