@@ -3,8 +3,6 @@ package online.kheops.auth_server.event;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.capability.CapabilityNotFoundException;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipal;
-import online.kheops.auth_server.principal.ReportProviderPrincipal;
 import online.kheops.auth_server.report_provider.ReportProviderNotFoundException;
 import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.series.SeriesNotFoundException;
@@ -18,7 +16,6 @@ import java.util.*;
 
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findCapabilityByCapabilityIDAndAlbumId;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientIdAndAlbumId;
-import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
@@ -28,8 +25,41 @@ public class MutationQueryParams {
     private static final String[] ACCEPTED_VALUES_FOR_FAMILIES_ARRAY = {"webhooks", "sending", "users"};
     private static final Set<String> ACCEPTED_VALUES_FOR_FAMILIES = new HashSet<>(Arrays.asList(ACCEPTED_VALUES_FOR_FAMILIES_ARRAY));
 
+    public enum families {
+        WEBHOOKS {
+            @Override
+            public void addTypes(MutationQueryParams mutationQueryParams) {
+                mutationQueryParams.types.add(Events.MutationType.CREATE_WEBHOOK.toString());
+                mutationQueryParams.types.add(Events.MutationType.DELETE_WEBHOOK.toString());
+                mutationQueryParams.types.add(Events.MutationType.EDIT_WEBHOOK.toString());
+                mutationQueryParams.types.add(Events.MutationType.TRIGGER_WEBHOOK.toString());
+            }
+        },
+        SENDING{
+            @Override
+            public void addTypes(MutationQueryParams mutationQueryParams) {
+                mutationQueryParams.types.add(Events.MutationType.IMPORT_SERIES.toString());
+                mutationQueryParams.types.add(Events.MutationType.IMPORT_STUDY.toString());
+                mutationQueryParams.types.add(Events.MutationType.REMOVE_SERIES.toString());
+                mutationQueryParams.types.add(Events.MutationType.REMOVE_STUDY.toString());
+            }
+        },
+        USERS{
+            @Override
+            public void addTypes (MutationQueryParams mutationQueryParams) {
+                mutationQueryParams.types.add(Events.MutationType.ADD_USER.toString());
+                mutationQueryParams.types.add(Events.MutationType.REMOVE_USER.toString());
+                mutationQueryParams.types.add(Events.MutationType.ADD_ADMIN.toString());
+                mutationQueryParams.types.add(Events.MutationType.PROMOTE_ADMIN.toString());
+                mutationQueryParams.types.add(Events.MutationType.DEMOTE_ADMIN.toString());
+                mutationQueryParams.types.add(Events.MutationType.LEAVE_ALBUM.toString());
+            }
+        };
+
+        public abstract void addTypes(MutationQueryParams mutationQueryParams);
+    }
+
     private List<String> types;
-    private List<String> families;
     private List<String> users;
     private List<String> studies;
     private List<String> series;
@@ -39,7 +69,7 @@ public class MutationQueryParams {
     private Optional<String> endDate;
 
 
-    public MutationQueryParams(KheopsPrincipal kheopsPrincipal, MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
+    public MutationQueryParams(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
 
         extractTypes(queryParameters);
@@ -75,11 +105,10 @@ public class MutationQueryParams {
 
     private void extractFamilies(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
-        final List<String> lst = new ArrayList<>();
         if (queryParameters.containsKey("family")) {
             for (String family:queryParameters.get("family")) {
                 if (ACCEPTED_VALUES_FOR_FAMILIES.contains(family)) {
-                    lst.add(family);
+                    families.valueOf(family.toUpperCase()).addTypes(this);
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -89,7 +118,6 @@ public class MutationQueryParams {
                 }
             }
         }
-        families = lst;
     }
 
     private void extractUsers(MultivaluedMap<String, String> queryParameters, EntityManager em)
@@ -204,7 +232,6 @@ public class MutationQueryParams {
 
 
     public List<String> getTypes() { return types; }
-    public List<String> getFamilies() { return families; }
     public List<String> getUsers() { return users; }
     public List<String> getStudies() { return studies; }
     public List<String> getSeries() { return series; }

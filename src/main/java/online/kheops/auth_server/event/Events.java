@@ -14,6 +14,9 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -170,6 +173,85 @@ public class Events {
                 eventResponses.add(new EventResponse(m, userMember, em));
             }
 
+            XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
+        } finally {
+            em.close();
+        }
+        return new PairListXTotalCount<>(XTotalCount, eventResponses);
+    }
+
+    public static PairListXTotalCount<EventResponse> getMutationsAlbumv2(String albumId, MultivaluedMap<String, String> queryParameters, Integer offset, Integer limit)
+            throws AlbumNotFoundException, BadQueryParametersException {
+
+        final List<EventResponse> eventResponses = new ArrayList<>();
+        final long XTotalCount;
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+
+        try {
+            MutationQueryParams mutationQueryParams = new MutationQueryParams(queryParameters, albumId, em);
+
+            final Album album = getAlbum(albumId, em);
+            final HashMap<String, Boolean> userMember = new HashMap<>();
+            for(AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
+            }
+
+            final CriteriaBuilder cb = em.getCriteriaBuilder();
+            final CriteriaQuery<Mutation> c = cb.createQuery(Mutation.class);
+            Root<Mutation> mutation = c.from(Mutation.class);
+            c.select(mutation);
+            Join<Mutation,Album> albumJoin = mutation.join("album_fk");
+            Join<Mutation,Series> seriesJoin = mutation.join("series_fk");
+            Join<Series,Study> studiesJoin = mutation.join("study_fk");
+            Join<Mutation,User> userJoin = mutation.join("user_fk");
+            Join<Mutation,Capability> capabilityJoin = mutation.join("capability_fk");
+            Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("report_provider_fk");
+
+            final List<Predicate> allPredicate = new ArrayList<>();
+            allPredicate.add(cb.equal(albumJoin.get("id"),albumId));
+
+            List<Predicate> criteria = new ArrayList<>();
+            for (String reportProviderClientId : mutationQueryParams.getReportProviders()) {
+                criteria.add(cb.equal(reportProviderJoin.get("clientId"), reportProviderClientId));
+            }
+            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+
+            criteria = new ArrayList<>();
+            for (String seriesInstanceUID : mutationQueryParams.getSeries()) {
+                criteria.add(cb.equal(seriesJoin.get("seriesInstanceUID"), seriesInstanceUID));
+            }
+            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+
+            criteria = new ArrayList<>();
+            for (String studyInstanceUID : mutationQueryParams.getStudies()) {
+                criteria.add(cb.equal(studiesJoin.get("studyInstanceUID"), studyInstanceUID));
+            }
+            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+
+            criteria = new ArrayList<>();
+            for (String sub : mutationQueryParams.getUsers()) {
+                criteria.add(cb.equal(userJoin.get("sub"), sub));
+            }
+            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+
+            criteria = new ArrayList<>();
+            for (String capabilityToken : mutationQueryParams.getCapabilityTokens()) {
+                criteria.add(cb.equal(capabilityJoin.get("id"), capabilityToken));
+            }
+            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+
+
+            c.where(cb.and(allPredicate.toArray(new Predicate[0])));
+
+            TypedQuery<Mutation> q = em.createQuery(c);
+            List<Mutation> mutationLst = q.getResultList();
+
+            for (Mutation m : mutationLst) {
+                eventResponses.add(new EventResponse(m, userMember, em));
+            }
+
+            //TODO a modifier pour que les filtres fonctionnent
             XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
         } finally {
             em.close();
