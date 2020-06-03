@@ -252,6 +252,14 @@ public class Events {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
+            criteria = new ArrayList<>();
+            for (MutationType type : mutationQueryParams.getTypes()) {
+                criteria.add(cb.equal(capabilityJoin.get("mutationType"), type));
+            }
+            if (!criteria.isEmpty()) {
+                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            }
+
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
             c.orderBy(cb.asc(mutation.get("eventTime")));
