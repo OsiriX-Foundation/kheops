@@ -201,6 +201,7 @@ public class Events {
             final CriteriaQuery<Mutation> c = cb.createQuery(Mutation.class);
             Root<Mutation> mutation = c.from(Mutation.class);
             c.select(mutation);
+            c.distinct(true);
             Join<Mutation,Album> albumJoin = mutation.join("album", JoinType.LEFT);
             Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
             Join<Series,Study> studiesJoin = mutation.join("study", JoinType.LEFT);
@@ -253,6 +254,7 @@ public class Events {
 
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
+            c.orderBy(cb.asc(mutation.get("eventTime")));
 
             TypedQuery<Mutation> q = em.createQuery(c);
             List<Mutation> mutationLst = q.getResultList();
