@@ -215,31 +215,41 @@ public class Events {
             for (String reportProviderClientId : mutationQueryParams.getReportProviders()) {
                 criteria.add(cb.equal(reportProviderJoin.get("clientId"), reportProviderClientId));
             }
-            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!criteria.isEmpty()) {
+                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            }
 
             criteria = new ArrayList<>();
             for (String seriesInstanceUID : mutationQueryParams.getSeries()) {
                 criteria.add(cb.equal(seriesJoin.get("seriesInstanceUID"), seriesInstanceUID));
             }
-            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!criteria.isEmpty()) {
+                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            }
 
             criteria = new ArrayList<>();
             for (String studyInstanceUID : mutationQueryParams.getStudies()) {
                 criteria.add(cb.equal(studiesJoin.get("studyInstanceUID"), studyInstanceUID));
             }
-            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!criteria.isEmpty()) {
+                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            }
 
             criteria = new ArrayList<>();
             for (String sub : mutationQueryParams.getUsers()) {
                 criteria.add(cb.equal(userJoin.get("sub"), sub));
             }
-            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!criteria.isEmpty()) {
+                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            }
 
             criteria = new ArrayList<>();
             for (String capabilityToken : mutationQueryParams.getCapabilityTokens()) {
                 criteria.add(cb.equal(capabilityJoin.get("id"), capabilityToken));
             }
-            allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!criteria.isEmpty()) {
+                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+            }
 
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
