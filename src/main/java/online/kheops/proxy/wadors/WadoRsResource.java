@@ -61,14 +61,6 @@ public final class WadoRsResource {
     }
 
     @GET
-    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
-    public Response wadoSeriesMetadata(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-                               @PathParam("studyInstanceUID") String studyInstanceUID,
-                               @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
-    }
-
-    @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{sopInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response wadoInstance(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                                  @PathParam("studyInstanceUID") String studyInstanceUID,
@@ -76,14 +68,6 @@ public final class WadoRsResource {
         return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
     }
 
-    @GET
-    @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{sopInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
-    public Response wadoInstanceMetadata(@HeaderParam(AUTHORIZATION) String authorizationHeader,
-                                 @PathParam("studyInstanceUID") String studyInstanceUID,
-                                 @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
-    }
-    
     @GET
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{sopInstanceUID:([0-9]+[.])*[0-9]+}/frames/{frameNumber:[0-9]+}")
     public Response wadoInstanceFrame(@HeaderParam(AUTHORIZATION) String authorizationHeader,

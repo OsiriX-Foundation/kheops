@@ -1,17 +1,11 @@
 package online.kheops.proxy;
 
 import online.kheops.proxy.filter.CORSFilter;
-import online.kheops.proxy.marshaller.JSONAttributesListMarshaller;
-import online.kheops.proxy.marshaller.JSONAttributesWriter;
-import online.kheops.proxy.marshaller.XMLAttributesListWriter;
-import online.kheops.proxy.marshaller.XMLAttributesWriter;
+import online.kheops.proxy.marshaller.*;
 import online.kheops.proxy.multipart.MultipartStreamingWriter;
 import online.kheops.proxy.ohif.OHIFMetadataResource;
 import online.kheops.proxy.stow.resource.Resource;
-import online.kheops.proxy.wadors.WadoRSSeriesInstances;
-import online.kheops.proxy.wadors.WadoRSStudy;
-import online.kheops.proxy.wadors.WadoRSStudyInstance;
-import online.kheops.proxy.wadors.WadoRsResource;
+import online.kheops.proxy.wadors.*;
 import online.kheops.proxy.wadouri.WadoUriResource;
 import org.glassfish.jersey.server.ServerProperties;
 
@@ -35,6 +29,7 @@ public class ProxyApplication extends Application {
         Set<Class<?>> set = new HashSet<>();
         set.add(Resource.class);
         set.add(WadoUriResource.class);
+        set.add(WadoRsMetadata.class);
         set.add(WadoRsResource.class);
         set.add(WadoRSStudy.class);
         set.add(WadoRSStudyInstance.class);
@@ -51,6 +46,7 @@ public class ProxyApplication extends Application {
         set.add(new XMLAttributesWriter());
         set.add(new XMLAttributesListWriter(providers));
         set.add(new MultipartStreamingWriter(providers));
+        set.add(new StreamingAttributesMessageBodyWriter(providers));
         set.add(new CORSFilter());
         return set;
     }
