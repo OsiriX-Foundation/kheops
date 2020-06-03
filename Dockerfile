@@ -1,11 +1,14 @@
 FROM nginx:stable
+RUN apt-get update &&  apt-get install -y inotify-tools certbot openssl
+COPY certbot.sh /opt/certbot.sh
+RUN chmod +x /opt/certbot.sh 
+ENV LETS_ENCRYPT_EMAIL=spalte@naturalimage.ch
 
 ENV SECRET_FILE_PATH=/run/secrets
 
 COPY kheops.conf /etc/nginx/conf.d/kheops.conf
 COPY script.sh /etc/nginx/conf.d/script.sh
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY chain.pem /etc/nginx/chain.pem
 
 RUN chmod +x /etc/nginx/conf.d/script.sh
 

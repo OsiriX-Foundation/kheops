@@ -17,9 +17,3 @@ Name : [osirixfoundation/kheops-reverse-proxy](https://hub.docker.com/r/osirixfo
 `KHEOPS_NGINX_URL_ZIPPER`
 
 `KHEOPS_NGINX_URL_VIEWER`
-
-## Secrets
-
-`privkey1.pem`
-
-`fullchain1.pem`
