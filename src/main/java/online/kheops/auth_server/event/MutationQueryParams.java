@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.ws.rs.core.MultivaluedMap;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findCapabilityByCapabilityIDAndAlbumId;
@@ -213,13 +214,19 @@ public class MutationQueryParams {
     private void extractDate(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        if (queryParameters.containsKey("startDate")) {
-            startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), formatter));
-            //startDate = Optional.ofNullable(queryParameters.get("startDate").get(0));
-        }
-        if (queryParameters.containsKey("endDate")) {
-            endDate = Optional.of(LocalDateTime.parse(queryParameters.get("endDate").get(0), formatter));
-            //endDate = Optional.ofNullable(queryParameters.get("endDate").get(0));
+        try {
+            if (queryParameters.containsKey("startDate")) {
+                startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), formatter));
+            }
+            if (queryParameters.containsKey("endDate")) {
+                endDate = Optional.of(LocalDateTime.parse(queryParameters.get("endDate").get(0), formatter));
+            }
+        } catch (DateTimeParseException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("'startDate' or 'endDate' parsing error format must be yyyy-MM-dd HH:mm:ss")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
         }
     }
 
