@@ -205,9 +205,6 @@ public final class Resource {
                 throw new WebApplicationException(BAD_REQUEST);
             } catch (WebApplicationException e) {
                 throw e;
-            } catch (Exception e) {
-                LOG.log(Level.SEVERE, "Error in the proxy", e);
-                throw new WebApplicationException(INTERNAL_SERVER_ERROR);
             }
         };
 

@@ -93,9 +93,6 @@ public class WadoUriResource {
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);
             throw new NotAuthorizedException("Bearer", "Basic");
-        } catch (Exception e) {
-            LOG.log(SEVERE, "unknown error while getting an access token", e);
-            throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
         for (Map.Entry<String, List<String>> parameter: queryParameters.entrySet()) {
@@ -121,9 +118,6 @@ public class WadoUriResource {
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
             throw new WebApplicationException(BAD_GATEWAY);
-        } catch (Exception e) {
-            LOG.log(SEVERE, "unknown error while getting from upstream", e);
-            throw new InternalServerErrorException("unknown error while getting from upstream");
         }
 
         if (upstreamResponse.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
@@ -139,8 +133,6 @@ public class WadoUriResource {
                     output.write(buffer, 0, len);
                     len = inputStream.read(buffer);
                 }
-            } catch (Exception e) {
-                throw new IOException(e);
             } finally {
                 upstreamResponse.close();
                 closeCounter.decrementAndGet();

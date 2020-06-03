@@ -49,7 +49,7 @@ public class JSONAttributesListMarshaller extends AttributesListMarshaller imple
             throw new IOException("Error while reading JSON datasets, (line:" + jsonLocation.getLineNumber() +
                     ", column:" + jsonLocation.getColumnNumber() +
                     ", stream offset:" + jsonLocation.getStreamOffset() + ")", e);
-        } catch (Exception e){
+        } catch (Exception e ) {
             throw new IOException("Error while reading JSON datasets", e);
         }
 

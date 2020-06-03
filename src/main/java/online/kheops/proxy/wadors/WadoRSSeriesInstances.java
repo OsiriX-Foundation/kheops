@@ -77,9 +77,6 @@ public class WadoRSSeriesInstances {
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);
             throw new NotAuthorizedException("Bearer", "Basic");
-        } catch (Exception e) {
-            LOG.log(SEVERE, "unknown error while getting an access token", e);
-            throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
         WebTarget webTarget = CLIENT.target(instanceQidoServiceURI)
@@ -106,9 +103,6 @@ public class WadoRSSeriesInstances {
         } catch (WebApplicationException e) {
             LOG.log(SEVERE, "error getting instances from upstream", e);
             throw new WebApplicationException(BAD_GATEWAY);
-        } catch (Exception e) {
-            LOG.log(SEVERE, "unknown error while getting from upstream", e);
-            throw new InternalServerErrorException("unknown error while getting from upstream");
         }
 
         final UriBuilder retrieveULRBuilder;

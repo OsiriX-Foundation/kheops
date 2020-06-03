@@ -123,9 +123,6 @@ public final class WadoRsResource {
         } catch (AccessTokenException e) {
             LOG.log(WARNING, "Unable to get an access token", e);
             throw new NotAuthorizedException("Bearer", "Basic");
-        } catch (Exception e) {
-            LOG.log(SEVERE, "unknown error while getting an access token", e);
-            throw new InternalServerErrorException("unknown error while getting an access token");
         }
 
         final Matcher m = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)").matcher(uriInfo.getPath());
@@ -158,9 +155,6 @@ public final class WadoRsResource {
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
             throw new WebApplicationException(BAD_GATEWAY);
-        } catch (Exception e) {
-            LOG.log(SEVERE, "unknown error while getting from upstream", e);
-            throw new InternalServerErrorException("unknown error while getting from upstream");
         }
 
         StreamingOutput streamingOutput = output -> {
@@ -171,8 +165,6 @@ public final class WadoRsResource {
                     output.write(buffer, 0, len);
                     len = inputStream.read(buffer);
                 }
-            } catch (Exception e) {
-                throw new IOException(e);
             } finally {
                 upstreamResponse.close();
                 closeCounter.decrementAndGet();
