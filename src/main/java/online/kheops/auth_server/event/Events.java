@@ -202,16 +202,16 @@ public class Events {
             Root<Mutation> mutation = c.from(Mutation.class);
             c.select(mutation);
             Join<Mutation,Album> albumJoin = mutation.join("album");
-            Join<Mutation,Series> seriesJoin = mutation.join("series");
-            Join<Series,Study> studiesJoin = mutation.join("study");
-            Join<Mutation,User> userJoin = mutation.join("user");
-            Join<Mutation,Capability> capabilityJoin = mutation.join("capability");
-            Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider");
+            //Join<Mutation,Series> seriesJoin = mutation.join("series");
+            //Join<Series,Study> studiesJoin = mutation.join("study");
+            //Join<Mutation,User> userJoin = mutation.join("user");
+            //Join<Mutation,Capability> capabilityJoin = mutation.join("capability");
+            //Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider");
 
             final List<Predicate> allPredicate = new ArrayList<>();
             allPredicate.add(cb.equal(albumJoin.get("id"),albumId));
 
-            List<Predicate> criteria = new ArrayList<>();
+            /*List<Predicate> criteria = new ArrayList<>();
             for (String reportProviderClientId : mutationQueryParams.getReportProviders()) {
                 criteria.add(cb.equal(reportProviderJoin.get("clientId"), reportProviderClientId));
             }
@@ -249,7 +249,7 @@ public class Events {
             }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
-            }
+            }*/
 
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
