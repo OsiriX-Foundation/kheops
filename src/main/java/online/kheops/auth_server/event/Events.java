@@ -264,6 +264,7 @@ public class Events {
             c.orderBy(cb.desc(mutation.get("eventTime")));
 
             TypedQuery<Mutation> q = em.createQuery(c);
+            q.setMaxResults(limit).setFirstResult(offset);
             List<Mutation> mutationLst = q.getResultList();
 
             for (Mutation m : mutationLst) {
