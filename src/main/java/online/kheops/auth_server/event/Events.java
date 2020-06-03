@@ -252,11 +252,10 @@ public class Events {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
+
             criteria = new ArrayList<>();
-            for (MutationType type : mutationQueryParams.getTypes()) {
-                criteria.add(cb.equal(capabilityJoin.get("mutationType"), type));
-            }
-            if (!criteria.isEmpty()) {
+            if (!mutationQueryParams.getTypes().isEmpty()) {
+                criteria.add(cb.in(capabilityJoin.get("mutationType").in(mutationQueryParams.getTypes())));
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 

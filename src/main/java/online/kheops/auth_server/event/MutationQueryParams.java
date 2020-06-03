@@ -85,11 +85,11 @@ public class MutationQueryParams {
 
     private void extractTypes(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
-        final List<Events.MutationType> lst = new ArrayList<>();
+
         if (queryParameters.containsKey("type")) {
             for (String type:queryParameters.get("type")) {
                 try {
-                    lst.add(Events.MutationType.valueOf(type));
+                    types.add(Events.MutationType.valueOf(type));
                 } catch (IllegalArgumentException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -99,7 +99,6 @@ public class MutationQueryParams {
                 }
             }
         }
-        types = lst;
     }
 
     private void extractFamilies(MultivaluedMap<String, String> queryParameters)
@@ -121,12 +120,11 @@ public class MutationQueryParams {
 
     private void extractUsers(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
-        final List<String> lst = new ArrayList<>();
         if (queryParameters.containsKey("user")) {
             for (String user:queryParameters.get("user")) {
                 try {
                     final User user1 = getUser(user, em);
-                    lst.add(user1.getSub());
+                    users.add(user1.getSub());
                 } catch (UserNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -136,17 +134,15 @@ public class MutationQueryParams {
                 }
             }
         }
-        users = lst;
     }
 
     private void extractStudies(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
-        final List<String> lst = new ArrayList<>();
         if (queryParameters.containsKey("studies")) {
             for (String study:queryParameters.get("studies")) {
                 try {
                     getStudy(study, em);
-                    lst.add(study);
+                    studies.add(study);
                 } catch (StudyNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -156,17 +152,15 @@ public class MutationQueryParams {
                 }
             }
         }
-        studies = lst;
     }
 
     private void extractSeries(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
-        final List<String> lst = new ArrayList<>();
         if (queryParameters.containsKey("series")) {
-            for (String series:queryParameters.get("series")) {
+            for (String seriesUID:queryParameters.get("series")) {
                 try {
-                    Series.getSeries(series, em);
-                    lst.add(series);
+                    Series.getSeries(seriesUID, em);
+                    series.add(seriesUID);
                 } catch (SeriesNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -176,17 +170,15 @@ public class MutationQueryParams {
                 }
             }
         }
-        series = lst;
     }
 
     private void extractReportProviders(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
-        final List<String> lst = new ArrayList<>();
         if (queryParameters.containsKey("reportProvider")) {
             for (String reportProvider:queryParameters.get("reportProvider")) {
                 try {
                     getReportProviderWithClientIdAndAlbumId(reportProvider, albumId, em);
-                    lst.add(reportProvider);
+                    reportProviders.add(reportProvider);
                 } catch (ReportProviderNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -196,17 +188,15 @@ public class MutationQueryParams {
                 }
             }
         }
-        reportProviders = lst;
     }
 
     private void extractCapabilityToken(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
-        final List<String> lst = new ArrayList<>();
         if (queryParameters.containsKey("capabilityToken")) {
             for (String capabilityToken:queryParameters.get("capabilityToken")) {
                 try {
                     findCapabilityByCapabilityIDAndAlbumId(capabilityToken, albumId, em);
-                    lst.add(capabilityToken);
+                    capabilityTokens.add(capabilityToken);
                 } catch (CapabilityNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -216,7 +206,6 @@ public class MutationQueryParams {
                 }
             }
         }
-        capabilityTokens = lst;
     }
 
     private void extractDate(MultivaluedMap<String, String> queryParameters)
