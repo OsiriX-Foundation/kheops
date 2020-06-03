@@ -59,12 +59,12 @@ public class MutationQueryParams {
         public abstract void addTypes(MutationQueryParams mutationQueryParams);
     }
 
-    private List<Events.MutationType> types;
-    private List<String> users;
-    private List<String> studies;
-    private List<String> series;
-    private List<String> capabilityTokens;
-    private List<String> reportProviders;
+    private List<Events.MutationType> types = new ArrayList<>();
+    private List<String> users = new ArrayList<>();
+    private List<String> studies = new ArrayList<>();
+    private List<String> series = new ArrayList<>();
+    private List<String> capabilityTokens = new ArrayList<>();
+    private List<String> reportProviders = new ArrayList<>();
     private Optional<String> startDate;
     private Optional<String> endDate;
 
