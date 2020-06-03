@@ -67,8 +67,8 @@ public class MutationQueryParams {
     private List<String> series = new ArrayList<>();
     private List<String> capabilityTokens = new ArrayList<>();
     private List<String> reportProviders = new ArrayList<>();
-    private Optional<LocalDateTime> startDate;
-    private Optional<LocalDateTime> endDate;
+    private Optional<LocalDateTime> startDate = Optional.empty();
+    private Optional<LocalDateTime> endDate = Optional.empty();
 
 
     public MutationQueryParams(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
