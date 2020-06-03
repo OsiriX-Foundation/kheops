@@ -66,6 +66,7 @@ const actions = {
       if (res.status === 200) {
         commit('SET_ALBUM_USERS', res.data);
       }
+      return res;
     }).catch((err) => Promise.reject(err));
   },
   editAlbum({ commit }, params) {
@@ -94,6 +95,15 @@ const actions = {
     const request = `albums/${params.album_id}/users/${params.user}`;
     return HTTP.put(request).then((res) => {
       if (res.status === 201) {
+        dispatch('getUsersAlbum', { album_id: params.album_id });
+      }
+      return res;
+    }).catch((err) => Promise.reject(err));
+  },
+  addAlbumUserAdmin({ dispatch }, params) {
+    const request = `albums/${params.album_id}/users/${params.user}/admin`;
+    return HTTP.put(request).then((res) => {
+      if (res.status === 204) {
         dispatch('getUsersAlbum', { album_id: params.album_id });
       }
       return res;

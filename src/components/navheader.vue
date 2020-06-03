@@ -1,22 +1,3 @@
-<i18n>
-{
-  "en": {
-    "welcome": "Welcome",
-    "lang": "lang",
-    "tooltipHelp": "Help",
-    "tooltipLogout": "Logout",
-    "tooltipLogin": "Login"
-  },
-  "fr": {
-    "welcome": "Bienvenue",
-    "lang": "lang",
-    "tooltipHelp": "Aide",
-    "tooltipLogout": "Déconnexion",
-    "tooltipLogin": "Se connecter"
-  }
-}
-</i18n>
-
 <template>
   <!--
     Navbar
@@ -30,21 +11,24 @@
   >
     <b-navbar-toggle target="nav_collapse" />
     <b-navbar-nav>
-      <div class="d-flex">
-        <div style="padding-right: 5px">
-          <kheops-pyramid
+      <router-link
+        to="/inbox"
+      >
+        <div class="d-flex">
+          <div style="padding-right: 5px">
+            <kheops-pyramid
               width="12.2696mm"
               height="7.41195mm"
-          />
+            />
+          </div>
+          <div class="align-self-end">
+            <kheops-font
+              width="16.5968mm"
+              height="3.70944mm"
+            />
+          </div>
         </div>
-        <div class="align-self-end">
-          <kheops-font
-            width="16.5968mm"
-            height="3.70944mm"
-          />
-        </div>
-      </div>
-      
+      </router-link>
     </b-navbar-nav>
     <b-collapse
       id="nav_collapse"
@@ -54,59 +38,55 @@
       <b-navbar-nav class="ml-auto">
         <b-navbar-nav right>
           <b-nav-item
-            v-if="logged"
-            v-access="'active'"
+            v-if="logged === true"
             class="font-kheops active"
           >
-            {{ $t('welcome') }}
             <router-link
               to="/user"
-              class="font-kheops"
             >
-              {{ currentuserFullname }}
+              {{ oidcUser.name }}
             </router-link>
           </b-nav-item>
           <b-nav-item
             v-else-if="logged === false"
             class="active pointer"
-            :title="$t('tooltipLogin')"
+            :title="$t('navbar.tooltipLogin')"
             @click="login()"
           >
-
             <span
               class="font-white"
             >
-              {{ $t('tooltipLogin') }}
+              {{ $t('navbar.tooltipLogin') }}
             </span>
           </b-nav-item>
           <b-nav-item
             class="active pointer"
-            :title="$t('tooltipHelp')"
+            :title="$t('navbar.tooltipHelp')"
             target="_blank"
-            @click="redirect('https://docs.kheops.online')"
+            @click="redirectOn('https://docs.kheops.online')"
           >
             <span
               class="font-white"
             >
-              {{ $t('tooltipHelp') }}
+              {{ $t('navbar.tooltipHelp') }}
               <v-icon name="help" />
             </span>
           </b-nav-item>
           <b-nav-item
             v-if="logged"
-            :title="$t('tooltipLogout')"
+            :title="$t('navbar.tooltipLogout')"
             class="active pointer"
-            @click="logout()"
           >
-            <span
+            <router-link
+              :to="{ path: '/oidc-logout', name: 'oidcLogout', params: {redirect: redirect} }"
               class="font-white"
             >
-              {{ $t('tooltipLogout') }}
+              {{ $t('navbar.tooltipLogout') }}
               <v-icon name="sign-out-alt" />
-            </span>
+            </router-link>
           </b-nav-item>
           <b-nav-item-dropdown
-            :text="`${$t('lang')}: ${lang}`"
+            :text="`${$t('navbar.lang')}: ${lang}`"
             toggle-class="font-white"
             right
             class="active"
@@ -131,16 +111,15 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import store from '@/store';
-import { CurrentUser } from '@/mixins/currentuser.js';
+import { mapActions, mapGetters } from 'vuex';
+import { loadLanguageAsync } from '@/setup/i18n-setup';
 import KheopsPyramid from '@/components/kheopsSVG/KheopsPyramid.vue';
 import KheopsFont from '@/components/kheopsSVG/KheopsFont.vue';
+import availableLanguage from '@/lang/availablelanguage';
 
 export default {
   name: 'NavHeader',
   components: { KheopsPyramid, KheopsFont },
-  mixins: [CurrentUser],
   props: {
     logged: {
       type: Boolean,
@@ -148,45 +127,53 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      availableLanguage: [
-        'en',
-        'fr',
-      ],
-    };
-  },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcUser',
+    ]),
+    availableLanguage() {
+      return availableLanguage;
+    },
     lang() {
       return this.$i18n.locale;
+    },
+    redirect: {
+      get() {
+        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      },
+      set() {
+        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
+      },
     },
   },
   created() {
     this.setFromLocalStorage();
   },
   methods: {
+    ...mapActions('oidcStore', ['authenticateOidcSilent', 'signOutOidc', 'authenticateOidc']),
     setFromLocalStorage() {
-      const language = localStorage.getItem('language');
-      if (language !== null) {
-        this.changeLang(language);
+      const storageLanguage = localStorage.getItem('language');
+      const navigatorLanguage = (navigator.language || navigator.userLanguage).split('-')[0];
+      if (storageLanguage !== null) {
+        this.changeLang(storageLanguage);
+      } else {
+        this.changeLang(navigatorLanguage);
       }
-    },
-    logout() {
-      store.dispatch('logout').then(() => {
-        Vue.prototype.$keycloak.logoutFn();
-      });
-    },
-    login() {
-      Vue.prototype.$keycloak.loginFn();
     },
     changeLang(value) {
       if (this.availableLanguage.includes(value)) {
         localStorage.setItem('language', value);
-        this.$root.$i18n.locale = value;
+        loadLanguageAsync(value);
       }
     },
-    redirect(href) {
+    redirectOn(href) {
       window.open(href, '_blank');
+    },
+    login() {
+      const payload = {
+        redirectPath: this.$route.path,
+      };
+      this.authenticateOidc(payload);
     },
   },
 };

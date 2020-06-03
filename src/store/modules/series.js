@@ -14,6 +14,11 @@ const state = {
     is_selected: false,
     is_favorite: false,
   },
+  modalities: [
+    'DOC',
+    'XC',
+    'SR',
+  ],
 };
 
 // getters
@@ -33,16 +38,18 @@ const actions = {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
     return HTTP.get(request + queries, { headers: { Accept: 'application/dicom+json' } }).then((res) => {
-      const newSeries = dicomoperations.translateObjectDICOM(res.data, '0020000E');
-      Object.keys(newSeries).forEach((serieUID) => {
-        newSeries[serieUID].imgSrc = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].imgSrc : '';
-        newSeries[serieUID].flag = JSON.parse(JSON.stringify(state.defaultFlagSerie));
-        newSeries[serieUID].SOPClassUID = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].SOPClassUID : undefined;
-        const seriesAlreadyExist = (state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined);
-        newSeries[serieUID].flag.is_selected = seriesAlreadyExist ? state.series[params.StudyInstanceUID][serieUID].flag.is_selected : params.studySelected;
-      });
-      commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: newSeries });
-      dispatch('setSeriesImage', { StudyInstanceUID: params.StudyInstanceUID });
+      if (res.status !== 204) {
+        const newSeries = dicomoperations.translateObjectDICOM(res.data, '0020000E');
+        Object.keys(newSeries).forEach((serieUID) => {
+          newSeries[serieUID].imgSrc = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].imgSrc : '';
+          newSeries[serieUID].flag = JSON.parse(JSON.stringify(state.defaultFlagSerie));
+          newSeries[serieUID].SOPClassUID = state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined ? state.series[params.StudyInstanceUID][serieUID].SOPClassUID : undefined;
+          const seriesAlreadyExist = (state.series[params.StudyInstanceUID] !== undefined && state.series[params.StudyInstanceUID][serieUID] !== undefined);
+          newSeries[serieUID].flag.is_selected = seriesAlreadyExist ? state.series[params.StudyInstanceUID][serieUID].flag.is_selected : params.studySelected;
+        });
+        commit('SET_SERIES', { StudyInstanceUID: params.StudyInstanceUID, series: newSeries });
+        dispatch('setSeriesImage', { StudyInstanceUID: params.StudyInstanceUID });
+      }
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -56,16 +63,19 @@ const actions = {
   },
   setSerieImage({ dispatch }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];
-    if (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1) {
+    const checkNumberOfSeriesRelatedInstance = (serie.NumberOfSeriesRelatedInstances !== undefined && serie.NumberOfSeriesRelatedInstances.Value !== undefined && serie.NumberOfSeriesRelatedInstances.Value[0] === 1);
+    const checkModalities = !checkNumberOfSeriesRelatedInstance && (serie.Modality !== undefined && serie.Modality.Value !== undefined && state.modalities.includes(serie.Modality.Value[0]));
+    if ((checkModalities) || (checkNumberOfSeriesRelatedInstance)) {
       return dispatch('getSeriesInstances', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID }).then((res) => {
         if (res.data !== undefined) {
-          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : ''
+          const modality = serie.Modality !== undefined ? serie.Modality.Value[0] : '';
           return dispatch('setImageSrc', {
-            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality
+            StudyInstanceUID: params.StudyInstanceUID, serie, serieUID: params.SeriesInstanceUID, data: res.data, modality,
           });
         }
         return res;
       }).catch((err) => {
+        dispatch('setImageError', serie);
         Promise.reject(err);
       });
     }
@@ -99,7 +109,7 @@ const actions = {
       videoPhotographicImageStorage: '1.2.840.10008.5.1.4.1.1.77.1.4.1',
       encapsulatedPDFStorage: '1.2.840.10008.5.1.4.1.1.104.1',
     };
-    const modality = params.modality.length > 0 ? params.modality : params.data[0][tagModality].Value[0];
+    const modality = params.modality.length > 0 || params.data[0][tagModality] === undefined ? params.modality : params.data[0][tagModality].Value[0];
     if (params.data[0][tagSOPClassUID] !== undefined) {
       serie.SOPClassUID = params.data[0][tagSOPClassUID];
     }
@@ -121,13 +131,14 @@ const actions = {
     }
     return true;
   },
-  getImage({ commit }, params) {
-    const request = `/wado?studyUID=${params.StudyInstanceUID}&seriesUID=${params.SeriesInstanceUID}&requestType=WADO&rows=250&columns=250&contentType=image%2Fjpeg`;
+  getImage({ commit, dispatch }, params) {
+    const request = `/studies/${params.StudyInstanceUID}/series/${params.SeriesInstanceUID}/thumbnail`;
+    const queries = `viewport=${encodeURIComponent('256,256')}`;
     const { serie } = params;
-    return HTTP.get(request, {
+    return HTTP.get(`${request}?${queries}`, {
       responseType: 'arraybuffer',
       headers: {
-        Accept: 'image/jpeg',
+        Accept: 'image/png',
       },
     }).then((resp) => {
       let img = DicomLogo;
@@ -141,9 +152,13 @@ const actions = {
       serie.imgSrc = img;
       commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
     }).catch(() => {
-      serie.imgSrc = DicomLogo;
-      commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
+      dispatch('setImageError', serie);
     });
+  },
+  setImageError({ commit }, params) {
+    const serie = params;
+    serie.imgSrc = DicomLogo;
+    commit('SET_SERIE', { StudyInstanceUID: params.StudyInstanceUID, SeriesInstanceUID: params.SeriesInstanceUID, serie: params.serie });
   },
   setFlagByStudyUIDSerieUID({ commit }, params) {
     const serie = state.series[params.StudyInstanceUID][params.SeriesInstanceUID];

@@ -4,18 +4,28 @@ import { HTTP } from '@/router/http';
 export const ViewerToken = {
   data() {
     return {
-      scope: 'viewer',
+      scope: 'viewer read write',
       grant_type: 'urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Atoken-exchange',
       subject_token_type: 'urn%3Aietf%3Aparams%3Aoauth%3Atoken-type%3Aaccess_token',
     };
   },
   methods: {
-    getViewerToken(token, studyInstanceUID, source) {
+    setScope(source, album) {
+      const defaultScope = 'viewer read';
+      if (source === 'album') {
+        return album.add_series === true ? `${defaultScope} write` : defaultScope;
+      }
+      if (source === 'inbox') {
+        return `${defaultScope} write`;
+      }
+      return defaultScope;
+    },
+    getViewerToken(token, studyInstanceUID, source, scope='viewer read') {
       const body = {
         grant_type: this.grant_type,
         subject_token: token,
         subject_token_type: this.subject_token_type,
-        scope: this.scope,
+        scope: scope,
         studyUID: studyInstanceUID,
       };
       if (Object.keys(source).length > 0) {

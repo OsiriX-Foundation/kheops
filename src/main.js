@@ -4,6 +4,7 @@
 
 import Vue from 'vue';
 import BootstrapVue from 'bootstrap-vue';
+import 'bootstrap-vue/dist/bootstrap-vue.css';
 import '@/css/bootstrap_dark.css';
 import '@/css/bootstrap_kheops.css';
 import '@/css/main.css';
@@ -14,14 +15,14 @@ import lodash from 'lodash';
 import Icon from 'vue-awesome/components/Icon';
 import ToggleButton from 'vue-js-toggle-button';
 import VeeValidate from 'vee-validate';
-import VueKeyCloak from '@dsb-norge/vue-keycloak-js';
 import '@/filters/filters.js';
 import VueI18n from 'vue-i18n';
+import VueScrollTo from 'vue-scrollto';
 import store from './store';
 import Access from '@/directives/access';
 import router from './router';
 import App from './App';
-import messages from '@/lang/messages';
+import { i18n } from '@/setup/i18n-setup';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;
@@ -39,65 +40,19 @@ Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
 Vue.use(VueI18n);
 Vue.use(lodash);
 Vue.use(ToggleButton);
+Vue.use(VueScrollTo);
 // Vue.use(Vuex)
 Vue.component('v-icon', Icon);
 Vue.directive('access', Access);
-const keycloakconfig = {
-  realm: process.env.VUE_APP_REALM_KEYCLOAK,
-  url: `${process.env.VUE_APP_URL_KEYCLOAK}/auth`,
-  clientId: process.env.VUE_APP_CLIENTID,
-  // logoutRedirectUri: 'http://logout'
-};
 
-function tokenInterceptor() {
-  const user = {
-    permissions: ['active'],
-  };
-  store.dispatch('login', user);
-}
-
-// Create VueI18n instance with options
-const i18n = new VueI18n({
-  locale: 'en',
-  messages,
-});
-/* eslint-disable no-new */
-Vue.use(VueKeyCloak, {
-  config: keycloakconfig,
-  init: {
-    onLoad: 'check-sso',
-    checkLoginIframe: true,
-  },
-  onReady: () => {
-    tokenInterceptor();
-    /* eslint-disable no-new */
-    new Vue({
-      el: '#app',
-      router,
-      store,
-      i18n,
-      components: { App },
-      template: '<App/>',
-    });
+// https://fr.vuejs.org/v2/guide/custom-directive.html
+Vue.directive('focus', {
+  inserted(el) {
+    el.focus();
   },
 });
-
-// if we don't need authentication...
-
-// new Vue({
-//   el: '#app',
-//   router,
-//   store,
-//   components: { App },
-//   template: '<App/>'
-// })
 
 Icon.register({
-  baidu: {
-    width: 24,
-    height: 24,
-    d: 'M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z',
-  },
   refresh: {
     width: 24,
     height: 24,
@@ -146,4 +101,26 @@ Icon.register({
     viewBox: '0 0 24 24',
     d: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z',
   },
+  add: {
+    width: 24,
+    height: 24,
+    viewBox: '0 0 24 24',
+    paths: [
+      {
+        d: 'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
+      },
+      {
+        d: 'M0 0h24v24H0z',
+        fill: 'none',
+      },
+    ],
+  },
 });
+
+// eslint-disable-next-line no-new
+new Vue({
+  router,
+  store,
+  i18n,
+  render: (h) => h(App),
+}).$mount('#app');

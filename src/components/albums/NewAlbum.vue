@@ -1,38 +1,3 @@
-<i18n>
-{
-  "en": {
-    "albumName": "Album Name",
-    "albumDescription": "Album Description",
-    "users": "Users",
-    "addUser": "Invite a user",
-    "addSeries": "Add studies / series",
-    "downloadSeries": "Show download button",
-    "sendSeries": "Sharing",
-    "deleteSeries": "Remove studies / series",
-    "writeComments": "Write comments",
-    "create": "Create",
-    "cancel": "Cancel",
-    "newalbum": "New album",
-    "usersettings": "Album user settings"
-  },
-  "fr": {
-    "albumName": "Nom de l'album",
-    "albumDescription": "Description de l'album",
-    "users": "Utilisateurs",
-    "addUser": "Inviter un utilisateur",
-    "addSeries": "Ajouter une étude / série",
-    "downloadSeries": "Montrer le bouton de téléchargement",
-    "sendSeries": "Partager",
-    "deleteSeries": "Supprimer une étude / série",
-    "writeComments": "Commenter",
-    "create": "Créer",
-    "cancel": "Annuler",
-    "newalbum": "Nouvel album",
-    "usersettings": "Réglages des utilisateurs de l'album"
-  }
-}
-</i18n>
-
 <template>
   <div class="container">
     <h3
@@ -45,28 +10,30 @@
         <div class="row">
           <div class="col-xs-12 col-sm-3">
             <dt class="d-none d-sm-block edit-title">
-              {{ $t('albumName') }}
+              {{ $t('newalbum.albumName') }}
             </dt>
-            <b class="d-block d-sm-none">{{ $t('albumName') }}</b>
+            <b class="d-block d-sm-none">{{ $t('newalbum.albumName') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
               <input
                 v-model="album.name"
+                v-focus
                 type="text"
-                :placeholder="$t('albumName')"
+                :placeholder="$t('newalbum.albumName')"
                 class="form-control"
                 maxlength="255"
               >
+              <field-obligatory :state="album.name !== ''" />
             </dd>
           </div>
         </div>
         <div class="row">
           <div class="col-xs-12 col-sm-3">
             <dt class="d-none d-sm-block edit-title">
-              {{ $t('albumDescription') }}
+              {{ $t('newalbum.albumDescription') }}
             </dt>
-            <b class="d-block d-sm-none">{{ $t('albumDescription') }}</b>
+            <b class="d-block d-sm-none">{{ $t('newalbum.albumDescription') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -74,7 +41,7 @@
                 v-model="album.description"
                 rows="5"
                 class="form-control"
-                :placeholder="$t('albumDescription')"
+                :placeholder="$t('newalbum.albumDescription')"
                 maxlength="2048"
               />
             </dd>
@@ -83,30 +50,12 @@
         <div class="row">
           <div class="col-xs-12 col-sm-3">
             <dt class="d-none d-sm-block edit-title">
-              {{ $t('users') }}
+              {{ $t('newalbum.users') }}
             </dt>
-            <b class="d-block d-sm-none">{{ $t('users') }}</b>
+            <b class="d-block d-sm-none">{{ $t('newalbum.users') }}</b>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
-              <h5
-                v-if="album.users.length > 0"
-                class="newalbum-user"
-              >
-                <span
-                  v-for="user in album.users"
-                  :key="user.email"
-                  class="badge badge-secondary"
-                >
-                  {{ user.email }}
-                  <span
-                    class="pointer"
-                    @click="deleteUser(user)"
-                  >
-                    <v-icon name="times" />
-                  </span>
-                </span>
-              </h5>
               <h5
                 class="newalbum-user"
               >
@@ -121,6 +70,7 @@
                   >
                   <div class="input-group-append">
                     <button
+                      v-if="loadingCheckUser === false"
                       id="button-addon2"
                       class="btn btn-outline-secondary btn-sm"
                       type="button"
@@ -129,10 +79,23 @@
                     >
                       <v-icon name="plus" />
                     </button>
+                    <kheops-clip-loader
+                      v-if="loadingCheckUser === true"
+                      size="25px"
+                      class="ml-1"
+                    />
                   </div>
                 </div>
               </h5>
             </dd>
+          </div>
+          <div class="offset-md-3 col-md-9">
+            <new-album-user
+              v-if="album.users.length > 0"
+              :users="album.users"
+              @toggle-admin="toggleAdmin"
+              @delete-user="deleteUser"
+            />
           </div>
         </div>
       </fieldset>
@@ -147,7 +110,7 @@
               <h4
                 class="mt-3 mb-3 ml-2"
               >
-                {{ $t('usersettings') }}
+                {{ $t('albumusersettings.usersettings') }}
               </h4>
             </div>
           </div>
@@ -156,28 +119,28 @@
           >
             <div class="col-xl-1" />
             <div
-              v-for="(value, idx) in numberCol"
+              v-for="(valuex, idx) in numberCol"
               :key="idx"
               class="col-md-12 col-lg-6 col-xl-5"
             >
               <span
-                v-for="(value,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*value)"
+                v-for="(valuey,idy) in Object.entries(album.userSettings).slice((userSettingsLength/2)*(idx), (userSettingsLength/2)*valuex)"
                 :key="idy"
               >
                 <div
                   class="mt-2"
-                  :class="(value[0]=='sendSeries')?'offset-1':''"
+                  :class="(valuey[0]=='sendSeries')?'offset-1':''"
                 >
                   <toggle-button
-                    v-model="album.userSettings[value[0]]"
-                    :disabled="(!album.userSettings.downloadSeries && value[0]=='sendSeries')"
+                    v-model="album.userSettings[valuey[0]]"
+                    :disabled="(!album.userSettings.downloadSeries && valuey[0]=='sendSeries')"
                     :color="{checked: '#5fc04c', unchecked: 'grey'}"
                     :sync="true"
                   />
                   <label
                     class="user-settings ml-2 mt-2 word-break"
                   >
-                    {{ $t(value[0]) }}
+                    {{ $t(`albumusersettings.${valuey[0]}`) }}
                   </label>
                 </div>
               </span>
@@ -187,38 +150,12 @@
       </div>
 
       <fieldset>
-        <div class="row">
-          <div class="col-md-10 mt-1 d-none d-sm-none d-md-block">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="!album.name"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-          <div class="col-12 mt-1 d-md-none">
-            <button
-              type="submit"
-              class="btn btn-primary btn-block"
-              :disabled="!album.name"
-            >
-              {{ $t('create') }}
-            </button>
-            <router-link
-              to="/albums"
-              class="btn btn-secondary btn-block"
-            >
-              {{ $t('cancel') }}
-            </router-link>
-          </div>
-        </div>
+        <create-cancel-button
+          :disabled="disabledCreate"
+          :loading="oncreate"
+          class-col="mt-3 col-12"
+          @cancel="cancel"
+        />
       </fieldset>
     </form>
   </div>
@@ -226,9 +163,16 @@
 
 <script>
 import { HTTP } from '@/router/http';
+import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
+import FieldObligatory from '@/components/globals/FieldObligatory';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import NewAlbumUser from '@/components/albums/NewAlbumUser';
 
 export default {
   name: 'NewAlbum',
+  components: {
+    CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser,
+  },
   data() {
     return {
       album: {
@@ -253,18 +197,26 @@ export default {
       },
       newUserName: '',
       numberCol: 2,
+      oncreate: false,
+      loadingCheckUser: false,
     };
   },
   computed: {
     displayName() {
-      return (!this.album.album_id) ? this.$t('newalbum') : this.album.name;
+      return (!this.album.album_id) ? this.$t('newalbum.newalbum') : this.album.name;
     },
     userSettingsLength() {
       return Object.keys(this.album.userSettings).length;
     },
+    downloadSeries() {
+      return this.album.userSettings.downloadSeries;
+    },
+    disabledCreate() {
+      return this.album.name === '' || this.oncreate;
+    },
   },
   watch: {
-    'album.userSettings.downloadSeries': function () {
+    downloadSeries() {
       if (!this.album.userSettings.downloadSeries) {
         this.album.userSettings.sendSeries = false;
       }
@@ -275,22 +227,35 @@ export default {
       const index = this.album.users.findIndex((i) => i.email === user.email);
       if (index > -1) this.album.users.splice(index, 1);
     },
+    toggleAdmin(user) {
+      const index = this.album.users.findIndex((i) => i.email === user.email);
+      if (index > -1) this.album.users[index].is_admin = !this.album.users[index].is_admin;
+    },
     checkUser() {
+      this.loadingCheckUser = true;
       const vm = this;
       const idx = _.findIndex(vm.album.users, (u) => u.email === vm.newUserName);
       if (vm.newUserName && idx === -1) {
         HTTP.get(`users?reference=${vm.newUserName}`, { headers: { Accept: 'application/json' } }).then((res) => {
           if (res.status === 204) this.$snotify.error('User unknown');
           else if (res.status === 200) {
-            this.album.users.push({ email: res.data.email });
+            const user = res.data;
+            user.is_admin = false;
+            this.album.users.unshift(user);
             vm.newUserName = '';
           }
+          this.loadingCheckUser = false;
         }).catch(() => {
+          this.loadingCheckUser = false;
           console.log('Sorry, an error occured');
         });
+      } else {
+        vm.newUserName = '';
+        this.loadingCheckUser = false;
       }
     },
     createAlbum() {
+      this.oncreate = true;
       const formData = {
         name: this.album.name,
         description: this.album.description,
@@ -304,7 +269,7 @@ export default {
       this.$store.dispatch('createAlbum', { formData }).then((res) => {
         if (res.status === 201) {
           const albumCreated = res.data;
-          this.addAlbumUser(albumCreated);
+          this.addAlbumNewUser(albumCreated);
           const data = this.dataToUpload(albumCreated.album_id);
           if (data.length > 0) {
             this.putStudiesInAlbum(albumCreated, data).then(() => {
@@ -316,33 +281,66 @@ export default {
         }
       }).catch(() => {
         this.$snotify.error(this.$t('sorryerror'));
+        this.oncreate = false;
       });
     },
-    addAlbumUser(albumCreated) {
+    addAlbumNewUser(albumCreated) {
       this.album.users.forEach((user) => {
         const paramsUser = {
           album_id: albumCreated.album_id,
           user: user.email,
         };
-        this.$store.dispatch('addAlbumUser', paramsUser).then((res) => {
-          if (res.status !== 201) {
-            this.$snotify.error(this.$t('sorryerror'));
-          }
-        }).catch((err) => {
+        if (user.is_admin === true) {
+          this.addAlbumUserAdmin(paramsUser);
+        } else {
+          this.addAlbumUser(paramsUser);
+        }
+      });
+    },
+    addAlbumUserAdmin(paramsUser) {
+      this.$store.dispatch('addAlbumUserAdmin', paramsUser).then((res) => {
+        if (res.status !== 204) {
           this.$snotify.error(this.$t('sorryerror'));
-          return err;
-        });
+        }
+      }).catch((err) => {
+        this.$snotify.error(this.$t('sorryerror'));
+        return err;
+      });
+    },
+    addAlbumUser(paramsUser) {
+      this.$store.dispatch('addAlbumUser', paramsUser).then((res) => {
+        if (res.status !== 201) {
+          this.$snotify.error(this.$t('sorryerror'));
+        }
+      }).catch((err) => {
+        this.$snotify.error(this.$t('sorryerror'));
+        return err;
       });
     },
     putStudiesInAlbum(albumCreated, data) {
       let queries = {};
       queries = this.$route.query.source === 'inbox' ? { inbox: true } : { album: this.$route.query.source };
-      return this.$store.dispatch('putStudiesInAlbum', { queries, data });
+      return this.$store.dispatch('putStudiesInAlbum', { queries, data }).then((results) => {
+        results.forEach((result) => {
+          const { res } = result;
+          if (res.request !== undefined && res.request.status !== 201) {
+            const { studyId } = result;
+            if (res.request.status === 403) {
+              this.$snotify.error(this.$t('authorizationerror', { study: studyId }));
+            } else if (res.request.status === 404) {
+              this.$snotify.error(this.$t('studynotfound', { study: studyId }));
+            } else {
+              this.$snotify.error(this.$t('sorryerror'));
+            }
+          }
+        });
+      });
     },
     dataToUpload(albumId) {
       const data = [];
       if (this.$route.query && this.$route.query.StudyInstanceUID) {
-        this.$route.query.StudyInstanceUID.forEach((study) => {
+        const studies = Array.isArray(this.$route.query.StudyInstanceUID) ? this.$route.query.StudyInstanceUID : [this.$route.query.StudyInstanceUID];
+        studies.forEach((study) => {
           data.push({
             album_id: albumId,
             study_id: study,
@@ -350,7 +348,8 @@ export default {
         });
       }
       if (this.$route.query && this.$route.query.SeriesInstanceUID) {
-        this.$route.query.SeriesInstanceUID.forEach((serie) => {
+        const series = Array.isArray(this.$route.query.SeriesInstanceUID) ? this.$route.query.SeriesInstanceUID : [this.$route.query.SeriesInstanceUID];
+        series.forEach((serie) => {
           const infoSerie = serie.split(',');
           if (infoSerie.length === 2) {
             data.push({
@@ -362,6 +361,9 @@ export default {
         });
       }
       return data;
+    },
+    cancel() {
+      this.$router.go(-1);
     },
   },
 };

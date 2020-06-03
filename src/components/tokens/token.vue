@@ -1,58 +1,11 @@
-<i18n>
-{
-  "en": {
-    "token": "token",
-    "description": "description",
-    "scope": "scope",
-    "album": "album",
-    "permission": "permission",
-    "write": "write",
-    "read": "read",
-    "download": "show download button",
-    "appropriate": "send to user / album",
-    "expirationdate": "expiration date",
-    "startdate": "start date",
-    "creationdate": "creation date",
-    "revokeddate": "revoke date",
-    "revoke": "Revoke",
-    "thistokenrevoked": "this token is revoked",
-    "lastuse": "last use date",
-    "back": "back",
-    "warningrevoke": "Are you sure you want to revoke this token ?",
-    "cancel": "Cancel",
-    "confirm": "Confirm"
-  },
-  "fr": {
-    "token": "token",
-    "description": "description",
-    "scope": "applicable à",
-    "album": "album",
-    "permission": "permission",
-    "write": "écriture",
-    "read": "lecture",
-    "download": "bouton téléchargement",
-    "appropriate": "envoyer à un utlisateur ou album",
-    "expirationdate": "date d'expiration",
-    "startdate": "date de début",
-    "creationdate": "date de création",
-    "revokeddate": "date de révoquation",
-    "revoke": "Révoquer",
-    "thistokenrevoked": "ce token a été revoqué",
-    "lastuse": "dernière utilisation",
-    "back": "retour",
-    "warningrevoke": "Etes-vous sûr de vouloir revoquer ce token ?",
-    "cancel": "Cancel",
-    "confirm": "Confirm"
-  }
-}
-</i18n>
-
 <template>
   <div class="token">
     <div
-      class="my-3 selection-button-container token-position"
+      class="my-3 token-position"
     >
-      <h4>
+      <h4
+        class="row word-break mb-3"
+      >
         <button
           type="button"
           class="btn btn-link btn-sm d-md-none"
@@ -72,13 +25,13 @@
       v-if="token.revoked"
       class="py-3 text-danger"
     >
-      {{ $t('thistokenrevoked') }}
+      {{ $t('token.thistokenrevoked') }}
     </p>
     <div>
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('scope') }}
+            {{ $t('token.scope') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9">
@@ -93,7 +46,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('album') }}
+            {{ $t('token.album') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9 word-break">
@@ -112,7 +65,22 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('permission') }}
+            {{ $t('token.createdby') }}
+          </dt>
+        </div>
+        <div class="col-xs-12 col-sm-9 word-break">
+          <dd>
+            {{ token.created_by|getUsername }}
+          </dd>
+        </div>
+      </div>
+      <div
+        v-if="token.scope_type=='album'"
+        class="row"
+      >
+        <div class="col-xs-12 col-sm-3">
+          <dt class="token-title">
+            {{ $t('token.permission') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-9">
@@ -122,7 +90,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('expirationdate') }}
+            {{ $t('token.expirationdate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -134,7 +102,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('startdate') }}
+            {{ $t('token.startdate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -146,7 +114,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('creationdate') }}
+            {{ $t('token.creationdate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -161,7 +129,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('lastuse') }}
+            {{ $t('token.lastuse') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -176,7 +144,7 @@
       >
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">
-            {{ $t('revokeddate') }}
+            {{ $t('token.revokeddate') }}
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
@@ -185,85 +153,31 @@
           </dd>
         </div>
       </div>
-      <div class="row mt-3">
-        <div class="offset-sm-3 col-sm-9 d-none d-sm-none d-md-block">
-          <button
-            v-if="!token.revoked && !confirmRevoke"
-            type="button"
-            class="btn btn-danger"
-            @click="revoke"
-          >
-            {{ $t('revoke') }}
-          </button>
-          <p
-            v-if="!token.revoked && confirmRevoke"
-          >
-            {{ $t('warningrevoke') }}
-          </p>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-danger"
-            @click="revoke"
-          >
-            {{ $t('confirm') }}
-          </button>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-secondary"
-            @click="confirmRevoke=false"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-
-        <div class="col-12 d-md-none">
-          <button
-            v-if="!token.revoked && !confirmRevoke"
-            type="button"
-            class="btn btn-danger btn-block"
-            @click="revoke"
-          >
-            {{ $t('revoke') }}
-          </button>
-          <p
-            v-if="!token.revoked && confirmRevoke"
-          >
-            {{ $t('warningrevoke') }}
-          </p>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-danger btn-block"
-            @click="revoke"
-          >
-            {{ $t('confirm') }}
-          </button>
-          <button
-            v-if="!token.revoked && confirmRevoke"
-            type="button"
-            class="btn btn-secondary btn-block"
-            @click="confirmRevoke=false"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-      </div>
+      <done-delete-button
+        class-row="mt-2"
+        class-col="offset-md-3 col-sm-12 col-md-4 col-lg-2 d-block"
+        class-col-warning-remove="offset-md-3 col-12 col-md-9"
+        :text-warning-remove="$t('token.warningrevoke')"
+        :text-button-remove="$t('disable')"
+        :show-done="false"
+        :loading="onloading"
+        @remove="revoke"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 
 export default {
   name: 'Token',
-  props: {
-  },
+  components: { DoneDeleteButton },
   data() {
     return {
       confirmRevoke: false,
+      onloading: false,
     };
   },
   computed: {
@@ -305,16 +219,13 @@ export default {
       return tokenId;
     },
     revoke() {
-      if (this.confirmRevoke === false) {
-        this.confirmRevoke = true;
-      } else {
-        this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then((res) => {
-          this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
-          this.cancel();
-        }).catch(() => {
-          this.$snotify.error(this.$t('sorryerror'));
-        });
-      }
+      this.onloading = true;
+      this.$store.dispatch('revokeToken', { token_id: this.tokenId }).then(() => {
+        this.cancel();
+      }).catch(() => {
+        this.onloading = false;
+        this.$snotify.error(this.$t('sorryerror'));
+      });
     },
     cancel() {
       this.$emit('done');

@@ -8,16 +8,6 @@
     send emit "remove-file-ui" to the parent when :
       - when the user delete an error file
 -->
-<i18n>
-{
-  "en": {
-    "hideError": "Hide errors"
-  },
-  "fr": {
-    "hideError": "Cacher les erreurs"
-  }
-}
-</i18n>
 <template>
   <div>
     <div
@@ -37,7 +27,7 @@
             <!--
               https://css-tricks.com/almanac/properties/o/overflow-wrap/
             -->
-            {{ error.id }}
+            {{ error.path }}
           </div>
           <div
             class="col-sm-auto text-warning"
@@ -54,7 +44,7 @@
         class="btn btn-primary"
         @click="hideErrors"
       >
-        <span>{{ $t('hideError') }}</span>
+        <span>{{ $t('upload.hideError') }}</span>
       </button>
     </div>
   </div>

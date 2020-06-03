@@ -1,57 +1,7 @@
-<i18n>
-{
-  "en": {
-    "newtoken": "New token",
-    "showrevokedtoken": "Show revoked tokens",
-    "showinvalidtoken": "Show invalid tokens",
-    "revoke": "revoke",
-    "revoked": "revoked",
-    "active": "active",
-    "expired": "expired",
-    "revokedsuccess": "revoked successfully",
-    "expiration date": "expiration date",
-    "status": "status",
-    "description": "description",
-    "scope": "scope",
-    "create date": "create date",
-    "last used": "last used",
-    "permission": "permission",
-    "notokens": "There are no tokens to show"
-  },
-  "fr": {
-    "newtoken": "Nouveau token",
-    "showrevokedtoken": "Afficher les tokens révoqués",
-    "showinvalidtoken": "Afficher les tokens invalides",
-    "revoke": "révoquer",
-    "revoked": "révoqué",
-    "active": "actif",
-    "expired": "expiré",
-    "revokedsuccess": "révoqué avec succès",
-    "expiration date": "date d'expiration",
-    "status": "statut",
-    "description": "description",
-    "scope": "application",
-    "create date": "créé le",
-    "last used": "dern. utilisation",
-    "permission": "permission",
-    "notokens": "Aucun token créé"
-  }
-}
-</i18n>
 <template>
   <div>
-    <button
-      class="btn btn-secondary my-3"
-      @click="clickNew()"
-    >
-      <v-icon
-        name="plus"
-        class="mr-2"
-      />
-      {{ $t('newtoken') }}
-    </button>
     <div class="d-flex align-content-around flex-wrap">
-      <div class="mt-2">
+      <div>
         <h4>
           Tokens
         </h4>
@@ -63,26 +13,25 @@
           @change="toggleValid"
         />
         <span class="ml-2 toggle-label">
-          {{ $t('showinvalidtoken') }}
+          {{ $t('token.showinvalidtoken') }}
         </span>
       </div>
     </div>
     <b-table
-      v-if="loadingData === false"
-      stacked="sm"
       striped
       hover
       show-empty
+      sort-icon-left
       :items="tokens"
       :fields="fields"
       :sort-desc="true"
       :sort-by.sync="sortBy"
+      :busy="loadingData"
       tbody-tr-class="link"
       @row-clicked="loadToken"
     >
       <template
-        slot="scope_type"
-        slot-scope="data"
+        v-slot:cell(scope_type)="data"
       >
         <div v-if="data.value=='album'">
           <router-link
@@ -101,12 +50,11 @@
             name="user"
             class="mr-2"
           />
-          {{ $t('user') }}
+          {{ $t('token.user') }}
         </div>
       </template>
       <template
-        slot="status"
-        slot-scope="data"
+        v-slot:cell(status)="data"
       >
         <div
           v-if="tokenStatus(data.item)=='active'"
@@ -145,62 +93,72 @@
         </div>
       </template>
       <template
-        slot="expiration_time"
-        slot-scope="data"
+        v-slot:cell(expiration_time)="data"
       >
         <span :class="(data.item.revoked)?'text-danger':''">
           {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
         </span>
       </template>
       <template
-        slot="issued_at_time"
-        slot-scope="data"
+        v-slot:cell(issued_at_time)="data"
       >
         {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
-        slot="last_used"
-        slot-scope="data"
+        v-slot:cell(last_used)="data"
       >
         {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
-        slot="permission"
-        slot-scope="data"
+        v-slot:cell(permission)="data"
       >
         {{ data.item|formatPermissions }}
       </template>
       <template
-        slot="actions"
-        slot-scope="data"
+        v-slot:cell(actions)="data"
       >
-        <button
+        <span
           v-if="!data.item.revoked"
-          type="button"
-          class="btn btn-danger btn-xs"
-          @click.stop="revoke(data.item.id)"
         >
-          {{ $t('revoke') }}
-        </button>
+          <button
+            v-if="onloading[data.item.id] === undefined || onloading[data.item.id] === false"
+            type="button"
+            class="btn btn-danger btn-xs"
+            @click.stop="revoke(data.item.id)"
+          >
+            {{ $t('disable') }}
+          </button>
+          <kheops-clip-loader
+            v-else
+            :loading="onloading[data.item.id]"
+          />
+        </span>
         <span
           v-if="data.item.revoked"
           class="text-danger"
         >
-          {{ $t('revoked') }}
+          {{ $t('token.revoked') }}
         </span>
       </template>
-      <template v-slot:empty="scope">
+      <template v-slot:table-busy>
+        <loading />
+      </template>
+      <template v-slot:empty>
         <div
           class="text-warning text-center"
         >
-          {{ $t('notokens') }}
+          <list-empty
+            :status="status"
+            :text-empty="$t('token.notokens')"
+            @reload="getTokens()"
+          />
         </div>
       </template>
-      <template v-slot:emptyfiltered="scope">
+      <template v-slot:emptyfiltered>
         <div
           class="text-warning text-center"
         >
-          {{ $t('notokens') }}
+          {{ $t('token.notokens') }}
         </div>
       </template>
     </b-table>
@@ -208,12 +166,17 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import moment from 'moment';
+import Loading from '@/components/globalloading/Loading';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import ListEmpty from '@/components/globallist/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListTokens',
-  components: { },
+  components: { Loading, ListEmpty, KheopsClipLoader },
   props: {
     scope: {
       type: String,
@@ -230,47 +193,48 @@ export default {
     return {
       showInvalid: false,
       loadingData: false,
+      onloading: {},
       sortBy: 'expiration_date',
       fields: [
         {
           key: 'status',
-          label: this.$t('status'),
+          label: this.$t('token.status'),
           sortable: true,
         },
         {
           key: 'title',
-          label: this.$t('description'),
+          label: this.$t('token.description'),
           sortable: true,
           tdClass: 'word-break',
         },
         {
           key: 'scope_type',
-          label: this.$t('scope'),
+          label: this.$t('token.scope'),
           sortable: true,
           class: this.scope === 'album' ? 'd-none' : 'd-none d-sm-table-cell',
           tdClass: 'word-break',
         },
         {
           key: 'expiration_time',
-          label: this.$t('expiration date'),
+          label: this.$t('token.expirationdate'),
           sortable: true,
-          class: 'd-none d-sm-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'issued_at_time',
-          label: this.$t('create date'),
+          label: this.$t('token.creationdate'),
           sortable: true,
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
         },
         {
           key: 'last_used',
-          label: this.$t('last used'),
+          label: this.$t('token.lastuse'),
           sortable: true,
           class: 'd-none d-lg-table-cell',
         },
         {
           key: 'permission',
-          label: this.$t('permission'),
+          label: this.$t('token.permission'),
           sortable: true,
           class: 'd-none d-sm-table-cell',
         },
@@ -284,6 +248,7 @@ export default {
         actionid: '',
         action: '',
       },
+      status: -1,
     };
   },
   computed: {
@@ -304,9 +269,7 @@ export default {
   created() {
     this.loadingData = true;
     this.initRouterName();
-    this.getTokens().then(() => {
-      this.loadingData = false;
-    });
+    this.getTokens();
   },
   beforeDestroy() {
     this.$store.dispatch('initValidParamToken');
@@ -321,14 +284,38 @@ export default {
       this.$store.dispatch('setValidParamToken', !this.showInvalid);
     },
     getTokens() {
+      this.loadingData = true;
       if (this.scope === 'album' && this.albumid) {
         const queries = {
           valid: !this.showInvalid,
           album: this.albumid,
         };
-        return this.$store.dispatch('getAlbumTokens', { queries });
+        return this.$store.dispatch('getAlbumTokens', { queries }).then((res) => {
+          const tokens = res.data;
+          this.setOnLoading(tokens);
+          this.loadingData = false;
+          this.status = -1;
+        }).catch((err) => {
+          this.loadingData = false;
+          this.status = httpoperations.getStatusError(err);
+          Promise.reject(err);
+        });
       }
-      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid });
+      return this.$store.dispatch('getUserTokens', { showInvalid: this.showInvalid, album_id: this.albumid }).then((res) => {
+        const tokens = res;
+        this.setOnLoading(tokens);
+        this.loadingData = false;
+        this.status = -1;
+      }).catch((err) => {
+        this.loadingData = false;
+        this.status = httpoperations.getStatusError(err);
+        Promise.reject(err);
+      });
+    },
+    setOnLoading(tokens) {
+      tokens.forEach((token) => {
+        Vue.set(this.onloading, token.id, false);
+      });
     },
     loadToken(item) {
       const action = 'token';
@@ -350,10 +337,15 @@ export default {
       return 'active';
     },
     revoke(tokenId) {
-      this.$store.dispatch('revokeToken', { token_id: tokenId }).then((res) => {
-        this.$snotify.success(`token ${res.data.title} ${this.$t('revokedsuccess')}`);
-        this.getTokens();
+      Vue.set(this.onloading, tokenId, true);
+      this.$store.dispatch('revokeToken', { token_id: tokenId }).then(() => {
+        this.getTokens().then(() => {
+          Vue.set(this.onloading, tokenId, false);
+        }).catch(() => {
+          Vue.set(this.onloading, tokenId, false);
+        });
       }).catch(() => {
+        Vue.set(this.onloading, tokenId, false);
         this.$snotify.error(this.$t('sorryerror'));
       });
     },

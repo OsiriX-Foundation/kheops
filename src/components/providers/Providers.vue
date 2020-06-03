@@ -1,31 +1,22 @@
-<i18n>
-  {
-    "en": {
-      "newprovider": "New report provider"
-
-    },
-    "fr": {
-      "newprovider": "Nouveau report provider"
-    }
-  }
-</i18n>
-
 <template>
   <div>
     <div
       v-if="(currentView === 'listproviders') && writePermission"
       class="my-3 selection-button-container provider-position"
     >
-      <button
+      <router-link
+        :to="{
+          name: 'albumsettingsaction',
+          params: { action: 'newprovider' }
+        }"
         class="btn btn-secondary"
-        @click="loadAction('newprovider')"
       >
         <v-icon
           name="plus"
           class="mr-2"
         />
-        {{ $t('newprovider') }}
-      </button>
+        {{ $t('provider.newprovider') }}
+      </router-link>
     </div>
 
     <new-provider

@@ -15,6 +15,7 @@ const state = {
     is_indeterminate: false,
     view: '',
   },
+  source: '',
   modalities: [],
 };
 
@@ -40,7 +41,12 @@ const getters = {
 
 // actions
 const actions = {
-  initStudies({ commit }) {
+  initStudies({ commit }, source) {
+    if (source !== undefined && typeof source === 'string') {
+      state.source = source;
+    } else {
+      state.source = '';
+    }
     commit('INIT_STUDIES');
   },
   getStudies({ commit }, params) {
@@ -53,13 +59,16 @@ const actions = {
       if (res.data !== '') {
         const studies = dicomoperations.translateDICOM(res.data);
         studies.forEach((study) => {
+          /* eslint-disable no-param-reassign */
           study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
-          study.flag.is_favorite = study.SumFavorites.Value[0] > 0;
-          study.flag.is_commented = study.SumComments.Value[0] > 0;
+          study.flag.is_favorite = study.SumFavorites !== undefined ? study.SumFavorites.Value[0] > 0 : false;
+          study.flag.is_commented = study.SumComments !== undefined ? study.SumComments.Value[0] > 0 : false;
           // https://bootstrap-vue.js.org/docs/components/table/
           // chapter - Row details support
+          // eslint-disable-next-line
           study._showDetails = false;
           study.showIcons = false;
+          /* eslint-enable no-param-reassign */
         });
         if (params.queries.offset === 0) {
           commit('INIT_STUDIES');
@@ -85,11 +94,14 @@ const actions = {
           const currentUID = study.StudyInstanceUID.Value[0];
           const stateUID = state.studies[index] !== undefined ? state.studies[index].StudyInstanceUID.Value[0] : undefined;
 
+          /* eslint-disable no-param-reassign */
           study.flag = JSON.parse(JSON.stringify(state.defaultFlagStudy));
-          study.flag.is_favorite = study.SumFavorites.Value[0] > 0;
-          study.flag.is_commented = study.SumComments.Value[0] > 0;
+          study.flag.is_favorite = study.SumFavorites !== undefined ? study.SumFavorites.Value[0] > 0 : false;
+          study.flag.is_commented = study.SumComments !== undefined ? study.SumComments.Value[0] > 0 : false;
+          // eslint-disable-next-line
           study._showDetails = false;
           study.showIcons = false;
+          /* eslint-enable no-param-reassign */
           if (state.studies.length > 0 && currentUID !== stateUID) {
             const paramsUpdate = {
               index,
@@ -146,7 +158,7 @@ const actions = {
   deleteStudy({ commit }, params) {
     const request = `/studies/${params.StudyInstanceUID}`;
     return HTTP.delete(request).then(() => {
-      commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
+      commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID, source: params.source });
       commit('DELETE_SERIE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
       return true;
     }).catch((err) => {
@@ -168,10 +180,11 @@ const actions = {
     if (params.queries !== undefined) {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
+    const { headers } = params;
     const promises = [];
     params.data.forEach((d) => {
       if (d.serie_id) {
-        promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`)
+        promises.push(HTTP.put(`${request}/${d.study_id}/series/${d.serie_id}${queries}`, {}, { headers })
           .then((res) => ({
             res,
             studyId: d.study_id,
@@ -185,7 +198,7 @@ const actions = {
             albumId: d.album_id,
           })));
       } else {
-        promises.push(HTTP.put(`${request}/${d.study_id}${queries}`)
+        promises.push(HTTP.put(`${request}/${d.study_id}${queries}`, {}, { headers })
           .then((res) => ({
             res,
             studyId: d.study_id,
@@ -239,18 +252,23 @@ const mutations = {
     }
   },
   SET_STUDY_FLAG(state, params) {
-    const study = state.studies[params.index];
-    study.flag[params.flag] = params.value;
-    Vue.set(state.studies, params.index, study);
+    if (params.index !== -1 && state.studies[params.index] !== undefined) {
+      const study = state.studies[params.index];
+      study.flag[params.flag] = params.value;
+      Vue.set(state.studies, params.index, study);
+    }
   },
   DELETE_STUDY(state, params) {
-    const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
-    if (studyIdx > -1) {
-      Vue.delete(state.studies, studyIdx);
+    if (state.source === '' || state.source === params.source) {
+      const studyIdx = _.findIndex(state.studies, (s) => s.StudyInstanceUID.Value[0] === params.StudyInstanceUID);
+      if (studyIdx > -1) {
+        Vue.delete(state.studies, studyIdx);
+      }
     }
   },
   SET_STUDY_SHOW_DETAILS(state, params) {
     const study = state.studies[params.index];
+    // eslint-disable-next-line
     study._showDetails = params.value;
     Vue.set(state.studies, params.indexStudy, study);
   },

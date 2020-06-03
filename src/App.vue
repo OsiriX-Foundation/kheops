@@ -1,70 +1,103 @@
-<i18n>
-{
-  "en": {
-    "albums": "Kheops - Albums",
-    "album": "Kheops - Album",
-    "newalbum": "Kheops - New album",
-    "user": "Kheops - User"
-  },
-  "fr": {
-    "albums": "Kheops - Albums",
-    "album": "Kheops - Album",
-    "newalbum": "Kheops - Nouvel album",
-    "user": "Kheops - Utilisateur"
-  }
-}
-</i18n>
 <template>
   <div id="app">
     <vue-snotify />
     <nav-header
-      :logged="logged"
+      v-if="showNavHeader"
+      :logged="oidcIsAuthenticated"
     />
     <nav-bar
-      v-if="logged"
+      v-if="oidcIsAuthenticated"
     />
-
     <!-- content -->
     <router-view
-      :style="logged ? 'margin: 25px auto' : 'margin: 75px auto'"
+      v-if="userSend === true || oidcIsAuthenticated === false"
+      :style="oidcIsAuthenticated ? 'margin: 25px auto' : 'margin: 75px auto'"
     />
-
+    <loading
+      v-else
+    />
     <send-studies />
     <!-- footer -->
-    <footer>
-    </footer>
+    <footer />
   </div>
 </template>
 
 <script>
 
+import { mapGetters, mapActions } from 'vuex';
 import navHeader from '@/components/navheader';
 import navBar from '@/components/navbar';
 import SendStudies from '@/components/study/SendStudies';
+import { CurrentUser } from '@/mixins/currentuser.js';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'App',
-  components: { navHeader, navBar, SendStudies },
+  components: {
+    navHeader,
+    navBar,
+    SendStudies,
+    Loading,
+  },
+  mixins: [CurrentUser],
   data() {
     return {
-      appTitle: 'Kheops',
+      appTitle: 'KHEOPS',
+      userSend: false,
     };
   },
   computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+      'oidcAccessToken',
+    ]),
     year() {
       return new Date().getFullYear();
     },
-    logged() {
-      return this.$keycloak.authenticated;
+    showNavHeader() {
+      return this.$route.meta.header === undefined ? true : this.$route.meta.header;
     },
   },
   watch: {
     $route(to) {
-      document.title = this.$t(to.meta.title) || this.appTitle;
+      document.title = to.meta.title === undefined ? this.appTitle : this.$t(`doctitle.${to.meta.title}`, { appTitle: this.appTitle });
+    },
+    oidcAccessToken() {
+      this.accessTokenLoaded(this.oidcAccessToken);
     },
   },
+  mounted() {
+    window.addEventListener('vuexoidc:userSignedOut', this.userSignOut);
+  },
   created() {
-    document.title = 'Kheops';
+    document.title = this.$route.meta.title === undefined ? this.appTitle : this.$t(`doctitle.${this.$route.meta.title}`, { appTitle: this.appTitle });
+  },
+  destroyed() {
+    window.removeEventListener('vuexoidc:userSignedOut', this.userSignOut);
+  },
+  methods: {
+    ...mapActions('oidcStore', [
+      'authenticateOidc',
+    ]),
+    userSignOut() {
+      if (!this.oidcIsAuthenticated) {
+        this.authenticateOidc();
+      }
+    },
+    accessTokenLoaded(accessToken) {
+      if (this.userSend === false) {
+        if (accessToken !== null) {
+          this.postAccessToken(accessToken).then((res) => {
+            if (res.status === 200) {
+              this.userSend = true;
+            }
+          }).catch((err) => {
+            this.userSend = true;
+            console.log(err);
+          });
+        }
+      }
+    },
   },
 };
 </script>

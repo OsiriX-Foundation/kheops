@@ -1,33 +1,9 @@
-<i18n>
-{
-  "en": {
-    "edit": "Edit",
-    "urlWorking": "This provider is on",
-    "urlNotWorking": "This provider is off",
-    "refresh": "Refresh",
-    "created_time": "Created time",
-    "name_provider": "Name of provider",
-    "url": "Configuration URL",
-    "noreports": "There are no report providers to show"
-  },
-  "fr": {
-    "edit": "Editer",
-    "urlWorking": "Ce provider est accessible",
-    "urlNotWorking": "Ce provider n'est pas accessible",
-    "refresh": "Rafraîchir",
-    "created_time": "Date de création",
-    "name_provider": "Nom du provider",
-    "url": "URL de configuration",
-    "noreports": "Aucun report provider créé"
-  }
-}
-</i18n>
 <template>
   <div>
     <div class="d-flex">
       <div>
         <h4>
-          Report providers
+          Report Providers
         </h4>
       </div>
       <div class="ml-auto">
@@ -40,19 +16,19 @@
       </div>
     </div>
     <b-table
-      stacked="sm"
       striped
       hover
       show-empty
+      sort-icon-left
       :items="providers"
       :fields="fields"
       :sort-desc="true"
+      :busy="loadingData"
       tbody-tr-class="link"
       @row-clicked="selectProvider"
     >
       <template
-        slot="url_check"
-        slot-scope="data"
+        v-slot:cell(url_check)="data"
       >
         <state-provider
           :loading="data.item.stateURL.loading"
@@ -62,8 +38,7 @@
       </template>
       <template
         v-if="writePermission"
-        slot="btn_edit"
-        slot-scope="data"
+        v-slot:cell(btn_edit)="data"
       >
         <button
           class="btn btn-sm btn-primary"
@@ -72,18 +47,25 @@
           {{ $t('edit') }}
         </button>
       </template>
-      <template v-slot:empty="scope">
+      <template v-slot:table-busy>
+        <loading />
+      </template>
+      <template v-slot:empty>
         <div
           class="text-warning text-center"
         >
-          {{ $t('noreports') }}
+          <list-empty
+            :status="status"
+            :text-empty="$t('provider.noreports')"
+            @reload="getProviders()"
+          />
         </div>
       </template>
-      <template v-slot:emptyfiltered="scope">
+      <template v-slot:emptyfiltered>
         <div
           class="text-warning text-center"
         >
-          {{ $t('noreports') }}
+          {{ $t('provider.noreports') }}
         </div>
       </template>
     </b-table>
@@ -92,11 +74,14 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import Loading from '@/components/globalloading/Loading';
 import StateProvider from '@/components/providers/StateProvider';
+import ListEmpty from '@/components/globallist/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'ListProviders',
-  components: { StateProvider },
+  components: { StateProvider, Loading, ListEmpty },
   props: {
     albumID: {
       type: String,
@@ -111,33 +96,45 @@ export default {
   },
   data() {
     return {
-      fields: {
-        name: {
-          label: this.$t('name_provider'),
-          sortable: true,
-          tdClass: 'word-break',
+      status: -1,
+      loadingData: false,
+      fields: [
+        {
+          key: 'url_check',
+          label: '',
+          sortable: false,
         },
-        url: {
-          label: this.$t('url'),
+        {
+          key: 'name',
+          label: this.$t('provider.name_provider'),
+          sortable: true,
+        },
+        {
+          key: 'url',
+          label: this.$t('provider.url'),
           sortable: true,
           tdClass: 'word-break',
           class: 'd-none d-sm-table-cell',
         },
-        created_time: {
-          label: this.$t('created_time'),
+        {
+          key: 'created_time',
+          label: this.$t('provider.created_time'),
           sortable: true,
           tdClass: 'word-break',
-          class: 'd-none d-md-table-cell',
+          class: 'd-none d-lg-table-cell',
+          formatter: (createdTime) => {
+            if (createdTime !== undefined) {
+              return this.$options.filters.formatDateTimeDetails(createdTime);
+            }
+            return '';
+          },
         },
-        btn_edit: {
+        {
+          key: 'btn_edit',
           label: '',
           sortable: false,
         },
-        url_check: {
-          label: '',
-          sortable: false,
-        },
-      },
+      ],
     };
   },
   computed: {
@@ -146,15 +143,19 @@ export default {
     }),
   },
   created() {
-    this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
-      if (res.status !== 200) {
-        this.$snotify.error('Sorry, an error occured');
-      }
-    }).catch((err) => {
-      console.log(err);
-    });
+    this.getProviders();
   },
   methods: {
+    getProviders() {
+      this.loadingData = true;
+      return this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
+        this.loadingData = false;
+        this.status = -1;
+      }).catch((err) => {
+        this.loadingData = false;
+        this.status = httpoperations.getStatusError(err);
+      });
+    },
     selectProvider(rowSelected) {
       this.$emit('providerselectedshow', rowSelected.client_id);
     },
@@ -162,13 +163,7 @@ export default {
       this.$emit('providerselectededit', clientId);
     },
     refresh() {
-      this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
-        if (res.status !== 200) {
-          this.$snotify.error('Sorry, an error occured');
-        }
-      }).catch((err) => {
-        console.log(err);
-      });
+      this.getProviders();
     },
   },
 };

@@ -1,41 +1,3 @@
-<i18n>
-{
-  "en": {
-    "filesSend": "{count} files have been sent | {count} file has been sent | {count} files have been sent",
-    "locationSend": ". | in an",
-    "album": "album.",
-    "filesErrors": "{count} files produced an error. | {count} file produced an error. | {count} files produced an error.",
-    "showError": "Show errors",
-    "hideError": "Hide errors",
-    "cancel": "Cancel",
-    "titleBoxSending": "Sending files",
-    "titleBoxSended": "Files sent",
-    "titleBoxDicomize": "Waiting for your input",
-    "unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
-    "errorcode": "Error code",
-    "authorizationerror": "Authorization Error",
-    "nondicomfile": "Non DICOM file",
-    "unknownerror": "Unknown Error"
-  },
-  "fr": {
-    "filesSend": "{count} fichier a été envoyé | {count} fichier a été envoyé | {count} fichiers ont été envoyés",
-    "locationSend": ". | dans un",
-    "album": "album.",
-    "filesErrors": "{count} fichier a rencontré une erreur. | {count} fichier a rencontré une erreur. | {count} fichiers ont rencontré une erreur.",
-    "showError": "Montrer les erreurs",
-    "hideError": "Cacher les erreurs",
-    "cancel": "Annuler",
-    "titleBoxSending": "Fichiers en cours d'envois",
-    "titleBoxSended": "Fichiers envoyés",
-    "titleBoxDicomize": "En attente d'informations",
-    "unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
-    "errorcode": "Code d'erreur",
-    "authorizationerror": "Erreur d'authorisation",
-    "nondicomfile": "Fichier non DICOM",
-    "unknownerror": "Erreur inconnue"
-  }
-}
-</i18n>
 <template>
   <div>
     <div
@@ -49,7 +11,7 @@
           v-if="sending === true && UI.getInfo === false"
           class="p-2"
         >
-          <clip-loader
+          <kheops-clip-loader
             :loading="sending"
             :size="'20px'"
             :color="'white'"
@@ -60,22 +22,19 @@
           class="p-2"
         >
           <done-icon
-            v-if="error.length === 0"
+            v-if="error.length === 0 && totalUnknownFilesError === 0"
             :height="'20'"
             :width="'20'"
           />
-          <span
-            v-if="error.length > 0 && error.length < totalSize"
-          >
-            <v-icon
-              name="warning"
-              :height="'20'"
-              :width="'20'"
-              color="red"
-            />
-          </span>
+          <v-icon
+            v-if="(error.length > 0 || totalUnknownFilesError > 0) && (error.length + totalUnknownFilesError) < totalSize"
+            name="warning"
+            :height="'20'"
+            :width="'20'"
+            color="red"
+          />
           <error-icon
-            v-if="error.length === totalSize"
+            v-if="(error.length === totalSize || totalUnknownFilesError === totalSize) && totalSize !== 0"
             :height="'20'"
             :width="'20'"
             color="red"
@@ -87,7 +46,9 @@
         >
           <v-icon
             class="align-middle"
-            name="baidu"
+            name="warning"
+            :height="'20'"
+            :width="'20'"
           />
         </div>
         <div
@@ -96,17 +57,17 @@
           <span
             v-if="sending === true && UI.getInfo === false"
           >
-            {{ $t("titleBoxSending") }}
+            {{ $t("upload.titleBoxSending") }}
           </span>
           <span
             v-else-if="sending === false && UI.getInfo === false"
           >
-            {{ $t("titleBoxSended") }}
+            {{ $t("upload.titleBoxSended") }}
           </span>
           <span
             v-else-if="UI.getInfo === true"
           >
-            {{ $t("titleBoxDicomize") }}
+            {{ $t("upload.titleBoxDicomize") }}
           </span>
         </div>
         <!--
@@ -180,7 +141,7 @@
             v-if="UI.cancel === false"
           >
             <b-progress-bar
-              :value="countSentFiles+progress"
+              :value="progress"
               :max="totalSize"
               show-progress
               animated
@@ -210,7 +171,7 @@
           <div
             v-else
           >
-            <clip-loader
+            <kheops-clip-loader
               :loading="UI.cancel"
               :size="UI.SpinnerCancelSize"
               :color="'red'"
@@ -227,17 +188,16 @@
           <div
             class="col-11 mt-2 mb-2 ml-3"
           >
-            {{ $tc("filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
-            {{ $tc("locationSend", sourceIsAlbum ? 0 : 1) }}
+            {{ $tc("upload.filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
+            {{ $tc("upload.locationSend", sourceIsAlbum ? 0 : 1) }}
             <span
               v-if="sourceIsAlbum"
             >
-              <a
-                href="#"
-                @click="goToAlbum()"
+              <router-link
+                :to="{ name: 'album', params: { album_id: sourceSending.value }}"
               >
-                {{ $t("album") }}
-              </a>
+                {{ $t("upload.album") }}
+              </router-link>
             </span>
 
             <span
@@ -254,11 +214,11 @@
                 v-for="(item, key) in listErrorUnknownFiles"
                 :key="item.key"
               >
-                {{ $tc("unknownError", item, {count: item }) }} <br>
+                {{ $tc("upload.unknownError", item, {count: item }) }} <br>
                 <span
                   class="text-warning"
                 >
-                  {{ errorValues[key] }}
+                  {{ generateTextError(key) }}
                 </span>
               </div>
             </div>
@@ -266,16 +226,32 @@
             <div
               v-if="error.length > 0"
             >
-              {{ $tc("filesErrors", error.length, {count: error.length}) }} <br>
+              <div
+                class="mb-1"
+              >
+                <span>
+                  {{ $tc("upload.filesErrors", error.length, {count: error.length}) }}
+                </span>
+              </div>
+              <div
+                class="mb-1"
+              >
+                <a
+                  class="text-center text-neutral"
+                  @click="retry"
+                >
+                  {{ $t('upload.reload') }}
+                </a>
+              </div>
               <a
                 class="text-center text-warning"
                 @click="UI.showErrors=!UI.showErrors"
               >
                 <span v-if="!UI.showErrors">
-                  {{ $t("showError") }}
+                  {{ $t("upload.showError") }}
                 </span>
                 <span v-else>
-                  {{ $t("hideError") }}
+                  {{ $t("upload.hideError") }}
                 </span>
                 <error-icon
                   :height="UI.SVGheight"
@@ -313,24 +289,23 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import { HTTP } from '@/router/http';
 import ListErrorFiles from '@/components/study/ListErrorFiles';
 import InputDicomize from '@/components/study/InputDicomize';
 import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue';
 import BlockIcon from '@/components/kheopsSVG/BlockIcon';
 import CloseIcon from '@/components/kheopsSVG/CloseIcon';
-import AddIcon from '@/components/kheopsSVG/AddIcon';
-import RemoveIcon from '@/components/kheopsSVG/RemoveIcon';
 import DoneIcon from '@/components/kheopsSVG/DoneIcon';
 import { DicomOperations } from '@/mixins/dicomoperations';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'SendStudies',
   components: {
-    ListErrorFiles, ErrorIcon, ClipLoader, BlockIcon, CloseIcon, AddIcon, RemoveIcon, DoneIcon, InputDicomize,
+    ListErrorFiles, ErrorIcon, KheopsClipLoader, BlockIcon, CloseIcon, DoneIcon, InputDicomize,
   },
-  mixins: [DicomOperations],
+  mixins: [DicomOperations, CurrentUser],
   props: {
   },
   data() {
@@ -355,20 +330,42 @@ export default {
             Accept: 'application/dicom+json',
           },
           onUploadProgress: (progressEvent) => {
-            this.progress = this.currentFilesLength * (progressEvent.loaded / progressEvent.total);
+            this.progress = this.countSentFiles + (this.currentFilesLength * (progressEvent.loaded / progressEvent.total));
           },
         },
         dicomizeData: {
           headers: {
             'Content-Type': 'multipart/related; type="application/dicom+json"; boundary=myboundary',
           },
+          onUploadProgress: (progressEvent) => {
+            this.progress = this.countSentFiles + (this.currentFilesLength * (progressEvent.loaded / progressEvent.total));
+          },
         },
       },
       errorValues: {
-        292: 'authorizationerror',
-        272: 'nondicomfile',
-        0: 'unknownerror',
+        0xC122: 'upload.transfersyntaxnotsupported',
+        292: 'upload.authorizationerror',
+        290: 'upload.sopnotsupported',
+        272: 'upload.processingfailure',
+        0: 'upload.unknownerror',
       },
+      hexErrorValues: [
+        {
+          pattern: 255,
+          value: 0xA7FF,
+          error: 'upload.refused',
+        },
+        {
+          pattern: 255,
+          value: 0xA9FF,
+          error: 'upload.notmatchsop',
+        },
+        {
+          pattern: 4095,
+          value: 0xCFFF,
+          error: 'upload.cannotunderstand',
+        },
+      ],
       errorDicom: {
         '0008119A': '00041500',
         '00081198': '00041500',
@@ -389,14 +386,17 @@ export default {
       files: 'files',
       totalSize: 'totalSize',
       error: 'error',
-      source: 'source',
+      sourceSending: 'sourceSending',
       studyUIDToSend: 'studyUIDToSend',
     }),
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
     totalSizeFiles() {
       return this.copyFiles.reduce((total, file) => total + file.content.size, 0);
     },
     sourceIsAlbum() {
-      return (this.source !== 'inbox' && this.source !== undefined);
+      return (this.sourceSending.key !== 'inbox' && this.sourceSending !== undefined && Object.keys(this.sourceSending).length > 0);
     },
   },
   watch: {
@@ -419,8 +419,9 @@ export default {
   destroyed() {
   },
   methods: {
-    goToAlbum() {
-      this.$router.push(`/albums/${this.source}`);
+    retry() {
+      this.$store.dispatch('setSending', { sending: true });
+      this.$store.dispatch('setFiles', { files: this.error });
     },
     closeWindow() {
       this.UI.show = !this.UI.show;
@@ -471,38 +472,58 @@ export default {
         this.sendFormData(this.filesFiltered);
       }
     },
+    errorDicomize(file, err = undefined) {
+      const status = err !== undefined ? err.status : undefined;
+      this.generateErrorNonDicom([file], status);
+      this.$store.dispatch('removeFileId', { id: file.id });
+    },
     sendDicomizeFiles(files, dicomValue) {
-      files.forEach((file) => {
-        this.dicomize(this.studyUIDToSend, file, dicomValue[file.name]).then((res) => {
-          if (res !== -1) {
-            const data = res;
-            this.sendDicomizeDataPromise(file.id, data).then(() => {
-              this.$store.dispatch('removeFileId', { id: file.id });
-              this.countSentFiles += 1;
+      let promiseSequential = Promise.resolve();
+      this.getStudy(this.studyUIDToSend).then((res) => {
+        const study = res.data[0];
+        files.forEach((file) => {
+          promiseSequential = promiseSequential.then(() => new Promise((resolve, reject) => {
+            this.dicomize(study, file, dicomValue[file.name]).then((resdicomize) => {
+              const data = resdicomize;
+              this.sendDicomizeDataPromise(file.id, data).then(() => {
+                this.$store.dispatch('removeFileId', { id: file.id });
+                this.countSentFiles += 1;
+                resolve({ id: file.id, data });
+              }).catch((err) => {
+                reject(err);
+              });
             }).catch((err) => {
-              this.generateErrorNonDicom([file], err.status);
-              this.$store.dispatch('removeFileId', { id: file.id });
-              this.countSentFiles += 1;
+              reject(err);
             });
-          } else {
-            this.$store.dispatch('removeFileId', { id: file.id });
+          })).catch((err) => {
+            console.log(err);
+            this.errorDicomize(file, err);
             this.countSentFiles += 1;
-          }
+          });
+        });
+      }).catch((err) => {
+        console.log(err);
+        files.forEach((file) => {
+          this.errorDicomize(file, err);
+          this.countSentFiles += 1;
         });
       });
     },
     sendDicomizeDataPromise(idFile, data) {
       return new Promise((resolve, reject) => {
-        const formData = new FormData();
-        formData.append(idFile, data);
-
-        const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
-
-        HTTP.post(request, data, this.config.dicomizeData).then((res) => {
-          resolve(res);
-        }).catch((err) => {
-          reject(err);
-        });
+        if (!this.UI.cancel && this.files.length > 0) {
+          const formData = new FormData();
+          this.currentFilesLength = 1;
+          formData.append(idFile, data);
+          const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
+          const headers = this.setAuthorizationHeader();
+          this.config.dicomizeData.headers = { ...this.config.dicomizeData.headers, ...headers };
+          HTTP.post(request, data, this.config.dicomizeData).then((res) => {
+            resolve(res);
+          }).catch((err) => {
+            reject(err);
+          });
+        }
       });
     },
     sendFormData(files) {
@@ -512,6 +533,13 @@ export default {
         this.sendBySize(files);
       }
     },
+    setAuthorizationHeader() {
+      const headers = {};
+      if (this.getCurrentuserAccessToken(this.oidcIsAuthenticated) !== '') {
+        headers.Authorization = `Bearer ${this.getCurrentuserAccessToken(this.oidcIsAuthenticated)}`;
+      }
+      return headers;
+    },
     initVariablesForSending() {
       this.UI.show = true;
       this.UI.cancel = false;
@@ -520,7 +548,6 @@ export default {
       this.progress = 0;
       this.listErrorUnknownFiles = {};
       this.totalUnknownFilesError = 0;
-
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('initErrorFiles');
     },
@@ -560,7 +587,9 @@ export default {
         if (!this.UI.cancel && this.files.length > 0) {
           const formData = this.createFormData(files);
           this.currentFilesLength = files.length;
-          const request = `/studies${this.sourceIsAlbum ? `?album=${this.source}` : ''}`;
+          const headers = this.setAuthorizationHeader();
+          this.config.formData.headers = { ...this.config.formData.headers, ...headers };
+          const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
           HTTP.post(request, formData, this.config.formData).then((res) => {
             this.manageResult(files, res.data, res.status);
             resolve(res);
@@ -598,7 +627,7 @@ export default {
       Object.keys(this.errorDicom).forEach((key) => {
         if (Object.prototype.hasOwnProperty.call(data, key)) {
           const errorInResponse = this.dicom2map(data[key].Value, this.errorDicom[key]);
-          this.generateListError(data[key].Value, this.errorDicom[key]);
+          this.createListUnknownError(data[key].Value, this.errorDicom[key]);
           this.createListError(errorInResponse);
           error = 0;
         }
@@ -616,23 +645,45 @@ export default {
       error.forEach((errorCode, id) => {
         const fileError = this.copyFiles.find((file) => file.id === id);
         if (fileError) {
-          const textError = this.errorValues[errorCode] !== undefined ? this.$t(this.errorValues[errorCode]) : `${this.$t('errorcode')}: ${errorCode}`;
-          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError.path, textError) });
+          const textError = this.errorValues[errorCode] !== undefined ? `${this.$t(this.errorValues[errorCode])} (${errorCode})` : `${this.$t('upload.errorcode')}: ${errorCode}`;
+          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError) });
+        } else {
+          this.updateListUnknownError(errorCode);
         }
       });
     },
-    generateListError(dicom, dicomTagFile) {
+    createListUnknownError(dicom, dicomTagFile) {
       dicom.forEach((x) => {
         if (!Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
           const errorCode = x[this.dicomTagError].Value[0];
-          if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
-            this.listErrorUnknownFiles[errorCode] += 1;
-          } else {
-            this.listErrorUnknownFiles[errorCode] = 1;
-          }
-          this.totalUnknownFilesError += 1;
+          this.updateListUnknownError(errorCode);
         }
       });
+    },
+    updateListUnknownError(errorCode) {
+      if (Object.prototype.hasOwnProperty.call(this.listErrorUnknownFiles, errorCode)) {
+        this.listErrorUnknownFiles[errorCode] += 1;
+      } else {
+        this.listErrorUnknownFiles[errorCode] = 1;
+      }
+      this.totalUnknownFilesError += 1;
+    },
+    generateTextError(errorCode) {
+      const code = parseInt(errorCode, 10);
+      if (this.errorValues[code] !== undefined) {
+        return `${this.$t(this.errorValues[code])} (${code})`;
+      }
+      let errorText = '';
+      this.hexErrorValues.forEach((error) => {
+        // eslint-disable-next-line no-bitwise
+        if ((code | error.pattern) === error.value) {
+          errorText = `${this.$t(error.error)} (${code})`;
+        }
+      });
+      if (errorText !== '') {
+        return errorText;
+      }
+      return `${this.$t('upload.unknownerror')} (${errorCode})`;
     },
     dicom2map(dicom, dicomTagFile) {
       const map = new Map();
@@ -645,11 +696,10 @@ export default {
       });
       return map;
     },
-    createObjErrors(id, value) {
-      return {
-        id,
-        value,
-      };
+    createObjErrors(file, value) {
+      const objError = file;
+      objError.value = value;
+      return objError;
     },
     setShowErrors(value) {
       this.UI.showErrors = value;

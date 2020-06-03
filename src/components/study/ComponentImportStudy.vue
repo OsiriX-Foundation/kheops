@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en": {
-    "cantUpload": "You can't upload when files are sending",
-    "upload": "Drop your files / directories !",
-    "cantUploadPermission": "You do not have the required permissions to upload studies.",
-    "cancel": "Cancel"
-  },
-  "fr": {
-    "cantUpload": "Vous ne pouvez pas charger d'autres fichiers pendant un envoi.",
-    "upload": "Lâcher vos fichiers / dossiers !",
-    "cantUploadPermission": "Vous n'avez pas les permissions requises pour charger des études.",
-    "cancel": "Annuler"
-  }
-}
-</i18n>
-
 <template>
   <div
     id="file-drag-drop"
@@ -40,26 +23,26 @@
           <p
             v-if="!canUpload"
           >
-            {{ $t("cantUploadPermission") }}
+            {{ $t("upload.cantUploadPermission") }}
           </p>
           <p
             v-else-if="sending && files.length > 0"
           >
             <span>
-              {{ $t("cantUpload") }}
+              {{ $t("upload.cantUpload") }}
             </span>
           </p>
           <p
             v-else
           >
-            {{ $t("upload") }}
+            {{ $t("upload.upload") }}
           </p>
         </div>
         <div
           v-if="loading"
           class="outPopUp"
         >
-          <clip-loader
+          <kheops-clip-loader
             :loading="loading"
             :size="'60px'"
             :color="'white'"
@@ -68,13 +51,24 @@
         <div
           :class="['dropzone-area', classDragIn]"
         >
-          <list
-            ref="list"
-            :permissions="permissions"
-            :source="source"
-            @loadfiles="inputLoadFiles"
-            @loaddirectories="inputLoadFiles"
-          />
+          <slot name="dropzone-content">
+            <!--
+            <list
+              ref="list"
+              :permissions="permissions"
+              :album-i-d="albumID"
+              @loadfiles="inputLoadFiles"
+              @loaddirectories="inputLoadFiles"
+            />
+            -->
+            <manage-list
+              ref="list"
+              :permissions="permissions"
+              :album-i-d="albumID"
+              @loadfiles="inputLoadFiles"
+              @loaddirectories="inputLoadFiles"
+            />
+          </slot>
         </div>
       </div>
     </form>
@@ -83,23 +77,23 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
-import List from '@/components/inbox/List';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import ManageList from '@/components/studieslist/ManageList';
 import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
   name: 'ComponentDragAndDrop',
-  components: { ClipLoader, List },
+  components: { KheopsClipLoader, ManageList },
   props: {
-    source: {
-      type: Object,
-      required: false,
-      default: () => ({}),
-    },
     permissions: {
       type: Object,
       required: true,
       default: () => ({}),
+    },
+    albumID: {
+      type: String,
+      required: false,
+      default: undefined,
     },
   },
   data() {
@@ -117,6 +111,7 @@ export default {
       sending: 'sending',
       files: 'files',
       demoDragAndDrop: 'demoDragAndDrop',
+      source: 'source',
     }),
     canUpload() {
       return this.permissions.add_series;
@@ -186,7 +181,7 @@ export default {
     storeFiles(files) {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files });
-      this.$store.dispatch('setSource', { source: this.source.key === 'inbox' ? this.source.key : this.source.value });
+      this.$store.dispatch('setSourceSending', { source: this.source });
     },
     createObjFiles(file, path, name) {
       if (!this.excludeFileName(name)) {
@@ -267,7 +262,11 @@ export default {
     },
     determineDragAndDropCapable() {
       const div = document.createElement('div');
-      return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+      let canUpload = this.permissions.add_series;
+      if (process.env.VUE_APP_DISABLE_UPLOAD !== undefined) {
+        canUpload = canUpload && !process.env.VUE_APP_DISABLE_UPLOAD.includes('true');
+      }
+      return ((('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window && canUpload);
     },
     determineGetAsEntry(item) {
       if (item.getAsEntry !== undefined) {

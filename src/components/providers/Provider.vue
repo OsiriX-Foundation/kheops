@@ -1,55 +1,11 @@
-<i18n>
-  {
-    "en": {
-      "url": "URL provider",
-      "stateurl": "Access provider",
-      "user": "User",
-      "clientid": "Client ID",
-      "created_time": "Created time",
-      "edit": "Edit",
-      "remove": "Remove",
-      "back": "Back",
-      "client_name": "Client name",
-      "client_uri": "Client URL",
-      "logo_uri": "Logo URL",
-      "tos_uri": "terms of service document",
-      "policy_uri": "Privacy policy document",
-      "software_version": "Software version",
-      "contacts": "Contact",
-      "supported_modalities": "Supported modalities",
-      "warningremove": "Are you sure to remove this report provider ?",
-      "confirm": "Confirm",
-      "cancel": "Cancel"
-    },
-    "fr": {
-      "url": "URL de configuration",
-      "stateurl": "Etat du provider",
-      "user": "Utilisateur",
-      "clientid": "Identifiant du provider",
-      "created_time": "Date de création",
-      "edit": "Editer",
-      "remove": "Supprimer",
-      "back": "Retour",
-      "client_name": "Nom du client",
-      "client_uri": "URL du client",
-      "logo_uri": "URL du logo",
-      "tos_uri": "Document de conditions d'utilisation",
-      "policy_uri": "Document de la politique de confidentialité",
-      "software_version": "Version du logiciel",
-      "contacts": "Contact",
-      "supported_modalities": "Modalités supportées",
-      "warningremove": "Etes-vous sûr de vouloir supprimer ce provider ?",
-      "confirm": "Confirmer",
-      "cancel": "Annuler"
-    }
-  }
-</i18n>
 <template>
   <div v-if="Object.keys(provider).length > 0">
     <div
       class="my-3 provider-position"
     >
-      <h4>
+      <h4
+        class="row word-break mb-3"
+      >
         <button
           type="button"
           class="btn btn-link btn-sm d-md-none"
@@ -62,15 +18,13 @@
             />
           </span>
         </button>
-        <span
-          class="breakwork"
-        >
+        <span>
           {{ provider.name }}
         </span>
       </h4>
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
-          <dt>{{ $t('url') }}</dt>
+          <dt>{{ $t('provider.url') }}</dt>
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
@@ -80,7 +34,7 @@
       </div>
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
-          <dt>{{ $t('stateurl') }}</dt>
+          <dt>{{ $t('provider.stateurl') }}</dt>
         </div>
         <div class="col-xs-12 col-sm-9">
           <div class="d-inline-flex">
@@ -93,7 +47,7 @@
       </div>
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
-          <dt>{{ $t('clientid') }}</dt>
+          <dt>{{ $t('provider.clientid') }}</dt>
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
@@ -103,11 +57,11 @@
       </div>
       <div class="row mb-2">
         <div class="col-xs-12 col-sm-3">
-          <dt>{{ $t('created_time') }}</dt>
+          <dt>{{ $t('provider.created_time') }}</dt>
         </div>
         <div class="col-xs-12 col-sm-9">
           <dd>
-            {{ provider.created_time }}
+            {{ provider.created_time|formatDateTimeDetails }}
           </dd>
         </div>
       </div>
@@ -119,7 +73,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('client_name') }}</dt>
+            <dt>{{ $t('provider.client_name') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -132,7 +86,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('client_uri') }}</dt>
+            <dt>{{ $t('provider.client_uri') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -147,7 +101,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('logo_uri') }}</dt>
+            <dt>{{ $t('provider.logo_uri') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -162,7 +116,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('contacts') }}</dt>
+            <dt>{{ $t('provider.contacts') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <li
@@ -180,7 +134,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('tos_uri') }}</dt>
+            <dt>{{ $t('provider.tos_uri') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -195,7 +149,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('policy_uri') }}</dt>
+            <dt>{{ $t('provider.policy_uri') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -210,7 +164,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('software_version') }}</dt>
+            <dt>{{ $t('provider.software_version') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -223,7 +177,7 @@
           class="row mb-2"
         >
           <div class="col-xs-12 col-sm-3">
-            <dt>{{ $t('supported_modalities') }}</dt>
+            <dt>{{ $t('provider.supported_modalities') }}</dt>
           </div>
           <div class="col-xs-12 col-sm-9">
             <dd>
@@ -238,70 +192,28 @@
         </div>
       </span>
     </div>
-    <div class="row mb-2">
-      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
-        <button
-          v-if="writePermission"
-          class="btn btn-primary btn-block"
-          @click.stop="edit()"
-        >
-          {{ $t('edit') }}
-        </button>
-        <button
-          v-if="writePermission && !confirmDelete"
-          type="button"
-          class="btn btn-danger btn-block"
-          @click="deleteProvider"
-        >
-          {{ $t('remove') }}
-        </button>
-      </div>
-    </div>
-    <div
-      v-if="writePermission && confirmDelete"
-      class="row mb-2"
-    >
-      <div class="offset-md-3 col-12 col-md-9">
-        <p
-          class="mt-2"
-        >
-          {{ $t('warningremove') }}
-        </p>
-      </div>
-    </div>
-    <div
-      v-if="writePermission && confirmDelete"
-      class="row mb-2"
-    >
-      <div class="offset-md-3 col-12 col-sm-12 col-md-3">
-        <button
-          v-if="writePermission && confirmDelete"
-          type="button"
-          class="btn btn-danger btn-block"
-          @click="deleteProvider"
-        >
-          {{ $t('confirm') }}
-        </button>
-        <button
-          v-if="writePermission && confirmDelete"
-          type="button"
-          class="btn btn-secondary btn-block"
-          @click="confirmDelete=false"
-        >
-          {{ $t('cancel') }}
-        </button>
-      </div>
-    </div>
+    <done-delete-button
+      v-if="writePermission"
+      class-row="mb-2"
+      class-col="offset-md-3 col-12 col-sm-12 col-md-3"
+      class-col-warning-remove="offset-md-3 col-sm-12 col-md-9"
+      :text-warning-remove="$t('provider.warningremove')"
+      :text-button-done="$t('edit')"
+      :loading="onloading"
+      @done="edit"
+      @remove="deleteProvider"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
 import StateProvider from '@/components/providers/StateProvider';
+import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
 
 export default {
   name: 'Provider',
-  components: { StateProvider },
+  components: { StateProvider, DoneDeleteButton },
   props: {
     albumID: {
       type: String,
@@ -317,6 +229,7 @@ export default {
   data() {
     return {
       confirmDelete: false,
+      onloading: false,
     };
   },
   computed: {
@@ -350,20 +263,18 @@ export default {
       this.$emit('providerselectededit', this.clientID);
     },
     deleteProvider() {
-      if (this.confirmDelete === false) {
-        this.confirmDelete = true;
-      } else {
-        this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
-          if (res.status !== 204) {
-            this.$snotify.error('Sorry, an error occured');
-          } else {
-            this.$snotify.success('Provider remove');
-            this.$emit('done');
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
-      }
+      this.onloading = true;
+      this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
+        if (res.status !== 204) {
+          this.onloading = false;
+          this.$snotify.error('Sorry, an error occured');
+        } else {
+          this.$emit('done');
+        }
+      }).catch((err) => {
+        this.onloading = false;
+        console.log(err);
+      });
     },
   },
 };

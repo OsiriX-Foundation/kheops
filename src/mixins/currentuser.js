@@ -1,24 +1,49 @@
+/* eslint-disable */
 import Vue from 'vue';
+import store from '@/store';
+import { HTTP } from '@/router/http';
+import httpoperations from '@/mixins/httpoperations';
 
 export const CurrentUser = {
   computed: {
-    currentuserAccessToken() {
+    currentuserOnView() {
+      return window.location.pathname.includes('view');
+    },
+    currentuserCapabilitiesToken() {
       if (window.location.pathname.includes('view')) {
         const [, , token] = window.location.pathname.split('/');
         return token;
-      } if (Vue.prototype.$keycloak.authenticated) {
-        return Vue.prototype.$keycloak.token;
+      }
+      return undefined;
+    },
+    currentuserAccessToken() {
+      return store.state.oidcStore.access_token;
+    },
+    currentuserSub() {
+      return store.state.oidcStore.user !== null ? store.state.oidcStore.user.sub : null;
+    },
+    currentuserEmail() {
+      return store.state.oidcStore.user !== null ? store.state.oidcStore.user.email : null;
+    },
+    currentuserFullname() {
+      console.log(store.state.oidcStore.user.name)
+      return store.state.oidcStore.user !== null ? store.state.oidcStore.user.name : null;
+    },
+  },
+  methods: {
+    getCurrentuserAccessToken(authenticated) {
+      if (window.location.pathname.includes('view')) {
+        const [, , token] = window.location.pathname.split('/');
+        return token;
+      } if (authenticated) {
+        return this.currentuserAccessToken;
       }
       return '';
     },
-    currentuserSub() {
-      return Vue.prototype.$keycloak.idTokenParsed.sub;
-    },
-    currentuserEmail() {
-      return Vue.prototype.$keycloak.idTokenParsed.email;
-    },
-    currentuserFullname() {
-      return Vue.prototype.$keycloak.idTokenParsed.name;
+    postAccessToken(access_token) {
+      const url = '/register';
+      const formData = httpoperations.getFormData({ access_token });
+      return HTTP.post(url, formData);
     },
   },
 };

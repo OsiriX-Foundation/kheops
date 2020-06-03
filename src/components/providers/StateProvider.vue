@@ -1,23 +1,10 @@
-<i18n>
-{
-  "en": {
-    "urlWorking": "This provider is on",
-    "urlNotWorking": "This provider is off"
-  },
-  "fr": {
-    "urlWorking": "This provider is on",
-    "urlNotWorking": "This provider is off"
-  }
-}
-</i18n>
-
 <template>
   <span
     v-if="loading"
     class="nowrap"
-    :title="$t('urlWorking')"
+    :title="$t('provider.urlWorking')"
   >
-    <clip-loader
+    <kheops-clip-loader
       :loading="loading"
       :size="'20px'"
       :color="'white'"
@@ -27,7 +14,7 @@
   <span
     v-else-if="checkURL"
     class="nowrap"
-    :title="$t('urlWorking')"
+    :title="$t('provider.urlWorking')"
   >
     <v-icon
       name="check-circle"
@@ -38,7 +25,7 @@
   <span
     v-else
     class="nowrap"
-    :title="$t('urlNotWorking')"
+    :title="$t('provider.urlNotWorking')"
   >
     <v-icon
       name="ban"
@@ -49,11 +36,11 @@
 </template>
 
 <script>
-import ClipLoader from 'vue-spinner/src/ClipLoader.vue';
+import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'StateProvider',
-  components: { ClipLoader },
+  components: { KheopsClipLoader },
   props: {
     loading: {
       type: Boolean,

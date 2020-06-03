@@ -4,6 +4,24 @@
     class="tokens"
   >
     <div
+      v-if="(currentView === 'listtokens')"
+      class="my-3 selection-button-container provider-position"
+    >
+      <router-link
+        :to="{
+          name: routename,
+          params: { action: 'newtoken' }
+        }"
+        class="btn btn-secondary"
+      >
+        <v-icon
+          name="plus"
+          class="mr-2"
+        />
+        {{ $t('token.newtoken') }}
+      </router-link>
+    </div>
+    <div
       v-if="currentView === 'listtokens'"
     >
       <list-tokens
@@ -65,6 +83,9 @@ export default {
     currentView() {
       return this.$route.params.action !== undefined ? this.$route.params.action : 'listtokens';
     },
+    routename() {
+      return this.scope === 'album' ? 'albumsettingsaction' : 'useraction';
+    },
   },
   watch: {
   },
@@ -72,11 +93,7 @@ export default {
   },
   methods: {
     loadView(action) {
-      if (this.scope === 'album') {
-        this.$router.push({ name: 'albumsettingsaction', params: { action } });
-      } else if (this.scope === 'user') {
-        this.$router.push({ name: 'useraction', params: { action } });
-      }
+      this.$router.push({ name: this.routename, params: { action } });
     },
   },
 };

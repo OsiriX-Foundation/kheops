@@ -32,7 +32,7 @@ const actions = {
         dispatch('setCheckURLProviders', { providers });
       }
       return res;
-    }).catch((err) => err);
+    }).catch((err) => Promise.reject(err));
   },
   getProvider({ commit, dispatch }, params) {
     const { albumID } = params;

@@ -29,7 +29,7 @@ const actions = {
     }
 
     return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
-      commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() });
+      commit('SET_COMMENTS', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() });
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -50,7 +50,7 @@ const actions = {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
     return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
-      commit('SET_COMMENTS_TEST', { StudyInstanceUID: params.album_id, comments: res.data.reverse() });
+      commit('SET_COMMENTS', { StudyInstanceUID: params.album_id, comments: res.data.reverse() });
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -63,15 +63,23 @@ const actions = {
     }
     return HTTP.post(request, queries, { headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then((res) => res).catch((err) => Promise.reject(err));
   },
+  deleteStoreComment({ commit }, params) {
+    if (state.comments[params.StudyInstanceUID] !== undefined) {
+      commit('DELETE_COMMENTS', { StudyInstanceUID: params.StudyInstanceUID });
+    }
+  },
 };
 
 // mutations
 const mutations = {
-  INIT_COMMENTS_TEST(state) {
+  INIT_COMMENTS(state) {
     state.comments = {};
   },
-  SET_COMMENTS_TEST(state, params) {
+  SET_COMMENTS(state, params) {
     Vue.set(state.comments, params.StudyInstanceUID, params.comments);
+  },
+  DELETE_COMMENTS(state, params) {
+    Vue.delete(state.comments, params.StudyInstanceUID);
   },
 };
 

@@ -1,20 +1,3 @@
-<i18n>
-{
-  "en": {
-    "username": "User name",
-    "user": "user",
-    "send": "Send",
-    "cancel": "Cancel"
-  },
-  "fr": {
-    "username": "Utilisateur",
-    "user": "Utilisateur",
-    "send": "Envoyer",
-    "cancel": "Annuler"
-  }
-}
-</i18n>
-
 <template>
   <div class="card">
     <div class="card-body">
@@ -24,10 +7,10 @@
             <!--
             <input
               v-model="new_user_name"
+              v-focus
               type="email"
               class="form-control"
-              autofocus
-              :placeholder="'email '+$t('user')"
+              :placeholder="$t('user.emailuser')"
             >
             -->
             <input-auto-complet
@@ -60,14 +43,22 @@
 
 <script>
 import InputAutoComplet from '@/components/globals/InputAutoComplet';
+import { mapGetters } from 'vuex';
+import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'FormGetUser',
   components: { InputAutoComplet },
+  mixins: [CurrentUser],
   data() {
     return {
       new_user_name: '',
     };
+  },
+  computed: {
+    ...mapGetters('oidcStore', [
+      'oidcIsAuthenticated',
+    ]),
   },
   methods: {
     validEmail(email) {
@@ -75,13 +66,25 @@ export default {
       return re.test(email);
     },
     getUser() {
-      this.$store.dispatch('checkUser', this.new_user_name).then((sub) => {
+      const headers = this.getHeaders();
+      this.$store.dispatch('checkUser', { user: this.new_user_name, headers }).then((sub) => {
         if (!sub) this.$snotify.error('Sorry, unknown user');
         else {
           this.$emit('get-user', sub);
           this.new_user_name = '';
         }
       });
+    },
+    getHeaders() {
+      if (this.oidcIsAuthenticated) {
+        return {
+          Authorization: `Bearer ${this.currentuserAccessToken}`,
+          Accept: 'application/json',
+        };
+      }
+      return {
+        Accept: 'application/json',
+      };
     },
     cancel() {
       this.new_user_name = '';

@@ -1,65 +1,20 @@
-<i18n>
-{
-  "en": {
-    "newalbum": "New album",
-    "Study #": "Study #",
-    "Modalities": "Modalities",
-    "User #": "User #",
-    "Message #": "Message #",
-    "Date": "Created date",
-    "LastEvent": "Last event",
-    "selectednbalbums": "{count} album is selected | {count} albums are selected",
-    "permissionsfailed": "You can't send this albums : ",
-    "send": "The album {albumName} has been shared.",
-    "nomodality": "No modality",
-    "name": "Name",
-    "nomorealbums": "No more albums",
-    "noresults": "No album found",
-    "albumshared": "Album shared",
-    "error": "An error occur please reload the albums.",
-    "reload": "Reload"
-  },
-  "fr": {
-    "newalbum": "Nouvel album",
-    "Study #": "# Etudes",
-    "Modalities": "Modalités",
-    "User #": "# Utilisateurs",
-    "Message #": "# Messages",
-    "Date": "Date de création",
-    "LastEvent": "Dernier événement",
-    "selectednbalbums": "{count} album est sélectionnée | {count} albums sont sélectionnées",
-    "permissionsfailed": "Vous ne pouvez pas envoyer ces albums : ",
-    "send": "L'album {albumName} a été partagé.",
-    "nomodality": "Aucune modalité",
-    "name": "Nom",
-    "nomorealbums": "Pas d'albums en plus",
-    "noresults": "Aucun album trouvé",
-    "albumshared": "Album partagé",
-    "error": "Une erreur s'est produite, veuillez recharger les albums.",
-    "reload": "Recharger"
-  }
-}
-</i18n>
 <template>
   <div>
     <list-albums-headers
+      class="list-header"
       :disabled-btn-share="albumsSelected.length === 0"
-      @inviteClick="form_send_album = true"
+      :albums-selected="albumsSelected"
       @searchClick="showFilters = !showFilters"
       @reloadAlbums="searchAlbums"
     />
-
-    <form-get-user
-      v-if="form_send_album && albumsSelected.length > 0"
-      @get-user="sendToUser"
-      @cancel-user="form_send_album=false"
-    />
     <b-table
       striped
-      hover
+      sort-icon-left
+      :hover="mobiledetect ? false : true"
       :items="albums"
       :fields="fields"
-      :sort-desc="true"
+      :sort-desc="albumsParams.sortDesc"
+      :sort-by="albumsParams.sortBy"
       :no-local-sorting="true"
       :dark="false"
       :no-sort-reset="true"
@@ -70,64 +25,41 @@
       @row-unhovered="setItemUnhover"
     >
       <template
-        slot="HEAD_name"
-        slot-scope="data"
+        v-slot:head(name)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           @click.stop=""
         >
           <input
             v-model="filters.name"
+            v-focus
             type="search"
             class="form-control form-control-sm"
-            :placeholder="$t('filter')"
-          > <br>
+            :placeholder="$t('listalbums.filter')"
+          >
         </div>
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
+      </template>
+      <template
+        v-slot:head(number_of_studies)="data"
+      >
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_number_of_studies"
-        slot-scope="data"
+        v-slot:head(number_of_users)="data"
       >
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_number_of_users"
-        slot-scope="data"
+        v-slot:head(number_of_comments)="data"
       >
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
       </template>
       <template
-        slot="HEAD_number_of_comments"
-        slot-scope="data"
+        v-slot:head(created_time)="data"
       >
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
         {{ data.label }}
-      </template>
-      <template
-        slot="HEAD_created_time"
-        slot-scope="data"
-      >
         <div
           v-if="showFilters"
           class="form-row"
@@ -140,7 +72,7 @@
                 :disabled-dates="disabledFromCreateDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('fromDate')"
+                :placeholder="$t('listalbums.fromDate')"
               />
             </div>
           </div>
@@ -151,23 +83,16 @@
                 :disabled-dates="disabledToCreateDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('toDate')"
+                :placeholder="$t('listalbums.toDate')"
               />
             </div>
           </div>
         </div>
-        <br v-if="showFilters">
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
-        {{ data.label }}
       </template>
       <template
-        slot="HEAD_last_event_time"
-        slot-scope="data"
+        v-slot:head(last_event_time)="data"
       >
+        {{ data.label }}
         <div
           v-if="showFilters"
           class="form-row"
@@ -180,7 +105,7 @@
                 :disabled-dates="disabledFromEventDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('fromDate')"
+                :placeholder="$t('listalbums.fromDate')"
               />
             </div>
           </div>
@@ -192,22 +117,14 @@
                 :disabled-dates="disabledToEventDates"
                 input-class="form-control form-control-sm search-calendar"
                 wrapper-class="calendar-wrapper"
-                :placeholder="$t('toDate')"
+                :placeholder="$t('listalbums.toDate')"
               />
             </div>
           </div>
         </div>
-        <br v-if="showFilters">
-        <sort-list
-          :sort-desc="albumsParams.sortDesc"
-          :current-header="data.field.key"
-          :sort-by="albumsParams.sortBy"
-        />
-        {{ data.label }}
       </template>
       <template
-        slot="is_selected"
-        slot-scope="row"
+        v-slot:cell(is_selected)="row"
       >
         <b-button-group>
           <b-form-checkbox
@@ -219,8 +136,7 @@
         </b-button-group>
       </template>
       <template
-        slot="name"
-        slot-scope="row"
+        v-slot:cell(name)="row"
       >
         <div
           :class="'d-flex flex-wrap'"
@@ -228,28 +144,18 @@
           <div class="">
             {{ row.value }}
           </div>
-          <span
-            class="ml-auto"
-            :class="row.item.flag.is_hover || mobiledetect || row.item.is_favorite ? 'iconsHover' : 'iconsUnhover'"
-            @click.stop="toggleFavorite(row.item.album_id, row.item.is_favorite)"
-          >
-            <v-icon
-              name="star"
-              class="kheopsicon"
-              :class="(!row.item.is_favorite) ? '' : 'bg-neutral fill-neutral'"
-            />
-          </span>
+          <list-albums-icons
+            :album="row.item"
+          />
         </div>
       </template>
       <template
-        slot="created_time"
-        slot-scope="data"
+        v-slot:cell(created_time)="data"
       >
         {{ data.item.created_time | formatDate }}
       </template>
       <template
-        slot="last_event_time"
-        slot-scope="data"
+        v-slot:cell(last_event_time)="data"
       >
         {{ data.item.last_event_time | formatDate }}
       </template>
@@ -259,51 +165,57 @@
       @infinite="infiniteHandler"
     >
       <div slot="spinner">
-        <pulse-loader
-          color="white"
-        />
+        <loading />
       </div>
       <div slot="no-more">
-        {{ $t('nomorealbums') }}
+        {{ $t('listalbums.nomorealbums') }}
       </div>
       <div slot="no-results">
-        {{ $t('noresults') }}
+        {{ $t('listalbums.noresults') }}
       </div>
       <div slot="error">
-        {{ $t('error') }}<br>
-        <button
-          type="button"
-          class=" btn btn-md"
-          @click="searchAlbums()"
+        <span
+          v-if="statusList === 401 || statusList === 403"
         >
-          {{ $t('reload') }}
-        </button>
+          {{ $t('listalbums.nopermissions') }}
+        </span>
+        <span
+          v-else
+        >
+          {{ $t('listalbums.error') }}<br><br>
+          <button
+            type="button"
+            class=" btn btn-md"
+            @click="searchAlbums()"
+          >
+            {{ $t('listalbums.reload') }}
+          </button>
+        </span>
       </div>
     </infinite-loading>
   </div>
 </template>
 <script>
 
-import { mapGetters } from 'vuex';
 import Datepicker from 'vuejs-datepicker';
 import InfiniteLoading from 'vue-infinite-loading';
 import moment from 'moment';
-import PulseLoader from 'vue-spinner/src/PulseLoader.vue';
-import formGetUser from '@/components/user/getUser';
 import ListAlbumsHeaders from '@/components/albums/ListAlbumsHeaders';
-import SortList from '@/components/inbox/SortList.vue';
+import ListAlbumsIcons from '@/components/albums/ListAlbumsIcons';
 import mobiledetect from '@/mixins/mobiledetect.js';
+import Loading from '@/components/globalloading/Loading';
 
 export default {
   name: 'Albums',
   components: {
-    InfiniteLoading, ListAlbumsHeaders, formGetUser, Datepicker, SortList, PulseLoader,
+    InfiniteLoading, ListAlbumsHeaders, Datepicker, Loading, ListAlbumsIcons,
   },
   data() {
     return {
-      form_send_album: false,
+      statusList: 200,
       showFilters: false,
       infiniteId: 0,
+      albumsKey: 'all',
       albumsParams: {
         offset: 0,
         limit: 50,
@@ -314,84 +226,86 @@ export default {
         {
           key: 'is_selected',
           label: '',
+          thClass: 'table-albums-header',
           sortable: false,
-          class: 'td_checkbox_albums word-break-all',
+          class: 'td_checkbox_albums word-break',
           thStyle: {
             width: '100px',
           },
         },
         {
           key: 'name',
-          label: this.$t('name'),
-          thClass: 'pointer',
+          label: this.$t('listalbums.name'),
+          thClass: 'pointer table-albums-header',
           tdClass: 'name',
           sortable: true,
-          class: 'word-break-all',
+          class: 'word-break',
           thStyle: {
             width: '250px',
           },
         },
         {
           key: 'number_of_studies',
-          label: this.$t('Study #'),
+          label: this.$t('listalbums.Study #'),
           sortable: true,
-          thClass: 'pointer',
-          class: 'd-none d-sm-table-cell word-break-all',
+          thClass: 'pointer table-albums-header',
+          class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
           },
         },
         {
           key: 'number_of_users',
-          label: this.$t('User #'),
+          label: this.$t('listalbums.User #'),
           sortable: true,
-          thClass: 'pointer',
-          class: 'd-none d-md-table-cell word-break-all',
+          thClass: 'pointer table-albums-header',
+          class: 'd-none d-md-table-cell word-break',
           thStyle: {
             width: '200px',
           },
         },
         {
           key: 'number_of_comments',
-          label: this.$t('Message #'),
+          label: this.$t('listalbums.Message #'),
           sortable: true,
-          thClass: 'pointer',
-          class: 'd-none d-lg-table-cell word-break-all',
+          thClass: 'pointer table-albums-header',
+          class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
           },
         },
         {
           key: 'created_time',
-          label: this.$t('Date'),
+          label: this.$t('listalbums.Date'),
           sortable: true,
-          thClass: 'pointer',
-          class: 'd-none d-sm-table-cell word-break-all',
+          thClass: 'pointer table-albums-header',
+          class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
           },
         },
         {
           key: 'last_event_time',
-          label: this.$t('LastEvent'),
+          label: this.$t('listalbums.LastEvent'),
           sortable: true,
-          thClass: 'pointer',
-          class: 'd-none d-lg-table-cell word-break-all',
+          thClass: 'pointer table-albums-header',
+          class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
           },
         },
         {
           key: 'modalities',
-          label: this.$t('Modalities'),
+          label: this.$t('listalbums.Modalities'),
           sortable: false,
           formatter: (value) => {
             if (value.length > 0) {
               return value.join(', ');
             }
-            return this.$t('nomodality');
+            return this.$t('listalbums.nomodality');
           },
-          class: 'word-break-all',
+          class: 'word-break',
+          thClass: 'table-albums-header',
           thStyle: {
             width: '200px',
           },
@@ -411,9 +325,9 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({
-      albums: 'albums',
-    }),
+    albums() {
+      return this.$store.getters.getAlbumsByKey(this.albumsKey);
+    },
     albumsSelected() {
       return this.albums.filter((album) => album.is_selected === true);
     },
@@ -471,10 +385,10 @@ export default {
     },
   },
   created() {
-    this.$store.dispatch('initAlbums', {});
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   destroyed() {
-    this.$store.dispatch('initAlbums', {});
+    this.$store.dispatch('initAlbums', { key: this.albumsKey });
   },
   methods: {
     clickAlbum(item) {
@@ -484,6 +398,9 @@ export default {
     },
     infiniteHandler($state) {
       this.getAlbums(this.albumsParams.offset, this.albumsParams.limit).then((res) => {
+        if (res.status !== undefined) {
+          this.statusList = res.status;
+        }
         if (this.albums.length === parseInt(res.headers['x-total-count'], 10)) {
           $state.complete();
         }
@@ -494,6 +411,9 @@ export default {
           $state.complete();
         }
       }).catch((err) => {
+        if (err.response !== undefined && err.response.status !== undefined) {
+          this.statusList = err.response.status;
+        }
         $state.error();
         return err;
       });
@@ -505,7 +425,7 @@ export default {
         sort: (this.albumsParams.sortDesc ? '-' : '') + this.albumsParams.sortBy,
       };
       const queries = Object.assign(params, this.prepareFilters());
-      return this.$store.dispatch('getAlbums', { queries });
+      return this.$store.dispatch('getAlbums', { queries, key: this.albumsKey });
     },
     prepareFilters() {
       const filtersToSend = {};
@@ -543,13 +463,6 @@ export default {
     transformDate(date) {
       return moment(date).format('YYYYMMDD');
     },
-    sendToUser(userId) {
-      this.albumsSelected.forEach((album) => {
-        this.$store.dispatch('addUser', { album_id: album.album_id, user_id: userId }).then(() => {
-          this.$snotify.success(this.$t('albumshared'));
-        });
-      });
-    },
     sortingChanged(ctx) {
       this.albumsParams.sortDesc = ctx.sortDesc;
       this.albumsParams.sortBy = ctx.sortBy;
@@ -557,14 +470,8 @@ export default {
     },
     searchAlbums() {
       this.albumsParams.offset = 0;
-      this.$store.dispatch('initAlbums', { });
+      this.$store.dispatch('initAlbums', { key: this.albumsKey });
       this.infiniteId += 1;
-    },
-    toggleFavorite(albumID, isFavorite) {
-      const value = !isFavorite;
-      this.$store.dispatch('manageFavoriteAlbum', { album_id: albumID, value }).then(() => {
-        this.$store.dispatch('setValueAlbum', { album_id: albumID, flag: 'is_favorite', value });
-      });
     },
     setItemHover(item, index) {
       this.albums[index].flag.is_hover = true;

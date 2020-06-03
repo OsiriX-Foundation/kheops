@@ -1,212 +1,103 @@
-<i18n scoped>
-{
-  "en": {
-    "write": "Add and delete series in the album",
-    "download": "Show download button",
-    "expirationdate": "Expiration date",
-    "create": "Create",
-    "cancel": "Cancel",
-    "revoke": "Do you want disable the latest sharing link created ?",
-    "valid": "Valid",
-    "disable": "Revoke",
-    "urlsharing": "Your sharing url :"
-  },
-  "fr": {
-    "write": "Ajouter et supprimer des séries dans l'album",
-    "download": "Montrer le bouton de téléchargement",
-    "expirationdate": "Date d'expiration",
-    "create": "Créer",
-    "cancel": "Annuler",
-    "revoke": "Voulez-vous désactiver le dernier lien de partage créé ?",
-    "valid": "Valider",
-    "disable": "Désactiver",
-    "urlsharing": "Votre url de partage :"
-  }
-}
-</i18n>
 <template>
   <span>
-    <div
-      v-if="url === '' && tokens.length === 0"
+    <span
+      id="sharing-link"
+      :text="sharingToken.length > 0 ? $t('sharinglink.sharingEnable') : $t('sharinglink.sharingDisable')"
+      class="btn btn-link p-0"
+      @click.stop="sharingTokenParams.show = !sharingTokenParams.show"
     >
-      <div class="row mt-2 mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-8">
-          <label>
-            {{ $t('write') }}
-          </label>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-4">
-          <toggle-button
-            v-model="token.write_permission"
-            :color="{checked: '#5fc04c', unchecked: 'grey'}"
-          />
-        </div>
-      </div>
-
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-8">
-          <label>
-            {{ $t('download') }}
-          </label>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-4">
-          <toggle-button
-            v-if="token.read_permission"
-            v-model="token.download_permission"
-            :color="{checked: '#5fc04c', unchecked: 'grey'}"
-          />
-        </div>
-      </div>
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-6">
-          {{ $t('expirationdate') }}
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-6">
-          <datepicker
-            v-model="token.expiration_time"
-            :bootstrap-styling="false"
-            input-class="form-control form-control-sm  search-calendar"
-            :calendar-button="false"
-            calendar-button-icon=""
-            wrapper-class="calendar-wrapper"
-            :placeholder="$t('expirationdate')"
-            :clear-button="true"
-            clear-button-icon="fa fa-times"
-          />
-        </div>
-      </div>
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <button
-            type="submit"
-            class="btn btn-primary btn-block"
-            @click="create"
-          >
-            {{ $t('create') }}
-          </button>
-        </div>
-      </div>
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <button
-            type="reset"
-            class="btn btn-secondary btn-block"
-            @click="cancel"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-      </div>
-    </div>
-    <div
-      v-else
+      <v-icon
+        name="link"
+        :color="(sharingToken.length > 0) ? 'white' : 'grey'"
+        scale="2"
+      />
+    </span>
+    <b-popover
+      v-if="sharingTokenParams.show"
+      target="sharing-link"
+      :show.sync="sharingTokenParams.show"
+      placement="auto"
     >
-      <span
-        v-if="url !== ''"
-      >
-        <div class="row mt-2">
-          <div class="col-xs-12 col-sm-12 col-md-12 mb-2">
-            {{ $t('urlsharing') }}
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-xs-12 col-sm-12 col-md-12 mb-2">
-            <b class="mr-2">{{ url }}</b>
-            <button
-              v-clipboard:copy="url"
-              type="button"
-              class="btn btn-secondary btn-sm"
-            >
-              <v-icon
-                name="paste"
-                scale="1"
-              />
-            </button>
-          </div>
-        </div>
-      </span>
-      <div class="row mt-2 mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <label>
-            {{ $t('revoke') }}
-          </label>
-        </div>
-      </div>
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <button
-            type="submit"
-            class="btn btn-danger btn-block"
-            @click="revoke"
-          >
-            {{ $t('disable') }}
-          </button>
-        </div>
-      </div>
-      <div class="row mb-2">
-        <div class="col-xs-12 col-sm-12 col-md-12">
-          <button
-            type="reset"
-            class="btn btn-secondary btn-block"
-            @click="cancel"
-          >
-            {{ $t('cancel') }}
-          </button>
-        </div>
-      </div>
-    </div>
+      <template v-slot:title>
+        <pop-over-title
+          :title="$t('sharinglink.sharingTitle')"
+          @cancel="cancelSharingToken"
+        />
+      </template>
+      <sharing-link-popover
+        :album-id="albumid"
+        :url="urlSharing"
+        :tokens="sharingToken"
+        :loading="waitCreate || loading"
+        @cancel="cancelSharingToken"
+        @revoke="revokeSharingTokens"
+        @create="createSharingToken"
+      />
+    </b-popover>
   </span>
 </template>
 <script>
-import Datepicker from 'vuejs-datepicker';
 import moment from 'moment';
-import CloseIcon from '@/components/kheopsSVG/CloseIcon';
+import PopOverTitle from '@/components/socialmedia/PopOverTitle';
+import SharingLinkPopover from '@/components/socialmedia/SharingLinkPopover';
 
 export default {
   name: 'SharingLink',
-  components: { Datepicker, CloseIcon },
+  components: { PopOverTitle, SharingLinkPopover },
   props: {
-    albumId: {
+    albumid: {
       type: String,
       required: true,
-      default: '',
-    },
-    url: {
-      type: String,
-      required: true,
-      default: '',
+      default: null,
     },
     tokens: {
       type: Array,
       required: true,
       default: () => [],
     },
+    loading: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
-      token: {
-        title: 'sharing_link',
-        scope_type: 'album',
-        album: this.albumId,
-        read_permission: true,
-        write_permission: false,
-        download_permission: false,
-        appropriate_permission: false,
-        expiration_time: moment().add(1, 'months').toDate(),
+      sharingTokenParams: {
+        show: false,
       },
-      toggle_revoke: false,
+      urlSharing: '',
+      waitCreate: false,
     };
   },
+  computed: {
+    sharingToken() {
+      return this.tokens.filter((token) => token.title.includes('sharing_link') && moment(token.expiration_time) > moment() && !token.revoked);
+    },
+  },
   methods: {
-    cancel() {
-      this.$emit('cancel');
+    createToken(token) {
+      return this.$store.dispatch('createToken', { token });
     },
-    create() {
-      this.token.expiration_time = moment(this.token.expiration_time).format();
-      this.$emit('create', this.token);
+    cancelSharingToken() {
+      this.sharingTokenParams.show = false;
     },
-    revoke() {
-      this.$emit('revoke', this.tokens);
+    revokeSharingTokens(tokens) {
+      this.cancelSharingToken();
+      this.urlSharing = '';
+      this.$emit('revoketokens', tokens);
+    },
+    createSharingToken(token) {
+      this.waitCreate = true;
+      this.createToken(token).then((res) => {
+        const urlSharing = `${process.env.VUE_APP_URL_ROOT}/view/${res.data.access_token}`;
+        this.urlSharing = urlSharing;
+        this.$emit('gettokens');
+        this.waitCreate = false;
+      }).catch(() => {
+        this.$snotify.error(this.$t('sorryerror'));
+        this.waitCreate = false;
+      });
     },
   },
 };
