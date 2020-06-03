@@ -263,8 +263,8 @@ public class Events {
             }
 
 
-            mutationQueryParams.getStartDate().ifPresent(date -> cb.greaterThanOrEqualTo(mutation.get("eventTime"), date));
-            mutationQueryParams.getEndDate().ifPresent(date -> cb.lessThanOrEqualTo(mutation.get("eventTime"), date));
+            mutationQueryParams.getStartDate().ifPresent(date -> allPredicate.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
+            mutationQueryParams.getEndDate().ifPresent(date ->allPredicate.add( cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
 
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
