@@ -19,7 +19,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,6 +43,7 @@ public final class WadoRsMetadata {
     private static final Client CLIENT = ClientBuilder.newClient();
 
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
+    private static final String LINK_AUTHORIZATION = "X-Link-Authorization";
 
     private static final Pattern SERIES_URL_PATTERN = Pattern.compile("(studies/(?:(?:[0-9]+[.])*[0-9]+)/series.*)");
 
@@ -67,8 +67,9 @@ public final class WadoRsMetadata {
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     public Response wadoSeriesMetadata(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                                        @PathParam("studyInstanceUID") String studyInstanceUID,
-                                       @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+                                       @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                                       @HeaderParam(LINK_AUTHORIZATION) String linkAuthorizationHeader) {
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), linkAuthorizationHeader);
     }
 
     @GET
@@ -76,15 +77,18 @@ public final class WadoRsMetadata {
     @Path("/password/dicomweb/studies/{studyInstanceUID:([0-9]+[.])*[0-9]+}/series/{seriesInstanceUID:([0-9]+[.])*[0-9]+}/instances/{sopInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     public Response wadoInstanceMetadata(@HeaderParam(AUTHORIZATION) String authorizationHeader,
                                          @PathParam("studyInstanceUID") String studyInstanceUID,
-                                         @PathParam("seriesInstanceUID") String seriesInstanceUID) {
-        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader));
+                                         @PathParam("seriesInstanceUID") String seriesInstanceUID,
+                                         @HeaderParam(LINK_AUTHORIZATION) String linkAuthorizationHeader) {
+        return webAccess(studyInstanceUID, seriesInstanceUID, AuthorizationToken.fromAuthorizationHeader(authorizationHeader), linkAuthorizationHeader);
     }
 
-    private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken) {
+    private Response webAccess(String studyInstanceUID, String seriesInstanceUID, AuthorizationToken authorizationToken, String linkAuthorizationHeader) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
         URI wadoServiceURI = getParameterURI("online.kheops.pacs.uri");
         final URI rootURI = getParameterURI("online.kheops.root.uri");
         final MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+
+        final boolean linkAuthorization = linkAuthorizationHeader != null && linkAuthorizationHeader.equalsIgnoreCase("true");
 
         final AccessToken accessToken;
         try {
@@ -137,6 +141,13 @@ public final class WadoRsMetadata {
             throw new WebApplicationException(upstreamResponse.getStatus());
         }
 
+        final String dicomwebRoot;
+        if (linkAuthorization) {
+            dicomwebRoot = rootURI + "/api/link/" + authorizationToken + "/";
+        } else {
+            dicomwebRoot = rootURI.toString() + "/api/";
+        }
+
         AttributesStreamingOutput streamingOutput = output -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);
                  final JsonParser parser = Json.createParser(inputStream)){
@@ -145,7 +156,7 @@ public final class WadoRsMetadata {
 
                 jsonReader.readDatasets((fmi, dataset) -> {
                     try {
-                        dataset.accept(new BulkDataVisitor(rootURI), true);
+                        dataset.accept(new BulkDataVisitor(dicomwebRoot), true);
                         output.write(dataset);
                     } catch (Exception e) {
                         throw new RuntimeException(e); // because accept() throws Exception and the readDatasets callback can not throw exceptions...
@@ -175,10 +186,10 @@ public final class WadoRsMetadata {
     }
 
     static private class BulkDataVisitor implements Attributes.Visitor {
-        final URI rootURI;
+        final String dicomwebRoot;
 
-        private BulkDataVisitor(URI rootURI) {
-            this.rootURI = rootURI;
+        private BulkDataVisitor(String dicomwebRoot) {
+            this.dicomwebRoot = dicomwebRoot;
         }
 
         public boolean visit(Attributes attrs, int tag, VR vr, Object value) {
@@ -189,7 +200,7 @@ public final class WadoRsMetadata {
                 if (uri != null) {
                     final Matcher matcher = SERIES_URL_PATTERN.matcher(uri);
                     if (matcher.find()) {
-                        bulkData.setURI(rootURI + "/api/" + matcher.group(1));
+                        bulkData.setURI(dicomwebRoot + matcher.group(1));
                     }
                 }
             }
