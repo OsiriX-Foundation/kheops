@@ -241,14 +241,14 @@ public class Events {
             for (String sub : mutationQueryParams.getUsers()) {
                 criteria.add(cb.equal(userJoin.get("sub"), sub));
             }
+            for (String sub : mutationQueryParams.getUsers()) {
+                criteria.add(cb.equal(toUserJoin.get("sub"), sub));
+            }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
             criteria = new ArrayList<>();
-            for (String sub : mutationQueryParams.getUsers()) {
-                criteria.add(cb.equal(toUserJoin.get("sub"), sub));
-            }
             for (String capabilityToken : mutationQueryParams.getCapabilityTokens()) {
                 criteria.add(cb.equal(capabilityJoin.get("id"), capabilityToken));
             }
