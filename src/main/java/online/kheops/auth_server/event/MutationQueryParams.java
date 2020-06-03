@@ -12,6 +12,8 @@ import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.MultivaluedMap;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findCapabilityByCapabilityIDAndAlbumId;
@@ -65,8 +67,8 @@ public class MutationQueryParams {
     private List<String> series = new ArrayList<>();
     private List<String> capabilityTokens = new ArrayList<>();
     private List<String> reportProviders = new ArrayList<>();
-    private Optional<String> startDate;
-    private Optional<String> endDate;
+    private Optional<LocalDateTime> startDate;
+    private Optional<LocalDateTime> endDate;
 
 
     public MutationQueryParams(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
@@ -210,11 +212,14 @@ public class MutationQueryParams {
 
     private void extractDate(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (queryParameters.containsKey("startDate")) {
-            startDate = Optional.ofNullable(queryParameters.get("startDate").get(0));
+            startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), formatter));
+            //startDate = Optional.ofNullable(queryParameters.get("startDate").get(0));
         }
-        if (queryParameters.containsKey("startDate")) {
-            endDate = Optional.ofNullable(queryParameters.get("endDate").get(0));
+        if (queryParameters.containsKey("endDate")) {
+            endDate = Optional.of(LocalDateTime.parse(queryParameters.get("endDate").get(0), formatter));
+            //endDate = Optional.ofNullable(queryParameters.get("endDate").get(0));
         }
     }
 
@@ -225,6 +230,6 @@ public class MutationQueryParams {
     public List<String> getSeries() { return series; }
     public List<String> getCapabilityTokens() { return capabilityTokens; }
     public List<String> getReportProviders() { return reportProviders; }
-    public Optional<String> getStartDate() { return startDate; }
-    public Optional<String> getEndDate() { return endDate; }
+    public Optional<LocalDateTime> getStartDate() { return startDate; }
+    public Optional<LocalDateTime> getEndDate() { return endDate; }
 }

@@ -142,7 +142,6 @@ public class Events {
                 userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }
 
-            List<Event> eventlist = EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em);
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
                 eventResponses.add(new EventResponse(e, userMember, em));
             }
@@ -262,6 +261,10 @@ public class Events {
                 criteria.add(mutation.get("mutationType").in(mutationQueryParams.getTypes()));
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
+
+
+            mutationQueryParams.getStartDate().ifPresent(date -> cb.greaterThanOrEqualTo(mutation.get("eventTime"), date));
+            mutationQueryParams.getEndDate().ifPresent(date -> cb.lessThanOrEqualTo(mutation.get("eventTime"), date));
 
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
