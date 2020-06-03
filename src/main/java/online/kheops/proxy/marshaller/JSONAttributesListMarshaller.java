@@ -20,7 +20,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import java.io.*;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +30,15 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 @Provider
 @Consumes(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
 @Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
-public class JSONAttributesListMarshaller implements MessageBodyReader<List>, MessageBodyWriter<List> {
+public class JSONAttributesListMarshaller extends AttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
     @Override
-    public boolean isReadable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
-        if (aClass.isAssignableFrom(List.class) && type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
-        }
-        return false;
+    public boolean isReadable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return isAttributeList(aClass, genericType);
     }
 
     @Override
-    public List<Attributes> readFrom(Class<List> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException {
+    public List<Attributes> readFrom(Class<List<Attributes>> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException {
         List<Attributes> list = new ArrayList<>();
 
         try (final JsonParser parser = Json.createParser(new CloseShieldInputStream(inputStream))) {
@@ -61,17 +56,14 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List>, Me
         return list;
     }
 
+
     @Override
     public boolean isWriteable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        if (List.class.isAssignableFrom(aClass) && genericType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) genericType;
-            return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
-        }
-        return false;
+        return isAttributeList(aClass, genericType);
     }
 
     @Override
-    public void writeTo(List attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
+    public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) {
 
         try (final JsonGenerator generator = Json.createGenerator(new CloseShieldOutputStream(entityStream))) {
             final JSONWriter jsonWriter = new JSONWriter(generator);

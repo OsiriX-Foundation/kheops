@@ -13,7 +13,6 @@ import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +21,7 @@ import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_A
 
 @Provider
 @Produces("multipart/related;type=\"application/dicom+xml\"")
-public class XMLAttributesListWriter implements MessageBodyWriter<List<Attributes>> {
+public class XMLAttributesListWriter extends AttributesListMarshaller implements MessageBodyWriter<List<Attributes>> {
 
     private final Providers providers;
 
@@ -33,11 +32,7 @@ public class XMLAttributesListWriter implements MessageBodyWriter<List<Attribute
 
     @Override
     public boolean isWriteable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        if (List.class.isAssignableFrom(aClass) && genericType instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) genericType;
-            return parameterizedType.getActualTypeArguments()[0] == Attributes.class;
-        }
-        return false;
+        return isAttributeList(aClass, genericType);
     }
 
     @Override
