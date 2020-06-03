@@ -201,12 +201,12 @@ public class Events {
             final CriteriaQuery<Mutation> c = cb.createQuery(Mutation.class);
             Root<Mutation> mutation = c.from(Mutation.class);
             c.select(mutation);
-            Join<Mutation,Album> albumJoin = mutation.join("album_fk");
-            Join<Mutation,Series> seriesJoin = mutation.join("series_fk");
-            Join<Series,Study> studiesJoin = mutation.join("study_fk");
-            Join<Mutation,User> userJoin = mutation.join("user_fk");
-            Join<Mutation,Capability> capabilityJoin = mutation.join("capability_fk");
-            Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("report_provider_fk");
+            Join<Mutation,Album> albumJoin = mutation.join("album");
+            Join<Mutation,Series> seriesJoin = mutation.join("series");
+            Join<Series,Study> studiesJoin = mutation.join("study");
+            Join<Mutation,User> userJoin = mutation.join("user");
+            Join<Mutation,Capability> capabilityJoin = mutation.join("capability");
+            Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider");
 
             final List<Predicate> allPredicate = new ArrayList<>();
             allPredicate.add(cb.equal(albumJoin.get("id"),albumId));
