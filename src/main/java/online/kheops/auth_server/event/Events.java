@@ -261,7 +261,7 @@ public class Events {
 
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
-            c.orderBy(cb.asc(mutation.get("eventTime")));
+            c.orderBy(cb.desc(mutation.get("eventTime")));
 
             TypedQuery<Mutation> q = em.createQuery(c);
             List<Mutation> mutationLst = q.getResultList();
