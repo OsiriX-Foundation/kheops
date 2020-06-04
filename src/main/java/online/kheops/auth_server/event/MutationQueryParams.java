@@ -213,7 +213,7 @@ public class MutationQueryParams {
 
     private void extractDate(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss][yyyy-MM-dd]");
         try {
             if (queryParameters.containsKey("startDate")) {
                 startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), formatter));
