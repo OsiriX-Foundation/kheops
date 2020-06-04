@@ -27,7 +27,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PAR
 
 public class MutationQueryParams {
 
-    private static final String[] ACCEPTED_VALUES_FOR_FAMILIES_ARRAY = {"webhooks", "sending", "users"};
+/*    private static final String[] ACCEPTED_VALUES_FOR_FAMILIES_ARRAY = {"webhooks", "sending", "users"};
     private static final Set<String> ACCEPTED_VALUES_FOR_FAMILIES = new HashSet<>(Arrays.asList(ACCEPTED_VALUES_FOR_FAMILIES_ARRAY));
 
     public enum families {
@@ -40,7 +40,7 @@ public class MutationQueryParams {
                 mutationQueryParams.types.add(Events.MutationType.TRIGGER_WEBHOOK);
             }
         },
-        SENDING{
+        SENDING {
             @Override
             public void addTypes(MutationQueryParams mutationQueryParams) {
                 mutationQueryParams.types.add(Events.MutationType.IMPORT_SERIES);
@@ -49,7 +49,7 @@ public class MutationQueryParams {
                 mutationQueryParams.types.add(Events.MutationType.REMOVE_STUDY);
             }
         },
-        USERS{
+        USERS {
             @Override
             public void addTypes (MutationQueryParams mutationQueryParams) {
                 mutationQueryParams.types.add(Events.MutationType.ADD_USER);
@@ -59,11 +59,20 @@ public class MutationQueryParams {
                 mutationQueryParams.types.add(Events.MutationType.DEMOTE_ADMIN);
                 mutationQueryParams.types.add(Events.MutationType.LEAVE_ALBUM);
             }
+        },
+        REPORT_PROVIDER {
+            @Override
+            public void addTypes(MutationQueryParams mutationQueryParams) {
+                mutationQueryParams.types.add(Events.MutationType.CREATE_REPORT_PROVIDER);
+                mutationQueryParams.types.add(Events.MutationType.EDIT_REPORT_PROVIDER);
+                mutationQueryParams.types.add(Events.MutationType.DELETE_REPORT_PROVIDER);
+                mutationQueryParams.types.add(Events.MutationType.NEW_REPORT);
+            }
         };
 
         public abstract void addTypes(MutationQueryParams mutationQueryParams);
     }
-
+*/
     private List<Events.MutationType> types = new ArrayList<>();
     private List<String> users = new ArrayList<>();
     private List<String> studies = new ArrayList<>();
@@ -110,7 +119,17 @@ public class MutationQueryParams {
             throws BadQueryParametersException {
         if (queryParameters.containsKey("family")) {
             for (String family:queryParameters.get("family")) {
-                if (ACCEPTED_VALUES_FOR_FAMILIES.contains(family)) {
+                try {
+                    types.addAll(Events.MutationTypeFamily.valueOf(family.toUpperCase()).getMutationTypes());
+                } catch (IllegalArgumentException e) {
+                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                            .message(BAD_QUERY_PARAMETER)
+                            .detail("'family' is not valid")
+                            .build();
+                    throw new BadQueryParametersException(errorResponse);
+                }
+
+/*              if (ACCEPTED_VALUES_FOR_FAMILIES.contains(family)) {
                     families.valueOf(family.toUpperCase()).addTypes(this);
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -119,6 +138,7 @@ public class MutationQueryParams {
                             .build();
                     throw new BadQueryParametersException(errorResponse);
                 }
+*/
             }
         }
     }
@@ -249,7 +269,6 @@ public class MutationQueryParams {
             throw new BadQueryParametersException(errorResponse);
         }
     }
-
 
     public List<Events.MutationType> getTypes() { return types; }
     public List<String> getUsers() { return users; }

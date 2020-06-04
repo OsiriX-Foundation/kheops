@@ -34,12 +34,67 @@ public class Events {
         throw new IllegalStateException("Utility class");
     }
 
-    public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN,
+    public enum MutationType {
+        ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN,
         CREATE_ALBUM, LEAVE_ALBUM,
         IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES,
         EDIT_ALBUM, ADD_FAV, REMOVE_FAV,
         CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT,
-        CREATE_WEBHOOK, DELETE_WEBHOOK, EDIT_WEBHOOK, TRIGGER_WEBHOOK}
+        CREATE_WEBHOOK, DELETE_WEBHOOK, EDIT_WEBHOOK, TRIGGER_WEBHOOK
+    }
+
+    public enum MutationTypeFamily {
+        WEBHOOKS {
+            @Override
+            public List<MutationType> getMutationTypes() {
+                List<MutationType> mutationTypes = new ArrayList<>();
+                mutationTypes.add(Events.MutationType.CREATE_WEBHOOK);
+                mutationTypes.add(Events.MutationType.DELETE_WEBHOOK);
+                mutationTypes.add(Events.MutationType.EDIT_WEBHOOK);
+                mutationTypes.add(Events.MutationType.TRIGGER_WEBHOOK);
+                return mutationTypes;
+            }
+        },
+        SENDING {
+            @Override
+            public List<MutationType> getMutationTypes () {
+                List<MutationType> mutationTypes = new ArrayList<>();
+                mutationTypes.add(Events.MutationType.IMPORT_SERIES);
+                mutationTypes.add(Events.MutationType.IMPORT_STUDY);
+                mutationTypes.add(Events.MutationType.REMOVE_SERIES);
+                mutationTypes.add(Events.MutationType.REMOVE_STUDY);
+                return mutationTypes;
+            }
+        },
+        USERS {
+            @Override
+            public List<MutationType> getMutationTypes () {
+                List<MutationType> mutationTypes = new ArrayList<>();
+
+                mutationTypes.add(Events.MutationType.ADD_USER);
+                mutationTypes.add(Events.MutationType.REMOVE_USER);
+                mutationTypes.add(Events.MutationType.ADD_ADMIN);
+                mutationTypes.add(Events.MutationType.PROMOTE_ADMIN);
+                mutationTypes.add(Events.MutationType.DEMOTE_ADMIN);
+                mutationTypes.add(Events.MutationType.LEAVE_ALBUM);
+                return mutationTypes;
+            }
+        },
+        REPORT_PROVIDER {
+            @Override
+            public List<MutationType> getMutationTypes () {
+                List<MutationType> mutationTypes = new ArrayList<>();
+                mutationTypes.add(Events.MutationType.CREATE_REPORT_PROVIDER);
+                mutationTypes.add(Events.MutationType.EDIT_REPORT_PROVIDER);
+                mutationTypes.add(Events.MutationType.DELETE_REPORT_PROVIDER);
+                mutationTypes.add(Events.MutationType.NEW_REPORT);
+                return mutationTypes;
+
+            }
+        };
+
+        public abstract List<MutationType> getMutationTypes();
+    }
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException {
@@ -262,10 +317,8 @@ public class Events {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
-
             mutationQueryParams.getStartDate().ifPresent(date -> allPredicate.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
             mutationQueryParams.getEndDate().ifPresent(date ->allPredicate.add( cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
-
 
             c.where(cb.and(allPredicate.toArray(new Predicate[0])));
             c.orderBy(cb.desc(mutation.get("eventTime")));
