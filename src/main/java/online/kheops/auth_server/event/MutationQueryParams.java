@@ -216,7 +216,7 @@ public class MutationQueryParams {
     private void extractDate(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         //final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss][yyyy-MM-dd]");
-        final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+        final DateTimeFormatter startDateformatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd")
                 .optionalStart()
                 .appendPattern(" HH:mm:ss")
@@ -224,13 +224,23 @@ public class MutationQueryParams {
                 .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
                 .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
                 .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                .toFormatter();  
+        final DateTimeFormatter endDateformatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd")
+                .optionalStart()
+                .appendPattern(" HH:mm:ss")
+                .optionalEnd()
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 23)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 59)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 59)
                 .toFormatter();
+
         try {
             if (queryParameters.containsKey("startDate")) {
-                startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), formatter));
+                startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), startDateformatter));
             }
             if (queryParameters.containsKey("endDate")) {
-                endDate = Optional.of(LocalDateTime.parse(queryParameters.get("endDate").get(0), formatter));
+                endDate = Optional.of(LocalDateTime.parse(queryParameters.get("endDate").get(0), endDateformatter));
             }
         } catch (DateTimeParseException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
