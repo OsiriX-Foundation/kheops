@@ -270,8 +270,7 @@ public class Events {
                 eventResponses.add(new EventResponse(m, userMember, em));
             }
 
-            //TODO a modifier pour que les filtres fonctionnent
-            XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
+            XTotalCount = EventQueries.getTotalMutationByAlbumv2(allPredicate, em);
         } finally {
             em.close();
         }
