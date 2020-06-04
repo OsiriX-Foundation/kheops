@@ -18,6 +18,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -44,56 +45,38 @@ public class Events {
     }
 
     public enum MutationTypeFamily {
-        WEBHOOKS {
-            @Override
-            public List<MutationType> getMutationTypes() {
-                List<MutationType> mutationTypes = new ArrayList<>();
-                mutationTypes.add(Events.MutationType.CREATE_WEBHOOK);
-                mutationTypes.add(Events.MutationType.DELETE_WEBHOOK);
-                mutationTypes.add(Events.MutationType.EDIT_WEBHOOK);
-                mutationTypes.add(Events.MutationType.TRIGGER_WEBHOOK);
-                return mutationTypes;
-            }
-        },
-        SENDING {
-            @Override
-            public List<MutationType> getMutationTypes () {
-                List<MutationType> mutationTypes = new ArrayList<>();
-                mutationTypes.add(Events.MutationType.IMPORT_SERIES);
-                mutationTypes.add(Events.MutationType.IMPORT_STUDY);
-                mutationTypes.add(Events.MutationType.REMOVE_SERIES);
-                mutationTypes.add(Events.MutationType.REMOVE_STUDY);
-                return mutationTypes;
-            }
-        },
-        USERS {
-            @Override
-            public List<MutationType> getMutationTypes () {
-                List<MutationType> mutationTypes = new ArrayList<>();
+        WEBHOOKS (Arrays.asList(
+                Events.MutationType.CREATE_WEBHOOK,
+                Events.MutationType.DELETE_WEBHOOK,
+                Events.MutationType.EDIT_WEBHOOK,
+                Events.MutationType.TRIGGER_WEBHOOK) ),
+        SENDING (Arrays.asList(
+                Events.MutationType.IMPORT_SERIES,
+                Events.MutationType.IMPORT_STUDY,
+                Events.MutationType.REMOVE_SERIES,
+                Events.MutationType.REMOVE_STUDY) ),
+        USERS (Arrays.asList(
+                Events.MutationType.ADD_USER,
+                Events.MutationType.REMOVE_USER,
+                Events.MutationType.ADD_ADMIN,
+                Events.MutationType.PROMOTE_ADMIN,
+                Events.MutationType.DEMOTE_ADMIN,
+                Events.MutationType.LEAVE_ALBUM) ),
+        REPORT_PROVIDER (Arrays.asList(
+                Events.MutationType.CREATE_REPORT_PROVIDER,
+                Events.MutationType.EDIT_REPORT_PROVIDER,
+                Events.MutationType.DELETE_REPORT_PROVIDER,
+                Events.MutationType.NEW_REPORT) );
 
-                mutationTypes.add(Events.MutationType.ADD_USER);
-                mutationTypes.add(Events.MutationType.REMOVE_USER);
-                mutationTypes.add(Events.MutationType.ADD_ADMIN);
-                mutationTypes.add(Events.MutationType.PROMOTE_ADMIN);
-                mutationTypes.add(Events.MutationType.DEMOTE_ADMIN);
-                mutationTypes.add(Events.MutationType.LEAVE_ALBUM);
-                return mutationTypes;
-            }
-        },
-        REPORT_PROVIDER {
-            @Override
-            public List<MutationType> getMutationTypes () {
-                List<MutationType> mutationTypes = new ArrayList<>();
-                mutationTypes.add(Events.MutationType.CREATE_REPORT_PROVIDER);
-                mutationTypes.add(Events.MutationType.EDIT_REPORT_PROVIDER);
-                mutationTypes.add(Events.MutationType.DELETE_REPORT_PROVIDER);
-                mutationTypes.add(Events.MutationType.NEW_REPORT);
-                return mutationTypes;
+        private final List<MutationType> mutationTypes;
 
-            }
-        };
+        MutationTypeFamily(List<MutationType> mutationTypes) {
+            this.mutationTypes = mutationTypes;
+        }
 
-        public abstract List<MutationType> getMutationTypes();
+        public List<MutationType> getMutationTypes() {
+            return mutationTypes;
+        }
     }
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
