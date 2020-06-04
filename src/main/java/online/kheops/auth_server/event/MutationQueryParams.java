@@ -14,7 +14,9 @@ import javax.persistence.EntityManager;
 import javax.ws.rs.core.MultivaluedMap;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.util.*;
 
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findCapabilityByCapabilityIDAndAlbumId;
@@ -213,7 +215,16 @@ public class MutationQueryParams {
 
     private void extractDate(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
-        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss][yyyy-MM-dd]");
+        //final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss][yyyy-MM-dd]");
+        final DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd")
+                .optionalStart()
+                .appendPattern(" HH:mm:ss")
+                .optionalEnd()
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                .toFormatter();
         try {
             if (queryParameters.containsKey("startDate")) {
                 startDate = Optional.of(LocalDateTime.parse(queryParameters.get("startDate").get(0), formatter));
