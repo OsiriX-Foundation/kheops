@@ -251,7 +251,7 @@ div.seriesSummaryContainer{
 	top: 70px;
     background: #06162c;
     opacity: 1;
-    z-index: 15;
+    z-index: 3;
 }
 
 .table-header {
@@ -259,7 +259,7 @@ div.seriesSummaryContainer{
 	position: sticky;
     background: #06162c;
     opacity: 1;
-    z-index: 14;
+    z-index: 2;
 }
 
 .table-albums-header {
@@ -268,7 +268,7 @@ div.seriesSummaryContainer{
 	top: 170px;
     background: #06162c;
     opacity: 1;
-    z-index: 14;
+    z-index: 2;
 }
 
 @media (min-width: 450px) {

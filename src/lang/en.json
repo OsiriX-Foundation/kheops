@@ -268,7 +268,7 @@
 		"tokenvalue": "Token value",
 		"urlvalue": "Access data url",
 		"user": "user",
-		"warning": "WARNING: You only see once the token value !",
+		"warning": "WARNING: Make sure to copy your new token now. You won’t be able to see it again!",
 		"warningpermissions": "Please select at least one permission",
 		"warningrevoke": "Are you sure you want to revoke this token ?",
 		"write": "write"
