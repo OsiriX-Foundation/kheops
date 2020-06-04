@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.*;
-import static online.kheops.auth_server.event.Events.MutationType.*;
-import static online.kheops.auth_server.event.Events.MutationType.EDIT_WEBHOOK;
-import static online.kheops.auth_server.event.Events.MutationType.TRIGGER_WEBHOOK;
+import static online.kheops.auth_server.event.MutationType.*;
+import static online.kheops.auth_server.event.MutationType.EDIT_WEBHOOK;
+import static online.kheops.auth_server.event.MutationType.TRIGGER_WEBHOOK;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;

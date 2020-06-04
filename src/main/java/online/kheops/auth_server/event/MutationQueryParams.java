@@ -27,53 +27,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PAR
 
 public class MutationQueryParams {
 
-/*    private static final String[] ACCEPTED_VALUES_FOR_FAMILIES_ARRAY = {"webhooks", "sending", "users"};
-    private static final Set<String> ACCEPTED_VALUES_FOR_FAMILIES = new HashSet<>(Arrays.asList(ACCEPTED_VALUES_FOR_FAMILIES_ARRAY));
-
-    public enum families {
-        WEBHOOKS {
-            @Override
-            public void addTypes(MutationQueryParams mutationQueryParams) {
-                mutationQueryParams.types.add(Events.MutationType.CREATE_WEBHOOK);
-                mutationQueryParams.types.add(Events.MutationType.DELETE_WEBHOOK);
-                mutationQueryParams.types.add(Events.MutationType.EDIT_WEBHOOK);
-                mutationQueryParams.types.add(Events.MutationType.TRIGGER_WEBHOOK);
-            }
-        },
-        SENDING {
-            @Override
-            public void addTypes(MutationQueryParams mutationQueryParams) {
-                mutationQueryParams.types.add(Events.MutationType.IMPORT_SERIES);
-                mutationQueryParams.types.add(Events.MutationType.IMPORT_STUDY);
-                mutationQueryParams.types.add(Events.MutationType.REMOVE_SERIES);
-                mutationQueryParams.types.add(Events.MutationType.REMOVE_STUDY);
-            }
-        },
-        USERS {
-            @Override
-            public void addTypes (MutationQueryParams mutationQueryParams) {
-                mutationQueryParams.types.add(Events.MutationType.ADD_USER);
-                mutationQueryParams.types.add(Events.MutationType.REMOVE_USER);
-                mutationQueryParams.types.add(Events.MutationType.ADD_ADMIN);
-                mutationQueryParams.types.add(Events.MutationType.PROMOTE_ADMIN);
-                mutationQueryParams.types.add(Events.MutationType.DEMOTE_ADMIN);
-                mutationQueryParams.types.add(Events.MutationType.LEAVE_ALBUM);
-            }
-        },
-        REPORT_PROVIDER {
-            @Override
-            public void addTypes(MutationQueryParams mutationQueryParams) {
-                mutationQueryParams.types.add(Events.MutationType.CREATE_REPORT_PROVIDER);
-                mutationQueryParams.types.add(Events.MutationType.EDIT_REPORT_PROVIDER);
-                mutationQueryParams.types.add(Events.MutationType.DELETE_REPORT_PROVIDER);
-                mutationQueryParams.types.add(Events.MutationType.NEW_REPORT);
-            }
-        };
-
-        public abstract void addTypes(MutationQueryParams mutationQueryParams);
-    }
-*/
-    private List<Events.MutationType> types = new ArrayList<>();
+    private List<MutationType> types = new ArrayList<>();
     private List<String> users = new ArrayList<>();
     private List<String> studies = new ArrayList<>();
     private List<String> series = new ArrayList<>();
@@ -103,7 +57,7 @@ public class MutationQueryParams {
         if (queryParameters.containsKey("type")) {
             for (String type:queryParameters.get("type")) {
                 try {
-                    types.add(Events.MutationType.valueOf(type));
+                    types.add(MutationType.valueOf(type));
                 } catch (IllegalArgumentException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -120,7 +74,7 @@ public class MutationQueryParams {
         if (queryParameters.containsKey("family")) {
             for (String family:queryParameters.get("family")) {
                 try {
-                    types.addAll(Events.MutationTypeFamily.valueOf(family.toUpperCase()).getMutationTypes());
+                    types.addAll(MutationTypeFamily.valueOf(family.toUpperCase()).getMutationTypes());
                 } catch (IllegalArgumentException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -270,7 +224,7 @@ public class MutationQueryParams {
         }
     }
 
-    public List<Events.MutationType> getTypes() { return types; }
+    public List<MutationType> getTypes() { return types; }
     public List<String> getUsers() { return users; }
     public List<String> getStudies() { return studies; }
     public List<String> getSeries() { return series; }

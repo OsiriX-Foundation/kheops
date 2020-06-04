@@ -1,6 +1,7 @@
 package online.kheops.auth_server.entity;
 
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.event.MutationType;
 
 import javax.persistence.*;
 import java.util.List;
@@ -32,11 +33,11 @@ public class Mutation extends Event{
     @Basic(optional = false)
     @Column(name = "mutation_type", updatable = false)
     @Enumerated(value = EnumType.STRING)
-    private Events.MutationType mutationType;
+    private MutationType mutationType;
 
     public User getToUser() { return toUser; }
 
-    public Events.MutationType getMutationType() { return mutationType; }
+    public MutationType getMutationType() { return mutationType; }
 
     public Optional<Capability> getCapability() { return Optional.ofNullable(capability); }
 
@@ -44,7 +45,7 @@ public class Mutation extends Event{
 
     public Mutation() {}
 
-    public Mutation(User callingUser, Album album, Events.MutationType mutationType, User targetUser) {
+    public Mutation(User callingUser, Album album, MutationType mutationType, User targetUser) {
         super(callingUser, album);
         this.mutationType = mutationType;
         toUser = targetUser;
@@ -52,12 +53,12 @@ public class Mutation extends Event{
         targetUser.addMutation(this);
     }
 
-    public Mutation(User callingUser, Album album, Events.MutationType mutationType) {
+    public Mutation(User callingUser, Album album, MutationType mutationType) {
         super(callingUser, album);
         this.mutationType = mutationType;
     }
 
-    public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
+    public Mutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType) {
         super(callingUser, album);
         this.mutationType = mutationType;
         this.reportProvider = reportProvider;
@@ -65,20 +66,20 @@ public class Mutation extends Event{
         reportProvider.addMutation(this);
     }
 
-    public Mutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType, Series series) {
+    public Mutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType, Series series) {
         this(callingUser, album, mutationType, series);
         this.reportProvider = reportProvider;
 
         reportProvider.addMutation(this);
     }
 
-    public Mutation(User callingUser, Album album, Events.MutationType mutationType, Series series) {
+    public Mutation(User callingUser, Album album, MutationType mutationType, Series series) {
         super(callingUser, album, series.getStudy());
         this.mutationType = mutationType;
         this.getSeries().add(series);
     }
 
-    public Mutation(User callingUser, Album album, Events.MutationType mutationType, Study study, List<Series> seriesList) {
+    public Mutation(User callingUser, Album album, MutationType mutationType, Study study, List<Series> seriesList) {
         super(callingUser, album, study);
         this.mutationType = mutationType;
         for (Series series :seriesList) {
@@ -86,7 +87,7 @@ public class Mutation extends Event{
         }
     }
 
-    public Mutation(Capability capability, Album album, Events.MutationType mutationType, Study study, List<Series> seriesList) {
+    public Mutation(Capability capability, Album album, MutationType mutationType, Study study, List<Series> seriesList) {
         super(capability.getUser(), album, study);
         this.mutationType = mutationType;
         this.capability = capability;
@@ -98,7 +99,7 @@ public class Mutation extends Event{
         }
     }
 
-    public Mutation (Capability capability, Album album, Events.MutationType mutationType, Series series) {
+    public Mutation (Capability capability, Album album, MutationType mutationType, Series series) {
         super(capability.getUser(), album, series.getStudy());
         this.mutationType = mutationType;
         this.getSeries().add(series);

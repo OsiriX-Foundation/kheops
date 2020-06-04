@@ -35,50 +35,6 @@ public class Events {
         throw new IllegalStateException("Utility class");
     }
 
-    public enum MutationType {
-        ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN,
-        CREATE_ALBUM, LEAVE_ALBUM,
-        IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES,
-        EDIT_ALBUM, ADD_FAV, REMOVE_FAV,
-        CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT,
-        CREATE_WEBHOOK, DELETE_WEBHOOK, EDIT_WEBHOOK, TRIGGER_WEBHOOK
-    }
-
-    public enum MutationTypeFamily {
-        WEBHOOKS (Arrays.asList(
-                Events.MutationType.CREATE_WEBHOOK,
-                Events.MutationType.DELETE_WEBHOOK,
-                Events.MutationType.EDIT_WEBHOOK,
-                Events.MutationType.TRIGGER_WEBHOOK) ),
-        SENDING (Arrays.asList(
-                Events.MutationType.IMPORT_SERIES,
-                Events.MutationType.IMPORT_STUDY,
-                Events.MutationType.REMOVE_SERIES,
-                Events.MutationType.REMOVE_STUDY) ),
-        USERS (Arrays.asList(
-                Events.MutationType.ADD_USER,
-                Events.MutationType.REMOVE_USER,
-                Events.MutationType.ADD_ADMIN,
-                Events.MutationType.PROMOTE_ADMIN,
-                Events.MutationType.DEMOTE_ADMIN,
-                Events.MutationType.LEAVE_ALBUM) ),
-        REPORT_PROVIDER (Arrays.asList(
-                Events.MutationType.CREATE_REPORT_PROVIDER,
-                Events.MutationType.EDIT_REPORT_PROVIDER,
-                Events.MutationType.DELETE_REPORT_PROVIDER,
-                Events.MutationType.NEW_REPORT) );
-
-        private final List<MutationType> mutationTypes;
-
-        MutationTypeFamily(List<MutationType> mutationTypes) {
-            this.mutationTypes = mutationTypes;
-        }
-
-        public List<MutationType> getMutationTypes() {
-            return mutationTypes;
-        }
-    }
-
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException {
 
@@ -127,16 +83,16 @@ public class Events {
         return new Mutation(callingUser, album, mutationType, targetUser);
     }
 
-    public static Mutation reportProviderMutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
+    public static Mutation reportProviderMutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType) {
         return new Mutation(callingUser, album, reportProvider, mutationType);
     }
 
-    public static Mutation newReport(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType, Series series) {
+    public static Mutation newReport(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType, Series series) {
         return new Mutation(callingUser, album, reportProvider, mutationType, series);
     }
 
     public static Mutation albumPostNewAlbumMutation(User callingUser, Album album) {
-        return new Mutation(callingUser, album, Events.MutationType.CREATE_ALBUM);
+        return new Mutation(callingUser, album, MutationType.CREATE_ALBUM);
     }
 
     public static Mutation albumPostSeriesMutation(User callingUser, Album album, MutationType mutationType, Series series) {

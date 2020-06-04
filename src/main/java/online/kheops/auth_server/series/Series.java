@@ -4,6 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import org.dcm4che3.data.Attributes;
@@ -126,12 +127,12 @@ public class Series {
             final online.kheops.auth_server.entity.Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             editSeriesFavorites(series, album, favorite, em);
 
-            final Events.MutationType mutation;
+            final MutationType mutation;
             if (favorite) {
-                mutation = Events.MutationType.ADD_FAV;
+                mutation = MutationType.ADD_FAV;
                 kheopsLogBuilder.action(ActionType.ADD_FAVORITE_SERIES);
             } else {
-                mutation = Events.MutationType.REMOVE_FAV;
+                mutation = MutationType.REMOVE_FAV;
                 kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_SERIES);
 
             }

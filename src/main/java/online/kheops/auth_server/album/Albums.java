@@ -3,6 +3,7 @@ package online.kheops.auth_server.album;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
@@ -250,7 +251,7 @@ public class Albums {
                     if (!targetAlbumUser.isAdmin() && isAdmin) {
                         //Here, the targetUser is an normal member and he will be promot as admin
                         targetAlbumUser.setAdmin(isAdmin);
-                        final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, Events.MutationType.PROMOTE_ADMIN, targetUser);
+                        final Mutation mutationPromoteAdmin = Events.albumPostUserMutation(callingUser, album, MutationType.PROMOTE_ADMIN, targetUser);
                         em.persist(mutationPromoteAdmin);
                     }
 
@@ -260,11 +261,11 @@ public class Albums {
             } else {
                 final AlbumUser targetAlbumUser = new AlbumUser(album, targetUser, isAdmin);
 
-                final Events.MutationType mutationType;
+                final MutationType mutationType;
                 if (isAdmin) {
-                    mutationType = Events.MutationType.ADD_ADMIN;
+                    mutationType = MutationType.ADD_ADMIN;
                 } else {
-                    mutationType = Events.MutationType.ADD_USER;
+                    mutationType = MutationType.ADD_USER;
                 }
 
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, targetUser);
@@ -318,12 +319,12 @@ public class Albums {
                 final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
                 final AlbumUser removedAlbumUser = getAlbumUser(album, removedUser, em);
 
-                final Events.MutationType mutationType;
+                final MutationType mutationType;
 
                 if (callingUser.getPk() == removedUser.getPk()) {
-                    mutationType = Events.MutationType.LEAVE_ALBUM;
+                    mutationType = MutationType.LEAVE_ALBUM;
                 } else if (callingAlbumUser.isAdmin()) {
-                    mutationType = Events.MutationType.REMOVE_USER;
+                    mutationType = MutationType.REMOVE_USER;
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(AUTHORIZATION_ERROR)
@@ -370,7 +371,7 @@ public class Albums {
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser removedAlbumUser = getAlbumUser(targetAlbum, removedUser, em);
 
-            final Mutation mutation = Events.albumPostUserMutation(callingUser, targetAlbum, Events.MutationType.DEMOTE_ADMIN, removedUser);
+            final Mutation mutation = Events.albumPostUserMutation(callingUser, targetAlbum, MutationType.DEMOTE_ADMIN, removedUser);
 
             em.persist(mutation);
             removedAlbumUser.setAdmin(false);
