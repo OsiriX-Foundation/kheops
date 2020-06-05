@@ -203,21 +203,21 @@ public class Events {
             //Join<Mutation,Capability> capabilityJoin = mutation.join("capability", JoinType.LEFT);
             //Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider", JoinType.LEFT);
 
-            final List<Predicate> allPredicate = new ArrayList<>();
-            allPredicate.add(cb.equal(mutation.get("album").get("id"),albumId));
+            final List<Predicate> filters = new ArrayList<>();
+            filters.add(cb.equal(mutation.get("album").get("id"),albumId));
 
             List<Predicate> criteria = new ArrayList<>();
             for (String reportProviderClientId : mutationQueryParams.getReportProviders()) {
                 criteria.add(cb.equal(mutation.get("reportProvider").get("clientId"), reportProviderClientId));
             }
             if (!criteria.isEmpty()) {
-                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
             if (!mutationQueryParams.getSeries().isEmpty()) {
                 criteria = new ArrayList<>();
                 criteria.add(seriesJoin.get("seriesInstanceUID").in(mutationQueryParams.getSeries()));
-                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
             criteria = new ArrayList<>();
@@ -225,7 +225,7 @@ public class Events {
                 criteria.add(cb.equal(mutation.get("study").get("studyInstanceUID"), studyInstanceUID));
             }
             if (!criteria.isEmpty()) {
-                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
             criteria = new ArrayList<>();
@@ -236,7 +236,7 @@ public class Events {
                 criteria.add(cb.equal(mutation.get("toUser").get("sub"), sub));
             }
             if (!criteria.isEmpty()) {
-                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
             criteria = new ArrayList<>();
@@ -244,20 +244,20 @@ public class Events {
                 criteria.add(cb.equal(mutation.get("capability").get("id"), capabilityToken));
             }
             if (!criteria.isEmpty()) {
-                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
 
             criteria = new ArrayList<>();
             if (!mutationQueryParams.getTypes().isEmpty()) {
                 criteria.add(mutation.get("mutationType").in(mutationQueryParams.getTypes()));
-                allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
-            mutationQueryParams.getStartDate().ifPresent(date -> allPredicate.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
-            mutationQueryParams.getEndDate().ifPresent(date ->allPredicate.add( cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
+            mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
+            mutationQueryParams.getEndDate().ifPresent(date ->filters.add( cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
 
-            c.where(cb.and(allPredicate.toArray(new Predicate[0])));
+            c.where(cb.and(filters.toArray(new Predicate[0])));
             c.orderBy(cb.desc(mutation.get("eventTime")));
 
             TypedQuery<Mutation> q = em.createQuery(c);
@@ -268,7 +268,7 @@ public class Events {
                 eventResponses.add(new EventResponse(m, userMember, em));
             }
 
-            XTotalCount = EventQueries.getTotalMutationByAlbumv2(allPredicate, em);
+            XTotalCount = EventQueries.getTotalMutationByAlbumv2(filters, em);
         } finally {
             em.close();
         }
