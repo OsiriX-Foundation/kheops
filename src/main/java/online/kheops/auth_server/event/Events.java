@@ -252,7 +252,7 @@ public class Events {
                 eventResponses.add(new EventResponse(m, userMember, em));
             }
 
-            XTotalCount = EventQueries.getTotalMutationByAlbumv2(filters, em);
+            XTotalCount = 1234;//EventQueries.getTotalMutationByAlbumv2(filters, em);
         } finally {
             em.close();
         }
