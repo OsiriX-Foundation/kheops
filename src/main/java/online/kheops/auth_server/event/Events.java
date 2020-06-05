@@ -196,19 +196,19 @@ public class Events {
             c.select(mutation);
             c.distinct(true);
             //Join<Mutation,Album> albumJoin = mutation.join("album", JoinType.LEFT);
-            Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
-            Join<Series,Study> studiesJoin = mutation.join("study", JoinType.LEFT);
-            Join<Mutation,User> userJoin = mutation.join("user", JoinType.LEFT);
-            Join<Mutation,User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
-            Join<Mutation,Capability> capabilityJoin = mutation.join("capability", JoinType.LEFT);
-            Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider", JoinType.LEFT);
+            //Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
+            //Join<Series,Study> studiesJoin = mutation.join("study", JoinType.LEFT);
+            //Join<Mutation,User> userJoin = mutation.join("user", JoinType.LEFT);
+            //Join<Mutation,User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
+            //Join<Mutation,Capability> capabilityJoin = mutation.join("capability", JoinType.LEFT);
+            //Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider", JoinType.LEFT);
 
             final List<Predicate> allPredicate = new ArrayList<>();
             allPredicate.add(cb.equal(mutation.get("album").get("id"),albumId));
 
             List<Predicate> criteria = new ArrayList<>();
             for (String reportProviderClientId : mutationQueryParams.getReportProviders()) {
-                criteria.add(cb.equal(reportProviderJoin.get("clientId"), reportProviderClientId));
+                criteria.add(cb.equal(mutation.get("reportProvider").get("clientId"), reportProviderClientId));
             }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
@@ -216,7 +216,7 @@ public class Events {
 
             criteria = new ArrayList<>();
             for (String seriesInstanceUID : mutationQueryParams.getSeries()) {
-                criteria.add(cb.equal(seriesJoin.get("seriesInstanceUID"), seriesInstanceUID));
+                criteria.add(cb.equal(mutation.get("series").get("seriesInstanceUID"), seriesInstanceUID));
             }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
@@ -224,7 +224,7 @@ public class Events {
 
             criteria = new ArrayList<>();
             for (String studyInstanceUID : mutationQueryParams.getStudies()) {
-                criteria.add(cb.equal(studiesJoin.get("studyInstanceUID"), studyInstanceUID));
+                criteria.add(cb.equal(mutation.get("study").get("studyInstanceUID"), studyInstanceUID));
             }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
@@ -232,10 +232,10 @@ public class Events {
 
             criteria = new ArrayList<>();
             for (String sub : mutationQueryParams.getUsers()) {
-                criteria.add(cb.equal(userJoin.get("sub"), sub));
+                criteria.add(cb.equal(mutation.get("user").get("sub"), sub));
             }
             for (String sub : mutationQueryParams.getUsers()) {
-                criteria.add(cb.equal(toUserJoin.get("sub"), sub));
+                criteria.add(cb.equal(mutation.get("toUser").get("sub"), sub));
             }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
@@ -243,7 +243,7 @@ public class Events {
 
             criteria = new ArrayList<>();
             for (String capabilityToken : mutationQueryParams.getCapabilityTokens()) {
-                criteria.add(cb.equal(capabilityJoin.get("id"), capabilityToken));
+                criteria.add(cb.equal(mutation.get("capability").get("id"), capabilityToken));
             }
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));

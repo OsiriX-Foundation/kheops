@@ -64,13 +64,13 @@ public class EventQueries {
         final CriteriaQuery<Long> c = cb.createQuery(Long.class);
         Root<Mutation> mutation = c.from(Mutation.class);
         c.select(cb.countDistinct(mutation));
-        Join<Mutation, Album> albumJoin = mutation.join("album", JoinType.LEFT);
-        Join<Mutation, Series> seriesJoin = mutation.join("series", JoinType.LEFT);
-        Join<Series, Study> studiesJoin = mutation.join("study", JoinType.LEFT);
-        Join<Mutation, User> userJoin = mutation.join("user", JoinType.LEFT);
-        Join<Mutation, User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
-        Join<Mutation, Capability> capabilityJoin = mutation.join("capability", JoinType.LEFT);
-        Join<Mutation, ReportProvider> reportProviderJoin = mutation.join("reportProvider", JoinType.LEFT);
+        //Join<Mutation, Album> albumJoin = mutation.join("album", JoinType.LEFT);
+        //Join<Mutation, Series> seriesJoin = mutation.join("series", JoinType.LEFT);
+        //Join<Series, Study> studiesJoin = mutation.join("study", JoinType.LEFT);
+        //Join<Mutation, User> userJoin = mutation.join("user", JoinType.LEFT);
+        //Join<Mutation, User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
+        //Join<Mutation, Capability> capabilityJoin = mutation.join("capability", JoinType.LEFT);
+        //Join<Mutation, ReportProvider> reportProviderJoin = mutation.join("reportProvider", JoinType.LEFT);
 
         c.where(cb.and(allPredicate.toArray(new Predicate[0])));
         TypedQuery<Long> q = em.createQuery(c);
