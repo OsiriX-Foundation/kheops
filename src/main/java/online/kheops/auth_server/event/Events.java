@@ -195,22 +195,13 @@ public class Events {
             final Root<Mutation> mutation = c.from(Mutation.class);
             c.select(mutation);
             c.distinct(true);
-            //Join<Mutation,Album> albumJoin = mutation.join("album", JoinType.LEFT);
-            //Join<Series,Study> studiesJoin = mutation.join("study", JoinType.LEFT);
-            //Join<Mutation,User> userJoin = mutation.join("user", JoinType.LEFT);
-            //Join<Mutation,User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
-            //Join<Mutation,Capability> capabilityJoin = mutation.join("capability", JoinType.LEFT);
-            //Join<Mutation,ReportProvider> reportProviderJoin = mutation.join("reportProvider", JoinType.LEFT);
 
             final List<Predicate> filters = new ArrayList<>();
+
             filters.add(cb.equal(mutation.get("album").get("id"),albumId));
 
-            List<Predicate> criteria = new ArrayList<>();
-            for (String reportProviderClientId : mutationQueryParams.getReportProviders()) {
-                criteria.add(cb.equal(mutation.get("reportProvider").get("clientId"), reportProviderClientId));
-            }
-            if (!criteria.isEmpty()) {
-                filters.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!mutationQueryParams.getReportProviders().isEmpty()) {
+                filters.add(cb.or(mutation.get("reportProvider").get("clientId").in(mutationQueryParams.getReportProviders())));
             }
 
             if (!mutationQueryParams.getSeries().isEmpty()) {
@@ -222,30 +213,17 @@ public class Events {
                 filters.add(cb.or(mutation.get("study").get("studyInstanceUID").in(mutationQueryParams.getStudies())));
             }
 
-            criteria = new ArrayList<>();
-            for (String sub : mutationQueryParams.getUsers()) {
-                criteria.add(cb.equal(mutation.get("user").get("sub"), sub));
-            }
-            for (String sub : mutationQueryParams.getUsers()) {
-                criteria.add(cb.equal(mutation.get("toUser").get("sub"), sub));
-            }
-            if (!criteria.isEmpty()) {
-                filters.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!mutationQueryParams.getUsers().isEmpty()) {
+                filters.add(cb.or(mutation.get("user").get("sub").in(mutationQueryParams.getUsers())));
+                filters.add(cb.or(mutation.get("toUser").get("sub").in(mutationQueryParams.getUsers())));
             }
 
-            criteria = new ArrayList<>();
-            for (String capabilityToken : mutationQueryParams.getCapabilityTokens()) {
-                criteria.add(cb.equal(mutation.get("capability").get("id"), capabilityToken));
-            }
-            if (!criteria.isEmpty()) {
-                filters.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!mutationQueryParams.getCapabilityTokens().isEmpty()) {
+                filters.add(cb.or(mutation.get("capability").get("id").in(mutationQueryParams.getCapabilityTokens())));
             }
 
-
-            criteria = new ArrayList<>();
             if (!mutationQueryParams.getTypes().isEmpty()) {
-                criteria.add(mutation.get("mutationType").in(mutationQueryParams.getTypes()));
-                filters.add(cb.or(criteria.toArray(new Predicate[0])));
+                filters.add(cb.or(mutation.get("mutationType").in(mutationQueryParams.getTypes())));
             }
 
             mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
