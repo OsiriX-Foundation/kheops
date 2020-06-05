@@ -213,12 +213,10 @@ public class Events {
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
-
-            criteria = new ArrayList<>();
-            for (String seriesInstanceUID : mutationQueryParams.getSeries()) {
-                criteria.add(cb.equal(mutation.get("series").get("seriesInstanceUID"), seriesInstanceUID));
-            }
-            if (!criteria.isEmpty()) {
+            
+            if (!mutationQueryParams.getSeries().isEmpty()) {
+                criteria = new ArrayList<>();
+                criteria.add((mutation.get("series").get("seriesInstanceUID").in(mutationQueryParams.getSeries())));
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 
