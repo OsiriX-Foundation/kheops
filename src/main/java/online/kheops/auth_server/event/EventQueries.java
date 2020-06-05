@@ -64,9 +64,6 @@ public class EventQueries {
         final CriteriaQuery<Long> c = cb.createQuery(Long.class);
         final Root<Mutation> mutation = c.from(Mutation.class);
         c.select(cb.countDistinct(mutation));
-        Join<Mutation, Series> seriesJoin = mutation.join("series", JoinType.LEFT);
-        Join<Mutation, User> userJoin = mutation.join("user", JoinType.LEFT);
-        Join<Mutation, User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
 
         c.where(cb.and(filters.toArray(new Predicate[0])));
         TypedQuery<Long> q = em.createQuery(c);

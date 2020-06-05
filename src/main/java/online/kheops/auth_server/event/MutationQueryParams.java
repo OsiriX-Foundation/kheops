@@ -56,7 +56,7 @@ public class MutationQueryParams {
 
         if (queryParameters.containsKey("type")) {
             if(types.isEmpty()) {
-                types = Optional.ofNullable(new ArrayList<>());
+                types = Optional.of(new ArrayList<>());
             }
             for (String type:queryParameters.get("type")) {
                 try {
@@ -76,7 +76,7 @@ public class MutationQueryParams {
             throws BadQueryParametersException {
         if (queryParameters.containsKey("family")) {
             if(types.isEmpty()) {
-                types = Optional.ofNullable(new ArrayList<>());
+                types = Optional.of(new ArrayList<>());
             }
             for (String family:queryParameters.get("family")) {
                 try {
@@ -95,7 +95,7 @@ public class MutationQueryParams {
     private void extractUsers(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("user")) {
-            users = Optional.ofNullable(new ArrayList<>());
+            users = Optional.of(new ArrayList<>());
             for (String user:queryParameters.get("user")) {
                 try {
                     final User user1 = getUser(user, em);
@@ -114,7 +114,7 @@ public class MutationQueryParams {
     private void extractStudies(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("studies")) {
-            studies = Optional.ofNullable(new ArrayList<>());
+            studies = Optional.of(new ArrayList<>());
             for (String study:queryParameters.get("studies")) {
                 try {
                     getStudy(study, em);
@@ -133,7 +133,7 @@ public class MutationQueryParams {
     private void extractSeries(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("series")) {
-            studies = Optional.ofNullable(new ArrayList<>());
+            studies = Optional.of(new ArrayList<>());
             for (String seriesUID:queryParameters.get("series")) {
                 try {
                     Series.getSeries(seriesUID, em);
@@ -152,7 +152,7 @@ public class MutationQueryParams {
     private void extractReportProviders(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("reportProvider")) {
-            reportProviders = Optional.ofNullable(new ArrayList<>());
+            reportProviders = Optional.of(new ArrayList<>());
             for (String reportProvider:queryParameters.get("reportProvider")) {
                 try {
                     getReportProviderWithClientIdAndAlbumId(reportProvider, albumId, em);
@@ -171,7 +171,7 @@ public class MutationQueryParams {
     private void extractCapabilityToken(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("capabilityToken")) {
-            capabilityTokens = Optional.ofNullable(new ArrayList<>());
+            capabilityTokens = Optional.of(new ArrayList<>());
             for (String capabilityToken:queryParameters.get("capabilityToken")) {
                 try {
                     findCapabilityByCapabilityIDAndAlbumId(capabilityToken, albumId, em);
