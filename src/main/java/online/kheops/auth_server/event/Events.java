@@ -14,17 +14,14 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
-import static online.kheops.auth_server.event.EventQueries.getMutationByAlbumv2;
+import static online.kheops.auth_server.event.EventQueries.getMutationByAlbum;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
@@ -147,34 +144,8 @@ public class Events {
         }
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
-
-    public static PairListXTotalCount<EventResponse> getMutationsAlbum(String albumId, Integer offset, Integer limit)
-            throws AlbumNotFoundException {
-
-        final List<EventResponse> eventResponses = new ArrayList<>();
-        final long XTotalCount;
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        try {
-            final Album album = getAlbum(albumId, em);
-            final HashMap<String, Boolean> userMember = new HashMap<>();
-            for(AlbumUser albumUser : album.getAlbumUser()) {
-                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
-            }
-
-            for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(m, userMember, em));
-            }
-
-            XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
-        } finally {
-            em.close();
-        }
-        return new PairListXTotalCount<>(XTotalCount, eventResponses);
-    }
-
-    public static PairListXTotalCount<EventResponse> getMutationsAlbumv2(String albumId, MultivaluedMap<String, String> queryParameters, Integer offset, Integer limit)
+    
+    public static PairListXTotalCount<EventResponse> getMutationsAlbum(String albumId, MultivaluedMap<String, String> queryParameters, Integer offset, Integer limit)
             throws AlbumNotFoundException, BadQueryParametersException {
 
         final List<EventResponse> eventResponses = new ArrayList<>();
@@ -191,13 +162,13 @@ public class Events {
                 userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }
 
-            final List<Mutation> mutationLst = getMutationByAlbumv2(albumId, mutationQueryParams, offset, limit, em);
+            final List<Mutation> mutationLst = getMutationByAlbum(albumId, mutationQueryParams, offset, limit, em);
 
             for (Mutation m : mutationLst) {
                 eventResponses.add(new EventResponse(m, userMember, em));
             }
 
-            XTotalCount = EventQueries.getTotalMutationByAlbumv2(albumId, mutationQueryParams, em);
+            XTotalCount = EventQueries.getTotalMutationByAlbum(albumId, mutationQueryParams, em);
         } finally {
             em.close();
         }

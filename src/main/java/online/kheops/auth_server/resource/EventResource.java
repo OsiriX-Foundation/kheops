@@ -78,11 +78,10 @@ public class EventResource {
             pair = Events.getCommentsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
             kheopsLogBuilder.events("comments");
         } else if (types.contains("mutations")) {
-            pair = Events.getMutationsAlbum(albumId, offset, limit);
+            pair = Events.getMutationsAlbum(albumId,uriInfo.getQueryParameters(), offset, limit);
             kheopsLogBuilder.events("mutations");
         } else {
-            pair = Events.getMutationsAlbumv2(albumId,uriInfo.getQueryParameters(), offset, limit);
-            //pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
+            pair = Events.getEventsAlbum(kheopsPrincipal.getUser(), albumId, offset, limit);
             kheopsLogBuilder.events("comments_mutations");
         }
 

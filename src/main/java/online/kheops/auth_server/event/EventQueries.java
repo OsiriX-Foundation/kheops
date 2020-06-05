@@ -59,7 +59,7 @@ public class EventQueries {
         return query.getSingleResult();
     }
 
-    public static long getTotalMutationByAlbumv2(String albumId, MutationQueryParams mutationQueryParams, EntityManager em) {
+    public static long getTotalMutationByAlbum(String albumId, MutationQueryParams mutationQueryParams, EntityManager em) {
 
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Long> c = cb.createQuery(Long.class);
@@ -86,7 +86,7 @@ public class EventQueries {
         return q.getSingleResult();
     }
 
-    public static List<Mutation> getMutationByAlbumv2(String albumId, MutationQueryParams mutationQueryParams, Integer offset, Integer limit, EntityManager em) {
+    public static List<Mutation> getMutationByAlbum(String albumId, MutationQueryParams mutationQueryParams, Integer offset, Integer limit, EntityManager em) {
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Mutation> c = cb.createQuery(Mutation.class);
         final Root<Mutation> mutation = c.from(Mutation.class);
