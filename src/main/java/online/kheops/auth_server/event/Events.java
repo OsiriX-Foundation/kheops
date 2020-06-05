@@ -227,7 +227,7 @@ public class Events {
                     filters.add(cb.or(criteria.toArray(new Predicate[0])));
                 }
             }
-            77mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.get("user").get("sub").in(lst)), cb.or(mutation.get("toUser").get("sub").in(lst)))));
+            //mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.get("user").get("sub").in(lst)), cb.or(mutation.get("toUser").get("sub").in(lst)))));
 
             if (!mutationQueryParams.getCapabilityTokens().isEmpty()) {
                 filters.add(cb.or(mutation.get("capability").get("id").in(mutationQueryParams.getCapabilityTokens())));
