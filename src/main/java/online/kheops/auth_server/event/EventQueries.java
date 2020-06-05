@@ -65,7 +65,6 @@ public class EventQueries {
         final CriteriaQuery<Long> c = cb.createQuery(Long.class);
         final Root<Mutation> mutation = c.from(Mutation.class);
         c.select(cb.countDistinct(mutation));
-        c.distinct(true);
 
         final List<Predicate> filters = new ArrayList<>();
 
@@ -82,7 +81,6 @@ public class EventQueries {
         mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
 
         c.where(cb.and(filters.toArray(new Predicate[0])));
-        c.orderBy(cb.desc(mutation.get("eventTime")));
 
         TypedQuery<Long> q = em.createQuery(c);
         return q.getSingleResult();
