@@ -24,6 +24,7 @@ import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
+import static online.kheops.auth_server.event.EventQueries.getMutationByAlbumv2;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
@@ -190,38 +191,13 @@ public class Events {
                 userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }
 
-            final CriteriaBuilder cb = em.getCriteriaBuilder();
-            final CriteriaQuery<Mutation> c = cb.createQuery(Mutation.class);
-            final Root<Mutation> mutation = c.from(Mutation.class);
-            c.select(mutation);
-            c.distinct(true);
-
-            final List<Predicate> filters = new ArrayList<>();
-
-            filters.add(cb.equal(mutation.get("album").get("id"), albumId));
-
-            mutationQueryParams.getReportProviders().ifPresent(lst -> filters.add(cb.or(mutation.join("reportProvider", JoinType.LEFT).get("clientId").in(lst))));
-            mutationQueryParams.getSeries().ifPresent(lst -> filters.add(cb.or(mutation.join("series", JoinType.LEFT).get("seriesInstanceUID").in(lst))));
-            mutationQueryParams.getStudies().ifPresent(lst -> filters.add(cb.or(mutation.join("study", JoinType.LEFT).get("studyInstanceUID").in(lst))));
-            mutationQueryParams.getTypes().ifPresent(lst -> filters.add(cb.or(mutation.get("mutationType").in(lst))));
-            mutationQueryParams.getCapabilityTokens().ifPresent(lst -> filters.add(cb.or(mutation.join("capability", JoinType.LEFT).get("id").in(lst))));
-            mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.join("user", JoinType.LEFT).get("sub").in(lst)), cb.or(mutation.join("toUser", JoinType.LEFT).get("sub").in(lst)))));
-
-            mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
-            mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
-
-            c.where(cb.and(filters.toArray(new Predicate[0])));
-            c.orderBy(cb.desc(mutation.get("eventTime")));
-
-            TypedQuery<Mutation> q = em.createQuery(c);
-            q.setMaxResults(limit).setFirstResult(offset);
-            List<Mutation> mutationLst = q.getResultList();
+            final List<Mutation> mutationLst = getMutationByAlbumv2(albumId, mutationQueryParams, offset, limit, em);
 
             for (Mutation m : mutationLst) {
                 eventResponses.add(new EventResponse(m, userMember, em));
             }
 
-            XTotalCount = EventQueries.getTotalMutationByAlbumv2(filters, em);
+            XTotalCount = EventQueries.getTotalMutationByAlbumv2(albumId, mutationQueryParams, em);
         } finally {
             em.close();
         }
