@@ -213,10 +213,8 @@ public class Events {
                 filters.add(cb.or(mutation.get("study").get("studyInstanceUID").in(mutationQueryParams.getStudies())));
             }
 
-            if (!mutationQueryParams.getUsers().isEmpty()) {
-                filters.add(cb.or(mutation.get("user").get("sub").in(mutationQueryParams.getUsers())));
-                filters.add(cb.or(mutation.get("toUser").get("sub").in(mutationQueryParams.getUsers())));
-            }
+            mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(mutation.get("user").get("sub").in(mutationQueryParams.getUsers()))));
+            mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(mutation.get("toUser").get("sub").in(mutationQueryParams.getUsers()))));
 
             if (!mutationQueryParams.getCapabilityTokens().isEmpty()) {
                 filters.add(cb.or(mutation.get("capability").get("id").in(mutationQueryParams.getCapabilityTokens())));
@@ -227,7 +225,7 @@ public class Events {
             }
 
             mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
-            mutationQueryParams.getEndDate().ifPresent(date ->filters.add( cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
+            mutationQueryParams.getEndDate().ifPresent(date -> filters.add( cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
 
             c.where(cb.and(filters.toArray(new Predicate[0])));
             c.orderBy(cb.desc(mutation.get("eventTime")));

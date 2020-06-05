@@ -28,7 +28,7 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PAR
 public class MutationQueryParams {
 
     private List<MutationType> types = new ArrayList<>();
-    private List<String> users = new ArrayList<>();
+    private Optional<List<String>> users = Optional.empty();
     private List<String> studies = new ArrayList<>();
     private List<String> series = new ArrayList<>();
     private List<String> capabilityTokens = new ArrayList<>();
@@ -89,10 +89,11 @@ public class MutationQueryParams {
     private void extractUsers(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("user")) {
+            users = Optional.ofNullable(new ArrayList<>());
             for (String user:queryParameters.get("user")) {
                 try {
                     final User user1 = getUser(user, em);
-                    users.add(user1.getSub());
+                    users.ifPresent(lst -> lst.add(user1.getSub()));
                 } catch (UserNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -214,7 +215,7 @@ public class MutationQueryParams {
     }
 
     public List<MutationType> getTypes() { return types; }
-    public List<String> getUsers() { return users; }
+    public Optional<List<String>> getUsers() { return users; }
     public List<String> getStudies() { return studies; }
     public List<String> getSeries() { return series; }
     public List<String> getCapabilityTokens() { return capabilityTokens; }
