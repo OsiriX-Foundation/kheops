@@ -82,17 +82,6 @@ public class MutationQueryParams {
                             .build();
                     throw new BadQueryParametersException(errorResponse);
                 }
-
-/*              if (ACCEPTED_VALUES_FOR_FAMILIES.contains(family)) {
-                    families.valueOf(family.toUpperCase()).addTypes(this);
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(BAD_QUERY_PARAMETER)
-                            .detail("'family' is not valid")
-                            .build();
-                    throw new BadQueryParametersException(errorResponse);
-                }
-*/
             }
         }
     }
