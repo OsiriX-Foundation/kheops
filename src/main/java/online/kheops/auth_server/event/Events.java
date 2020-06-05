@@ -192,11 +192,11 @@ public class Events {
 
             final CriteriaBuilder cb = em.getCriteriaBuilder();
             final CriteriaQuery<Mutation> c = cb.createQuery(Mutation.class);
-            Root<Mutation> mutation = c.from(Mutation.class);
+            final Root<Mutation> mutation = c.from(Mutation.class);
             c.select(mutation);
             c.distinct(true);
             //Join<Mutation,Album> albumJoin = mutation.join("album", JoinType.LEFT);
-            //Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
+            Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
             //Join<Series,Study> studiesJoin = mutation.join("study", JoinType.LEFT);
             //Join<Mutation,User> userJoin = mutation.join("user", JoinType.LEFT);
             //Join<Mutation,User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
@@ -213,10 +213,10 @@ public class Events {
             if (!criteria.isEmpty()) {
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
-            
+
             if (!mutationQueryParams.getSeries().isEmpty()) {
                 criteria = new ArrayList<>();
-                criteria.add((mutation.get("series").get("seriesInstanceUID").in(mutationQueryParams.getSeries())));
+                criteria.add(seriesJoin.get("seriesInstanceUID").in(mutationQueryParams.getSeries()));
                 allPredicate.add(cb.or(criteria.toArray(new Predicate[0])));
             }
 

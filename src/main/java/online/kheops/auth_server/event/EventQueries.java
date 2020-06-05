@@ -62,7 +62,7 @@ public class EventQueries {
 
         final CriteriaBuilder cb = em.getCriteriaBuilder();
         final CriteriaQuery<Long> c = cb.createQuery(Long.class);
-        Root<Mutation> mutation = c.from(Mutation.class);
+        final Root<Mutation> mutation = c.from(Mutation.class);
         c.select(cb.countDistinct(mutation));
         //Join<Mutation, Album> albumJoin = mutation.join("album", JoinType.LEFT);
         //Join<Mutation, Series> seriesJoin = mutation.join("series", JoinType.LEFT);
