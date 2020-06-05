@@ -196,7 +196,6 @@ public class Events {
             c.select(mutation);
             c.distinct(true);
             //Join<Mutation,Album> albumJoin = mutation.join("album", JoinType.LEFT);
-            Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
             //Join<Series,Study> studiesJoin = mutation.join("study", JoinType.LEFT);
             //Join<Mutation,User> userJoin = mutation.join("user", JoinType.LEFT);
             //Join<Mutation,User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
@@ -215,17 +214,12 @@ public class Events {
             }
 
             if (!mutationQueryParams.getSeries().isEmpty()) {
-                criteria = new ArrayList<>();
-                criteria.add(seriesJoin.get("seriesInstanceUID").in(mutationQueryParams.getSeries()));
-                filters.add(cb.or(criteria.toArray(new Predicate[0])));
+                Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
+                filters.add(cb.or(seriesJoin.get("seriesInstanceUID").in(mutationQueryParams.getSeries())));
             }
 
-            criteria = new ArrayList<>();
-            for (String studyInstanceUID : mutationQueryParams.getStudies()) {
-                criteria.add(cb.equal(mutation.get("study").get("studyInstanceUID"), studyInstanceUID));
-            }
-            if (!criteria.isEmpty()) {
-                filters.add(cb.or(criteria.toArray(new Predicate[0])));
+            if (!mutationQueryParams.getStudies().isEmpty()) {
+                filters.add(cb.or(mutation.get("study").get("studyInstanceUID").in(mutationQueryParams.getStudies())));
             }
 
             criteria = new ArrayList<>();
