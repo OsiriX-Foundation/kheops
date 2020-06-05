@@ -27,12 +27,12 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PAR
 
 public class MutationQueryParams {
 
-    private List<MutationType> types = new ArrayList<>();
+    private Optional<List<MutationType>> types = Optional.empty();
     private Optional<List<String>> users = Optional.empty();
-    private List<String> studies = new ArrayList<>();
-    private List<String> series = new ArrayList<>();
-    private List<String> capabilityTokens = new ArrayList<>();
-    private List<String> reportProviders = new ArrayList<>();
+    private Optional<List<String>> studies = Optional.empty();
+    private Optional<List<String>> series = Optional.empty();
+    private Optional<List<String>> capabilityTokens = Optional.empty();
+    private Optional<List<String>> reportProviders = Optional.empty();
     private Optional<LocalDateTime> startDate = Optional.empty();
     private Optional<LocalDateTime> endDate = Optional.empty();
 
@@ -55,9 +55,12 @@ public class MutationQueryParams {
             throws BadQueryParametersException {
 
         if (queryParameters.containsKey("type")) {
+            if(types.isEmpty()) {
+                types = Optional.ofNullable(new ArrayList<>());
+            }
             for (String type:queryParameters.get("type")) {
                 try {
-                    types.add(MutationType.valueOf(type));
+                    types.ifPresent(lst -> lst.add(MutationType.valueOf(type)));
                 } catch (IllegalArgumentException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -72,9 +75,12 @@ public class MutationQueryParams {
     private void extractFamilies(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("family")) {
+            if(types.isEmpty()) {
+                types = Optional.ofNullable(new ArrayList<>());
+            }
             for (String family:queryParameters.get("family")) {
                 try {
-                    types.addAll(MutationTypeFamily.valueOf(family.toUpperCase()).getMutationTypes());
+                    types.ifPresent(lst -> lst.addAll(MutationTypeFamily.valueOf(family.toUpperCase()).getMutationTypes()));
                 } catch (IllegalArgumentException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -108,10 +114,11 @@ public class MutationQueryParams {
     private void extractStudies(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("studies")) {
+            studies = Optional.ofNullable(new ArrayList<>());
             for (String study:queryParameters.get("studies")) {
                 try {
                     getStudy(study, em);
-                    studies.add(study);
+                    studies.ifPresent(lst -> lst.add(study));
                 } catch (StudyNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -126,10 +133,11 @@ public class MutationQueryParams {
     private void extractSeries(MultivaluedMap<String, String> queryParameters, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("series")) {
+            studies = Optional.ofNullable(new ArrayList<>());
             for (String seriesUID:queryParameters.get("series")) {
                 try {
                     Series.getSeries(seriesUID, em);
-                    series.add(seriesUID);
+                    series.ifPresent(lst -> lst.add(seriesUID));
                 } catch (SeriesNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -144,10 +152,11 @@ public class MutationQueryParams {
     private void extractReportProviders(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("reportProvider")) {
+            reportProviders = Optional.ofNullable(new ArrayList<>());
             for (String reportProvider:queryParameters.get("reportProvider")) {
                 try {
                     getReportProviderWithClientIdAndAlbumId(reportProvider, albumId, em);
-                    reportProviders.add(reportProvider);
+                    reportProviders.ifPresent(lst -> lst.add(reportProvider));
                 } catch (ReportProviderNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -162,10 +171,11 @@ public class MutationQueryParams {
     private void extractCapabilityToken(MultivaluedMap<String, String> queryParameters, String albumId, EntityManager em)
             throws BadQueryParametersException {
         if (queryParameters.containsKey("capabilityToken")) {
+            capabilityTokens = Optional.ofNullable(new ArrayList<>());
             for (String capabilityToken:queryParameters.get("capabilityToken")) {
                 try {
                     findCapabilityByCapabilityIDAndAlbumId(capabilityToken, albumId, em);
-                    capabilityTokens.add(capabilityToken);
+                    capabilityTokens.ifPresent(lst -> lst.add(capabilityToken));
                 } catch (CapabilityNotFoundException e) {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(BAD_QUERY_PARAMETER)
@@ -214,12 +224,12 @@ public class MutationQueryParams {
         }
     }
 
-    public List<MutationType> getTypes() { return types; }
+    public Optional<List<MutationType>> getTypes() { return types; }
     public Optional<List<String>> getUsers() { return users; }
-    public List<String> getStudies() { return studies; }
-    public List<String> getSeries() { return series; }
-    public List<String> getCapabilityTokens() { return capabilityTokens; }
-    public List<String> getReportProviders() { return reportProviders; }
+    public Optional<List<String>> getStudies() { return studies; }
+    public Optional<List<String>> getSeries() { return series; }
+    public Optional<List<String>> getCapabilityTokens() { return capabilityTokens; }
+    public Optional<List<String>> getReportProviders() { return reportProviders; }
     public Optional<LocalDateTime> getStartDate() { return startDate; }
     public Optional<LocalDateTime> getEndDate() { return endDate; }
 }
