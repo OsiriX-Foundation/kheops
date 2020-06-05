@@ -186,7 +186,7 @@ public class Events {
 
             final Album album = getAlbum(albumId, em);
             final HashMap<String, Boolean> userMember = new HashMap<>();
-            for(AlbumUser albumUser : album.getAlbumUser()) {
+            for (AlbumUser albumUser : album.getAlbumUser()) {
                 userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }
 
@@ -198,14 +198,14 @@ public class Events {
 
             final List<Predicate> filters = new ArrayList<>();
 
-            filters.add(cb.equal(mutation.get("album").get("id"),albumId));
+            filters.add(cb.equal(mutation.get("album").get("id"), albumId));
 
             if (!mutationQueryParams.getReportProviders().isEmpty()) {
                 filters.add(cb.or(mutation.get("reportProvider").get("clientId").in(mutationQueryParams.getReportProviders())));
             }
 
             if (!mutationQueryParams.getSeries().isEmpty()) {
-                Join<Mutation,Series> seriesJoin = mutation.join("series", JoinType.LEFT);
+                Join<Mutation, Series> seriesJoin = mutation.join("series", JoinType.LEFT);
                 filters.add(cb.or(seriesJoin.get("seriesInstanceUID").in(mutationQueryParams.getSeries())));
             }
 
@@ -223,8 +223,23 @@ public class Events {
                 filters.add(cb.or(mutation.get("mutationType").in(mutationQueryParams.getTypes())));
             }
 
-            mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
-            mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
+
+            if (mutationQueryParams.getUsers().isPresent()) {
+                Join<Mutation, User> userJoin = mutation.join("user", JoinType.LEFT);
+                Join<Mutation, User> toUserJoin = mutation.join("toUser", JoinType.LEFT);
+                List<Predicate> criteria = new ArrayList<>();
+                for (String sub : mutationQueryParams.getUsers().get()) {
+                    criteria.add(cb.equal(userJoin.get("sub"), sub));
+                }
+                for (String sub : mutationQueryParams.getUsers().get()) {
+                    criteria.add(cb.equal(toUserJoin.get("sub"), sub));
+                }
+                if (!criteria.isEmpty()) {
+                    filters.add(cb.or(criteria.toArray(new Predicate[0])));
+                }
+            }
+            //mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get("eventTime"), date)));
+            //mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get("eventTime"), date)));
 
             c.where(cb.and(filters.toArray(new Predicate[0])));
             c.orderBy(cb.desc(mutation.get("eventTime")));
