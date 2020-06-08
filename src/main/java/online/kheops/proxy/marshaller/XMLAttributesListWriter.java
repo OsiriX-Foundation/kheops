@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
+import static org.dcm4che3.ws.rs.MediaTypes.*;
 import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_ANNOTATIONS;
 
 @Provider
@@ -38,16 +39,16 @@ public class XMLAttributesListWriter implements MessageBodyWriter<List<Attribute
     public void writeTo(List<Attributes> attributesList, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
             throws IOException {
 
-        MultiPart multiPart = new MultiPart(new MediaType("multipart", "related", Collections.singletonMap("type", "application/dicom+xml")));
+        MultiPart multiPart = new MultiPart(MULTIPART_RELATED_APPLICATION_DICOM_XML_TYPE);
         for (Attributes attributes: attributesList) {
-            multiPart.bodyPart(attributes, new MediaType("application", "dicom+xml"));
+            multiPart.bodyPart(attributes, APPLICATION_DICOM_XML_TYPE);
         }
 
         final MessageBodyWriter<MultiPart> bodyWriter = providers.getMessageBodyWriter(
                 MultiPart.class,
                 MultiPart.class,
                 EMPTY_ANNOTATIONS,
-                new MediaType("multipart", "related"));
+                MULTIPART_RELATED_TYPE);
 
         if (bodyWriter == null) {
             throw new IllegalArgumentException();

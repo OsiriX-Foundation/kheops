@@ -42,8 +42,7 @@ public class JSONStreamingAttributesWriter implements StreamingAttributesWriter 
     }
 
     @Override
-    public void flush() throws IOException
-    {
+    public void flush() throws IOException {
         try {
             generator.flush();
         } catch (JsonException e) {
@@ -52,8 +51,7 @@ public class JSONStreamingAttributesWriter implements StreamingAttributesWriter 
     }
 
     @Override
-    public void close() throws IOException
-    {
+    public void close() throws IOException {
         try {
             generator.close();
         } catch (JsonException e) {
