@@ -77,7 +77,7 @@ public class UserQueries {
         if(search.contains("@")) {
             return search + "%";
         } else {
-            return "%" + search + "%" + "@" + "%";
+            return "%" + search + "%@%";
         }
     }
 }
