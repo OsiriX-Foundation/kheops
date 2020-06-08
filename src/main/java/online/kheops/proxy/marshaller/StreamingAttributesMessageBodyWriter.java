@@ -68,6 +68,7 @@ public class StreamingAttributesMessageBodyWriter implements MessageBodyWriter<A
                 try (StreamingAttributesWriter writer = new XMLStreamingAttributesWriter(
                         new CloseShieldMultipartOutputStream(multipartOutputStream))) {
                     attributesStreamingOutput.write(writer);
+                    writer.flush();
                 }
             };
 

@@ -69,6 +69,7 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
                 boundaryMediaType,
                 providers)) {
             multipartStreamingOutput.write(multipartOutputStream);
+            multipartOutputStream.flush();
         }
 
         // Write the final boundary string
@@ -78,6 +79,7 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
             writer.write("\r\n--");
             writer.write(boundaryMediaType.getParameters().get("boundary"));
             writer.write("--\r\n");
+            writer.flush();
         }
     }
 }

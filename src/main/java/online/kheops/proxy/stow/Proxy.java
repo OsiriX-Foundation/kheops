@@ -66,7 +66,7 @@ public final class Proxy {
 
         String partString = "Unknown part";
         List<String> fileID = new ArrayList<>();
-        try (Part part = Part.getInstance(contentType, providers, multipartInputStream, fileID::add)) {
+        try (final Part part = Part.getInstance(contentType, providers, multipartInputStream, fileID::add)) {
             partString = part.toString();
             Set<InstanceID> authorizedInstanceIDs = authorizationManager.getAuthorization(part, fileID.isEmpty() ? null : fileID.get(0));
             writePart(partNumber, authorizedInstanceIDs, part);
