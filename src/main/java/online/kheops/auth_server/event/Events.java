@@ -144,7 +144,7 @@ public class Events {
         }
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
-    
+
     public static PairListXTotalCount<EventResponse> getMutationsAlbum(String albumId, MultivaluedMap<String, String> queryParameters, Integer offset, Integer limit)
             throws AlbumNotFoundException, BadQueryParametersException {
 
@@ -239,8 +239,7 @@ public class Events {
         }
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
-
-
+    
     public static void studyPostComment(User callingUser, String studyInstanceUID, String commentContent, String targetUserPk)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
 
