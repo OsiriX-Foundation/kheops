@@ -2,7 +2,8 @@ package online.kheops.proxy.stow;
 
 import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.id.SeriesID;
-import online.kheops.proxy.multipart.MultipartOutputStream;
+import online.kheops.proxy.multipart.MultipartOutputStream
+        ;
 import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.part.Part;
 import online.kheops.proxy.stow.authorization.AuthorizationManager;

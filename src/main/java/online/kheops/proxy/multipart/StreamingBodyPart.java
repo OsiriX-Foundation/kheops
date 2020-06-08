@@ -9,7 +9,7 @@ import javax.ws.rs.core.MultivaluedMap;
 public class StreamingBodyPart {
     private Object entity;
     private MediaType mediaType;
-    private MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+    private MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
     private ContentDisposition contentDisposition;
 
     public StreamingBodyPart(final Object entity, final MediaType mediaType) {
@@ -17,7 +17,7 @@ public class StreamingBodyPart {
         this.mediaType = mediaType;
     }
 
-    public StreamingBodyPart(final Object entity, final MediaType mediaType, final MultivaluedMap<String, String> headers) {
+    public StreamingBodyPart(final Object entity, final MediaType mediaType, final MultivaluedMap<String, Object> headers) {
         this.entity = entity;
         this.mediaType = mediaType;
         this.headers.putAll(headers);
@@ -39,11 +39,11 @@ public class StreamingBodyPart {
         this.mediaType = mediaType;
     }
 
-    public MultivaluedMap<String, String> getHeaders() {
+    public MultivaluedMap<String, Object> getHeaders() {
         return headers;
     }
 
-    public void setHeaders(MultivaluedMap<String, String> headers) {
+    public void setHeaders(MultivaluedMap<String, Object> headers) {
         this.headers = headers;
     }
 

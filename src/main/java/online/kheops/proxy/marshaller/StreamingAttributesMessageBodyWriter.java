@@ -1,5 +1,6 @@
 package online.kheops.proxy.marshaller;
 
+import online.kheops.proxy.multipart.CloseShieldMultipartOutputStream;
 import online.kheops.proxy.multipart.MultipartStreamingOutput;
 import org.apache.commons.io.output.CloseShieldOutputStream;
 
@@ -64,8 +65,10 @@ public class StreamingAttributesMessageBodyWriter implements MessageBodyWriter<A
             }
 
             MultipartStreamingOutput output = multipartOutputStream -> {
-                StreamingAttributesWriter writer = new XMLStreamingAttributesWriter(multipartOutputStream);
-                attributesStreamingOutput.write(writer);
+                try (StreamingAttributesWriter writer = new XMLStreamingAttributesWriter(
+                        new CloseShieldMultipartOutputStream(multipartOutputStream))) {
+                    attributesStreamingOutput.write(writer);
+                }
             };
 
             bodyWriter.writeTo(output,

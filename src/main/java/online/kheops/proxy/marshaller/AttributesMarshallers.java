@@ -6,9 +6,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-abstract class AttributesListMarshaller {
+final class AttributesMarshallers {
 
-    protected boolean isAttributeList(Class<?> aClass, Type genericType) {
+    private AttributesMarshallers() {
+        throw new AssertionError();
+    }
+
+    static boolean isAttributeList(Class<?> aClass, Type genericType) {
         if (List.class.isAssignableFrom(aClass) && genericType instanceof ParameterizedType) {
             Type listType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
             if (listType instanceof Class) {

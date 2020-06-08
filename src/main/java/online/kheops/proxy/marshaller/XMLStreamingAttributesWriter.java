@@ -22,12 +22,14 @@ public class XMLStreamingAttributesWriter implements StreamingAttributesWriter {
     }
 
     @Override
-    public void flush()
+    public void flush() throws IOException
     {
+        multipartOutputStream.flush();
     }
 
     @Override
-    public void close()
+    public void close() throws IOException
     {
+        multipartOutputStream.close();
     }
 }

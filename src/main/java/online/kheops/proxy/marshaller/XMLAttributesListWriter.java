@@ -21,7 +21,7 @@ import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_A
 
 @Provider
 @Produces("multipart/related;type=\"application/dicom+xml\"")
-public class XMLAttributesListWriter extends AttributesListMarshaller implements MessageBodyWriter<List<Attributes>> {
+public class XMLAttributesListWriter implements MessageBodyWriter<List<Attributes>> {
 
     private final Providers providers;
 
@@ -29,10 +29,9 @@ public class XMLAttributesListWriter extends AttributesListMarshaller implements
         this.providers = providers;
     }
 
-
     @Override
     public boolean isWriteable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return isAttributeList(aClass, genericType);
+        return AttributesMarshallers.isAttributeList(aClass, genericType);
     }
 
     @Override

@@ -169,11 +169,13 @@ public final class WadoRSStudy {
 
                     final MultipartParser.Handler handler = (partNumber, multipartInputStream) -> {
                         Map<String, List<String>> sourceHeaders = multipartInputStream.readHeaderParams();
-                        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+                        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
                         headers.putSingle(CONTENT_TYPE, sourceHeaders.get(CONTENT_TYPE).get(0));
                         // TODO handle content Location if needed
 
-                        output.writePart(new StreamingBodyPart(multipartInputStream, MediaType.valueOf(headers.getFirst(CONTENT_TYPE)), headers));
+                        output.writePart(new StreamingBodyPart(multipartInputStream,
+                                MediaType.valueOf(headers.getFirst(CONTENT_TYPE).toString()),
+                                headers));
                     };
 
                     new MultipartParser(boundary).parse(inputStream, handler);

@@ -19,6 +19,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -150,7 +151,7 @@ public final class WadoRsMetadata {
 
         AttributesStreamingOutput streamingOutput = output -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);
-                 final JsonParser parser = Json.createParser(inputStream)){
+                 final JsonParser parser = Json.createParser(inputStream)) {
 
                 final JSONReader jsonReader = new JSONReader(parser);
 
@@ -159,9 +160,15 @@ public final class WadoRsMetadata {
                         dataset.accept(new BulkDataVisitor(dicomwebRoot), true);
                         output.write(dataset);
                     } catch (Exception e) {
-                        throw new RuntimeException(e); // because accept() throws Exception and the readDatasets callback can not throw exceptions...
+                        throw new AcceptException(e);
                     }
                 });
+            } catch (AcceptException e) {
+                if (e.getCause() instanceof IOException) {
+                    throw (IOException) e.getCause();
+                } else {
+                    throw new IOException(e.getCause());
+                }
             } finally {
                 upstreamResponse.close();
             }
@@ -205,6 +212,13 @@ public final class WadoRsMetadata {
                 }
             }
             return true;
+        }
+    }
+
+    // class that is used because accept() throws Exception and the readDatasets callback can not throw exceptions...
+    private static class AcceptException extends RuntimeException {
+        AcceptException(Exception e) {
+            super(e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package online.kheops.proxy.multipart;
 
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.glassfish.jersey.media.multipart.Boundary;
 import org.glassfish.jersey.message.MessageUtils;
 
@@ -63,14 +64,20 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
         }
 
         // Build the MultiPartOutputStream
-        final MultipartOutputStream multipartOutputStream = new MultipartOutputStream(stream, boundaryMediaType, providers);
-        multipartStreamingOutput.write(multipartOutputStream);
+        try (final MultipartOutputStream multipartOutputStream = new MultipartOutputStreamImpl(
+                new CloseShieldOutputStream(stream),
+                boundaryMediaType,
+                providers)) {
+            multipartStreamingOutput.write(multipartOutputStream);
+        }
 
         // Write the final boundary string
-        final Writer writer = new BufferedWriter(new OutputStreamWriter(stream, MessageUtils.getCharset(mediaType)));
-        writer.write("\r\n--");
-        writer.write(boundaryMediaType.getParameters().get("boundary"));
-        writer.write("--\r\n");
-        writer.flush();
+        try (final Writer writer = new BufferedWriter(
+                new OutputStreamWriter(new CloseShieldOutputStream(stream), MessageUtils.getCharset(mediaType)),
+                512)) {
+            writer.write("\r\n--");
+            writer.write(boundaryMediaType.getParameters().get("boundary"));
+            writer.write("--\r\n");
+        }
     }
 }
