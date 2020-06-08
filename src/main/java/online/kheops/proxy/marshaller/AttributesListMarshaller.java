@@ -8,7 +8,7 @@ import java.util.List;
 
 abstract class AttributesListMarshaller {
 
-    boolean isAttributeList(Class<?> aClass, Type genericType) {
+    protected boolean isAttributeList(Class<?> aClass, Type genericType) {
         if (List.class.isAssignableFrom(aClass) && genericType instanceof ParameterizedType) {
             Type listType = ((ParameterizedType) genericType).getActualTypeArguments()[0];
             if (listType instanceof Class) {
