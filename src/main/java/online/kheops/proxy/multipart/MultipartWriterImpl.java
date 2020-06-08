@@ -17,20 +17,24 @@ import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
 final class MultipartWriterImpl implements MultipartWriter {
-    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     private final OutputStream outputStream;
     private final Providers providers;
+    private final Annotation[] annotations;
     private final MediaType mediaType;
     private final Writer writer;
 
     private boolean firstPartWritten = false;
 
-    MultipartWriterImpl(final OutputStream outputStream, final MediaType mediaType, final Providers providers) {
+    MultipartWriterImpl(final OutputStream outputStream,
+                        final MediaType mediaType,
+                        final Providers providers,
+                        final Annotation[] annotations) {
         this.outputStream = outputStream;
         this.writer = new BufferedWriter(new OutputStreamWriter(outputStream, MessageUtils.getCharset(mediaType)));
         this.mediaType = mediaType;
         this.providers = providers;
+        this.annotations = annotations;
     }
 
     @Override
@@ -68,7 +72,7 @@ final class MultipartWriterImpl implements MultipartWriter {
         final MessageBodyWriter<Object> bodyWriter = providers.getMessageBodyWriter(
                 bodyClass,
                 bodyClass,
-                EMPTY_ANNOTATIONS,
+                annotations,
                 bodyMediaType);
 
         if (bodyWriter == null) {
@@ -79,7 +83,7 @@ final class MultipartWriterImpl implements MultipartWriter {
                 bodyEntity,
                 bodyClass,
                 bodyClass,
-                EMPTY_ANNOTATIONS,
+                annotations,
                 bodyMediaType,
                 bodyHeaders,
                 outputStream

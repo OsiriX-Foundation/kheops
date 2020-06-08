@@ -17,7 +17,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import static org.dcm4che3.ws.rs.MediaTypes.*;
-import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_ANNOTATIONS;
 
 @Provider
 @Produces("multipart/related;type=\"application/dicom+xml\"")
@@ -46,7 +45,7 @@ public class XMLAttributesListProvider implements MessageBodyWriter<List<Attribu
         final MessageBodyWriter<MultiPart> bodyWriter = providers.getMessageBodyWriter(
                 MultiPart.class,
                 MultiPart.class,
-                EMPTY_ANNOTATIONS,
+                annotations,
                 MULTIPART_RELATED_TYPE);
 
         if (bodyWriter == null) {
@@ -57,7 +56,7 @@ public class XMLAttributesListProvider implements MessageBodyWriter<List<Attribu
                 multiPart,
                 MultiPart.class,
                 MultiPart.class,
-                EMPTY_ANNOTATIONS,
+                annotations,
                 multiPart.getMediaType(),
                 httpHeaders,
                 entityStream

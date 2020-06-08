@@ -42,11 +42,10 @@ import static java.nio.charset.StandardCharsets.US_ASCII;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
 import static javax.ws.rs.core.HttpHeaders.CONTENT_TYPE;
-import static javax.ws.rs.core.MediaType.MULTIPART_FORM_DATA_TYPE;
+import static javax.ws.rs.core.MediaType.*;
 import static javax.ws.rs.core.Response.Status.*;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
-import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_TYPE;
-import static org.dcm4che3.ws.rs.MediaTypes.MULTIPART_RELATED_APPLICATION_DICOM_TYPE;
+import static org.dcm4che3.ws.rs.MediaTypes.*;
 import static org.glassfish.jersey.client.ClientProperties.REQUEST_ENTITY_PROCESSING;
 import static org.glassfish.jersey.client.RequestEntityProcessing.CHUNKED;
 
@@ -54,6 +53,9 @@ import static org.glassfish.jersey.client.RequestEntityProcessing.CHUNKED;
 public final class Resource {
     private static final Logger LOG = Logger.getLogger(Resource.class.getName());
     private static final Client CLIENT = newClient();
+
+    private static final String CONSUMED_TYPES = MULTIPART_RELATED + "," + MULTIPART_FORM_DATA + "," + APPLICATION_DICOM;
+    private static final String PRODUCED_TYPES = APPLICATION_DICOM_JSON + ";qs=0.9," + "application/dicom+xml;qs=1.0," + APPLICATION_JSON+ ";qs=0.8";
 
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
     private static final String HEADER_X_LINK_AUTHORIZATION = "X-Link-Authorization";
@@ -87,34 +89,18 @@ public final class Resource {
 
     @POST
     @Path("/password/dicomweb/studies")
-    @Consumes("multipart/related,multipart/form-data,application/dicom")
-    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
+    @Consumes({CONSUMED_TYPES})
+    @Produces({PRODUCED_TYPES})
     public Response stow(@HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
     }
 
     @POST
-    @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies")
-    @Consumes("multipart/related,multipart/form-data,application/dicom")
-    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
-    public Response stowWithCapability(@PathParam("capability") String capabilityToken, @QueryParam("album") String albumId) {
-        return store(AuthorizationToken.from(capabilityToken), albumId, null);
-    }
-
-    @POST
     @Path("/password/dicomweb/studies/{studyInstanceUID}")
-    @Consumes("multipart/related,multipart/form-data,application/dicom")
-    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
+    @Consumes({CONSUMED_TYPES})
+    @Produces({PRODUCED_TYPES})
     public Response stowStudy(@HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
         return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
-    }
-
-    @POST
-    @Path("/{capability:[a-zA-Z0-9]{22}}/dicomweb/studies/{studyInstanceUID}")
-    @Consumes("multipart/related,multipart/form-data,application/dicom")
-    @Produces({"application/dicom+json;qs=0.9, application/dicom+xml;qs=1.0, application/json;qs=0.8"})
-    public Response stowStudyWithCapability(@PathParam("capability") String capabilityToken, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
-        return store(AuthorizationToken.from(capabilityToken), albumId, studyInstanceUID);
     }
 
     private Response store(AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {

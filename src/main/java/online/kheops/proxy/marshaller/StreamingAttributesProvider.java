@@ -3,6 +3,7 @@ package online.kheops.proxy.marshaller;
 import online.kheops.proxy.multipart.CloseShieldMultipartWriter;
 import online.kheops.proxy.multipart.MultipartStreamingOutput;
 import org.apache.commons.io.output.CloseShieldOutputStream;
+import org.glassfish.jersey.media.multipart.internal.LocalizationMessages;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -21,10 +22,9 @@ import java.lang.reflect.Type;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.dcm4che3.ws.rs.MediaTypes.*;
-import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_ANNOTATIONS;
 
 @Provider
-@Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON + "," + "multipart/related;type=\"application/dicom+xml\"")
+@Produces({APPLICATION_DICOM_JSON, APPLICATION_JSON, "multipart/related;type=\"application/dicom+xml\""})
 public class StreamingAttributesProvider implements MessageBodyWriter<AttributesStreamingOutput> {
 
     private final Providers providers;
@@ -57,11 +57,11 @@ public class StreamingAttributesProvider implements MessageBodyWriter<Attributes
             final MessageBodyWriter<MultipartStreamingOutput> bodyWriter = providers.getMessageBodyWriter(
                     MultipartStreamingOutput.class,
                     MultipartStreamingOutput.class,
-                    EMPTY_ANNOTATIONS,
+                    annotations,
                     MULTIPART_RELATED_APPLICATION_DICOM_XML_TYPE);
 
             if (bodyWriter == null) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException(LocalizationMessages.NO_AVAILABLE_MBW(MultipartStreamingOutput.class, mediaType));
             }
 
             MultipartStreamingOutput output = multipartOutputStream -> {
@@ -75,7 +75,7 @@ public class StreamingAttributesProvider implements MessageBodyWriter<Attributes
             bodyWriter.writeTo(output,
                     MultipartStreamingOutput.class,
                     MultipartStreamingOutput.class,
-                    EMPTY_ANNOTATIONS,
+                    annotations,
                     MULTIPART_RELATED_APPLICATION_DICOM_XML_TYPE,
                     httpHeaders,
                     entityStream);

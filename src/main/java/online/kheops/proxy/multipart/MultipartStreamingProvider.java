@@ -67,7 +67,8 @@ public class MultipartStreamingProvider implements MessageBodyWriter<MultipartSt
         try (final MultipartWriter multipartWriter = new MultipartWriterImpl(
                 new CloseShieldOutputStream(stream),
                 boundaryMediaType,
-                providers)) {
+                providers,
+                annotations)) {
             multipartStreamingOutput.write(multipartWriter);
             multipartWriter.flush();
         }

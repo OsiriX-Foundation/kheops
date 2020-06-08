@@ -28,8 +28,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 
 @Provider
-@Consumes(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
-@Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
+@Consumes({APPLICATION_DICOM_JSON, APPLICATION_JSON})
+@Produces({APPLICATION_DICOM_JSON, APPLICATION_JSON})
 public class JSONAttributesListProvider implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
     @Override
