@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.*;
@@ -105,7 +106,7 @@ public abstract class Part implements AutoCloseable {
     }
 
     public void close() throws IOException {
-        Files.delete(cacheFilePath);
+        Files.deleteIfExists(cacheFilePath);
     }
 
     public InputStream newInputStreamForInstance(Set<InstanceID> instanceIDs) throws IOException {
@@ -127,5 +128,11 @@ public abstract class Part implements AutoCloseable {
             }
         }
         return stringBuilder.toString();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        super.finalize();
     }
 }
