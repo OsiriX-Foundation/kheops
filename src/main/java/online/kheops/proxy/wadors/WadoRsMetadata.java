@@ -38,7 +38,7 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 
 @Path("/")
 public final class WadoRsMetadata {
-    private static final Logger LOG = Logger.getLogger(WadoRsResource.class.getName());
+    private static final Logger LOG = Logger.getLogger(WadoRsMetadata.class.getName());
 
     private static final Client CLIENT = ClientBuilder.newClient();
 
@@ -180,12 +180,12 @@ public final class WadoRsMetadata {
         try {
             return new URI(context.getInitParameter(parameter));
         } catch (URISyntaxException e) {
-            LOG.log(SEVERE, "Error getting " + parameter, e);
+            LOG.log(SEVERE, e, () -> "Error getting " + parameter);
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }
 
-    static private class BulkDataVisitor implements Attributes.Visitor {
+    private static class BulkDataVisitor implements Attributes.Visitor {
         final String dicomwebRoot;
 
         private BulkDataVisitor(String dicomwebRoot) {

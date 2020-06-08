@@ -11,8 +11,8 @@ import java.io.OutputStream;
 
 public class JSONStreamingAttributesWriter implements StreamingAttributesWriter {
 
-    final private JsonGenerator generator;
-    final private JSONWriter jsonWriter;
+    private final JsonGenerator generator;
+    private final JSONWriter jsonWriter;
 
     JSONStreamingAttributesWriter(OutputStream outputStream) {
         this.generator = Json.createGenerator(outputStream);

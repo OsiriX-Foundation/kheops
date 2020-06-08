@@ -70,12 +70,8 @@ public class JSONAttributesListMarshaller extends AttributesListMarshaller imple
 
             generator.writeStartArray();
 
-            for (final Object object : attributesList) {
-                if (object instanceof Attributes) {
-                    jsonWriter.write((Attributes) object);
-                } else {
-                    throw new IllegalArgumentException("Trying to write an object that is not of class Attributes");
-                }
+            for (final Attributes attributes : attributesList) {
+                jsonWriter.write(attributes);
             }
 
             generator.writeEnd();

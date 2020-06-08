@@ -10,7 +10,6 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.client.*;
 import javax.ws.rs.core.*;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
