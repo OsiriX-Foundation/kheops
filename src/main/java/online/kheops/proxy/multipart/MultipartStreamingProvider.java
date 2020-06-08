@@ -18,11 +18,11 @@ import java.lang.reflect.Type;
 
 @Provider
 @Produces("multipart/*")
-public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStreamingOutput> {
+public class MultipartStreamingProvider implements MessageBodyWriter<MultipartStreamingOutput> {
 
     private final Providers providers;
 
-    public MultipartStreamingWriter(@Context final Providers providers) {
+    public MultipartStreamingProvider(@Context final Providers providers) {
         this.providers = providers;
     }
 
@@ -64,12 +64,12 @@ public class MultipartStreamingWriter implements MessageBodyWriter<MultipartStre
         }
 
         // Build the MultiPartOutputStream
-        try (final MultipartOutputStream multipartOutputStream = new MultipartOutputStreamImpl(
+        try (final MultipartWriter multipartWriter = new MultipartWriterImpl(
                 new CloseShieldOutputStream(stream),
                 boundaryMediaType,
                 providers)) {
-            multipartStreamingOutput.write(multipartOutputStream);
-            multipartOutputStream.flush();
+            multipartStreamingOutput.write(multipartWriter);
+            multipartWriter.flush();
         }
 
         // Write the final boundary string

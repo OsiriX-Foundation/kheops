@@ -30,11 +30,11 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 @Provider
 @Consumes(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
 @Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON)
-public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
+public class JSONAttributesListProvider implements MessageBodyReader<List<Attributes>>, MessageBodyWriter<List<Attributes>> {
 
     @Override
     public boolean isReadable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return AttributesMarshallers.isAttributeList(aClass, genericType);
+        return AttributesProviders.isAttributeList(aClass, genericType);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class JSONAttributesListMarshaller implements MessageBodyReader<List<Attr
 
     @Override
     public boolean isWriteable(Class<?> aClass, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return AttributesMarshallers.isAttributeList(aClass, genericType);
+        return AttributesProviders.isAttributeList(aClass, genericType);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package online.kheops.proxy.wadors;
 
 import online.kheops.proxy.id.SeriesID;
-import online.kheops.proxy.marshaller.JSONAttributesListMarshaller;
+import online.kheops.proxy.marshaller.JSONAttributesListProvider;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
@@ -32,7 +32,7 @@ import static javax.ws.rs.core.Response.Status.*;
 @Path("/")
 public final class WadoRSStudyInstance {
     private static final Logger LOG = Logger.getLogger(WadoRSStudyInstance.class.getName());
-    private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
+    private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListProvider.class);
 
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 

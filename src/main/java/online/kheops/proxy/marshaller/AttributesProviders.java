@@ -6,9 +6,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-final class AttributesMarshallers {
+final class AttributesProviders {
 
-    private AttributesMarshallers() {
+    private AttributesProviders() {
         throw new AssertionError();
     }
 

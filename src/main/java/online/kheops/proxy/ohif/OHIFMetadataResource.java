@@ -1,6 +1,6 @@
 package online.kheops.proxy.ohif;
 
-import online.kheops.proxy.marshaller.JSONAttributesListMarshaller;
+import online.kheops.proxy.marshaller.JSONAttributesListProvider;
 import online.kheops.proxy.tokens.AuthorizationToken;
 import org.dcm4che3.data.Attributes;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
@@ -33,7 +33,7 @@ public class OHIFMetadataResource {
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 
     private static final Client CLIENT = ClientBuilder.newClient()
-            .register(JSONAttributesListMarshaller.class)
+            .register(JSONAttributesListProvider.class)
             .register(MoxyJsonFeature.class);
 
     @Context

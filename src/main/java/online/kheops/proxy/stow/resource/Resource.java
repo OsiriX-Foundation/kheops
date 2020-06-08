@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.proxy.multipart.MultipartStreamingOutput;
-import online.kheops.proxy.multipart.MultipartStreamingWriter;
+import online.kheops.proxy.multipart.MultipartStreamingProvider;
 import online.kheops.proxy.stow.FetchRequester;
 import online.kheops.proxy.stow.GatewayException;
 import online.kheops.proxy.stow.Proxy;
@@ -62,7 +62,7 @@ public final class Resource {
 
     private static Client newClient() {
         final Client client = ClientBuilder.newClient();
-        client.register(MultipartStreamingWriter.class);
+        client.register(MultipartStreamingProvider.class);
         client.property(REQUEST_ENTITY_PROCESSING, CHUNKED);
         return client;
     }

@@ -2,7 +2,7 @@ package online.kheops.proxy.stow;
 
 import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.id.SeriesID;
-import online.kheops.proxy.multipart.MultipartOutputStream
+import online.kheops.proxy.multipart.MultipartWriter
         ;
 import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.part.Part;
@@ -34,7 +34,7 @@ public final class Proxy {
 
     private final AuthorizationManager authorizationManager;
 
-    private MultipartOutputStream multipartOutputStream;
+    private MultipartWriter multipartWriter;
 
     private final Consumer<Set<SeriesID>> sentSeries;
 
@@ -47,9 +47,9 @@ public final class Proxy {
         this.sentSeries = sentSeries;
     }
 
-    public void processStream(final MultipartOutputStream multipartOutputStream) throws GatewayException, RequestException
+    public void processStream(final MultipartWriter multipartWriter) throws GatewayException, RequestException
     {
-        this.multipartOutputStream = Objects.requireNonNull(multipartOutputStream);
+        this.multipartWriter = Objects.requireNonNull(multipartWriter);
 
         final MultipartParser multipartParser = new MultipartParser(getBoundary());
         try {
@@ -89,7 +89,7 @@ public final class Proxy {
         try (final InputStream partInputStream = part.newInputStreamForInstance(instanceIDs)) {
             final StreamingBodyPart streamingBodyPart = new StreamingBodyPart(partInputStream, part.getMediaType());
             part.getContentLocation().ifPresent(contentLocation -> streamingBodyPart.getHeaders().putSingle(CONTENT_LOCATION, contentLocation.toString()));
-            multipartOutputStream.writePart(streamingBodyPart);
+            multipartWriter.writePart(streamingBodyPart);
         } catch (IOException e) {
             throw new GatewayException("Unable to write part " + partNumber + ": " + part, e);
         }

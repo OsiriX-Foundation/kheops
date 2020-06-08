@@ -1,6 +1,6 @@
 package online.kheops.proxy.marshaller;
 
-import online.kheops.proxy.multipart.CloseShieldMultipartOutputStream;
+import online.kheops.proxy.multipart.CloseShieldMultipartWriter;
 import online.kheops.proxy.multipart.MultipartStreamingOutput;
 import org.apache.commons.io.output.CloseShieldOutputStream;
 
@@ -25,11 +25,11 @@ import static org.glassfish.jersey.message.filtering.spi.FilteringHelper.EMPTY_A
 
 @Provider
 @Produces(APPLICATION_DICOM_JSON + "," + APPLICATION_JSON + "," + "multipart/related;type=\"application/dicom+xml\"")
-public class StreamingAttributesMessageBodyWriter implements MessageBodyWriter<AttributesStreamingOutput> {
+public class StreamingAttributesProvider implements MessageBodyWriter<AttributesStreamingOutput> {
 
     private final Providers providers;
 
-    public StreamingAttributesMessageBodyWriter(@Context final Providers providers) {
+    public StreamingAttributesProvider(@Context final Providers providers) {
         this.providers = providers;
     }
 
@@ -66,7 +66,7 @@ public class StreamingAttributesMessageBodyWriter implements MessageBodyWriter<A
 
             MultipartStreamingOutput output = multipartOutputStream -> {
                 try (StreamingAttributesWriter writer = new XMLStreamingAttributesWriter(
-                        new CloseShieldMultipartOutputStream(multipartOutputStream))) {
+                        new CloseShieldMultipartWriter(multipartOutputStream))) {
                     attributesStreamingOutput.write(writer);
                     writer.flush();
                 }

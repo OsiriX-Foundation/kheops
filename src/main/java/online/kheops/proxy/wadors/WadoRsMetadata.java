@@ -128,6 +128,13 @@ public final class WadoRsMetadata {
             invocationBuilder.header(ACCEPT_CHARSET, acceptCharsetParam);
         }
 
+        final String dicomwebRoot;
+        if (linkAuthorization) {
+            dicomwebRoot = rootURI + "/api/link/" + authorizationToken + "/";
+        } else {
+            dicomwebRoot = rootURI.toString() + "/api/";
+        }
+
         final Response upstreamResponse;
         try {
             upstreamResponse = invocationBuilder.get();
@@ -137,16 +144,18 @@ public final class WadoRsMetadata {
         }
 
         if (upstreamResponse.getStatusInfo().getFamily() != SUCCESSFUL) {
-            upstreamResponse.close();
-            LOG.log(SEVERE, "upstreamResponse was not successful");
-            throw new WebApplicationException(upstreamResponse.getStatus());
-        }
-
-        final String dicomwebRoot;
-        if (linkAuthorization) {
-            dicomwebRoot = rootURI + "/api/link/" + authorizationToken + "/";
-        } else {
-            dicomwebRoot = rootURI.toString() + "/api/";
+            LOG.log(WARNING, () -> "upstreamResponse was not successful (" + upstreamResponse.getStatus() + ")");
+            try {
+                String entity = upstreamResponse.readEntity(String.class);
+                throw new WebApplicationException(Response.status(upstreamResponse.getStatus())
+                        .entity(entity)
+                        .build());
+            } catch (ProcessingException e) {
+                LOG.log(SEVERE, "error getting the entity from upstream", e);
+                throw new ServerErrorException(BAD_GATEWAY);
+            } finally {
+                upstreamResponse.close();
+            }
         }
 
         AttributesStreamingOutput streamingOutput = output -> {

@@ -20,7 +20,7 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 
 @Provider
 @Produces({APPLICATION_DICOM_JSON,APPLICATION_JSON})
-public class JSONAttributesWriter implements MessageBodyWriter<Attributes> {
+public class JSONAttributesProvider implements MessageBodyWriter<Attributes> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return Attributes.class.isAssignableFrom(type);

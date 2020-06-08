@@ -21,7 +21,7 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_XML;
 
 @Provider
 @Produces(APPLICATION_DICOM_XML)
-public class XMLAttributesWriter implements MessageBodyWriter<Attributes> {
+public class XMLAttributesProvider implements MessageBodyWriter<Attributes> {
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type.isAssignableFrom(Attributes.class);

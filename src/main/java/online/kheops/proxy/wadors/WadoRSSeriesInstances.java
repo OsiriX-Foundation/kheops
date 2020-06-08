@@ -1,7 +1,7 @@
 package online.kheops.proxy.wadors;
 
 import online.kheops.proxy.id.SeriesID;
-import online.kheops.proxy.marshaller.JSONAttributesListMarshaller;
+import online.kheops.proxy.marshaller.JSONAttributesListProvider;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
 import online.kheops.proxy.tokens.AuthorizationToken;
@@ -31,7 +31,7 @@ import static org.dcm4che3.ws.rs.MediaTypes.APPLICATION_DICOM_JSON;
 @Path("/")
 public class WadoRSSeriesInstances {
     private static final Logger LOG = Logger.getLogger(WadoRSSeriesInstances.class.getName());
-    private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
+    private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListProvider.class);
 
     private static final String LINK_AUTHORIZATION = "X-Link-Authorization";
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";

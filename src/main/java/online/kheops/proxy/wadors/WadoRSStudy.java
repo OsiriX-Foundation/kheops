@@ -1,10 +1,10 @@
 package online.kheops.proxy.wadors;
 
 import online.kheops.proxy.id.SeriesID;
-import online.kheops.proxy.marshaller.JSONAttributesListMarshaller;
-import online.kheops.proxy.marshaller.JSONAttributesWriter;
+import online.kheops.proxy.marshaller.JSONAttributesListProvider;
+import online.kheops.proxy.marshaller.JSONAttributesProvider;
 import online.kheops.proxy.multipart.MultipartStreamingOutput;
-import online.kheops.proxy.multipart.MultipartStreamingWriter;
+import online.kheops.proxy.multipart.MultipartStreamingProvider;
 import online.kheops.proxy.multipart.StreamingBodyPart;
 import online.kheops.proxy.tokens.AccessToken;
 import online.kheops.proxy.tokens.AccessTokenException;
@@ -47,9 +47,9 @@ public final class WadoRSStudy {
 
     private static Client newClient() {
         final Client client = ClientBuilder.newClient();
-        client.register(MultipartStreamingWriter.class);
-        client.register(JSONAttributesWriter.class);
-        client.register(JSONAttributesListMarshaller.class);
+        client.register(MultipartStreamingProvider.class);
+        client.register(JSONAttributesProvider.class);
+        client.register(JSONAttributesListProvider.class);
         return client;
     }
 

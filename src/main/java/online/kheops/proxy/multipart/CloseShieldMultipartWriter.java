@@ -2,13 +2,13 @@ package online.kheops.proxy.multipart;
 
 import java.io.IOException;
 
-public final class CloseShieldMultipartOutputStream implements MultipartOutputStream {
+public final class CloseShieldMultipartWriter implements MultipartWriter {
 
-    private final MultipartOutputStream multipartOutputStream;
+    private final MultipartWriter multipartWriter;
     private boolean closed;
 
-    public CloseShieldMultipartOutputStream(final MultipartOutputStream multipartOutputStream) {
-        this.multipartOutputStream = multipartOutputStream;
+    public CloseShieldMultipartWriter(final MultipartWriter multipartWriter) {
+        this.multipartWriter = multipartWriter;
     }
 
     @Override
@@ -16,14 +16,14 @@ public final class CloseShieldMultipartOutputStream implements MultipartOutputSt
         if (closed) {
             throw new IOException("writePart failed: multipartOutputStream is closed");
         } else {
-            multipartOutputStream.writePart(bodyPart);
+            multipartWriter.writePart(bodyPart);
         }
     }
 
     @Override
     public void close() throws IOException {
         if (!closed) {
-            multipartOutputStream.flush();
+            multipartWriter.flush();
         }
         closed = true;
     }
@@ -33,7 +33,7 @@ public final class CloseShieldMultipartOutputStream implements MultipartOutputSt
         if (closed) {
             throw new IOException("flush failed: multipartOutputStream is closed");
         } else {
-            multipartOutputStream.flush();
+            multipartWriter.flush();
         }
     }
 }
