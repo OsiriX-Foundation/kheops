@@ -80,7 +80,4 @@ public class UserQueries {
             return "%" + search + "%" + "@" + "%";
         }
     }
-
-
-
 }
