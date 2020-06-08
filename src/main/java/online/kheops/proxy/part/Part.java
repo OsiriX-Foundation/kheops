@@ -50,7 +50,7 @@ public abstract class Part implements AutoCloseable {
                 final Map<String, String> contentDispositionParameters = new ContentDisposition(getHeaderParamValue(headerParams, CONTENT_DISPOSITION)).getParameters();
                 fileID.accept(contentDispositionParameters.get("name"));
             } catch (IllegalArgumentException | ParseException e) {
-                LOG.log(WARNING, "Unable to parse content-disposition: " + getHeaderParamValue(headerParams, CONTENT_DISPOSITION), e);
+                LOG.log(WARNING, e, () -> "Unable to parse content-disposition: " + getHeaderParamValue(headerParams, CONTENT_DISPOSITION));
             }
             mediaType = APPLICATION_DICOM_TYPE;
         } else {

@@ -12,7 +12,6 @@ import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static java.util.logging.Level.SEVERE;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
@@ -24,7 +23,7 @@ public class FetchRequester {
 
     private final UriBuilder fetchUriBuilder;
     private final AuthorizationToken bearerToken;
-    private String albumId;
+    private final String albumId;
 
     private final MultivaluedMap<String,SeriesID> studies = new MultivaluedHashMap<>();
 
@@ -70,7 +69,7 @@ public class FetchRequester {
                         " response:" + responseString);
             }
         } catch (ProcessingException | WebApplicationException e) {
-            LOG.log(SEVERE, "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID, e);
+            LOG.log(SEVERE, e, () -> "Error while triggering fetch for studyInstanceUID:" + studyInstanceUID);
         }
     }
 }

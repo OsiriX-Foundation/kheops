@@ -15,7 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.SEVERE;
@@ -57,8 +56,6 @@ public class WadoUriResource {
     public Response wadoWithCapability(@PathParam("capability") String capabilityToken) {
         return webAccess(AuthorizationToken.from(capabilityToken));
     }
-
-    final static AtomicInteger closeCounter = new AtomicInteger();
 
     private Response webAccess(AuthorizationToken authorizationToken) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
@@ -113,14 +110,13 @@ public class WadoUriResource {
         final Response upstreamResponse;
         try {
             upstreamResponse = invocationBuilder.get();
-            LOG.log(SEVERE, "closeCounter:" + closeCounter.getAndIncrement());
         } catch (ProcessingException e) {
             LOG.log(SEVERE, "error processing response from upstream", e);
             throw new WebApplicationException(BAD_GATEWAY);
         }
 
         if (upstreamResponse.getStatusInfo().getFamily() == Family.SERVER_ERROR) {
-            LOG.log(WARNING, "Sever error from upstream: status" + upstreamResponse.getStatus());
+            LOG.log(WARNING, () -> "Sever error from upstream: status" + upstreamResponse.getStatus());
             throw new WebApplicationException(BAD_GATEWAY);
         }
 
@@ -134,7 +130,6 @@ public class WadoUriResource {
                 }
             } finally {
                 upstreamResponse.close();
-                closeCounter.decrementAndGet();
             }
         };
 

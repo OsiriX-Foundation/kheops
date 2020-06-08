@@ -64,10 +64,10 @@ public final class Proxy {
     private void processPart(final int partNumber, final MultipartInputStream multipartInputStream)
             throws GatewayException {
 
-        String partString = "Unknown part";
+        final String[] partString = {"Unknown part"};
         List<String> fileID = new ArrayList<>();
         try (final Part part = Part.getInstance(contentType, providers, multipartInputStream, fileID::add)) {
-            partString = part.toString();
+            partString[0] = part.toString();
             Set<InstanceID> authorizedInstanceIDs = authorizationManager.getAuthorization(part, fileID.isEmpty() ? null : fileID.get(0));
             writePart(partNumber, authorizedInstanceIDs, part);
             if (sentSeries != null) {
@@ -79,9 +79,9 @@ public final class Proxy {
             throw e;
         } catch (IOException e) {
             authorizationManager.addProcessingFailure(fileID.isEmpty() ? null : fileID.get(0));
-            LOG.log(WARNING, "IOException while parsing part:\n" + partNumber, e);
+            LOG.log(WARNING, e, () ->  "IOException while parsing part:\n" + partNumber);
         } catch (AuthorizationManagerException e) {
-            LOG.log(WARNING, "Unable to get authorization for part:" + partNumber + ", " + partString, e);
+            LOG.log(WARNING, e, () -> "Unable to get authorization for part:" + partNumber + ", " + partString[0]);
         }
     }
 

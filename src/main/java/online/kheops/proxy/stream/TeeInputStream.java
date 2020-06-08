@@ -77,10 +77,9 @@ public class TeeInputStream extends FilterInputStream {
                 break;
             }
             skippedBytes += bytesRead;
-// TODO bring this code back in once the dcm4che skip/skipFully bug is fixed
-//            if (bytesRead < bytesToRead) {
-//                break;
-//            }
+            if (bytesRead < bytesToRead) {
+                break;
+            }
         }
 
         return skippedBytes;
