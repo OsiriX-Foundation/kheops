@@ -132,7 +132,7 @@ public abstract class Part implements AutoCloseable {
 
     @Override
     protected void finalize() throws Throwable {
-        close();
+        Files.deleteIfExists(cacheFilePath);
         super.finalize();
     }
 }
