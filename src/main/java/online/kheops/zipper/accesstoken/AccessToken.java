@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 public final class AccessToken {
     private static final Logger LOG = Logger.getLogger(AccessToken.class.getName());
 
-    public static final String UNKNOWN_TOKEN_URN = "urn:x-kheops:params:oauth:grant-type:unknown-bearer";
-
     private final String token;
 
     private AccessToken(String token) {
