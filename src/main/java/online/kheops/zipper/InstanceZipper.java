@@ -54,7 +54,7 @@ public final class InstanceZipper {
                     final byte[] instanceBytes = instanceRetrievalService.take().get();
 
                     final String instanceFileName = String.format("%08d", i + 1);
-                    final Future dicomdirFuture = EXECUTOR_SERVICE.submit(dicomDirGenerator.getAddInstanceCallable(instanceBytes, Paths.get("DICOM", instanceFileName)));
+                    final Future<Void> dicomdirFuture = EXECUTOR_SERVICE.submit(dicomDirGenerator.getAddInstanceCallable(instanceBytes, Paths.get("DICOM", instanceFileName)));
 
                     zipStream.putNextEntry(new ZipEntry("DICOM/" + instanceFileName));
                     zipStream.write(instanceBytes);
