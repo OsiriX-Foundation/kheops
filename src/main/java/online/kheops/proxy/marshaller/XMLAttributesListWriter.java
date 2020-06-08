@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Collections;
 import java.util.List;
 
 import static org.dcm4che3.ws.rs.MediaTypes.*;

@@ -182,7 +182,7 @@ public final class WadoRSStudyInstance {
         try {
             return new URI(context.getInitParameter(parameter));
         } catch (URISyntaxException e) {
-            LOG.log(SEVERE, "Error with the STOWServiceURI", e);
+            LOG.log(SEVERE, e, () -> "Error with the " + parameter+ "URI");
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
     }

@@ -97,8 +97,12 @@ class DICOMMetadataPart extends Part {
     private Set<Attributes> readJSONAttributes(InputStream inputStream) throws IOException {
         final GenericType<List<Attributes>> genericType = new GenericType<List<Attributes>>() {
         };
-        final MessageBodyReader<List> bodyReader = getProviders().getMessageBodyReader(
-                List.class,
+
+        @SuppressWarnings("unchecked")
+        Class<List<Attributes>> clazz = (Class<List<Attributes>>)(Class<?>)List.class;
+
+        final MessageBodyReader<List<Attributes>> bodyReader = getProviders().getMessageBodyReader(
+                clazz,
                 genericType.getType(),
                 EMPTY_ANNOTATIONS,
                 MediaTypes.APPLICATION_DICOM_JSON_TYPE);
@@ -107,22 +111,15 @@ class DICOMMetadataPart extends Part {
             throw new IllegalArgumentException("Could not get a MessageBodyReader for List<Attributes>");
         }
 
-        List<?> attributesList = bodyReader.readFrom(
-                List.class,
+        List<Attributes> attributesList = bodyReader.readFrom(
+                clazz,
                 genericType.getType(),
                 EMPTY_ANNOTATIONS,
                 MediaTypes.APPLICATION_DICOM_JSON_TYPE,
                 new MultivaluedHashMap<>(),
                 inputStream);
 
-        return attributesList.stream()
-                .map(attributes -> {
-                    if (attributes instanceof Attributes) {
-                        return (Attributes) attributes;
-                    } else {
-                        throw new IllegalArgumentException("Not Arguments encoded");
-                    }
-                }).collect(Collectors.toSet());
+        return new HashSet<>(attributesList);
     }
 
     private List<Attributes> getAttributesListForInstances(Set<InstanceID> requestedInstanceIDs) throws IOException {
@@ -138,9 +135,12 @@ class DICOMMetadataPart extends Part {
     private byte[] getBytesForInstances(Set<InstanceID> instanceIDs) throws IOException {
         final GenericType<List<Attributes>> genericType = new GenericType<List<Attributes>>() { };
 
+        @SuppressWarnings("unchecked")
+        Class<List<Attributes>> clazz = (Class<List<Attributes>>)(Class<?>)List.class;
+
         try (final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            final MessageBodyWriter<List> bodyWriter = getProviders().getMessageBodyWriter(
-                    List.class,
+            final MessageBodyWriter<List<Attributes>> bodyWriter = getProviders().getMessageBodyWriter(
+                    clazz,
                     genericType.getType(),
                     EMPTY_ANNOTATIONS,
                     MediaTypes.APPLICATION_DICOM_JSON_TYPE);

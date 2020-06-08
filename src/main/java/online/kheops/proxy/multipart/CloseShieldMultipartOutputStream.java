@@ -2,7 +2,7 @@ package online.kheops.proxy.multipart;
 
 import java.io.IOException;
 
-final public class CloseShieldMultipartOutputStream implements MultipartOutputStream {
+public final class CloseShieldMultipartOutputStream implements MultipartOutputStream {
 
     private final MultipartOutputStream multipartOutputStream;
     private boolean closed;
