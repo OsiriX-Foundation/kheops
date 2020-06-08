@@ -239,7 +239,7 @@ public class Events {
         }
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
-    
+
     public static void studyPostComment(User callingUser, String studyInstanceUID, String commentContent, String targetUserPk)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {
 
