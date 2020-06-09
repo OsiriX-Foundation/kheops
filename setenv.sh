@@ -5,8 +5,8 @@ export CATALINA_OPTS="$CATALINA_OPTS -Donline.kheops.auth_server.uri=\"http://$K
 export CATALINA_OPTS="$CATALINA_OPTS -Donline.kheops.root.uri=\"$KHEOPS_ROOT_URL\""
 export CATALINA_OPTS="$CATALINA_OPTS -Donline.kheops.client.dicomwebproxyclientid=\"$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID\""
 
-kheops_auth_hmasecret_post="$(head -n 1 /run/secrets/kheops_auth_hmasecret_post)"
-export HMAC_SECRET_POST=$kheops_auth_hmasecret_post
+HMAC_SECRET_POST="$(head -n 1 /run/secrets/kheops_auth_hmasecret_post)"
+export HMAC_SECRET_POST
 
-kheops_client_dicomwebproxysecret="$(head -n 1 /run/secrets/kheops_client_dicomwebproxysecret)"
-export DICOMWEB_PROXY_SECRET=$kheops_client_dicomwebproxysecret
+DICOMWEB_PROXY_SECRET="$(head -n 1 /run/secrets/kheops_client_dicomwebproxysecret)"
+export DICOMWEB_PROXY_SECRET
