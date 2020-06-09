@@ -240,7 +240,7 @@ public final class Resource {
     }
 
     private String getPostBearerToken(Introspect.Response introspectResponse) {
-        final String authSecret = System.getProperty("online.kheops.auth.hmacsecretpost");
+        final String authSecret = System.getenv("HMAC_SECRET_POST");
         final Algorithm algorithmHMAC = Algorithm.HMAC256(authSecret);
 
         JWTCreator.Builder jwtBuilder = JWT.create()

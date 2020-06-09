@@ -95,7 +95,7 @@ public final class WadoRsMetadata {
         try {
             accessToken = AccessToken.createBuilder(authorizationURI)
                     .withClientId(System.getProperty("online.kheops.client.dicomwebproxyclientid"))
-                    .withClientSecret(System.getProperty("online.kheops.client.dicomwebproxysecret"))
+                    .withClientSecret(System.getenv("DICOMWEB_PROXY_SECRET"))
                     .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .xForwardedFor(headerXForwardedFor)

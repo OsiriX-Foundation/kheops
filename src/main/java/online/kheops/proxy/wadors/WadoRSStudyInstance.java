@@ -66,7 +66,7 @@ public final class WadoRSStudyInstance {
         final AuthorizationToken authorizationToken = AuthorizationToken.fromAuthorizationHeader(authorizationHeader);
         final AccessToken.AccessTokenBuilder accessTokenBuilder =  AccessToken.createBuilder(authorizationURI)
                 .withClientId(System.getProperty("online.kheops.client.dicomwebproxyclientid"))
-                .withClientSecret(System.getProperty("online.kheops.client.dicomwebproxysecret"))
+                .withClientSecret(System.getenv("DICOMWEB_PROXY_SECRET"))
                 .withCapability(authorizationToken.getToken());
 
         final UriBuilder qidoServiceURIBuilder = UriBuilder.fromUri(authorizationURI)
