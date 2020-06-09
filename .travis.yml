@@ -1,14 +1,16 @@
-language: minimal
+language: java
 sudo: required
 
 services:
   - docker
 
+jdk:
+  - openjdk11
+
 notifications:
   email: false
 
 script:
-  - docker build --target build -f docker/Dockerfile -t builder .
   - docker build -f docker/Dockerfile --build-arg VCS_REF=`git rev-parse --short HEAD` -t osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
@@ -17,7 +19,7 @@ after_success:
 
 deploy:
   provider: script
-  script: git fetch --unshallow && docker run --rm builder gradle sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN --no-daemon
+  script: git fetch --unshallow && ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
   skip_cleanup: true
   on:
     branch: master
