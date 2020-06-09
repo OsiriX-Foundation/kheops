@@ -1,3 +1,8 @@
+FROM gradle:6.5-jdk11 AS build
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build --no-daemon
+
 FROM tomcat:9-jdk11
 
 ARG VCS_REF
@@ -8,8 +13,10 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 ENV SECRET_FILE_PATH=/run/secrets
 ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
 
-COPY KheopsDICOMwebProxy.war /usr/local/tomcat/webapps/capabilities.war
-COPY context.xml /usr/local/tomcat/conf/context.xml
+COPY --from=build /home/gradle/src/build/libs/src.war /usr/local/tomcat/webapps/capabilities.war
+
+#COPY KheopsDICOMwebProxy.war /usr/local/tomcat/webapps/capabilities.war
+COPY docker/context.xml /usr/local/tomcat/conf/context.xml
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
@@ -21,6 +28,6 @@ RUN dpkg -i filebeat-amd64.deb && \
 COPY filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
-COPY replaceSecretsAndRun.sh replaceSecretsAndRun.sh
+COPY docker/replaceSecretsAndRun.sh replaceSecretsAndRun.sh
 
 CMD ["./replaceSecretsAndRun.sh"]

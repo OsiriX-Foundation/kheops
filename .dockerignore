@@ -1,0 +1,12 @@
+.gradle
+.idea
+build
+docker/Dockerfile
+gradle
+out
+.dockerignore
+.travis.yml
+gradlew
+gradlew.bat
+.DS_Store
+*.iml
