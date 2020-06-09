@@ -1,13 +1,13 @@
-#! /bin/sh
+#! /bin/bash
 
 missing_env_var_secret=false
 
 #Verify secrets
-if ! [ -f ${SECRET_FILE_PATH}/kheops_auth_hmasecret_post ]; then
+if ! [ -f /run/secrets/kheops_auth_hmasecret_post ]; then
     echo "Missing kheops_auth_hmasecret_post secret"
     missing_env_var_secret=true
 fi
-if ! [ -f ${SECRET_FILE_PATH}/kheops_client_dicomwebproxysecret ]; then
+if ! [ -f /run/secrets/kheops_client_dicomwebproxysecret ]; then
     echo "Missing kheops_client_dicomwebproxysecret secret"
     missing_env_var_secret=true
 fi
@@ -53,7 +53,7 @@ fi
 
 
 #get secrets and verify content
-for f in ${SECRET_FILE_PATH}/*
+for f in /run/secrets/*
 do
   filename=$(basename "$f")
   
@@ -68,18 +68,7 @@ do
     echo Error with secret $filename. He contains $word_count word and $line_count line
     exit 1
   fi
-
-  value=$(cat ${f})
-  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
 done
-
-
-#get env var
-sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT$KHEOPS_AUTHORIZATION_PATH|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_root_url}|$KHEOPS_ROOT_URL|" ${REPLACE_FILE_PATH}
-echo "Ending setup NGINX secrets and env var"
 
 #######################################################################################
 #ELASTIC SEARCH
@@ -125,5 +114,4 @@ fi
 
 #######################################################################################
 
-#run tomcat
-catalina.sh run;
+exec "$@"

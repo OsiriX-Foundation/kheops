@@ -165,7 +165,7 @@ public class OHIFMetadataResource {
 
     private URI getParameterURI(String parameter) {
         try {
-            return new URI(context.getInitParameter(parameter));
+            return new URI(System.getProperty(parameter));
         } catch (URISyntaxException e) {
             LOG.log(SEVERE, "Error with the STOWServiceURI", e);
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);

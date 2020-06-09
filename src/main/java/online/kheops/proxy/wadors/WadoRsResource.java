@@ -126,8 +126,8 @@ public final class WadoRsResource {
         final AccessToken accessToken;
         try {
             accessToken = AccessToken.createBuilder(authorizationURI)
-                    .withClientId(context.getInitParameter("online.kheops.client.dicomwebproxyclientid"))
-                    .withClientSecret(context.getInitParameter("online.kheops.client.dicomwebproxysecret"))
+                    .withClientId(System.getProperty("online.kheops.client.dicomwebproxyclientid"))
+                    .withClientSecret(System.getProperty("online.kheops.client.dicomwebproxysecret"))
                     .withCapability(authorizationToken.getToken())
                     .withSeriesID(new SeriesID(studyInstanceUID, seriesInstanceUID))
                     .xForwardedFor(headerXForwardedFor)
@@ -192,7 +192,7 @@ public final class WadoRsResource {
 
     private URI getParameterURI(String parameter) {
         try {
-            return new URI(context.getInitParameter(parameter));
+            return new URI(System.getProperty(parameter));
         } catch (URISyntaxException e) {
             LOG.log(SEVERE, "Error with the STOWServiceURI", e);
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);

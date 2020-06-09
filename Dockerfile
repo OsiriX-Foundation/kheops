@@ -4,19 +4,13 @@ WORKDIR /home/gradle/src
 RUN gradle build --no-daemon
 
 FROM tomcat:9-jdk11
-
 ARG VCS_REF
-
 LABEL org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="https://github.com/OsiriX-Foundation/KheopsProxy"
-
-ENV SECRET_FILE_PATH=/run/secrets
-ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
+      org.label-schema.vcs-url="https://github.com/OsiriX-Foundation/KheopsDICOMwebProxy"
 
 COPY --from=build /home/gradle/src/build/libs/src.war /usr/local/tomcat/webapps/capabilities.war
-
-#COPY KheopsDICOMwebProxy.war /usr/local/tomcat/webapps/capabilities.war
-COPY docker/context.xml /usr/local/tomcat/conf/context.xml
+COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
+COPY kheops-entrypoint.sh kheops-entrypoint.sh
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
@@ -28,6 +22,5 @@ RUN dpkg -i filebeat-amd64.deb && \
 COPY filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
-COPY docker/replaceSecretsAndRun.sh replaceSecretsAndRun.sh
-
-CMD ["./replaceSecretsAndRun.sh"]
+CMD ["catalina.sh", "run"]
+ENTRYPOINT ["/usr/local/tomcat/kheops-entrypoint.sh"]

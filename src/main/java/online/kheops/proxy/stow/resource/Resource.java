@@ -232,7 +232,7 @@ public final class Resource {
 
     private URI getParameterURI(String parameter) {
         try {
-            return new URI(context.getInitParameter(parameter));
+            return new URI(System.getProperty(parameter));
         } catch (URISyntaxException e) {
             LOG.log(Level.SEVERE, "Error with the STOWServiceURI", e);
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
@@ -240,7 +240,7 @@ public final class Resource {
     }
 
     private String getPostBearerToken(Introspect.Response introspectResponse) {
-        final String authSecret = context.getInitParameter("online.kheops.auth.hmacsecretpost");
+        final String authSecret = System.getProperty("online.kheops.auth.hmacsecretpost");
         final Algorithm algorithmHMAC = Algorithm.HMAC256(authSecret);
 
         JWTCreator.Builder jwtBuilder = JWT.create()

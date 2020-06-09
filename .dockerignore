@@ -1,7 +1,7 @@
 .gradle
 .idea
 build
-docker/Dockerfile
+Dockerfile
 gradle
 out
 .dockerignore

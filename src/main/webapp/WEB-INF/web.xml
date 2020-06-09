@@ -14,35 +14,4 @@
         <filter-name>ServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
-    <context-param>
-        <description>Base URI for the pacs</description>
-        <param-name>online.kheops.pacs.uri</param-name>
-        <param-value>http://localhost:82</param-value>
-    </context-param>
-    <context-param>
-        <description>Base URI for the authentication server</description>
-        <param-name>online.kheops.auth_server.uri</param-name>
-        <param-value>http://localhost:7575/authorization</param-value>
-    </context-param>
-    <context-param>
-        <description>Root url of the Kheops service</description>
-        <param-name>online.kheops.root.uri</param-name>
-        <param-value>http://localhost:8042</param-value>
-    </context-param>
-    <context-param>
-        <description>HMAC shared secret used to sign tokens used for post</description>
-        <param-name>online.kheops.auth.hmacsecretpost</param-name>
-        <param-value>P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==</param-value>
-    </context-param>
-    <context-param>
-        <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
-        <param-name>online.kheops.client.dicomwebproxyclientid</param-name>
-        <param-value>DICOMWebProxy</param-value>
-    </context-param>
-    <context-param>
-        <description>Password the dicomewebproxy uses when connecting to the token endpoint</description>
-        <param-name>online.kheops.client.dicomwebproxysecret</param-name>
-        <param-value>dicomwebproxyclientpassword</param-value>
-    </context-param>
 </web-app>
