@@ -113,7 +113,7 @@ public abstract class Part implements AutoCloseable {
         if (instanceIDs.equals(getInstanceIDs())) {
             return Files.newInputStream(cacheFilePath);
         } else {
-            throw new IllegalArgumentException("Requested instanceIDs don't match this Part's instanceIDs");
+            throw new IllegalArgumentException("Requested instanceIDs do not match this Part's instanceIDs");
         }
     }
 

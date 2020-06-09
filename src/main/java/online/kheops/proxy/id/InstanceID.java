@@ -51,7 +51,7 @@ public final class InstanceID {
 
     @Override
     public int hashCode() {
-        return seriesID.hashCode() | sopInstanceUID.hashCode() | sopClassUID.hashCode();
+        return seriesID.hashCode() ^ sopInstanceUID.hashCode() ^ sopClassUID.hashCode();
     }
 
     @Override
