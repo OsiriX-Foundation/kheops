@@ -10,14 +10,13 @@ notifications:
 script:
   - docker build -f docker/Dockerfile --build-arg VCS_REF=`git rev-parse --short HEAD` -t osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - git fetch --unshallow && ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
 
 after_success:
   - docker push osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH
 
-#deploy:
-#  provider: script
-#  script:
-#  skip_cleanup: true
-#  on:
-#    branch: master
+deploy:
+  provider: script
+  script: git fetch --unshallow && ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
+  skip_cleanup: true
+  on:
+    branch: master
