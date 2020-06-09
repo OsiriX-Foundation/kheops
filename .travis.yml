@@ -7,7 +7,7 @@ notifications:
 script:
   - docker build -f docker/Dockerfile --build-arg VCS_REF=`git rev-parse --short HEAD` -t osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker push osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH
+  - docker push osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH
 
 deploy:
   provider: script
