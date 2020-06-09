@@ -1,5 +1,8 @@
-language: minimal
+language: java
 sudo: required
+
+jdk:
+  - openjdk11
 
 notifications:
   email: false
@@ -7,7 +10,7 @@ notifications:
 script:
   - docker build -f docker/Dockerfile --build-arg VCS_REF=`git rev-parse --short HEAD` -t osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH .
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - git fetch --unshallow && ./gradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
+  - git fetch --unshallow && ./Zgradlew sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN
 
 after_success:
   - docker push osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH
