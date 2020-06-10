@@ -1,5 +1,6 @@
 FROM gradle:6.5-jdk11 AS build
-COPY --chown=gradle:gradle . /home/gradle/capabilities
+COPY --chown=gradle:gradle src /home/gradle/capabilities/src
+COPY --chown=gradle:gradle build.gradle /home/gradle/capabilities/build.gradle
 WORKDIR /home/gradle/capabilities
 RUN gradle war --no-daemon
 
