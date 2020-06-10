@@ -100,7 +100,7 @@ if ! [ -z "$KHEOPS_DICOMWEB_PROXY_ENABLE_ELASTIC" ]; then
         if [[ $missing_env_var_secret = true ]]; then
           exit 1
         else
-           echo -e "all elastic secrets and all env var \e[92mOK\e[0m"
+           echo -e "all elastic secrets and all env vars \e[92mOK\e[0m"
         fi
 
         filebeat modules disable system
@@ -109,7 +109,7 @@ if ! [ -z "$KHEOPS_DICOMWEB_PROXY_ENABLE_ELASTIC" ]; then
         echo "Ending setup FILEBEAT"
     fi
 else
-    echo "[INFO] : Missing KHEOPS_DICOMWEB_PROXY_ENABLE_ELASTIC environment variable. Elastic is not enable."
+    echo "[INFO] : Missing KHEOPS_DICOMWEB_PROXY_ENABLE_ELASTIC environment variable. Elastic is not enabled."
 fi
 
 #######################################################################################

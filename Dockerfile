@@ -10,7 +10,7 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 
 COPY --from=build /home/gradle/src/build/libs/src.war /usr/local/tomcat/webapps/capabilities.war
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
-COPY kheops-entrypoint.sh kheops-entrypoint.sh
+COPY kheops-entrypoint.sh /kheops-entrypoint.sh
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
@@ -23,4 +23,4 @@ COPY filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
 CMD ["catalina.sh", "run"]
-ENTRYPOINT ["/usr/local/tomcat/kheops-entrypoint.sh"]
+ENTRYPOINT ["/kheops-entrypoint.sh"]
