@@ -3,5 +3,4 @@
 .gradle/
 out/
 build/
-/webapp-config/tomcat-context.xml
 *.iml
