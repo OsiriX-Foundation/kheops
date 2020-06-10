@@ -1,8 +1,8 @@
 FROM gradle:6.5-jdk11 AS build
-COPY --chown=gradle:gradle src /home/gradle/capabilities/src
-COPY --chown=gradle:gradle build.gradle /home/gradle/capabilities/build.gradle
 WORKDIR /home/gradle/capabilities
-RUN gradle war --no-daemon
+COPY --chown=gradle:gradle build.gradle /home/gradle/capabilities/build.gradle
+COPY --chown=gradle:gradle src /home/gradle/capabilities/src
+RUN gradle war --no-daemon --info
 
 FROM tomcat:9.0.35-jdk11
 ARG VCS_REF
