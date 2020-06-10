@@ -4,7 +4,7 @@ import java.io.*;
 
 import static java.lang.Math.min;
 
-public class TeeInputStream extends FilterInputStream {
+public final class TeeInputStream extends FilterInputStream {
     private final OutputStream outputStream;
     private long bytesSinceMark = 0;
     private long bytesRewound = 0;

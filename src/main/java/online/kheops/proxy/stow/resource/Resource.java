@@ -109,7 +109,7 @@ public final class Resource {
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
         final Introspect.Response introspectResponse;
         try {
-            introspectResponse = Introspect.endpoint(context, introspectionURI, headerXForwardedFor).token(authorizationToken.getToken());
+            introspectResponse = Introspect.endpoint(introspectionURI, headerXForwardedFor).token(authorizationToken.getToken());
             if (!introspectResponse.isActive()) {
                 LOG.log(Level.WARNING, "Authorization token is not valid for writing");
                 throw new NotAuthorizedException("Bearer", "Basic");
@@ -126,7 +126,8 @@ public final class Resource {
         final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken, albumId);
         final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId, headerXLinkAuthorization);
 
-        try (InputStream inputStream = getConvertedInputStream(request.getInputStream())) {
+        try (InputStream requestInputStream = request.getInputStream();
+             InputStream inputStream = getConvertedInputStream(requestInputStream)) {
             final Proxy proxy = new Proxy(providers, getConvertedContentType(), inputStream, authorizationManager, fetchRequester::addSeries);
             return processProxy(proxy, authorizationManager, studyInstanceUID, introspectResponse);
         } catch (IOException e) {
@@ -189,8 +190,6 @@ public final class Resource {
             } catch (RequestException e) {
                 LOG.log(Level.WARNING, "Bad request Error", e);
                 throw new WebApplicationException(BAD_REQUEST);
-            } catch (WebApplicationException e) {
-                throw e;
             }
         };
 

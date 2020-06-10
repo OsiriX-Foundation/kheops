@@ -26,7 +26,7 @@ public class AccessToken {
 
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
 
-    private String token;
+    private final String token;
 
     @SuppressWarnings("unused")
     static class TokenResponse {

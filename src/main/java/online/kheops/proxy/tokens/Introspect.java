@@ -2,7 +2,6 @@ package online.kheops.proxy.tokens;
 
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -85,12 +84,10 @@ public class Introspect {
     }
 
     public static class Introspector {
-        private final ServletContext servletContext;
         private final WebTarget webTarget;
         private final String headerXForwardedFor;
 
-        private Introspector(ServletContext servletContext, URI endpoint, String headerXForwardedFor) {
-            this.servletContext = servletContext;
+        private Introspector(URI endpoint, String headerXForwardedFor) {
             webTarget = CLIENT.target(Objects.requireNonNull(endpoint));
             this.headerXForwardedFor = headerXForwardedFor;
         }
@@ -111,7 +108,7 @@ public class Introspect {
         }
     }
 
-    public static Introspector endpoint(ServletContext servletContext, URI endpoint, String headerXForwardedFor) {
-        return new Introspector(servletContext, endpoint, headerXForwardedFor);
+    public static Introspector endpoint(URI endpoint, String headerXForwardedFor) {
+        return new Introspector(endpoint, headerXForwardedFor);
     }
 }
