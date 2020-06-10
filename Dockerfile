@@ -1,14 +1,14 @@
 FROM gradle:6.5-jdk11 AS build
-COPY --chown=gradle:gradle . /home/gradle/src
-WORKDIR /home/gradle/src
-RUN gradle build --no-daemon
+COPY --chown=gradle:gradle . /home/gradle/capabilities
+WORKDIR /home/gradle/capabilities
+RUN gradle war --no-daemon
 
-FROM tomcat:9-jdk11
+FROM tomcat:9.0.36-jdk11
 ARG VCS_REF
 LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/OsiriX-Foundation/KheopsDICOMwebProxy"
 
-COPY --from=build /home/gradle/src/build/libs/src.war /usr/local/tomcat/webapps/capabilities.war
+COPY --from=build /home/gradle/src/build/libs/capabilities.war /usr/local/tomcat/webapps/capabilities.war
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
 COPY kheops-entrypoint.sh /kheops-entrypoint.sh
 

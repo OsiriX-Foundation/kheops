@@ -20,7 +20,7 @@ after_success:
 
 deploy:
   provider: script
-  script: docker run --rm build gradle sonarqube -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_LOGIN --scan --info --stacktrace --no-daemon
+  script: echo "org $SONAR_ORGANIZATION" && "docker run --rm build gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --scan --info --stacktrace --no-daemon
   skip_cleanup: true
   on:
     branch: master
