@@ -14,10 +14,4 @@ script:
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push osirixfoundation/kheops-dicomweb-proxy:$TRAVIS_BRANCH
-
-deploy:
-  provider: script
-  script: docker run --rm sonarqube gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --no-daemon
-  skip_cleanup: true
-  on:
-    branch: master
+  - docker run --rm sonarqube gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --no-daemon
