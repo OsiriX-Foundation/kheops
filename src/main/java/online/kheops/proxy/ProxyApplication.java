@@ -38,7 +38,6 @@ public class ProxyApplication extends Application {
         set.add(MultipartStreamingProvider.class);
         set.add(StreamingAttributesProvider.class);
         set.add(CORSFilter.class);
-        set.add(FixTypeQuoteFilter.class);
         set.add(IncludefieldFilter.class);
 
         return set;
