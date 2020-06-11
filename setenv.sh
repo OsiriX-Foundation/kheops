@@ -1,6 +1,6 @@
 #! /bin/bash
 
-env_check() {
+check_env() {
   local missing_env_var=false
 
   while [[ -n $1 ]]; do
@@ -16,7 +16,31 @@ env_check() {
   fi
 }
 
-env_check "KHEOPS_PACS_PEP_HOST" \
+check_secrets() {
+  local missing_secret=false;
+
+    while [[ -n $1 ]]; do
+    local var="$1"
+    if [[ -f $var ]]; then
+        word_count=$(wc -w "$var" | cut -f1 -d" ")
+        line_count=$(wc -l "$var" | cut -f1 -d" ")
+
+        if [[ "${word_count}" != 1 ]] || [[ "${line_count}" != 1 ]]; then
+          echo "Error with secret $var. It contains $word_count words and $line_count lines"
+          missing_secret=true
+        fi
+    else
+      echo >&2 "Missing $var secret"
+      missing_secret=true
+    fi
+    shift
+  done
+  if [[ $missing_secret = true ]]; then
+    exit 1
+  fi
+}
+
+check_env "KHEOPS_PACS_PEP_HOST" \
           "KHEOPS_PACS_PEP_PORT" \
           "KHEOPS_AUTHORIZATION_HOST" \
           "KHEOPS_AUTHORIZATION_PORT" \
@@ -25,41 +49,8 @@ env_check "KHEOPS_PACS_PEP_HOST" \
           "KHEOPS_API_PATH" \
           "KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID"
 
-
-missing_secret=false
-
-#Verify secrets
-if ! [ -f /run/secrets/kheops_auth_hmasecret_post ]; then
-    echo >&2 "Missing kheops_auth_hmasecret_post secret"
-    missing_secret=true
-fi
-if ! [ -f /run/secrets/kheops_client_dicomwebproxysecret ]; then
-    echo >&2 "Missing kheops_client_dicomwebproxysecret secret"
-    missing_secret=true
-fi
-
-#if missing env var or secret => exit
-if [ "$missing_secret" = true ]; then
-    exit 1
-fi
-
-#get secrets and verify content
-for f in /run/secrets/*
-do
-  filename=$(basename "$f")
-
-  if [ "$filename" = "kubernetes.io" ]; then
-    continue
-  fi
-
-  word_count=$(wc -w "$f" | cut -f1 -d" ")
-  line_count=$(wc -l "$f" | cut -f1 -d" ")
-
-  if [ "${word_count}" != 1 ] || [ "${line_count}" != 1 ]; then
-    echo "Error with secret $filename. He contains $word_count word and $line_count line"
-    exit 1
-  fi
-done
+check_secrets "/run/secrets/kheops_auth_hmasecret_post" \
+              "/run/secrets/kheops_client_dicomwebproxysecret"
 
 export CATALINA_OPTS="$CATALINA_OPTS -Donline.kheops.pacs.uri=\"http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT\""
 export CATALINA_OPTS="$CATALINA_OPTS -Donline.kheops.auth_server.uri=\"http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT$KHEOPS_AUTHORIZATION_PATH\""
