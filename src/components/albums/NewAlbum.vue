@@ -63,6 +63,7 @@
                   <input-auto-complet
                     :placeholder="$t('user.emailuser')"
                     :reset="resetUser"
+                    :focus="false"
                     @input-reset="setResetInput(false)"
                     @input-value="setUsername"
                     @keydown-enter-prevent="checkUser"

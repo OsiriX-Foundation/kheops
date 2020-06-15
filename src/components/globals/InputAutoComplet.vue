@@ -15,7 +15,6 @@
       id="userslist-choice"
       ref="inputList"
       v-model="user"
-      v-focus
       type="email"
       :placeholder="placeholder"
       :disabled="disabled"
@@ -65,6 +64,11 @@ export default {
       required: false,
       default: false,
     },
+    focus: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   data() {
     return {
@@ -93,8 +97,7 @@ export default {
     disabled: {
       handler() {
         if (this.disabled === false) {
-          const { inputList } = this.$refs;
-          setTimeout(() => { inputList.focus(); }, 0);
+          this.inputFocus();
         }
       },
     },
@@ -108,6 +111,11 @@ export default {
   },
   created() {
     this.addContext();
+  },
+  mounted() {
+    if (this.focus === true) {
+      this.inputFocus();
+    }
   },
   methods: {
     addContext() {
@@ -139,6 +147,10 @@ export default {
     inputReset() {
       this.user = '';
       this.$emit('input-reset');
+    },
+    inputFocus() {
+      const { inputList } = this.$refs;
+      setTimeout(() => { inputList.focus(); }, 0);
     },
   },
 };
