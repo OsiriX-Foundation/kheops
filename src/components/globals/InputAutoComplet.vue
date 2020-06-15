@@ -4,9 +4,9 @@
       id="userslist-choice"
       ref="inputList"
       v-model="user"
+      v-focus
       type="email"
-      autofocus
-      :placeholder="$t('user.emailuser')"
+      :placeholder="placeholder"
       list="userslist"
       name="userslist-choice"
       class="form-control"
@@ -32,6 +32,11 @@ import httpoperations from '@/mixins/httpoperations';
 export default {
   name: 'InputAutoComplet',
   props: {
+    placeholder: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {

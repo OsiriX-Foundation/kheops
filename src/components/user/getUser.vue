@@ -14,6 +14,7 @@
             >
             -->
             <input-auto-complet
+              :placeholder="$t('user.emailuser')"
               @input-value="setUsername"
             />
           </div>
