@@ -60,6 +60,11 @@ export default {
       required: false,
       default: false,
     },
+    reset: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -90,6 +95,13 @@ export default {
         if (this.disabled === false) {
           const { inputList } = this.$refs;
           setTimeout(() => { inputList.focus(); }, 0);
+        }
+      },
+    },
+    reset: {
+      handler() {
+        if (this.reset === true) {
+          this.inputReset();
         }
       },
     },
@@ -136,6 +148,10 @@ export default {
     },
     pressedEnter() {
       this.$emit('keydown-enter-prevent');
+    },
+    inputReset() {
+      this.user = '';
+      this.$emit('input-reset');
     },
   },
 };
