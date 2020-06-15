@@ -5,7 +5,7 @@
       v-model="user"
       type="email"
       autofocus
-      :placeholder="'email '+$t('user')"
+      :placeholder="$t('user.emailuser')"
       list="userslist"
       name="userslist"
       class="form-control"
@@ -15,13 +15,12 @@
         id="userslist"
         ref="userslist"
       >
-        <option v-if="users.length < minlength" />
         <option
           v-for="searchuser in users"
           :key="searchuser.key"
           :value="searchuser.email !== undefined ? searchuser.email : ''"
         >
-          {{ user.email !== undefined ? user.email : 'no value' }}
+          {{ searchuser.email !== undefined ? searchuser.email : 'no value' }}
         </option>
       </datalist>
     </label>
@@ -43,7 +42,7 @@ export default {
         limit: 3,
         offset: 0,
       },
-      minlength: 1,
+      charminlength: 3,
       users: [],
       user: '',
       cpt: 0,
@@ -53,7 +52,7 @@ export default {
     user: {
       handler() {
         this.inputValue();
-        if (this.user.length >= this.minlength) {
+        if (this.user.length >= this.charminlength) {
           this.searchUser(this.user);
         } else {
           this.users = [];
