@@ -70,7 +70,7 @@ export default {
     return {
       queryParams: {
         search: '',
-        limit: 3,
+        limit: 5,
         offset: 0,
       },
       charminlength: 3,
