@@ -131,6 +131,8 @@ public class UserResource {
                 result = searchUsers(search, limit, offset);
             }
 
+            result.remove(new UserResponse(kheopsPrincipal.getUser()));
+
             kheopsLogBuilder.log();
 
             if(result.isEmpty()) {
