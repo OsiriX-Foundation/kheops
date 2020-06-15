@@ -1,3 +1,14 @@
+<!--
+    context: object to define the context of the search.
+      - type: Object
+      - required: false
+      - default: {}
+      Structure of the object:
+        {
+          key: queryparameter key (example album, studyInstanceUID)
+          value: queryparameter value
+        }
+-->
 <template>
   <span>
     <input
@@ -37,6 +48,11 @@ export default {
       required: false,
       default: '',
     },
+    context: {
+      type: Object,
+      required: false,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -63,6 +79,9 @@ export default {
       },
     },
   },
+  created() {
+    this.addContext();
+  },
   mounted() {
     // https://stackoverflow.com/questions/57202606/show-autocomplete-only-after-3-entered-chars-in-datalist-field
     /*
@@ -77,6 +96,11 @@ export default {
     */
   },
   methods: {
+    addContext() {
+      if (Object.keys(this.context).length > 0 && this.context.constructor === Object) {
+        this.queryParams[this.context.key] = this.context.value;
+      }
+    },
     searchUser(user) {
       this.queryParams.search = user;
       this.cpt += 1;

@@ -15,6 +15,7 @@
             -->
             <input-auto-complet
               :placeholder="$t('user.emailuser')"
+              :context="context"
               @input-value="setUsername"
             />
           </div>
@@ -43,8 +44,8 @@
 </template>
 
 <script>
-import InputAutoComplet from '@/components/globals/InputAutoComplet';
 import { mapGetters } from 'vuex';
+import InputAutoComplet from '@/components/globals/InputAutoComplet';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
@@ -60,6 +61,16 @@ export default {
     ...mapGetters('oidcStore', [
       'oidcIsAuthenticated',
     ]),
+    context() {
+      const albumId = this.$route.params.album_id;
+      if (albumId !== undefined) {
+        return {
+          key: 'album',
+          value: albumId,
+        };
+      }
+      return {};
+    },
   },
   methods: {
     validEmail(email) {
@@ -91,9 +102,9 @@ export default {
       this.new_user_name = '';
       this.$emit('cancel-user');
     },
-    setUsername(username){
-      this.new_user_name = username
-    }
+    setUsername(username) {
+      this.new_user_name = username;
+    },
   },
 
 };
