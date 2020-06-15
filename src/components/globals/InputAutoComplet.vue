@@ -1,13 +1,13 @@
 <template>
   <span>
     <input
+      ref="inputList"
       v-model="user"
       type="email"
       autofocus
       :placeholder="'email '+$t('user')"
       list="userslist"
       name="userslist"
-      ref="inputList"
       class="form-control"
     >
     <label for="userslist">
@@ -15,11 +15,11 @@
         id="userslist"
         ref="userslist"
       >
-        <option v-if="users.length < minlength"></option>
+        <option v-if="users.length < minlength" />
         <option
-          v-for="user in users"
-          :id="user.id"
-          :value="user.email !== undefined ? user.email : ''"
+          v-for="searchuser in users"
+          :key="searchuser.key"
+          :value="searchuser.email !== undefined ? searchuser.email : ''"
         >
           {{ user.email !== undefined ? user.email : 'no value' }}
         </option>
@@ -49,6 +49,18 @@ export default {
       cpt: 0,
     };
   },
+  watch: {
+    user: {
+      handler() {
+        this.inputValue();
+        if (this.user.length >= this.minlength) {
+          this.searchUser(this.user);
+        } else {
+          this.users = [];
+        }
+      },
+    },
+  },
   mounted() {
     // https://stackoverflow.com/questions/57202606/show-autocomplete-only-after-3-entered-chars-in-datalist-field
     /*
@@ -62,28 +74,16 @@ export default {
     });
     */
   },
-  watch: {
-    user: {
-      handler() {
-        this.inputValue()
-        if (this.user.length >= this.minlength) {
-          this.searchUser(this.user);
-        } else {
-          this.users = []
-        }
-      },
-    },
-  },
   methods: {
     searchUser(user) {
-      this.queryParams.search = user
-      this.cpt += 1
-      const tmpcpt = this.cpt
-      this.search().then(res => {
+      this.queryParams.search = user;
+      this.cpt += 1;
+      const tmpcpt = this.cpt;
+      this.search().then((res) => {
         if (tmpcpt === this.cpt) {
-          this.users = res.data
+          this.users = res.data;
         }
-      })
+      });
     },
     search() {
       const request = `users`;
@@ -95,5 +95,4 @@ export default {
     },
   },
 };
-
 </script>
