@@ -1,29 +1,27 @@
 <template>
   <span>
     <input
+      id="userslist-choice"
       ref="inputList"
       v-model="user"
       type="email"
       autofocus
       :placeholder="$t('user.emailuser')"
       list="userslist"
-      name="userslist"
+      name="userslist-choice"
       class="form-control"
+      autocomplete="off"
     >
-    <label for="userslist">
-      <datalist
-        id="userslist"
-        ref="userslist"
-      >
-        <option
-          v-for="searchuser in users"
-          :key="searchuser.key"
-          :value="searchuser.email !== undefined ? searchuser.email : ''"
-        >
-          {{ searchuser.email !== undefined ? searchuser.email : 'no value' }}
-        </option>
-      </datalist>
-    </label>
+    <datalist
+      id="userslist"
+      ref="userslist"
+    >
+      <option
+        v-for="searchuser in users"
+        :key="searchuser.key"
+        :value="searchuser.email !== undefined ? searchuser.email : 'email undefined'"
+      />
+    </datalist>
   </span>
 </template>
 
