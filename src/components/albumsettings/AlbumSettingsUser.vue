@@ -177,10 +177,7 @@ export default {
   },
   methods: {
     addUser() {
-      const sameUserName = this.users.filter((user) => user.email === this.new_user_name);
-      if (sameUserName.length > 0) {
-        this.$snotify.error(this.$t('albumusersettings.allreadypresent'));
-      } else if (this.validEmail(this.new_user_name)) {
+      if (this.validEmail(this.new_user_name)) {
         this.onloading = true;
         const params = {
           album_id: this.album.album_id,
