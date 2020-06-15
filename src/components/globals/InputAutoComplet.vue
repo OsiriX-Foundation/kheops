@@ -23,7 +23,7 @@
       name="userslist-choice"
       class="form-control"
       autocomplete="off"
-      @keydown.enter.prevent="pressedEnter"
+      @keydown.enter="pressedEnter"
     >
     <datalist
       id="userslist"
