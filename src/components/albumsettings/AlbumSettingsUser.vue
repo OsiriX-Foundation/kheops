@@ -25,13 +25,10 @@
       >
         <div class="input-group">
           <div>
-            <input
-              v-model="new_user_name"
-              v-focus
-              type="email"
-              class="form-control"
+            <input-auto-complet
               :placeholder="$t('user.emailuser')"
-            >
+              @input-value="setUsername"
+            />
           </div>
           <div class="input-group-append">
             <button
@@ -134,10 +131,11 @@
 import { mapGetters } from 'vuex';
 import AlbumUsers from '@/components/albumsettings/AlbumUsers';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import InputAutoComplet from '@/components/globals/InputAutoComplet';
 
 export default {
   name: 'AlbumSettingsUser',
-  components: { AlbumUsers, KheopsClipLoader },
+  components: { AlbumUsers, KheopsClipLoader, InputAutoComplet },
   props: {
     album: {
       type: Object,
@@ -219,6 +217,9 @@ export default {
         queries,
       };
       this.$store.dispatch('editAlbum', params);
+    },
+    setUsername(username) {
+      this.new_user_name = username;
     },
   },
 };

@@ -18,10 +18,12 @@
       v-focus
       type="email"
       :placeholder="placeholder"
+      :disabled="disabled"
       list="userslist"
       name="userslist-choice"
       class="form-control"
       autocomplete="off"
+      @keydown.enter.prevent="pressedEnter"
     >
     <datalist
       id="userslist"
@@ -53,6 +55,11 @@ export default {
       required: false,
       default: () => ({}),
     },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -75,6 +82,14 @@ export default {
           this.searchUser(this.user);
         } else {
           this.users = [];
+        }
+      },
+    },
+    disabled: {
+      handler() {
+        if (this.disabled === false) {
+          const { inputList } = this.$refs;
+          setTimeout(() => { inputList.focus(); }, 0);
         }
       },
     },
@@ -112,12 +127,15 @@ export default {
       });
     },
     search() {
-      const request = `users`;
+      const request = 'users';
       const queryParams = httpoperations.getFormData(this.queryParams);
       return HTTP.get(`${request}?${queryParams}`, { headers: { Accept: 'application/json' } });
     },
     inputValue() {
       this.$emit('input-value', this.user);
+    },
+    pressedEnter() {
+      this.$emit('keydown-enter-prevent');
     },
   },
 };
