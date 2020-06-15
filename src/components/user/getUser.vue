@@ -16,6 +16,8 @@
             <input-auto-complet
               :placeholder="$t('user.emailuser')"
               :context="context"
+              :reset="resetUser"
+              @input-reset="setResetInput(false)"
               @input-value="setUsername"
             />
           </div>
@@ -55,6 +57,7 @@ export default {
   data() {
     return {
       new_user_name: '',
+      resetUser: false,
     };
   },
   computed: {
@@ -84,6 +87,7 @@ export default {
         else {
           this.$emit('get-user', sub);
           this.new_user_name = '';
+          this.setResetInput(true);
         }
       });
     },
@@ -104,6 +108,9 @@ export default {
     },
     setUsername(username) {
       this.new_user_name = username;
+    },
+    setResetInput(value) {
+      this.resetUser = value;
     },
   },
 
