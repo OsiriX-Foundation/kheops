@@ -18,7 +18,7 @@ import java.util.logging.Logger;
         @NamedQuery(name = "User.searchByEmailOrNameInAlbumId",
                 query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a WHERE a.id = :albumId AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
         @NamedQuery(name = "User.searchByEmailWithStudyAccess",
-                query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries als JOIN Series se JOIN Study st WHERE st.studyInstanceUID = :studyUID AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
+                query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries als JOIN als.series se JOIN se.study st WHERE st.studyInstanceUID = :studyUID AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
         @NamedQuery(name = "User.searchByEmailOrName",
                 query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname)")
 })
