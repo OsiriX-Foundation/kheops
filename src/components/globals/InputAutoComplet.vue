@@ -109,19 +109,6 @@ export default {
   created() {
     this.addContext();
   },
-  mounted() {
-    // https://stackoverflow.com/questions/57202606/show-autocomplete-only-after-3-entered-chars-in-datalist-field
-    /*
-    this.$refs.inputList.addEventListener('keyup', (e) => {
-      console.log(this.minlength)
-      if (e.target.value.length >= this.minlength) {
-        this.$refs.userslist.setAttribute("id", "userslist");
-      } else {
-        this.$refs.userslist.setAttribute("id", "");
-      }
-    });
-    */
-  },
   methods: {
     addContext() {
       if (Object.keys(this.context).length > 0 && this.context.constructor === Object) {
