@@ -228,9 +228,11 @@ public class UserResource {
                 userInfoUrl = res.userinfoEndpoint;
                 userInfoURLsCache.put(accessToken.getIssuer().get(), userInfoUrl);
             } catch (ProcessingException | WebApplicationException e) {
+                LOG.log(Level.SEVERE, "Unable to get userInfoURL", e);
                 return Response.status(BAD_GATEWAY).build();
             } catch (URISyntaxException e) {
-                return Response.status(BAD_REQUEST).build();
+                LOG.log(Level.SEVERE, "bad configuration URL", e);
+                return Response.status(INTERNAL_SERVER_ERROR).build();
             }
         }
         try {
@@ -253,12 +255,13 @@ public class UserResource {
 
             return Response.ok().entity(userResponse).build();
         } catch (ProcessingException | WebApplicationException e) {
+            LOG.log(Level.SEVERE, "Unable to get user response", e);
             return Response.status(BAD_GATEWAY).build();
         } catch (URISyntaxException e) {
-            return Response.status(BAD_REQUEST).build();
+            LOG.log(Level.SEVERE, "bad configuration URL", e);
+            return Response.status(INTERNAL_SERVER_ERROR).build();
         }
     }
-
 
     @GET
     @Path("userinfo")
