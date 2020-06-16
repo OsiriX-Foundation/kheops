@@ -4,7 +4,6 @@ import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.Series;
-import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
 
@@ -54,7 +53,7 @@ public class NewSeriesWebhook implements WebhookResult{
         updatedStudy.addSeries(series);
     }
 
-    public void setReportProvider(ReportProvider reportProvider) { sourceUser.setReportProvider(reportProvider, ReportProviderResponse.Type.WEBHOOK); }
+    public void setReportProvider(ReportProvider reportProvider) { sourceUser.setReportProvider(reportProvider); }
 
     public void setCapabilityToken(Capability capability) { sourceUser.setCapabilityToken(capability); }
 

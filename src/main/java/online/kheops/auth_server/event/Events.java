@@ -135,12 +135,22 @@ public class Events {
             final Album album = getAlbum(albumId, em);
 
             final HashMap<String, Boolean> userMember = new HashMap<>();
-            for(AlbumUser albumUser : album.getAlbumUser()) {
-                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
-            }
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(e, userMember));
+                if (!userMember.containsKey(e.getUser().getSub())) {
+                    userMember.put(e.getUser().getSub(), isMemberOfAlbum(e.getUser(), album, em));
+                }
+                if (e instanceof Comment) {
+                    if (e.getPrivateTargetUser() != null && !userMember.containsKey(e.getPrivateTargetUser().getSub())) {
+                        userMember.put(e.getPrivateTargetUser().getSub(), isMemberOfAlbum(e.getPrivateTargetUser(), album, em));
+                    }
+                    eventResponses.add(new EventResponse((Comment)e, userMember));
+                } else if (e instanceof Mutation) {
+                    if (((Mutation) e).getToUser() != null && !userMember.containsKey(((Mutation) e).getToUser().getSub())) {
+                        userMember.put(((Mutation) e).getToUser().getSub(), isMemberOfAlbum(((Mutation) e).getToUser(), album, em));
+                    }
+                    eventResponses.add(new EventResponse((Mutation) e, userMember));
+                }
             }
 
             XTotalCount = EventQueries.getTotalEventsByAlbum(callingUser, album, em);
@@ -161,12 +171,15 @@ public class Events {
         try {
             final Album album = getAlbum(albumId, em);
             final HashMap<String, Boolean> userMember = new HashMap<>();
-            for(AlbumUser albumUser : album.getAlbumUser()) {
-                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
-            }
 
             for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                eventResponses.add(new EventResponse(m, userMember));
+                if (!userMember.containsKey(m.getUser().getSub())) {
+                    userMember.put(m.getUser().getSub(), isMemberOfAlbum(m.getUser(), album, em));
+                }
+                if (m.getToUser() != null && !userMember.containsKey(m.getToUser().getSub())) {
+                    userMember.put(m.getToUser().getSub(), isMemberOfAlbum(m.getToUser(), album, em));
+                }
+                    eventResponses.add(new EventResponse(m, userMember));
             }
 
             XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
@@ -183,17 +196,19 @@ public class Events {
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
+        final HashMap<String, Boolean> userMember = new HashMap<>();
 
         try {
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
-            final HashMap<String, Boolean> userMember = new HashMap<>();
-            for(AlbumUser albumUser : album.getAlbumUser()) {
-                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
-            }
-
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
+                if (!userMember.containsKey(c.getUser().getSub())) {
+                    userMember.put(c.getUser().getSub(), isMemberOfAlbum(c.getUser(), album, em));
+                }
+                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getSub())) {
+                    userMember.put(c.getPrivateTargetUser().getSub(), isMemberOfAlbum(c.getPrivateTargetUser(), album, em));
+                }
                 eventResponses.add(new EventResponse(c, userMember));
             }
             XTotalCount = EventQueries.getTotalCommentsByAlbum(callingUser, album, em);
@@ -226,11 +241,11 @@ public class Events {
             }
 
             for (Comment c : comments) {
-                if (!userMember.containsKey(c.getUser().getSub()) && canAccessStudy(c.getUser(), c.getStudy(), em)) {
-                    userMember.put(c.getUser().getSub(), null);
+                if (!userMember.containsKey(c.getUser().getSub())) {
+                    userMember.put(c.getUser().getSub(), canAccessStudy(c.getUser(), c.getStudy(), em));
                 }
-                if (c.getPrivateTargetUser() != null && !isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub()) && canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em)) {
-                    userMember.put(c.getPrivateTargetUser().getSub(), null);
+                if (c.getPrivateTargetUser() != null && isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub())) {
+                    userMember.put(c.getPrivateTargetUser().getSub(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
                 }
                 eventResponses.add(new EventResponse(c, userMember));
             }

@@ -8,35 +8,6 @@ import java.time.LocalDateTime;
 
 public class ReportProviderResponse {
 
-    public enum Type {
-        FULL {
-            @Override
-            public void buildResponse(ReportProviderResponse response, ReportProvider reportProvider) {
-                response.name = reportProvider.getName();
-                response.url = reportProvider.getUrl();
-                response.clientId = reportProvider.getClientId();
-                response.createdTime = reportProvider.getCreationTime();
-            }
-        },
-        WEBHOOK{
-            @Override
-            public void buildResponse(ReportProviderResponse response, ReportProvider reportProvider) {
-                response.name = reportProvider.getName();
-                response.clientId = reportProvider.getClientId();
-            }
-        },
-        EVENT{
-            @Override
-            public void buildResponse (ReportProviderResponse response, ReportProvider reportProvider) {
-                response.name = reportProvider.getName();
-                response.clientId = reportProvider.getClientId();
-                response.isRemoved = reportProvider.isRemoved();
-            }
-        };
-
-        public abstract void buildResponse(ReportProviderResponse response, ReportProvider reportProvider);
-    }
-
     @XmlElement(name = "name")
     private String name;
     @XmlElement(name = "url")
@@ -45,14 +16,19 @@ public class ReportProviderResponse {
     private String clientId;
     @XmlElement(name = "created_time")
     private LocalDateTime createdTime;
-    @XmlElement(name = "is_removed")
-    private Boolean isRemoved;
 
 
     private ReportProviderResponse() { /*empty*/ }
 
-    public ReportProviderResponse(ReportProvider reportProvider, Type type) {
-        type.buildResponse(this, reportProvider);
+    public ReportProviderResponse(ReportProvider reportProvider) {
+        name = reportProvider.getName();
+        url = reportProvider.getUrl();
+        clientId = reportProvider.getClientId();
+        createdTime = reportProvider.getCreationTime();
     }
 
+    public void webhookResponse() {
+        url = null;
+        createdTime = null;
+    }
 }
