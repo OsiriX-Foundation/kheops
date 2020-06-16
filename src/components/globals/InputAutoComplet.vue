@@ -12,6 +12,7 @@
 <template>
   <span>
     <input
+      v-if="submit === true"
       id="userslist-choice"
       ref="inputList"
       v-model="user"
@@ -23,6 +24,20 @@
       class="form-control"
       autocomplete="off"
       @keydown.enter="pressedEnter"
+    >
+    <input
+      v-else
+      id="userslist-choice"
+      ref="inputList"
+      v-model="user"
+      type="email"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      list="userslist"
+      name="userslist-choice"
+      class="form-control"
+      autocomplete="off"
+      @keydown.enter.prevent="pressedEnter"
     >
     <datalist
       id="userslist"
@@ -65,6 +80,11 @@ export default {
       default: false,
     },
     focus: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+    submit: {
       type: Boolean,
       required: false,
       default: true,
