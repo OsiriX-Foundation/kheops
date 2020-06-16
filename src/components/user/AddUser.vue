@@ -44,6 +44,7 @@
           :placeholder="$t('user.emailuser')"
           :context="context"
           :disabled="!enableAdd"
+          :submit="false"
           @keydown-enter-prevent="checkUser"
           @input-value="setUsername"
         />
