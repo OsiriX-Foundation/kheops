@@ -207,6 +207,7 @@ public class UserResource {
                     .message(BAD_FORM_PARAMETER)
                     .detail("Param 'access_token' must be set")
                     .build();
+            LOG.log(Level.WARNING, "token is null");
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
@@ -214,12 +215,17 @@ public class UserResource {
         try {
             accessToken = new OidcAccessToken.Builder(servletContext).build(token);
         } catch (AccessTokenVerificationException e) {
+            LOG.log(Level.WARNING, "Access token error", e);
             return Response.status(BAD_REQUEST).build();
         }
 
-        String userInfoUrl = userInfoURLsCache.get(accessToken.getIssuer().get());
+        final String issuer = accessToken.getIssuer().orElseGet(() -> {
+            throw new IllegalStateException("Token should have an issuer");
+        });
+
+        String userInfoUrl = userInfoURLsCache.get(issuer);
         if (userInfoUrl == null) {
-            final String openidConfiguration = accessToken.getIssuer().get() + "/.well-known/openid-configuration";
+            final String openidConfiguration = issuer + "/.well-known/openid-configuration";
             final URI openidConfigurationURI;
 
             try {
