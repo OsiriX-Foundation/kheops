@@ -4,15 +4,6 @@
       <form @submit.prevent="getUser">
         <div class="input-group mb-2">
           <div>
-            <!--
-            <input
-              v-model="new_user_name"
-              v-focus
-              type="email"
-              class="form-control"
-              :placeholder="$t('user.emailuser')"
-            >
-            -->
             <input-auto-complet
               :placeholder="$t('user.emailuser')"
               :reset="resetUser"
