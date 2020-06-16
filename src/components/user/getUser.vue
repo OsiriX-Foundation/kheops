@@ -15,7 +15,6 @@
             -->
             <input-auto-complet
               :placeholder="$t('user.emailuser')"
-              :context="context"
               :reset="resetUser"
               @input-reset="setResetInput(false)"
               @input-value="setUsername"
@@ -64,16 +63,6 @@ export default {
     ...mapGetters('oidcStore', [
       'oidcIsAuthenticated',
     ]),
-    context() {
-      const albumId = this.$route.params.album_id;
-      if (albumId !== undefined) {
-        return {
-          key: 'album',
-          value: albumId,
-        };
-      }
-      return {};
-    },
   },
   methods: {
     validEmail(email) {
