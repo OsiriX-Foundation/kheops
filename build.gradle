@@ -20,9 +20,7 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-    api group: 'com.sun.xml.bind', name: 'jaxb-core', version: '2.3.0.1'
-    api group: 'com.sun.xml.bind', name: 'jaxb-impl', version: '2.3.3'
+    api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
     api group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.31'
     api group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.31'
