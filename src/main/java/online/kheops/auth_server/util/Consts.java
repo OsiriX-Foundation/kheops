@@ -1,11 +1,7 @@
 package online.kheops.auth_server.util;
 
-import com.google.common.collect.ImmutableList;
-
 import javax.ws.rs.Priorities;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Consts {
