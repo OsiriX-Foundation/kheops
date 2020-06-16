@@ -19,7 +19,7 @@
       type="email"
       :placeholder="placeholder"
       :disabled="disabled"
-      list="userslist"
+      :list="'userslist'+listID"
       name="userslist-choice"
       class="form-control"
       autocomplete="off"
@@ -33,7 +33,7 @@
       type="email"
       :placeholder="placeholder"
       :disabled="disabled"
-      list="userslist"
+      :list="'userslist'+listID"
       name="userslist-choice"
       class="form-control"
       autocomplete="off"
@@ -41,7 +41,7 @@
     >
     <datalist
       v-if="canAutoComplet === true"
-      id="userslist"
+      :id="'userslist'+listID"
       ref="userslist"
     >
       <option
@@ -105,6 +105,9 @@ export default {
     };
   },
   computed: {
+    listID() {
+      return Math.floor((Math.random() * 10000) + 1);
+    },
     canAutoComplet() {
       let canAutoComplet = true;
       if (process.env.VUE_APP_DISABLE_AUTOCOMPLET !== undefined) {
