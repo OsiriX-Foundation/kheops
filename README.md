@@ -30,6 +30,10 @@ Set this variable to true, to disable uploading from the UI (optional, default i
 
 User management URL. (optional, default is false)
 
+#### `KHEOPS_UI_DISABLE_AUTOCOMPLET`
+
+Set this variable to true, to disable the user autocomplete from the UI (optional, default is false)
+
 ### API
 
 There are two ways to define the API URL. One must be used.

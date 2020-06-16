@@ -40,6 +40,7 @@
       @keydown.enter.prevent="pressedEnter"
     >
     <datalist
+      v-if="canAutoComplet === true"
       id="userslist"
       ref="userslist"
     >
@@ -103,11 +104,20 @@ export default {
       cpt: 0,
     };
   },
+  computed: {
+    canAutoComplet() {
+      let canAutoComplet = true;
+      if (process.env.VUE_APP_DISABLE_AUTOCOMPLET !== undefined) {
+        canAutoComplet = !process.env.VUE_APP_DISABLE_AUTOCOMPLET.includes('true');
+      }
+      return canAutoComplet;
+    },
+  },
   watch: {
     user: {
       handler() {
         this.inputValue();
-        if (this.user.length >= this.charminlength) {
+        if (this.user.length >= this.charminlength && this.canAutoComplet === true) {
           this.searchUser(this.user);
         } else {
           this.users = [];
