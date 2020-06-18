@@ -1,5 +1,7 @@
 {
 	"add": "Ajouter",
+	"show": "Montrer",
+	"hide": "Cacher",
 	"album": {
 		"addalbum": "Ajouter à un album",
 		"addinnewalbum": "Ajouter à un nouvel album",

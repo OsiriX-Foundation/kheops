@@ -4,7 +4,7 @@
   >
     <div class="card-header">
       <div class="bd-highlight">
-        <i> {{ $t('comment.notificationof') }} {{ comment.post_date | formatDate }} </i>
+        <i>{{ comment.post_date | formatDate }} </i>
       </div>
     </div>
     <div class="card-body">

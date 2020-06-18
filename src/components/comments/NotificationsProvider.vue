@@ -4,25 +4,19 @@
       v-if="comment.mutation_type === 'CREATE_REPORT_PROVIDER' && comment.report_provider"
       class=" flex-grow-1 bd-highlight"
     >
-      {{ $t('comment.createreportprovider', {user: getName(comment.origin), reportname: comment.report_provider.name}) }}
+      {{ $t('comment.createreportprovider', {user: getName(comment.source), reportname: comment.report_provider.name}) }}
     </div>
     <div
       v-if="comment.mutation_type === 'EDIT_REPORT_PROVIDER' && comment.report_provider"
       class=" flex-grow-1 bd-highlight"
     >
-      {{ $t('comment.editreportprovider', {user: getName(comment.origin), reportname: comment.report_provider.name}) }}
+      {{ $t('comment.editreportprovider', {user: getName(comment.source), reportname: comment.report_provider.name}) }}
     </div>
     <div
       v-if="comment.mutation_type === 'DELETE_REPORT_PROVIDER' && comment.report_provider"
       class=" flex-grow-1 bd-highlight"
     >
-      {{ $t('comment.deletereportprovider', {user: getName(comment.origin), reportname: comment.report_provider.name}) }}
-    </div>
-    <div
-      v-if="comment.mutation_type === 'NEW_REPORT' && comment.report_provider"
-      class=" flex-grow-1 bd-highlight"
-    >
-      {{ $t('comment.newreport', {user: getName(comment.origin), reportname: comment.report_provider.name, study: comment.study.description ? comment.study.description : comment.study.UID}) }}
+      {{ $t('comment.deletereportprovider', {user: getName(comment.source), reportname: comment.report_provider.name}) }}
     </div>
   </span>
 </template>

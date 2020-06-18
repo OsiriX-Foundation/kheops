@@ -7,34 +7,34 @@
       <v-icon
         name="user"
         class="icon-margin-right"
-        :class="comment.origin.can_access === false ? 'font-neutral' : ''"
+        :class="comment.source.can_access === false ? 'font-neutral' : ''"
       />
       <span
-        v-if="currentuserEmail === comment.origin.email"
+        v-if="currentuserEmail === comment.source.email"
       >
         {{ $t('comment.you') }}
       </span>
       <a
-        v-else-if="comment.origin.can_access === true && writeComments === true"
+        v-else-if="comment.source.can_access === true && writeComments === true"
         class="font-white"
-        :title="comment.origin.email"
-        @click="clickPrivateUser(comment.origin.email)"
+        :title="comment.source.email"
+        @click="clickPrivateUser(comment.source.email)"
       >
-        {{ comment.origin|getUsername }}
+        {{ comment.source|getUsername }}
       </a>
       <span
-        v-else-if="comment.origin.can_access === true"
+        v-else-if="comment.source.can_access === true"
         color="white"
-        :title="comment.origin.email"
+        :title="comment.source.email"
       >
-        {{ comment.origin|getUsername }}
+        {{ comment.source|getUsername }}
       </span>
       <span
         v-else
         class="font-neutral"
-        :title="comment.origin.email"
+        :title="comment.source.email"
       >
-        {{ comment.origin|getUsername }} - <i>{{ scope === 'album' ? $t('comment.nocommentaccessalbum') : $t('comment.nocommentaccessstudy') }}</i>
+        {{ comment.source|getUsername }} - <i>{{ scope === 'album' ? $t('comment.nocommentaccessalbum') : $t('comment.nocommentaccessstudy') }}</i>
       </span>
       <span class="float-right">
         {{ comment.post_date | formatDate }}
@@ -43,7 +43,7 @@
         v-if="comment.is_private"
       >
         <b
-          v-if="comment.is_private && currentuserEmail !== comment.origin.email"
+          v-if="comment.is_private && currentuserEmail !== comment.source.email"
           class="text-warning"
         >
           {{ $t('comment.privatemessagereceive') }}
