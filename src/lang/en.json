@@ -120,7 +120,7 @@
 		"nomodality": "No modality",
 		"nomorealbums": "No more albums",
 		"nopermissions": "You don't have the permissions to show the albums list.",
-		"noresults": "No album found",
+		"noresults": "You do not have any albums yet",
 		"reload": "Reload",
 		"share": "Invite user",
 		"toDate": "To"
@@ -211,7 +211,7 @@
 		"metadata": "Metadata",
 		"nomorestudies": "No more studies",
 		"nopermissions": "You don't have the permissions to show the studies list.",
-		"noresults": "No study found",
+		"noresults": "No studies found",
 		"opencomments": "Open comments",
 		"patientinfo": "Patient details",
 		"selectednbstudies": "{count} study is selected | {count} studies are selected",
