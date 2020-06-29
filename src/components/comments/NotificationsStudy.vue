@@ -25,7 +25,7 @@
         <i>{{ comment.source|getUsername }}</i> {{ $t('comment.imported') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
       </span>
       <div
-        v-if="comment.study.series !== undefined"
+        v-if="comment.study.series !== undefined && comment.study.series.length > 0"
       >
         <br> {{ $t('comment.nbseriesinstudy', {nbseries: lengthPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
         <span
@@ -89,7 +89,7 @@
         <i>{{ comment.source|getUsername }}</i> {{ $t('comment.removed') }} {{ $t('comment.thestudy') }} <b>{{ comment.study.description ? comment.study.description : comment.study.UID }}</b>
       </span>
       <div
-        v-if="comment.study.series !== undefined"
+        v-if="comment.study.series !== undefined && comment.study.series.length > 0"
       >
         <br> {{ $t('comment.nbnoseriesinstudy', {nbseries: lengthNotPresent(comment.study.series), study: comment.study.description ? comment.study.description : comment.study.UID}) }}
         <span
