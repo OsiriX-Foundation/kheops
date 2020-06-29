@@ -5,7 +5,7 @@
     <changeSet author="kheops" id="v3.2-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="mutation_series" schemaName="public"/>
+                <tableExists tableName="event_series" schemaName="public"/>
             </not>
         </preConditions>
         <createTable tableName="event_series">
