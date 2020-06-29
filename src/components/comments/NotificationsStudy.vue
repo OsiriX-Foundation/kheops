@@ -108,13 +108,12 @@
               slot="value-toshow"
             >
               <span
-                v-for="serie in isPresent(comment.study.series)"
+                v-for="serie in comment.study.series"
                 :key="serie.id"
-                class="text-warning"
               >
                 <span
                   v-if="serie.is_present_in_album === true"
-                  class="text_warning"
+                  class="text-warning"
                 >
                   <br>{{ $t('comment.theseriepresentinalbum', {serie: serie.description ? serie.description : serie.UID}) }}
                 </span>
