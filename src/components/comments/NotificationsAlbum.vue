@@ -4,7 +4,7 @@
       v-if="comment.mutation_type === 'CREATE_ALBUM'"
       class=" flex-grow-1 bd-highlight"
     >
-      <i>{{ comment.origin|getUsername }}</i> {{ $t('comment.hascreated') }} {{ $t('comment.thealbum') }}
+      <i>{{ comment.source|getUsername }}</i> {{ $t('comment.hascreated') }} {{ $t('comment.thealbum') }}
     </div>
 
     <!-- EDIT_ALBUM -->
@@ -12,7 +12,7 @@
       v-if="comment.mutation_type === 'EDIT_ALBUM'"
       class=" flex-grow-1 bd-highlight"
     >
-      <i>{{ comment.origin|getUsername }}</i> {{ $t('comment.hasedited') }} {{ $t('comment.thealbum') }}
+      <i>{{ comment.source|getUsername }}</i> {{ $t('comment.hasedited') }} {{ $t('comment.thealbum') }}
     </div>
   </span>
 </template>

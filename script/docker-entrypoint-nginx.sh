@@ -58,9 +58,14 @@ if [ -z "$KHEOPS_UI_USER_MANAGEMENT_URL" ]; then
     KHEOPS_UI_USER_MANAGEMENT_URL=false
 fi
 
+if [ -z "$KHEOPS_UI_DISABLE_AUTOCOMPLET" ]; then
+    KHEOPS_UI_DISABLE_AUTOCOMPLET=false
+fi
+
 sed -i "s|\%{kheops_ui_viewer_url}|$KHEOPS_UI_VIEWER_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_user_management}|$KHEOPS_UI_USER_MANAGEMENT_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_upload}|$KHEOPS_UI_DISABLE_UPLOAD|g" $FILENAME
+sed -i "s|\%{kheops_ui_disable_autocomplet}|$KHEOPS_UI_DISABLE_AUTOCOMPLET|g" $FILENAME
 
 chmod a+w /etc/nginx/conf.d/ui.conf
 

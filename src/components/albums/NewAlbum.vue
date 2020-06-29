@@ -60,14 +60,15 @@
                 class="newalbum-user"
               >
                 <div class="input-group mb-3">
-                  <input
-                    v-model="newUserName"
-                    type="text"
-                    class="form-control form-control-sm"
-                    placeholder="email"
-                    aria-label="Email"
-                    @keydown.enter.prevent="checkUser"
-                  >
+                  <input-auto-complet
+                    :placeholder="$t('user.emailuser')"
+                    :reset="resetUser"
+                    :focus="false"
+                    :submit="false"
+                    @input-reset="setResetInput(false)"
+                    @input-value="setUsername"
+                    @keydown-enter-prevent="checkUser"
+                  />
                   <div class="input-group-append">
                     <button
                       v-if="loadingCheckUser === false"
@@ -167,11 +168,12 @@ import CreateCancelButton from '@/components/globalbutton/CreateCancelButton';
 import FieldObligatory from '@/components/globals/FieldObligatory';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import NewAlbumUser from '@/components/albums/NewAlbumUser';
+import InputAutoComplet from '@/components/globals/InputAutoComplet';
 
 export default {
   name: 'NewAlbum',
   components: {
-    CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser,
+    CreateCancelButton, FieldObligatory, KheopsClipLoader, NewAlbumUser, InputAutoComplet,
   },
   data() {
     return {
@@ -199,6 +201,7 @@ export default {
       numberCol: 2,
       oncreate: false,
       loadingCheckUser: false,
+      resetUser: false,
     };
   },
   computed: {
@@ -242,7 +245,7 @@ export default {
             const user = res.data;
             user.is_admin = false;
             this.album.users.unshift(user);
-            vm.newUserName = '';
+            this.setResetInput(true);
           }
           this.loadingCheckUser = false;
         }).catch(() => {
@@ -250,8 +253,8 @@ export default {
           console.log('Sorry, an error occured');
         });
       } else {
-        vm.newUserName = '';
         this.loadingCheckUser = false;
+        this.setResetInput(true);
       }
     },
     createAlbum() {
@@ -364,6 +367,12 @@ export default {
     },
     cancel() {
       this.$router.go(-1);
+    },
+    setUsername(username) {
+      this.newUserName = username;
+    },
+    setResetInput(value) {
+      this.resetUser = value;
     },
   },
 };

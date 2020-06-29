@@ -40,16 +40,14 @@
       class="user"
     >
       <div class="input-group mb-3">
-        <input
-          ref="textcomment"
-          v-model="newUserName"
-          type="email"
-          class="form-control form-control-sm"
-          placeholder="email"
-          aria-label="Email"
+        <input-auto-complet
+          :placeholder="$t('user.emailuser')"
+          :context="context"
           :disabled="!enableAdd"
-          @keydown.enter.prevent="checkUser"
-        >
+          :submit="false"
+          @keydown-enter-prevent="checkUser"
+          @input-value="setUsername"
+        />
         <div
           v-if="onloading === false"
           class="input-group-append"
@@ -80,11 +78,12 @@
 
 <script>
 import { HTTP } from '@/router/http';
+import InputAutoComplet from '@/components/globals/InputAutoComplet';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 
 export default {
   name: 'AddUser',
-  components: { KheopsClipLoader },
+  components: { KheopsClipLoader, InputAutoComplet },
   props: {
     scope: {
       type: String,
@@ -113,15 +112,24 @@ export default {
     accessVar() {
       return this.scope === 'album' ? 'album_access' : 'study_access';
     },
+    context() {
+      if (this.scope === 'album') {
+        return {
+          key: 'album',
+          value: this.id,
+        };
+      }
+      return {
+        key: 'studyInstanceUID',
+        value: this.id,
+      };
+    },
   },
   watch: {
     enableAdd: {
       handler() {
         if (!this.enableAdd) {
           this.deleteUser();
-        } else {
-          const { textcomment } = this.$refs;
-          setTimeout(() => { textcomment.focus(); }, 0);
         }
       },
     },
@@ -160,6 +168,9 @@ export default {
       this.user = user;
       this.newUserName = '';
       this.$emit('private-user', this.user);
+    },
+    setUsername(username) {
+      this.newUserName = username;
     },
   },
 };

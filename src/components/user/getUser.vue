@@ -4,13 +4,12 @@
       <form @submit.prevent="getUser">
         <div class="input-group mb-2">
           <div>
-            <input
-              v-model="new_user_name"
-              v-focus
-              type="email"
-              class="form-control"
+            <input-auto-complet
               :placeholder="$t('user.emailuser')"
-            >
+              :reset="resetUser"
+              @input-reset="setResetInput(false)"
+              @input-value="setUsername"
+            />
           </div>
           <div class="input-group-append">
             <button
@@ -38,14 +37,17 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import InputAutoComplet from '@/components/globals/InputAutoComplet';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'FormGetUser',
+  components: { InputAutoComplet },
   mixins: [CurrentUser],
   data() {
     return {
       new_user_name: '',
+      resetUser: false,
     };
   },
   computed: {
@@ -65,6 +67,7 @@ export default {
         else {
           this.$emit('get-user', sub);
           this.new_user_name = '';
+          this.setResetInput(true);
         }
       });
     },
@@ -82,6 +85,12 @@ export default {
     cancel() {
       this.new_user_name = '';
       this.$emit('cancel-user');
+    },
+    setUsername(username) {
+      this.new_user_name = username;
+    },
+    setResetInput(value) {
+      this.resetUser = value;
     },
   },
 
