@@ -24,8 +24,7 @@ public enum MutationTypeFamily {
     REPORT_PROVIDER (Arrays.asList(
             MutationType.CREATE_REPORT_PROVIDER,
             MutationType.EDIT_REPORT_PROVIDER,
-            MutationType.DELETE_REPORT_PROVIDER,
-            MutationType.NEW_REPORT) );
+            MutationType.DELETE_REPORT_PROVIDER) );
 
     private final List<MutationType> mutationTypes;
 
