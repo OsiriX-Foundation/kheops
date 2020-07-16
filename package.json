@@ -12,7 +12,7 @@
     "bootstrap-vue": "^2.1.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.19.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.24.0",
     "oidc-client": "^1.10.1",
     "v-calendar": "^0.9.7",
