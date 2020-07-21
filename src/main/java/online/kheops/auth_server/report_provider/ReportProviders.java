@@ -70,7 +70,7 @@ public class ReportProviders {
                 .action(ActionType.NEW_REPORT_PROVIDER)
                 .clientID(reportProvider.getClientId())
                 .log();
-        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
+        return new ReportProviderResponse(reportProvider);
     }
 
     public static ReportProviderClientMetadata callConfigURL(ReportProvider reportProvider)
@@ -195,7 +195,7 @@ public class ReportProviders {
         }
 
         for (ReportProvider reportProvider : reportProvidersEntity) {
-            reportProviders.add(new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL));
+            reportProviders.add(new ReportProviderResponse(reportProvider));
         }
 
         kheopsLogBuilder.album(albumId)
@@ -234,7 +234,7 @@ public class ReportProviders {
                 .clientID(clientId)
                 .album(albumId)
                 .log();
-        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
+        return new ReportProviderResponse(reportProvider);
     }
 
     public static void deleteReportProvider(User callingUser, String albumId, String clientId, KheopsLogBuilder kheopsLogBuilder)
@@ -333,7 +333,7 @@ public class ReportProviders {
                 .clientID(clientId)
                 .action(ActionType.EDIT_REPORT_PROVIDER)
                 .log();
-        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
+        return new ReportProviderResponse(reportProvider);
     }
 
     public static ReportProvider getReportProvider(String clientId)
