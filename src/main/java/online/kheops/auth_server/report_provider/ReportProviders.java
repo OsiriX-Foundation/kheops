@@ -70,7 +70,7 @@ public class ReportProviders {
                 .action(ActionType.NEW_REPORT_PROVIDER)
                 .clientID(reportProvider.getClientId())
                 .log();
-        return new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
     }
 
     public static ReportProviderClientMetadata callConfigURL(ReportProvider reportProvider)
@@ -141,7 +141,7 @@ public class ReportProviders {
     }
 
     public static ReportProviderClientMetadata getClientMetadata (String configUrl)
-    throws ReportProviderUriNotValidException {
+            throws ReportProviderUriNotValidException {
         try {
             new URI(configUrl);
         } catch (URISyntaxException e) {
@@ -195,7 +195,7 @@ public class ReportProviders {
         }
 
         for (ReportProvider reportProvider : reportProvidersEntity) {
-            reportProviders.add(new ReportProviderResponse(reportProvider));
+            reportProviders.add(new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL));
         }
 
         kheopsLogBuilder.album(albumId)
@@ -234,7 +234,7 @@ public class ReportProviders {
                 .clientID(clientId)
                 .album(albumId)
                 .log();
-        return new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
     }
 
     public static void deleteReportProvider(User callingUser, String albumId, String clientId, KheopsLogBuilder kheopsLogBuilder)
@@ -333,7 +333,7 @@ public class ReportProviders {
                 .clientID(clientId)
                 .action(ActionType.EDIT_REPORT_PROVIDER)
                 .log();
-        return new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
     }
 
     public static ReportProvider getReportProvider(String clientId)
