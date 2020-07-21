@@ -3,7 +3,7 @@ package online.kheops.auth_server;
 //import online.kheops.auth_server.principal.KheopsPrincipal;
 //import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+//import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class KheopsPrincipalTest {
 
