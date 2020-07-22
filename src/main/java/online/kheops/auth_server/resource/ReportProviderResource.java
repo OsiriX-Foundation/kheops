@@ -268,8 +268,8 @@ public class ReportProviderResource {
                     "    <meta http-equiv=\"refresh\" content=\"0;URL='" + reportProviderUrl + "'\" />\n" +
                     "  </head>\n" +
                     "  <body>\n" +
-                    "    <p>This page has moved to <a href=\"" + reportProviderUrl + "\">\n" +
-                    "      here</a>.</p> \n" +
+                    "    <p>Please wait</p> \n" +
+                    "    <p>Loading the report provider at <a href=\"" + reportProviderUrl + "\">\n" + "</a>.</p> \n" +
                     "  </body>\n" +
                     "</html>";
 
