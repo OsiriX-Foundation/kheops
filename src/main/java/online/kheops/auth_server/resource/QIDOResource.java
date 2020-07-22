@@ -178,7 +178,7 @@ public class QIDOResource {
             if(includeFieldFavorite) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_QUERY_PARAMETER)
-                        .detail("If include field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as query param")
+                        .detail("when including field favorite(0x0001,2345), you must specify "+INBOX+"=true OR "+ALBUM+"={album_id} as a query param")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
