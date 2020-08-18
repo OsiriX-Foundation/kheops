@@ -219,15 +219,6 @@ public class UserPrincipal implements KheopsPrincipal {
         return "[UserPrincipal user:" + getUser() + " scope:" + getScope() + " hasUserAccess:" + hasUserAccess() + " hasInboxAccess:" + hasInboxAccess() + "]";
     }
 
-    private boolean linkAuthorization;
-    @Override
-    public void setLink(boolean linkAuthorization) {
-        this.linkAuthorization = linkAuthorization;
-    }
-
-    @Override
-    public boolean isLink() { return linkAuthorization; }
-
     @Override
     public String getOriginalToken() {
         return originalToken;

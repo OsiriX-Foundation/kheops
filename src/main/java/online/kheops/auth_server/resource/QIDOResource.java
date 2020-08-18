@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
+import static online.kheops.auth_server.filter.SecuredFilter.LINK_AUTH;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
@@ -306,7 +307,7 @@ public class QIDOResource {
                         final StringBuilder retrieveURL = new StringBuilder();
                         retrieveURL.append(context.getInitParameter(HOST_ROOT_PARAMETER));
                         retrieveURL.append("/api");
-                        if(kheopsPrincipal.isLink()) {
+                        if (securityContext.getAuthenticationScheme().equals(LINK_AUTH)) {
                             retrieveURL.append("/link/").append(kheopsPrincipal.getOriginalToken());
                         }
                         retrieveURL.append("/studies/");
