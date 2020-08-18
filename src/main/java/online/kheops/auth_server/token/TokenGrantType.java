@@ -2,20 +2,22 @@ package online.kheops.auth_server.token;
 
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
-import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
-import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
-import online.kheops.auth_server.report_provider.ReportProviders;
+import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static online.kheops.auth_server.accesstoken.AccessTokenUtils.StringContainsScope;
 import static online.kheops.auth_server.accesstoken.AccessTokenUtils.ValidateScopeString;
+import static online.kheops.auth_server.report_provider.ClientMetadataListUriParameter.REDIRECT_URIS;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -35,18 +37,27 @@ public enum TokenGrantType {
 
             final String code = form.getFirst("code");
             final String clientId = form.getFirst("client_id");
-            final String redirectUri = form.getFirst("redirect_uri");
+            final String redirectUriString = form.getFirst("redirect_uri");
 
-            if (!securityContext.isUserInRole(TokenClientKind.REPORT_PROVIDER.getRoleString())) {
-                throw new TokenRequestException(UNAUTHORIZED_CLIENT);
+            final URI redirectUri;
+            try {
+                redirectUri = new URI(redirectUriString);
+            } catch (URISyntaxException e) {
+                throw new TokenRequestException(INVALID_REQUEST, "Bad redirect_uri", e);
             }
 
-            try {
-                if (!ReportProviders.getRedirectUri(ReportProviders.getReportProvider(clientId)).equals(redirectUri)) {
-                    throw new TokenRequestException(INVALID_GRANT, "redirect_uri does not match");
-                }
-            } catch (ReportProviderUriNotValidException | ClientIdNotFoundException e) {
-                throw new TokenRequestException(INVALID_GRANT, e.getMessage(), e);
+            final Principal principal = securityContext.getUserPrincipal();
+            final ReportProvider reportProvider;
+            if (principal instanceof ReportProviderPrinciple) {
+                reportProvider = ((ReportProviderPrinciple) principal).getReportProvider();
+            } else {
+                throw new AssertionError("principle is not a report provider");
+            }
+
+            final ClientMetadata clientMetadata = reportProvider.getClientMetadata();
+
+            if (!clientMetadata.getValue(REDIRECT_URIS).contains(redirectUri)) {
+                throw new TokenRequestException(INVALID_GRANT, "redirect_uri is not valid");
             }
 
             final DecodedAuthorizationCode authorizationCode;

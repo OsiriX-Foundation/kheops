@@ -14,6 +14,8 @@ public class ConfigurationResponse {
     private String dicomwebEndpoint;
     @XmlElement(name = "dicomweb_uri_endpoint")
     private String wadoEndpoint;
+    @XmlElement(name = "authorization_endpoint")
+    private String authorizationEndpoint;
     @XmlElement(name = "token_endpoint")
     private String tokenEndpoint;
     @XmlElement(name = "introspection_endpoint")
@@ -45,6 +47,7 @@ public class ConfigurationResponse {
         issuer = kheopsRootUri;
         dicomwebEndpoint = kheopsRootUri + "/api";
         wadoEndpoint = kheopsRootUri + "/api/wado";
+        authorizationEndpoint = kheopsRootUri + "/api/authorize";
         tokenEndpoint = kheopsRootUri + "/api/token";
         introspectUri = kheopsRootUri + "/api/token/introspect";
         userInfoEndpoint = kheopsRootUri + "/api/userinfo";

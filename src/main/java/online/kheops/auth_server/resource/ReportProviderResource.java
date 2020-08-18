@@ -10,6 +10,7 @@ import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.token.LoginHintGenerator;
 import online.kheops.auth_server.token.ReportProviderAccessTokenGenerator;
 import online.kheops.auth_server.token.ReportProviderAuthCodeGenerator;
 import online.kheops.auth_server.user.UserNotFoundException;
@@ -28,6 +29,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.logging.Level;
@@ -62,6 +64,8 @@ public class ReportProviderResource {
 
     @Context
     private ServletContext context;
+
+    private final ReportProviderCatalogue reportProviderCatalogue = new ReportProviderCatalogue();
 
     @POST
     @Secured
@@ -98,8 +102,10 @@ public class ReportProviderResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.TEXT_HTML)
     public Response newReport(@FormParam("access_token") @NotNull @NotEmpty final String tokenParam,
-                              @FormParam("client_id") final String clientId,
-                              @FormParam("studyUID") @NotNull @NotEmpty List<String> studyInstanceUIDs)
+                              @FormParam("client_id") @NotNull @NotEmpty final String clientId,
+                              @FormParam("studyUID") @NotNull @NotEmpty List<String> studyInstanceUIDs,
+                              @FormParam(ALBUM) String fromAlbumId,
+                              @FormParam(INBOX) Boolean fromInbox)
             throws AlbumNotFoundException, UserNotFoundException {//Edit UidValidator for work with @FormParam
 
         for (String uid : studyInstanceUIDs) {
@@ -140,6 +146,19 @@ public class ReportProviderResource {
                     .detail("The token is not a user capability token or a keycloak token")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
+        }
+
+        try {
+            final online.kheops.auth_server.report_provider.ReportProvider reportProvider = reportProviderCatalogue.getReportProvider(clientId);
+            ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context)
+                    .withClientId(clientId)
+                    .withStudyInstanceUIDs(studyInstanceUIDs)
+                    .withSubject(accessToken.getSubject());
+            final ClientRedirectEntity clientRedirectEntity = new ClientRedirectEntity(reportProvider.getClientMetadata(), getHostRoot() + "/api", generator.generate(300));
+
+            return Response.ok(clientRedirectEntity).build();
+        } catch (ReportProviderNotFoundException e) {
+            LOG.log(Level.INFO, "ClientID is not an OIDC report provider, going on to check if it is an old report provider", e);
         }
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -279,6 +298,35 @@ public class ReportProviderResource {
         } catch (UnsupportedEncodingException e) {
             return Response.status(FORBIDDEN).entity("ERROR").build();
         }
+    }
+
+    @GET
+    @Path("authorize")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.TEXT_HTML)
+    public Response newReport(@QueryParam("response_type") @NotNull @NotEmpty final String tokenParam,
+                              @QueryParam("client_id") @NotNull @NotEmpty final String clientId,
+                              @QueryParam("redirect_uri") @NotNull @NotEmpty final String redirectUri,
+                              @QueryParam("login_hint") String login_hint,
+                              @QueryParam("scope") String scope,
+                              @QueryParam("state") String state) {
+
+        UriBuilder redirectUriBuilder = UriBuilder.fromUri(redirectUri)
+                .queryParam("code", login_hint);
+
+        if (state != null) {
+            redirectUriBuilder.queryParam("state", state);
+        }
+
+        return Response.seeOther(redirectUriBuilder.build()).build();
+    }
+
+    @GET
+    @Path(".well-known/openid-configuration")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response OidcConfiguration() {
+        new KheopsLogBuilder().action(ActionType.REPORT_PROVIDER_CONFIGURATION).log();
+        return  Response.status(OK).entity(new ConfigurationResponse(getHostRoot())).build();
     }
 
     @GET

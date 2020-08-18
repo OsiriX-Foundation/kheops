@@ -1,5 +1,10 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.report_provider.ClientMetadata;
+import online.kheops.auth_server.report_provider.ReportProvider;
+import online.kheops.auth_server.report_provider.ReportProviderCatalogue;
+import online.kheops.auth_server.report_provider.ReportProviderNotFoundException;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
@@ -8,6 +13,9 @@ import java.util.Base64;
 import java.util.List;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static online.kheops.auth_server.report_provider.ClientMetadataOptionalAuthMethodParameter.TOKEN_ENDPOINT_AUTH_METHOD;
+import static online.kheops.auth_server.report_provider.ClientMetadataOptionalStringParameter.CLIENT_NAME;
+import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_CLIENT;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
 public enum TokenClientAuthenticationType {
@@ -52,18 +60,41 @@ public enum TokenClientAuthenticationType {
                     .requestPath(requestPath)
                     .authenticate();
         }
-
-        private void verifySingleHeader(MultivaluedMap<String, String> formParams, String header) {
-            final List<String> headers = formParams.get(header);
-
-            if (headers == null || headers.size() != 1) {
-                throw new TokenRequestException(INVALID_REQUEST, "There isn't a single " + header + " header");
-            }
-        }
     },
 
-    PUBLIC("public") {
+    NONE("none") {
         public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
+            MultivaluedMap<String, String> formParams = form.asMap();
+
+            verifySingleHeader(formParams, CLIENT_ID);
+
+            final ReportProviderCatalogue reportProviderCatalogue = new ReportProviderCatalogue();
+            try {
+                final ReportProvider reportProvider = reportProviderCatalogue.getReportProvider(formParams.getFirst(CLIENT_ID));
+                final ClientMetadata clientMetadata = reportProvider.getClientMetadata();
+
+                if (!NONE.equals(clientMetadata.getValue(TOKEN_ENDPOINT_AUTH_METHOD).orElse(null))) {
+                    throw new TokenRequestException(INVALID_CLIENT);
+                }
+
+                return new ReportProviderPrinciple() {
+                    @Override
+                    public String getName() {
+                        return reportProvider.getClientMetadata().getValue(CLIENT_NAME).orElse("Unknown Report Provider");
+                    }
+
+                    @Override
+                    public TokenClientKind getClientKind() {
+                        return TokenClientKind.PUBLIC;
+                    }
+
+                    @Override
+                    public ReportProvider getReportProvider() {
+                        return reportProvider;
+                    }
+                };
+            } catch (ReportProviderNotFoundException ignored) {
+            }
             return PUBLIC_PRINCIPAL;
         }
     };
@@ -85,7 +116,7 @@ public enum TokenClientAuthenticationType {
         }
     };
 
-    private String schemeString;
+    private final String schemeString;
 
     TokenClientAuthenticationType(String schemeString) {
         this.schemeString = schemeString;
@@ -114,7 +145,7 @@ public enum TokenClientAuthenticationType {
                     return TokenClientAuthenticationType.CLIENT_SECRET_BASIC;
                 }
                 if (authorizationHeaders.get(0).substring(0, 7).equalsIgnoreCase("Bearer ")) {
-                    return TokenClientAuthenticationType.PUBLIC;
+                    return TokenClientAuthenticationType.NONE;
                 }
             } catch (IndexOutOfBoundsException e) {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown authorization type", e);
@@ -140,7 +171,15 @@ public enum TokenClientAuthenticationType {
             }
         }
 
-        return TokenClientAuthenticationType.PUBLIC;
+        return TokenClientAuthenticationType.NONE;
+    }
+
+    protected static void verifySingleHeader(MultivaluedMap<String, String> formParams, String header) {
+        final List<String> headers = formParams.get(header);
+
+        if (headers == null || headers.size() != 1) {
+            throw new TokenRequestException(INVALID_REQUEST, "There isn't a single " + header + " header");
+        }
     }
 
     public abstract TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form);

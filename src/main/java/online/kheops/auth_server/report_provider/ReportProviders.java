@@ -30,7 +30,7 @@ import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.event.Events.reportProviderMutation;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.*;
 
-public class ReportProviders {
+public final class ReportProviders {
 
     private ReportProviders() {
         throw new IllegalStateException("Utility class");

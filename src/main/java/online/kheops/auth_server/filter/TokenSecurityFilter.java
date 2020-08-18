@@ -31,12 +31,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        final ContainerRequest containerRequest;
-        if (requestContext instanceof ContainerRequest) {
-            containerRequest = (ContainerRequest) requestContext;
-        } else {
-            throw new IllegalStateException("requestContext is not a ContainerRequest");
-        }
+        final ContainerRequest containerRequest = castRequest(requestContext);
 
         final Form form;
         final MultivaluedMap<String, String> requestHeaders;
@@ -90,5 +85,15 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
                 return authenticationType.getSchemeString();
             }
         });
+    }
+
+    private static ContainerRequest castRequest(final ContainerRequestContext containerRequestContext) {
+        final ContainerRequest containerRequest;
+        if (containerRequestContext instanceof ContainerRequest) {
+            containerRequest = (ContainerRequest) containerRequestContext;
+        } else {
+            throw new AssertionError("requestContext is not a ContainerRequest");
+        }
+        return containerRequest;
     }
 }
