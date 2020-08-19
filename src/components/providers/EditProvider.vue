@@ -129,14 +129,14 @@ export default {
   created() {
     this.$store.dispatch('getProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
       if (res.status !== 200) {
-        this.$snotify.error('Sorry, an error occured');
+        this.$snotify.error('Sorry, an error occurred');
         this.cancel();
       }
     }).catch((err) => {
       if (err.response !== undefined && err.response.status === 404) {
         this.$snotify.error('Report provider not found');
       } else {
-        this.$snotify.error('Sorry, an error occured');
+        this.$snotify.error('Sorry, an error occurred');
       }
       this.cancel();
     });
@@ -180,7 +180,7 @@ export default {
       this.$store.dispatch('deleteProvider', { albumID: this.albumID, clientID: this.clientID }).then((res) => {
         if (res.status !== 204) {
           this.onloading = false;
-          this.$snotify.error('Sorry, an error occured');
+          this.$snotify.error('Sorry, an error occurred');
         } else {
           this.$emit('done');
         }

@@ -250,7 +250,7 @@ export default {
           this.loadingCheckUser = false;
         }).catch(() => {
           this.loadingCheckUser = false;
-          console.log('Sorry, an error occured');
+          console.log('Sorry, an error occurred');
         });
       } else {
         this.loadingCheckUser = false;

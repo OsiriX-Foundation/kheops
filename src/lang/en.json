@@ -130,7 +130,7 @@
 		"Study #": "Study #",
 		"User #": "User #",
 		"albumshared": "Album shared",
-		"error": "An error occur please reload the albums.",
+		"error": "An error occurred, please reload the albums.",
 		"filter": "Filter",
 		"fromDate": "From",
 		"name": "Name",
@@ -221,7 +221,7 @@
 		"addInbox": "Add to inbox",
 		"comments": "Comments",
 		"confirmDelete": "Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them. | Are you sure you want to delete {countSeries} series within {countStudies} studies ? Once deleted, you will not be able to re-upload any series if other users still have access to them.",
-		"error": "An error occur please reload the studies.",
+		"error": "An error occurred, please reload the studies.",
 		"filter": "Filter",
 		"fromDate": "From",
 		"import": "Import data",
@@ -240,8 +240,8 @@
 	},
 	"texterror": {
 		"notfound": "Not found",
-		"unauthorized": "You don't have the permission",
-		"unknownerror": "An unknown error occur"
+		"unauthorized": "You don't have the appropriate permissions",
+		"unknownerror": "An unknown error occurred"
 	},
 	"token": {
 		"active": "active",
@@ -328,7 +328,7 @@
 		"weasis": "Open Weasis"
 	},
 	"webhook": {
-		"-1": "An error occured",
+		"-1": "An error occurred",
 		"activate": "Trigger by adding {event}",
 		"attempt": "Attempt",
 		"date": "Date",

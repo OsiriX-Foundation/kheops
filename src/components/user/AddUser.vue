@@ -158,7 +158,7 @@ export default {
           this.onloading = false;
         }).catch(() => {
           this.onloading = false;
-          console.log('Sorry, an error occured');
+          console.log('Sorry, an error occurred');
         });
       } else {
         this.$snotify.error(this.$t('user.nouser'));

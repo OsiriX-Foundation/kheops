@@ -203,11 +203,11 @@ export default {
     this.$store.dispatch('getToken', { capabilityId }).then((res) => {
       if (res.status !== 200) {
         this.redirect('listtokens');
-        this.$snotify.error('Sorry, an error occur');
+        this.$snotify.error('Sorry, an error occurred');
       }
     }).catch(() => {
       this.redirect('listtokens');
-      this.$snotify.error('Sorry, an error occur');
+      this.$snotify.error('Sorry, an error occurred');
     });
   },
   methods: {

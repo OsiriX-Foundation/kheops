@@ -1,6 +1,6 @@
 <template>
   <span>
-    An error occur...
+    An error occurred...
   </span>
 </template>
 <script>
