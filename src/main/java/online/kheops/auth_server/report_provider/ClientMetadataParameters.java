@@ -5,25 +5,27 @@ import java.util.*;
 
 public final class ClientMetadataParameters {
 
-    public static Collection<Class<? extends ClientMetadataParameter<?>>> PARAMETER_ENUMS = verifyEnum(List.of(
-            ClientMetadataOptionalAlgorithmParameter.class,
-            ClientMetadataOptionalAuthMethodParameter.class,
-            ClientMetadataOptionalEncodingParameter.class,
-            ClientMetadataListGrantTypeParameter.class,
-            ClientMetadataListJwkParameter.class,
-            ClientMetadataListResponseTypeParameter.class,
-            ClientMetadataListStringParameter.class,
-            ClientMetadataListUriParameter.class,
-            ClientMetadataOptionalApplicationTypeParameter.class,
-            ClientMetadataOptionalBooleanParameter.class,
-            ClientMetadataOptionalIntParameter.class,
-            ClientMetadataOptionalStringParameter.class,
-            ClientMetadataOptionalSubjectTypeParameter.class,
-            ClientMetadataOptionalUriParameter.class,
-            ClientMetadataStringParameter.class,
-            ClientMetadataURIParameter.class));
+    public static final Collection<Class<? extends ClientMetadataParameter<?>>> PARAMETER_ENUMS =
+            Collections.unmodifiableCollection(verifyEnum(List.of(
+                ClientMetadataOptionalAlgorithmParameter.class,
+                ClientMetadataOptionalAuthMethodParameter.class,
+                ClientMetadataOptionalEncodingParameter.class,
+                ClientMetadataListGrantTypeParameter.class,
+                ClientMetadataListJwkParameter.class,
+                ClientMetadataListResponseTypeParameter.class,
+                ClientMetadataListStringParameter.class,
+                ClientMetadataListUriParameter.class,
+                ClientMetadataOptionalApplicationTypeParameter.class,
+                ClientMetadataOptionalBooleanParameter.class,
+                ClientMetadataOptionalIntParameter.class,
+                ClientMetadataOptionalStringParameter.class,
+                ClientMetadataOptionalSubjectTypeParameter.class,
+                ClientMetadataOptionalUriParameter.class,
+                ClientMetadataStringParameter.class,
+                ClientMetadataURIParameter.class)));
 
-    public static final Collection<ClientMetadataParameter<?>> PARAMETERS = parameterList();
+    public static final Collection<ClientMetadataParameter<?>> PARAMETERS =
+            Collections.unmodifiableCollection(parameterList());
 
     public static ClientMetadataParameter<?> parameterFromKey(String key) {
         final int languageDelimiterIndex = key.indexOf(LANGUAGE_DELIMITER);
@@ -39,7 +41,8 @@ public final class ClientMetadataParameters {
         return PARAMETER_MAP.get(stripedKey);
     }
 
-    private static final Map<String, ? extends ClientMetadataParameter<?>> PARAMETER_MAP = parameterMap();
+    private static final Map<String, ? extends ClientMetadataParameter<?>> PARAMETER_MAP =
+            Collections.unmodifiableMap(parameterMap());
 
     private static Map<String, ? extends ClientMetadataParameter<?>> parameterMap() {
         final Map<String, ClientMetadataParameter<?>> parameterMap = new HashMap<>();
