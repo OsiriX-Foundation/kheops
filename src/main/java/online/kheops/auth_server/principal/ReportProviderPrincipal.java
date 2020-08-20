@@ -2,12 +2,15 @@ package online.kheops.auth_server.principal;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.accesstoken.AccessToken.*;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
+import online.kheops.auth_server.report_provider.*;
+import online.kheops.auth_server.report_provider.ReportProvider;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.Source;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.ForbiddenException;
@@ -15,11 +18,12 @@ import javax.ws.rs.ForbiddenException;
 import java.util.List;
 import java.util.Optional;
 
+import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
-public class ReportProviderPrincipal implements KheopsPrincipal {
+public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrincipal {
 
     private EntityManager em;
     private final User user;
@@ -29,22 +33,24 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     private final String capabilityTokenId;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    private boolean linkAuthorization;
-
     private final List<String> studyUids;
+    private final Source source;
     private final String clientId;
-    private Album album;
     private final String originalToken;
+    private final ReportProvider reportProvider;
 
-    public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids,
+    public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids, Source source,
                                    String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, String originalToken) {
         try {
-            album = getReportProvider(clientId).getAlbum();
-        } catch (ClientIdNotFoundException e) {
+            ReportProviderCatalogue reportProviderCatalogue = new ReportProviderCatalogue();
+            reportProvider = reportProviderCatalogue.getReportProvider(clientId);
+        } catch (ReportProviderNotFoundException e) {
             throw new ForbiddenException("Client id not found");
         }
+
         this.clientId = clientId;
         this.studyUids = studyUids;
+        this.source = source;
         this.user = user;
         this.actingParty = actingParty;
         this.capabilityTokenId = capabilityTokenId;
@@ -69,14 +75,21 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
         this.em = EntityManagerListener.createEntityManager();
         try {
-             album = em.merge(album);
+            if (source.isInbox() && !user.getInbox().getId().equals(albumId)) {
+                return false;
+            }
+            if (!source.isInbox() && !source.getAlbumId().equals(albumId)) {
+                return false;
+            }
 
-             if(!album.getId().equals(albumId))  {
-                 return false;
-             }
+            final String albumRestriction = reportProvider.getAlbumIdRestriction().orElse(null);
+            if (albumRestriction != null && !albumRestriction.equals(albumId)) {
+                return false;
+            }
 
-            return usersPermission.hasProviderPermission(album);
-
+            return usersPermission.hasProviderPermission(getAlbum(albumId, em));
+        } catch (AlbumNotFoundException ignored) {
+            return false;
         } finally {
             em.close();
         }
@@ -94,8 +107,17 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
         this.em = EntityManagerListener.createEntityManager();
         try {
+            Album album;
+            if (source.isInbox()) {
+                album = user.getInbox();
+            } else {
+                album = getAlbum(source.getAlbumId(), em);
+            }
+
             album = em.merge(album);
             return canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em);
+        } catch (AlbumNotFoundException ignored) {
+            return false;
         } finally {
             em.close();
         }
@@ -107,8 +129,22 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             return false;
         }
 
-        return canAccessStudy(album, studyInstanceUID);
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            Album album;
+            if (source.isInbox()) {
+                album = user.getInbox();
+            } else {
+                album = getAlbum(source.getAlbumId(), em);
+            }
 
+            album = em.merge(album);
+            return canAccessStudy(album, studyInstanceUID);
+        } catch (AlbumNotFoundException ignored) {
+            return false;
+        } finally {
+            em.close();
+        }
     }
 
     @Override
@@ -123,6 +159,12 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
         this.em = EntityManagerListener.createEntityManager();
         try {
+            Album album;
+            if (source.isInbox()) {
+                album = user.getInbox();
+            } else {
+                album = getAlbum(source.getAlbumId(), em);
+            }
 
             if (!canAccessStudy(album, studyInstanceUID)) {
                 return false;
@@ -139,6 +181,8 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             if(canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em)) {
                 return true;
             }
+        } catch (AlbumNotFoundException ignored) {
+            return false;
         } finally {
             em.close();
         }
@@ -153,35 +197,59 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
         if (!studyUids.contains(studyInstanceUID)) {
             return false;
         }
-        if (!canAccessStudy(album, studyInstanceUID)) {
+        this.em = EntityManagerListener.createEntityManager();
+        try {
+            Album album;
+            if (source.isInbox()) {
+                album = user.getInbox();
+            } else {
+                album = getAlbum(source.getAlbumId(), em);
+            }
+
+            album = em.merge(album);
+            if (!canAccessStudy(album, studyInstanceUID)) {
+                return false;
+            }
+        } catch (AlbumNotFoundException ignored) {
             return false;
+        } finally {
+            em.close();
         }
+
         return true;
     }
 
     @Override
-    public boolean hasAlbumAccess(String albumId){
-        return albumId.equals(album.getId());
+    public boolean hasAlbumAccess(String albumId) {
+        return source.equals(Source.album(albumId));
     }
 
     @Override
-    public boolean hasInboxAccess() { return false; }
+    public boolean hasInboxAccess() {
+        return source.isInbox();
+    }
 
     @Override
-    public User getUser() { return user; }
+    public User getUser() {
+        return user;
+    }
 
     @Override
-    public ScopeType getScope() { return ScopeType.ALBUM; }
+    public ScopeType getScope() {
+        return source.isInbox() ? ScopeType.USER : ScopeType.ALBUM;
+    }
 
     @Override
-    public String getAlbumID() { return album.getId(); }
+    public String getAlbumID() {
+        return source.getAlbumIdOrElse(null);
+    }
 
     @Override
     public KheopsLogBuilder getKheopsLogBuilder() { return kheopsLogBuilder; }
 
     @Override
     public String toString() {
-        return "[ReportProviderPrincipal user:" + getUser() + " albumId:" + album.getId() + " clientID:" + clientId + "]";
+        return "[ReportProviderPrincipal user:" + getUser() + " source:" + source + " clientID:" + clientId + "]";
     }
 
     @Override

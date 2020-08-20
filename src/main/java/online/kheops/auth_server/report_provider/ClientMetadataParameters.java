@@ -20,6 +20,7 @@ public final class ClientMetadataParameters {
                 ClientMetadataOptionalIntParameter.class,
                 ClientMetadataOptionalStringParameter.class,
                 ClientMetadataOptionalSubjectTypeParameter.class,
+                ClientMetadataOptionalUriBuilderParameter.class,
                 ClientMetadataOptionalUriParameter.class,
                 ClientMetadataStringParameter.class,
                 ClientMetadataURIParameter.class)));

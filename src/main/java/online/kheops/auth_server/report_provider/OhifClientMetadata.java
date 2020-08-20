@@ -1,5 +1,6 @@
 package online.kheops.auth_server.report_provider;
 
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Locale;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import static online.kheops.auth_server.report_provider.ClientMetadataListUriParameter.REDIRECT_URIS;
 import static online.kheops.auth_server.report_provider.ClientMetadataOptionalAuthMethodParameter.TOKEN_ENDPOINT_AUTH_METHOD;
 import static online.kheops.auth_server.report_provider.ClientMetadataOptionalStringParameter.CLIENT_NAME;
+import static online.kheops.auth_server.report_provider.ClientMetadataOptionalUriBuilderParameter.KHEOPS_TARGET_LINK_URI_TEMPLATE;
 import static online.kheops.auth_server.report_provider.ClientMetadataStringParameter.CLIENT_ID;
 import static online.kheops.auth_server.report_provider.ClientMetadataURIParameter.INITIATE_LOGIN_URI;
 import static online.kheops.auth_server.report_provider.ClientMetadataWithDefaults.EMPTY_DEFAULT_METADATA;
@@ -24,6 +26,7 @@ public class OhifClientMetadata implements ClientMetadata {
 
         metadata.put(INITIATE_LOGIN_URI, rootURI.resolve("/login"));
         metadata.put(REDIRECT_URIS, Collections.singletonList(rootURI.resolve("/callback")));
+        metadata.put(KHEOPS_TARGET_LINK_URI_TEMPLATE, Optional.of(UriBuilder.fromUri(rootURI).path("/viewer/{StudyInstanceUID}")));
         metadata.putAll(OHIF_METADATA);
     }
 

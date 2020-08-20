@@ -1,5 +1,7 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.util.JWTs;
+import online.kheops.auth_server.util.Source;
 import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
@@ -22,6 +24,7 @@ public class ReportProviderAccessTokenGenerator {
     private String clientId;
     private String scope;
     private Set<String> studyInstanceUIDs;
+    private Source source;
 
     public static ReportProviderAccessTokenGenerator createGenerator(final ServletContext servletContext) {
         return new ReportProviderAccessTokenGenerator(servletContext);
@@ -59,6 +62,11 @@ public class ReportProviderAccessTokenGenerator {
         return this;
     }
 
+    public ReportProviderAccessTokenGenerator withSource(Source source) {
+        this.source = source;
+        return this;
+    }
+
     public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
 
         JwtClaims claims = new JwtClaims();
@@ -72,6 +80,7 @@ public class ReportProviderAccessTokenGenerator {
         claims.setClaim("scope", Objects.requireNonNull(scope));
         claims.setClaim("type", "report_generator");
         claims.setClaim("studyUID", studyInstanceUIDs.toArray(new String[0]));
+        JWTs.encodeSource(claims, source);
 
         if (actingParty != null) {
             claims.setClaim("act", Collections.singletonMap("sub", actingParty));
@@ -80,7 +89,6 @@ public class ReportProviderAccessTokenGenerator {
         if (capabilityTokenId != null) {
             claims.setClaim("cap_token", capabilityTokenId);
         }
-
 
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());

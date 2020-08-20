@@ -3,6 +3,8 @@ package online.kheops.auth_server.token;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
+import online.kheops.auth_server.util.JWTs;
+import online.kheops.auth_server.util.Source;
 
 import javax.servlet.ServletContext;
 import java.time.Instant;
@@ -19,6 +21,7 @@ public class ReportProviderAuthCodeGenerator {
     private final ServletContext servletContext;
 
     private List<String> studyInstanceUIDs;
+    private Source source;
     private String clientId;
     private String subject;
     private String actingParty;
@@ -32,9 +35,13 @@ public class ReportProviderAuthCodeGenerator {
         return new ReportProviderAuthCodeGenerator(servletContext);
     }
 
-
     public ReportProviderAuthCodeGenerator withStudyInstanceUIDs(final List<String> studyInstanceUIDs) {
         this.studyInstanceUIDs = Objects.requireNonNull(studyInstanceUIDs);
+        return this;
+    }
+
+    public ReportProviderAuthCodeGenerator withSource(final Source source) {
+        this.source = Objects.requireNonNull(source);
         return this;
     }
 
@@ -78,6 +85,8 @@ public class ReportProviderAuthCodeGenerator {
                 .withAudience(getHostRoot())
                 .withClaim("azp", Objects.requireNonNull(clientId))
                 .withClaim("type", "report_provider_code");
+
+        JWTs.encodeSource(jwtBuilder, source);
 
         if (actingParty != null) {
             jwtBuilder.withClaim("act", actingParty);

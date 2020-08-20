@@ -69,6 +69,7 @@ public enum TokenGrantType {
                     .withSubject(authorizationCode.getSubject())
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(authorizationCode.getStudyInstanceUIDs())
+                    .withSource(authorizationCode.getSource())
                     .withScope("read write");
 
             authorizationCode.getActingParty().ifPresent(generator::withActingParty);

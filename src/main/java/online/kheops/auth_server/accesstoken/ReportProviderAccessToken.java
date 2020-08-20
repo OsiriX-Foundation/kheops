@@ -8,6 +8,8 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.*;
+import online.kheops.auth_server.util.JWTs;
+import online.kheops.auth_server.util.Source;
 
 import javax.servlet.ServletContext;
 import java.time.Instant;
@@ -18,6 +20,7 @@ import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 public class ReportProviderAccessToken implements AccessToken {
     private final String sub;
     private final List<String> studyUIDs;
+    private final Source source;
     private final String clientId;
     private final String actingParty;
     private final String capabilityTokenId;
@@ -83,6 +86,7 @@ public class ReportProviderAccessToken implements AccessToken {
                 final List<String> aud = Objects.requireNonNull(jwt.getAudience());
                 final String iss = Objects.requireNonNull(jwt.getIssuer());
                 final List<String> studyUIDs = jwt.getClaim("studyUID").asList(String.class);
+                final Source source = JWTs.decodeSource(jwt);
 
                 final String actingParty;
                 Claim actClaim = jwt.getClaim("act");
@@ -103,7 +107,7 @@ public class ReportProviderAccessToken implements AccessToken {
                     capabilityTokenId = null;
                 }
 
-                return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss, assertionToken);
+                return new ReportProviderAccessToken(jwt.getSubject(), actingParty, capabilityTokenId, studyUIDs, source, azpClaim.asString(), hasReadAccess, hasWriteAccess, exp, iat, nbf, aud, iss, assertionToken);
             } catch (NullPointerException | JWTDecodeException | IllegalArgumentException e) {
                 throw new AccessTokenVerificationException("AccessToken missing fields.", e);
             } catch (ClassCastException e) {
@@ -121,12 +125,13 @@ public class ReportProviderAccessToken implements AccessToken {
 
     }
 
-    private ReportProviderAccessToken(String sub, String actingParty, String capabilityTokenId, List<String> studyUIDs, String clientId, boolean hasReadAccess, boolean hasWriteAccess,
+    private ReportProviderAccessToken(String sub, String actingParty, String capabilityTokenId, List<String> studyUIDs, Source source, String clientId, boolean hasReadAccess, boolean hasWriteAccess,
                                       Instant exp, Instant iat, Instant nbf, List<String> aud, String iss, String token) {
         this.sub = Objects.requireNonNull(sub);
         this.actingParty = actingParty;
         this.capabilityTokenId = capabilityTokenId;
         this.studyUIDs = Objects.requireNonNull(studyUIDs);
+        this.source = Objects.requireNonNull(source);
         this.clientId = Objects.requireNonNull(clientId);
         this.hasReadAccess = hasReadAccess;
         this.hasWriteAccess = hasWriteAccess;
@@ -136,6 +141,10 @@ public class ReportProviderAccessToken implements AccessToken {
         this.aud = aud;
         this.iss = iss;
         this.token = token;
+    }
+
+    public Source getSource() {
+        return source;
     }
 
     @Override
@@ -216,6 +225,6 @@ public class ReportProviderAccessToken implements AccessToken {
 
     @Override
     public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, clientId, hasReadAccess, hasWriteAccess, token);
+        return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, source, clientId, hasReadAccess, hasWriteAccess, token);
     }
 }

@@ -18,6 +18,7 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.Source;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -118,6 +119,18 @@ public class ReportProviderResource {
             }
         }
 
+        final Source source;
+        try {
+            source = Source.instance(Boolean.TRUE.equals(fromInbox), fromAlbumId);
+        } catch (IllegalArgumentException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_FORM_PARAMETER)
+                    .detail("Could not determine the inbox or album source: " + e.getMessage())
+                    .build();
+            LOG.log(Level.WARNING, "Error finding source", e);
+            return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+        }
+
         final AccessToken accessToken;
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
@@ -153,8 +166,10 @@ public class ReportProviderResource {
             ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context)
                     .withClientId(clientId)
                     .withStudyInstanceUIDs(studyInstanceUIDs)
-                    .withSubject(accessToken.getSubject());
-            final ClientRedirectEntity clientRedirectEntity = new ClientRedirectEntity(reportProvider.getClientMetadata(), getHostRoot() + "/api", generator.generate(300));
+                    .withSubject(accessToken.getSubject())
+                    .withSource(source);
+            final ClientRedirectEntity clientRedirectEntity = new ClientRedirectEntity(reportProvider.getClientMetadata(),
+                    getHostRoot() + "/api", studyInstanceUIDs.get(0), generator.generate(300));
 
             return Response.ok(clientRedirectEntity).build();
         } catch (ReportProviderNotFoundException e) {
@@ -218,7 +233,8 @@ public class ReportProviderResource {
                 ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context)
                         .withClientId(reportProvider.getClientId())
                         .withStudyInstanceUIDs(studyInstanceUIDs)
-                        .withSubject(accessToken.getSubject());
+                        .withSubject(accessToken.getSubject())
+                        .withSource(source);
 
                 accessToken.getActingParty().ifPresent(generator::withActingParty);
                 accessToken.getCapabilityTokenId().ifPresent(generator::withCapabilityTokenId);

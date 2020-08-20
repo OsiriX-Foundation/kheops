@@ -1,25 +1,19 @@
 package online.kheops.auth_server.report_provider;
 
-import online.kheops.auth_server.token.TokenClientKind;
-import online.kheops.auth_server.token.TokenPrincipal;
-
-import javax.security.auth.Subject;
 import java.util.Optional;
-
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalStringParameter.CLIENT_NAME;
 
 public class ReportProvider {
 
     private final ClientMetadata clientMetadata;
-    private final String albumID;
+    private final String albumIdRestriction;
 
-    public ReportProvider(ClientMetadata clientMetadata, String albumID) {
+    public ReportProvider(ClientMetadata clientMetadata, String albumIdRestriction) {
         this.clientMetadata = clientMetadata;
-        this.albumID = albumID;
+        this.albumIdRestriction = albumIdRestriction;
     }
 
-    public Optional<String> getAlbumID() {
-        return Optional.ofNullable(albumID);
+    public Optional<String> getAlbumIdRestriction() {
+        return Optional.ofNullable(albumIdRestriction);
     }
 
     public ClientMetadata getClientMetadata() {

@@ -6,6 +6,8 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import online.kheops.auth_server.util.JWTs;
+import online.kheops.auth_server.util.Source;
 
 import javax.servlet.ServletContext;
 import java.util.*;
@@ -56,6 +58,12 @@ class AuthorizationCodeValidator {
         if (studyUIs == null) {
             throw new TokenRequestException(INVALID_REQUEST, "Can't find study UIDs");
         }
+        final Source source;
+        try {
+            source = JWTs.decodeSource(jwt);
+        } catch (JWTDecodeException e) {
+            throw new TokenRequestException(INVALID_REQUEST, "Can't read source", e);
+        }
 
         final String subject;
         try {
@@ -83,7 +91,7 @@ class AuthorizationCodeValidator {
             capabilityTokenId = null;
         }
 
-        return DecodedAuthorizationCode.createDecodedAuthorizationCode(subject, actingParty, capabilityTokenId, new HashSet<>(studyUIs));
+        return DecodedAuthorizationCode.createDecodedAuthorizationCode(subject, actingParty, capabilityTokenId, new HashSet<>(studyUIs), source);
     }
 
     private String getHMAC256Secret() {
