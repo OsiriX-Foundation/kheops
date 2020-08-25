@@ -34,10 +34,12 @@ public enum TokenGrantType {
             verifySingleHeader(form, "code");
             verifySingleHeader(form, "client_id");
             verifySingleHeader(form, "redirect_uri");
+            verifyNotDuplicateHeader(form, "code_verifier");
 
             final String code = form.getFirst("code");
             final String clientId = form.getFirst("client_id");
             final String redirectUriString = form.getFirst("redirect_uri");
+            final String codeVerifier = form.getFirst("code_verifier");
 
             final URI redirectUri;
             try {
@@ -60,10 +62,14 @@ public enum TokenGrantType {
                 throw new TokenRequestException(INVALID_GRANT, "redirect_uri is not valid");
             }
 
-            final DecodedAuthorizationCode authorizationCode;
-            authorizationCode = AuthorizationCodeValidator.createAuthorizer(servletContext)
-                    .withClientId(clientId)
-                    .validate(code);
+            AuthCodeValidator authCodeValidator = AuthCodeValidator.createAuthorizer(servletContext)
+                    .withClientId(clientId);
+
+            if (codeVerifier != null) {
+                authCodeValidator.withCodeVerifier(codeVerifier);
+            }
+
+            final DecodedToken authorizationCode = authCodeValidator.validate(code);
 
             ReportProviderAccessTokenGenerator generator = ReportProviderAccessTokenGenerator.createGenerator(servletContext)
                     .withSubject(authorizationCode.getSubject())
@@ -224,7 +230,6 @@ public enum TokenGrantType {
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
     private static void verifyNotDuplicateHeader(final MultivaluedMap<String, String> form, final String param) {
         final List<String> params = form.get(param);
         if (params != null && params.size() > 1) {

@@ -4,7 +4,11 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 
+import java.util.Objects;
+import java.util.Optional;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.valueOf;
 
 @SuppressWarnings("unused")
 public class TokenRequestException extends BadRequestException {
@@ -44,6 +48,26 @@ public class TokenRequestException extends BadRequestException {
             this.errorDescription = errorDescription;
         }
 
+    }
+
+    public String getError() {
+        final Object entity = getResponse().getEntity();
+
+        if (entity instanceof TokenErrorResponse) {
+            return ((TokenErrorResponse) entity).error;
+        } else {
+            throw new AssertionError("entity is not an Error");
+        }
+    }
+
+    public Optional<String> getErrorDescription() {
+      final Object entity = getResponse().getEntity();
+
+      if (entity instanceof TokenErrorResponse) {
+        return Optional.ofNullable(((TokenErrorResponse) entity).errorDescription);
+      } else {
+        throw new AssertionError("entity is not an Error");
+      }
     }
 
     public TokenRequestException(Error error) {
