@@ -4,19 +4,19 @@ import java.util.Optional;
 
 public class ReportProvider {
 
-    private final ClientMetadata clientMetadata;
-    private final String albumIdRestriction;
+  private final ClientMetadata clientMetadata;
+  private final String albumIdRestriction;
 
-    public ReportProvider(ClientMetadata clientMetadata, String albumIdRestriction) {
-        this.clientMetadata = clientMetadata;
-        this.albumIdRestriction = albumIdRestriction;
-    }
+  public ReportProvider(ClientMetadata clientMetadata, String albumIdRestriction) {
+    this.clientMetadata = clientMetadata;
+    this.albumIdRestriction = albumIdRestriction;
+  }
 
-    public Optional<String> getAlbumIdRestriction() {
-        return Optional.ofNullable(albumIdRestriction);
-    }
+  public Optional<String> getAlbumIdRestriction() {
+    return Optional.ofNullable(albumIdRestriction);
+  }
 
-    public ClientMetadata getClientMetadata() {
-        return clientMetadata;
-    }
+  public ClientMetadata getClientMetadata() {
+    return clientMetadata;
+  }
 }

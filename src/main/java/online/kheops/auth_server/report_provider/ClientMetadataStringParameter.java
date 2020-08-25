@@ -1,5 +1,7 @@
 package online.kheops.auth_server.report_provider;
 
+
+
 public enum ClientMetadataStringParameter implements ClientMetadataParameter<String> {
     CLIENT_ID("client_id", false);
 
@@ -21,8 +23,7 @@ public enum ClientMetadataStringParameter implements ClientMetadataParameter<Str
         throw new UnsupportedOperationException("Unable to get an empty value for a String parameter");
     }
 
-    @Override
-    public boolean isLocalizable() {
+    @Override public boolean isLocalizable() {
         return localizable;
     }
 }
