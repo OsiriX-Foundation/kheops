@@ -1,10 +1,12 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
+
+import online.kheops.auth_server.report_provider.metadata.Parameter;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Collections;
 import java.util.List;
 
-public interface ClientMetadataListParameter<T> extends ClientMetadataParameter<List<T>> {
+public interface ListParameter<T> extends Parameter<List<T>> {
 
     default List<T> getEmptyValue() {
         return Collections.emptyList();

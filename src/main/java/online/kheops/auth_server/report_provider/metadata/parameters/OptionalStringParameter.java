@@ -1,13 +1,13 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
 
-public enum ClientMetadataOptionalStringParameter implements ClientMetadataOptionalParameter<String> {
+public enum OptionalStringParameter implements OptionalParameter<String> {
     CLIENT_NAME("client_name", true),
     CLIENT_SECRET("client_secret", false);
 
     private final String key;
     private final boolean localizable;
 
-    ClientMetadataOptionalStringParameter(final String key, final boolean localizable) {
+    OptionalStringParameter(final String key, final boolean localizable) {
         this.key = key;
         this.localizable = localizable;
     }

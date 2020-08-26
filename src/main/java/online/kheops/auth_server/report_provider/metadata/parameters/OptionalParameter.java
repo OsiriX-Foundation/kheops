@@ -1,9 +1,11 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
+
+import online.kheops.auth_server.report_provider.metadata.Parameter;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
 
-public interface ClientMetadataOptionalParameter<T> extends ClientMetadataParameter<Optional<T>> {
+public interface OptionalParameter<T> extends Parameter<Optional<T>> {
     default Optional<T> getEmptyValue() {
         return Optional.empty();
     }

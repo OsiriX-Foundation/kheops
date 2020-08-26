@@ -1,14 +1,15 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
 
 
+import online.kheops.auth_server.report_provider.metadata.Parameter;
 
-public enum ClientMetadataStringParameter implements ClientMetadataParameter<String> {
+public enum StringParameter implements Parameter<String> {
     CLIENT_ID("client_id", false);
 
     private final String key;
     private final boolean localizable;
 
-    ClientMetadataStringParameter(final String key, final boolean localizable) {
+    StringParameter(final String key, final boolean localizable) {
         this.key = key;
         this.localizable = localizable;
     }

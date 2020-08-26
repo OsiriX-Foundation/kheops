@@ -1,13 +1,15 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
+
+import online.kheops.auth_server.report_provider.metadata.Parameter;
 
 import java.util.OptionalInt;
 
-public enum ClientMetadataOptionalIntParameter implements ClientMetadataParameter<OptionalInt> {
+public enum OptionalIntParameter implements Parameter<OptionalInt> {
     DEFAULT_MAX_AGE("default_max_age");
 
     private final String key;
 
-    ClientMetadataOptionalIntParameter(final String key) {
+    OptionalIntParameter(final String key) {
         this.key = key;
     }
 

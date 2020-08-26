@@ -39,7 +39,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Level.INFO;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
-import static online.kheops.auth_server.report_provider.ClientMetadataListUriParameter.REDIRECT_URIS;
+import static online.kheops.auth_server.report_provider.metadata.parameters.ListUriParameter.REDIRECT_URIS;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;

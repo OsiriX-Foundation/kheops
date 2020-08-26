@@ -1,5 +1,7 @@
 package online.kheops.auth_server.report_provider;
 
+import online.kheops.auth_server.report_provider.metadata.parameters.StringParameter;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
@@ -19,7 +21,7 @@ public final class ReportProviderCatalogueImp implements ReportProviderCatalogue
   public ReportProvider getReportProvider(String clientID) throws ReportProviderNotFoundException {
     Objects.requireNonNull(clientID);
 
-    if (clientID.equals(OHIF_CLIENT_METADATA.getValue(ClientMetadataStringParameter.CLIENT_ID))) {
+    if (clientID.equals(OHIF_CLIENT_METADATA.getValue(StringParameter.CLIENT_ID))) {
       return new ReportProvider(OHIF_CLIENT_METADATA, null);
     } else {
       throw new ReportProviderNotFoundException(

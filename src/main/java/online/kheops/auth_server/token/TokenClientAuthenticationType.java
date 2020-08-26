@@ -1,6 +1,6 @@
 package online.kheops.auth_server.token;
 
-import online.kheops.auth_server.report_provider.ClientMetadata;
+import online.kheops.auth_server.report_provider.metadata.OidcMetadata;
 import online.kheops.auth_server.report_provider.ReportProvider;
 import online.kheops.auth_server.report_provider.ReportProviderNotFoundException;
 
@@ -11,8 +11,8 @@ import java.util.Base64;
 import java.util.List;
 
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalAuthMethodParameter.TOKEN_ENDPOINT_AUTH_METHOD;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalStringParameter.CLIENT_NAME;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalAuthMethodParameter.TOKEN_ENDPOINT_AUTH_METHOD;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalStringParameter.CLIENT_NAME;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_CLIENT;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
 
@@ -68,7 +68,7 @@ public enum TokenClientAuthenticationType {
 
             try {
                 final ReportProvider reportProvider = context.getReportProviderCatalogue().getReportProvider(formParams.getFirst(CLIENT_ID));
-                final ClientMetadata clientMetadata = reportProvider.getClientMetadata();
+                final OidcMetadata clientMetadata = reportProvider.getClientMetadata();
 
                 if (!NONE.equals(clientMetadata.getValue(TOKEN_ENDPOINT_AUTH_METHOD).orElse(null))) {
                     throw new TokenRequestException(INVALID_CLIENT);

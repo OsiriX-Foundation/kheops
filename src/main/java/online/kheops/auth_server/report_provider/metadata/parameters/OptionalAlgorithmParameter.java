@@ -1,6 +1,8 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
 
-public enum ClientMetadataOptionalAlgorithmParameter implements ClientMetadataOptionalParameter<Algorithm> {
+import online.kheops.auth_server.report_provider.Algorithm;
+
+public enum OptionalAlgorithmParameter implements OptionalParameter<Algorithm> {
     ID_TOKEN_SIGNED_RESPONSE_ALG("id_token_signed_response_alg"),
     ID_TOKEN_ENCRYPTED_RESPONSE_ALG("id_token_encrypted_reponse_alg"),
     USERINFO_SIGNED_RESPONSE_ALG("userinfo_signed_response_alg"),
@@ -11,7 +13,7 @@ public enum ClientMetadataOptionalAlgorithmParameter implements ClientMetadataOp
 
     private final String key;
 
-    ClientMetadataOptionalAlgorithmParameter(final String key) {
+    OptionalAlgorithmParameter(final String key) {
         this.key = key;
     }
 

@@ -3,6 +3,7 @@ package online.kheops.auth_server.token;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.report_provider.*;
+import online.kheops.auth_server.report_provider.metadata.OidcMetadata;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -16,7 +17,7 @@ import java.util.List;
 
 import static online.kheops.auth_server.accesstoken.AccessTokenUtils.StringContainsScope;
 import static online.kheops.auth_server.accesstoken.AccessTokenUtils.ValidateScopeString;
-import static online.kheops.auth_server.report_provider.ClientMetadataListUriParameter.REDIRECT_URIS;
+import static online.kheops.auth_server.report_provider.metadata.parameters.ListUriParameter.REDIRECT_URIS;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -55,7 +56,7 @@ public enum TokenGrantType {
                 throw new AssertionError("principle is not a report provider");
             }
 
-            final ClientMetadata clientMetadata = reportProvider.getClientMetadata();
+            final OidcMetadata clientMetadata = reportProvider.getClientMetadata();
 
             if (!clientMetadata.getValue(REDIRECT_URIS).contains(redirectUri)) {
                 throw new TokenRequestException(INVALID_GRANT, "redirect_uri is not valid");

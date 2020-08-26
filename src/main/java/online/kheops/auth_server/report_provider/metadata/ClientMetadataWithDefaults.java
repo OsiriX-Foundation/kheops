@@ -1,37 +1,38 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata;
 
+import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.token.TokenClientAuthenticationType;
 
 import java.util.*;
 
-import static online.kheops.auth_server.report_provider.ClientMetadataListGrantTypeParameter.GRANT_TYPES;
-import static online.kheops.auth_server.report_provider.ClientMetadataListResponseTypeParameter.RESPONSE_TYPES;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalAlgorithmParameter.*;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalApplicationTypeParameter.APPLICATION_TYPE;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalAuthMethodParameter.TOKEN_ENDPOINT_AUTH_METHOD;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalBooleanParameter.REQUIRE_AUTH_TIME;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalEncodingParameter.*;
-import static online.kheops.auth_server.report_provider.EmptyClientMetadata.EMPTY_CLIENT_METADATA;
+import static online.kheops.auth_server.report_provider.metadata.parameters.ListGrantTypeParameter.GRANT_TYPES;
+import static online.kheops.auth_server.report_provider.metadata.parameters.ListResponseTypeParameter.RESPONSE_TYPES;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalAlgorithmParameter.*;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalApplicationTypeParameter.APPLICATION_TYPE;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalAuthMethodParameter.TOKEN_ENDPOINT_AUTH_METHOD;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalBooleanParameter.REQUIRE_AUTH_TIME;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalEncodingParameter.*;
+import static online.kheops.auth_server.report_provider.metadata.EmptyOidcMetadata.EMPTY_OIDC_METADATA;
 
-public final class ClientMetadataWithDefaults implements ClientMetadata {
+public final class ClientMetadataWithDefaults implements OidcMetadata {
 
-    public static final ClientMetadataWithDefaults EMPTY_DEFAULT_METADATA = new ClientMetadataWithDefaults(EMPTY_CLIENT_METADATA);
+    public static final ClientMetadataWithDefaults EMPTY_DEFAULT_METADATA = new ClientMetadataWithDefaults(EMPTY_OIDC_METADATA);
 
-    private final ClientMetadata clientMetadata;
+    private final OidcMetadata oidcMetadata;
 
-    ClientMetadataWithDefaults(ClientMetadata clientMetadata) {
-        this.clientMetadata = clientMetadata;
+    ClientMetadataWithDefaults(OidcMetadata oidcMetadata) {
+        this.oidcMetadata = oidcMetadata;
     }
 
-    public static ClientMetadata from(ClientMetadata clientMetadata) {
+    public static OidcMetadata from(OidcMetadata clientMetadata) {
         return new ClientMetadataWithDefaults(clientMetadata);
     }
 
-    private static final ClientMetadataParameterMap DEFAULT_VALUES = defaultValues();
+    private static final ParameterMap DEFAULT_VALUES = defaultValues();
 
     @Override
-    public <T> T getValue(ClientMetadataParameter<T> parameter) {
-        T value = clientMetadata.getValue(parameter);
+    public <T> T getValue(Parameter<T> parameter) {
+        T value = oidcMetadata.getValue(parameter);
         if (DEFAULT_VALUES.containsKey(parameter)) {
             if ((value instanceof Optional && ((Optional<?>) value).isEmpty())
                     || (value instanceof List && ((List<?>) value).isEmpty())) {
@@ -42,13 +43,13 @@ public final class ClientMetadataWithDefaults implements ClientMetadata {
     }
 
     @Override
-    public <T> T getValue(ClientMetadataParameter<T> parameter, Locale local) {
+    public <T> T getValue(Parameter<T> parameter, Locale local) {
         // none of the localizable parameters have defaults
-        return clientMetadata.getValue(parameter, local);
+        return oidcMetadata.getValue(parameter, local);
     }
 
-    private static ClientMetadataParameterMap defaultValues() {
-        final ClientMetadataParameterMap defaultValues = new ClientMetadataParameterMap();
+    private static ParameterMap defaultValues() {
+        final ParameterMap defaultValues = new ParameterHashMap();
 
         defaultValues.put(RESPONSE_TYPES, Collections.singletonList(ResponseType.CODE));
         defaultValues.put(GRANT_TYPES, Collections.singletonList(GrantType.AUTHORIZATION_CODE));

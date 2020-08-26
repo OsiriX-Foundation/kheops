@@ -1,5 +1,7 @@
 package online.kheops.auth_server.report_provider;
 
+import online.kheops.auth_server.report_provider.metadata.OidcMetadata;
+
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriBuilderException;
 import java.net.URI;
@@ -8,20 +10,20 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalStringParameter.CLIENT_NAME;
-import static online.kheops.auth_server.report_provider.ClientMetadataOptionalUriBuilderParameter.KHEOPS_TARGET_LINK_URI_TEMPLATE;
-import static online.kheops.auth_server.report_provider.ClientMetadataURIParameter.INITIATE_LOGIN_URI;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalStringParameter.CLIENT_NAME;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalUriBuilderParameter.KHEOPS_TARGET_LINK_URI_TEMPLATE;
+import static online.kheops.auth_server.report_provider.metadata.parameters.URIParameter.INITIATE_LOGIN_URI;
 
 public class ClientRedirectEntity implements LoginRedirectEntity {
 
     private static final Logger LOG = Logger.getLogger(ClientRedirectEntity.class.getName());
 
-    private final ClientMetadata clientMetadata;
+    private final OidcMetadata clientMetadata;
     private final String issuer;
     private final String studyInstanceUid;
     private final String loginHint;
 
-    public ClientRedirectEntity(ClientMetadata clientMetadata, String issuer, String studyInstanceUid, String loginHint) {
+    public ClientRedirectEntity(OidcMetadata clientMetadata, String issuer, String studyInstanceUid, String loginHint) {
         this.clientMetadata = clientMetadata;
         this.issuer = issuer;
         this.loginHint = loginHint;

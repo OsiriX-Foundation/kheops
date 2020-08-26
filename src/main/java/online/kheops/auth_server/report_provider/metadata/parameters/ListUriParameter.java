@@ -1,8 +1,8 @@
-package online.kheops.auth_server.report_provider;
+package online.kheops.auth_server.report_provider.metadata.parameters;
 
 import java.net.URI;
 
-public enum ClientMetadataListUriParameter implements ClientMetadataListParameter<URI>
+public enum ListUriParameter implements ListParameter<URI>
 {
     REDIRECT_URIS("redirect_uris"),
     REQUEST_URIS("request_uris"),
@@ -10,7 +10,7 @@ public enum ClientMetadataListUriParameter implements ClientMetadataListParamete
 
     final private String key;
 
-    ClientMetadataListUriParameter(final String key) {
+    ListUriParameter(final String key) {
         this.key = key;
     }
 
