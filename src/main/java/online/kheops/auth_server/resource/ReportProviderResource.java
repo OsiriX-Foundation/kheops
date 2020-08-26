@@ -61,7 +61,7 @@ public class ReportProviderResource {
 
   @Context private ServletContext context;
 
-  private final ReportProviderCatalogue reportProviderCatalogue = new ReportProviderCatalogue();
+  @Context private TokenAuthenticationContext tokenAuthenticationContext;
 
   @POST
   @Secured
@@ -135,7 +135,7 @@ public class ReportProviderResource {
 
     final AccessToken accessToken;
     try {
-      accessToken = AccessTokenVerifier.authenticateAccessToken(context, tokenParam);
+      accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, tokenParam);
     } catch (AccessTokenVerificationException e) {
       final ErrorResponse errorResponse =
           new ErrorResponse.ErrorResponseBuilder()
@@ -168,7 +168,7 @@ public class ReportProviderResource {
 
     try {
       final online.kheops.auth_server.report_provider.ReportProvider reportProvider =
-          reportProviderCatalogue.getReportProvider(clientId);
+          tokenAuthenticationContext.getReportProviderCatalogue().getReportProvider(clientId);
       ReportProviderLoginHintGenerator generator =
           ReportProviderLoginHintGenerator.createGenerator(context)
               .withClientId(clientId)
@@ -199,7 +199,7 @@ public class ReportProviderResource {
 
     try {
       callingUser = getUser(accessToken.getSubject(), em);
-      principal = accessToken.newPrincipal(context, callingUser);
+      principal = accessToken.newPrincipal(tokenAuthenticationContext, callingUser);
       reportProvider = getReportProviderWithClientId(clientId, em);
       album = reportProvider.getAlbum();
     } catch (NoResultException e) {
@@ -275,7 +275,7 @@ public class ReportProviderResource {
         final boolean userHasWriteAccess = principal.hasAlbumPermission(ADD_SERIES, album.getId());
 
         ReportProviderAccessTokenGenerator generator =
-            ReportProviderAccessTokenGenerator.createGenerator(context)
+            ReportProviderAccessTokenGenerator.createGenerator(tokenAuthenticationContext)
                 .withClientId(clientId)
                 .withScope(userHasWriteAccess ? "read write" : "read")
                 .withStudyInstanceUIDs(studyInstanceUIDs)
@@ -369,10 +369,9 @@ public class ReportProviderResource {
       @QueryParam("code_challenge") String codeChallenge,
       @QueryParam("code_challenge_method") String codeChallengeMethod) {
 
-    final ReportProviderCatalogue catalogue = new ReportProviderCatalogue();
     final online.kheops.auth_server.report_provider.ReportProvider reportProvider;
     try {
-      reportProvider = catalogue.getReportProvider(clientId);
+      reportProvider = tokenAuthenticationContext.getReportProviderCatalogue().getReportProvider(clientId);
     } catch (ReportProviderNotFoundException e) {
       // TODO show the user a page with the error
       throw new BadRequestException();

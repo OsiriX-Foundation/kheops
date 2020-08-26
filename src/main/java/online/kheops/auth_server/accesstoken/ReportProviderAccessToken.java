@@ -8,10 +8,10 @@ import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.*;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.util.JWTs;
 import online.kheops.auth_server.util.Source;
 
-import javax.servlet.ServletContext;
 import java.time.Instant;
 import java.util.*;
 
@@ -35,10 +35,10 @@ public class ReportProviderAccessToken implements AccessToken {
 
     static class Builder implements AccessTokenBuilder{
 
-        private final ServletContext servletContext;
+        private final TokenAuthenticationContext tokenAuthenticationContext;
 
-        Builder(ServletContext servletContext) {
-            this.servletContext = Objects.requireNonNull(servletContext);
+        Builder(TokenAuthenticationContext tokenAuthenticationContext) {
+            this.tokenAuthenticationContext = Objects.requireNonNull(tokenAuthenticationContext);
         }
 
         public ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
@@ -116,11 +116,11 @@ public class ReportProviderAccessToken implements AccessToken {
         }
 
         private String authorizationSecret() {
-            return servletContext.getInitParameter("online.kheops.auth.hmacsecret");
+            return tokenAuthenticationContext.getServletContext().getInitParameter("online.kheops.auth.hmacsecret");
         }
 
         private String getIssuerHost() {
-            return servletContext.getInitParameter(HOST_ROOT_PARAMETER);
+            return tokenAuthenticationContext.getServletContext().getInitParameter(HOST_ROOT_PARAMETER);
         }
 
     }
@@ -224,7 +224,7 @@ public class ReportProviderAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new ReportProviderPrincipal(user, actingParty, capabilityTokenId, studyUIDs, source, clientId, hasReadAccess, hasWriteAccess, token);
+    public KheopsPrincipal newPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user) {
+        return new ReportProviderPrincipal(tokenAuthenticationContext, user, actingParty, capabilityTokenId, studyUIDs, source, clientId, hasReadAccess, hasWriteAccess, token);
     }
 }

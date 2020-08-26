@@ -1,12 +1,12 @@
 package online.kheops.auth_server.filter;
 
 import online.kheops.auth_server.annotation.TokenSecurity;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.token.TokenClientAuthenticationType;
 import online.kheops.auth_server.token.TokenPrincipal;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.annotation.Priority;
-import javax.servlet.ServletContext;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
@@ -27,7 +27,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
     private static final Logger LOG = Logger.getLogger(TokenSecurityFilter.class.getName());
 
     @Context
-    private ServletContext servletContext;
+    private TokenAuthenticationContext tokenAuthenticationContext;
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
@@ -55,7 +55,7 @@ public class TokenSecurityFilter implements ContainerRequestFilter {
         final TokenPrincipal principal;
         try {
             final String relativePath = containerRequest.getBaseUri().relativize(containerRequest.getRequestUri()).toString();
-            principal = authenticationType.authenticate(servletContext, "/api/" + relativePath, requestHeaders, form);
+            principal = authenticationType.authenticate(tokenAuthenticationContext, "/api/" + relativePath, requestHeaders, form);
         } catch (WebApplicationException e) {
             LOG.log(INFO, "Unable to authenticate the client", e);
             containerRequest.abortWith(e.getResponse());

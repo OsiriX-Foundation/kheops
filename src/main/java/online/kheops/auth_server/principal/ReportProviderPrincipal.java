@@ -8,6 +8,7 @@ import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.report_provider.*;
 import online.kheops.auth_server.report_provider.ReportProvider;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.Source;
@@ -39,11 +40,10 @@ public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrinc
     private final String originalToken;
     private final ReportProvider reportProvider;
 
-    public ReportProviderPrincipal(User user, String actingParty, String capabilityTokenId, List<String> studyUids, Source source,
+    public ReportProviderPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user, String actingParty, String capabilityTokenId, List<String> studyUids, Source source,
                                    String clientId, boolean hasReadAccessAccess, boolean hasWriteAccess, String originalToken) {
         try {
-            ReportProviderCatalogue reportProviderCatalogue = new ReportProviderCatalogue();
-            reportProvider = reportProviderCatalogue.getReportProvider(clientId);
+            reportProvider = tokenAuthenticationContext.getReportProviderCatalogue().getReportProvider(clientId);
         } catch (ReportProviderNotFoundException e) {
             throw new ForbiddenException("Client id not found");
         }

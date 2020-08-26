@@ -10,6 +10,7 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.AlbumUserPermissions;
 import online.kheops.auth_server.user.Users;
@@ -17,7 +18,6 @@ import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.servlet.ServletContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +36,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    public ViewerPrincipal(ServletContext servletContext, ViewerAccessToken viewerAccessToken, String originalToken) {
+    public ViewerPrincipal(TokenAuthenticationContext tokenAuthenticationContext, ViewerAccessToken viewerAccessToken, String originalToken) {
 
         final AccessToken accessToken = viewerAccessToken.getAccessToken();
 
@@ -46,7 +46,7 @@ public class ViewerPrincipal implements KheopsPrincipal {
         } catch (UserNotFoundException e) {
             throw new IllegalStateException(e);
         }
-        kheopsPrincipal = accessToken.newPrincipal(servletContext, user);
+        kheopsPrincipal = accessToken.newPrincipal(tokenAuthenticationContext, user);
 
         this.viewerAccessToken = viewerAccessToken;
         this.originalToken = originalToken;

@@ -6,6 +6,7 @@ import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.UserNotFoundException;
 
 import javax.annotation.Priority;
@@ -41,6 +42,9 @@ public class SecuredFilter implements ContainerRequestFilter {
     @Context
     private ServletContext servletContext;
 
+    @Context
+    private TokenAuthenticationContext tokenAuthenticationContext;
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
 
@@ -56,7 +60,7 @@ public class SecuredFilter implements ContainerRequestFilter {
 
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token.getAccessToken());
+            accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, token.getAccessToken());
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Received bad accesstoken" + getRequestString(requestContext), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
@@ -80,7 +84,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         }
 
         final boolean isSecured = requestContext.getSecurityContext().isSecure();
-        final KheopsPrincipal principal = accessToken.newPrincipal(servletContext, user);
+        final KheopsPrincipal principal = accessToken.newPrincipal(tokenAuthenticationContext, user);
         principal.getKheopsLogBuilder().link(isLink);
         requestContext.setSecurityContext(new SecurityContext() {
             @Override

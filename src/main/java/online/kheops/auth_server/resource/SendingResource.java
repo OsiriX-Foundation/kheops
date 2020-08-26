@@ -16,6 +16,7 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 
@@ -48,6 +49,9 @@ public class SendingResource
 
     @Context
     private ServletContext context;
+
+    @Context
+    private TokenAuthenticationContext tokenAuthenticationContext;
 
     @Context
     private SecurityContext securityContext;
@@ -644,9 +648,9 @@ public class SendingResource
     private KheopsPrincipal getPrincipalFromHeadersXTokenSource(String token)
             throws AccessTokenVerificationException, UserNotFoundException {
 
-        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, getToken(token).getAccessToken());
+        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, getToken(token).getAccessToken());
         final User user = getUser(accessToken.getSubject());
 
-        return accessToken.newPrincipal(context, user);
+        return accessToken.newPrincipal(tokenAuthenticationContext, user);
     }
 }

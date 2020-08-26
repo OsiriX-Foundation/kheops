@@ -13,6 +13,7 @@ import online.kheops.auth_server.OIDCProviderContextListener;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.UserPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -20,7 +21,6 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.MediaType;
@@ -79,10 +79,10 @@ public final class OidcAccessToken implements AccessToken {
     public static final class Builder implements AccessTokenBuilder {
         private final String configurationUrl = OIDCProviderContextListener.getOIDCConfigurationString();
 
-        private final ServletContext servletContext;
+        private final TokenAuthenticationContext tokenAuthenticationContext;
 
-        public Builder(ServletContext servletContext) {
-            this.servletContext = servletContext;
+        public Builder(TokenAuthenticationContext tokenAuthenticationContext) {
+            this.tokenAuthenticationContext = tokenAuthenticationContext;
         }
 
         public OidcAccessToken build(String assertionToken) throws AccessTokenVerificationException {
@@ -114,7 +114,7 @@ public final class OidcAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
-            final boolean verifyScope = Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.use.scope"));
+            final boolean verifyScope = Boolean.parseBoolean(tokenAuthenticationContext.getServletContext().getInitParameter("online.kheops.use.scope"));
             if (verifyScope) {
                 final Claim scopeClaim = jwt.getClaim("scope");
                 if (scopeClaim.isNull() || scopeClaim.asString() == null) {
@@ -213,7 +213,7 @@ public final class OidcAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
+    public KheopsPrincipal newPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user) {
         return new UserPrincipal(user, actingParty, token);
     }
 

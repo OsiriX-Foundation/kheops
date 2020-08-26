@@ -8,7 +8,6 @@ import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.util.Objects;
@@ -21,13 +20,13 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FO
 class PepAccessTokenGenerator {
     private static final Logger LOG = Logger.getLogger(PepAccessTokenGenerator.class.getName());
 
-    private final ServletContext context;
+    private final TokenAuthenticationContext context;
 
     private String token;
     private String studyInstanceUID;
     private String seriesInstanceUID;
 
-    private PepAccessTokenGenerator(final ServletContext context) {
+    private PepAccessTokenGenerator(final TokenAuthenticationContext context) {
         this.context = Objects.requireNonNull(context);
     }
 
@@ -46,7 +45,7 @@ class PepAccessTokenGenerator {
         return this;
     }
 
-    static PepAccessTokenGenerator createGenerator(final ServletContext context) {
+    static PepAccessTokenGenerator createGenerator(final TokenAuthenticationContext context) {
       return new PepAccessTokenGenerator(context);
     }
 

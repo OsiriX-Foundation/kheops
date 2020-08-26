@@ -8,7 +8,6 @@ import org.jose4j.jwt.JwtClaims;
 import org.jose4j.keys.HmacKey;
 import org.jose4j.lang.JoseException;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.InternalServerErrorException;
 import java.util.*;
 
@@ -17,7 +16,7 @@ import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 public class ReportProviderAccessTokenGenerator {
     private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
-    private final ServletContext context;
+    private final TokenAuthenticationContext context;
     private String subject;
     private String actingParty;
     private String capabilityTokenId;
@@ -26,8 +25,8 @@ public class ReportProviderAccessTokenGenerator {
     private Set<String> studyInstanceUIDs;
     private Source source;
 
-    public static ReportProviderAccessTokenGenerator createGenerator(final ServletContext servletContext) {
-        return new ReportProviderAccessTokenGenerator(servletContext);
+    public static ReportProviderAccessTokenGenerator createGenerator(final TokenAuthenticationContext tokenAuthenticationContext) {
+        return new ReportProviderAccessTokenGenerator(tokenAuthenticationContext);
     }
 
     public ReportProviderAccessTokenGenerator withSubject(final String subject) {
@@ -102,19 +101,19 @@ public class ReportProviderAccessTokenGenerator {
         }
     }
 
-    private ReportProviderAccessTokenGenerator(final ServletContext servletContext) {
-        this.context = servletContext;
+    private ReportProviderAccessTokenGenerator(final TokenAuthenticationContext tokenAuthenticationContext) {
+        this.context = tokenAuthenticationContext;
     }
 
     private String getAudienceHost() {
-        return context.getInitParameter(HOST_ROOT_PARAMETER);
+        return context.getServletContext().getInitParameter(HOST_ROOT_PARAMETER);
     }
 
     private String getIssuerHost() {
-        return context.getInitParameter(HOST_ROOT_PARAMETER);
+        return context.getServletContext().getInitParameter(HOST_ROOT_PARAMETER);
     }
 
     private String getHMAC256Secret() {
-        return context.getInitParameter(HMAC_SECRET_PARAMETER);
+        return context.getServletContext().getInitParameter(HMAC_SECRET_PARAMETER);
     }
 }

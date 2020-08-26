@@ -7,10 +7,10 @@ import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.AlbumCapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.UserCapabilityPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -109,7 +109,7 @@ final class CapabilityAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
+    public KheopsPrincipal newPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user) {
         if (capability.getScopeType().equalsIgnoreCase(ScopeType.ALBUM.name())) {
             return new AlbumCapabilityPrincipal(capability, user, token);
         } else {

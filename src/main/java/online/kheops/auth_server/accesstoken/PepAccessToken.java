@@ -6,20 +6,19 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.Users;
-
-import javax.servlet.ServletContext;
 
 final class PepAccessToken implements AccessToken {
 
     private final String sub;
 
     static final class Builder implements AccessTokenBuilder {
-        private final ServletContext servletContext;
+        private final TokenAuthenticationContext tokenAuthenticationContext;
 
-        Builder(ServletContext servletContext) {
-            this.servletContext = servletContext;
+        Builder(TokenAuthenticationContext tokenAuthenticationContext) {
+            this.tokenAuthenticationContext = tokenAuthenticationContext;
         }
 
         public PepAccessToken build(String assertionToken) throws AccessTokenVerificationException {
@@ -45,7 +44,7 @@ final class PepAccessToken implements AccessToken {
         }
 
         private String authorizationSecret() {
-            return servletContext.getInitParameter("online.kheops.auth.hmacsecret");
+            return tokenAuthenticationContext.getServletContext().getInitParameter("online.kheops.auth.hmacsecret");
         }
     }
 
@@ -64,7 +63,7 @@ final class PepAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
+    public KheopsPrincipal newPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user) {
         throw new UnsupportedOperationException("Can't make a KheopsPrincipal from a PEP Access Token");
     }
 

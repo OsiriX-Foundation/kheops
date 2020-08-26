@@ -2,9 +2,9 @@ package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.token.TokenProvenance;
 
-import javax.servlet.ServletContext;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +24,7 @@ public interface AccessToken extends TokenProvenance {
 
   TokenType getTokenType();
 
-  KheopsPrincipal newPrincipal(ServletContext servletContext, User user);
+  KheopsPrincipal newPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user);
 
   default Optional<String> getScope() {
     return Optional.empty();

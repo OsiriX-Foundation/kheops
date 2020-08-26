@@ -10,7 +10,6 @@ import org.jose4j.jwe.JsonWebEncryption;
 import org.jose4j.jwe.KeyManagementAlgorithmIdentifiers;
 import org.jose4j.lang.JoseException;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.time.Instant;
@@ -29,7 +28,7 @@ import static online.kheops.auth_server.util.Consts.INBOX;
 class ViewerAccessTokenGenerator {
     private static final Logger LOG = Logger.getLogger(ViewerAccessTokenGenerator.class.getName());
 
-    private final ServletContext servletContext;
+    private final TokenAuthenticationContext tokenAuthenticationContext;
 
     private String token;
     private String studyInstanceUID;
@@ -37,8 +36,8 @@ class ViewerAccessTokenGenerator {
     private String sourceId;
     private Collection<String> scopes;
 
-    private ViewerAccessTokenGenerator(ServletContext servletContext) {
-        this.servletContext = servletContext;
+    private ViewerAccessTokenGenerator(TokenAuthenticationContext tokenAuthenticationContext) {
+        this.tokenAuthenticationContext = tokenAuthenticationContext;
     }
 
     ViewerAccessTokenGenerator withToken(final String token) {
@@ -66,8 +65,8 @@ class ViewerAccessTokenGenerator {
         return this;
     }
 
-    static ViewerAccessTokenGenerator createGenerator(ServletContext servletContext) {
-        return new ViewerAccessTokenGenerator(servletContext);
+    static ViewerAccessTokenGenerator createGenerator(TokenAuthenticationContext tokenAuthenticationContext) {
+        return new ViewerAccessTokenGenerator(tokenAuthenticationContext);
     }
 
     @SuppressWarnings("unchecked")
@@ -86,7 +85,7 @@ class ViewerAccessTokenGenerator {
 
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, token);
         } catch (AccessTokenVerificationException e) {
             throw new TokenRequestException(TokenRequestException.Error.INVALID_GRANT, e.getMessage(), e);
         } catch (DownloadKeyException e) {

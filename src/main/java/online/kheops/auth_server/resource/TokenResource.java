@@ -42,6 +42,9 @@ public class TokenResource
     private ServletContext context;
 
     @Context
+    private TokenAuthenticationContext tokenAuthenticationContext;
+
+    @Context
     private SecurityContext securityContext;
 
     @HeaderParam(X_FORWARDED_FOR)
@@ -72,7 +75,7 @@ public class TokenResource
         }
 
         try {
-            final TokenGrantResult result = grantType.processGrant(securityContext, context, form);
+            final TokenGrantResult result = grantType.processGrant(securityContext, tokenAuthenticationContext, form);
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
@@ -107,7 +110,7 @@ public class TokenResource
 
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateIntrospectableAccessToken(context, assertionToken);
+            accessToken = AccessTokenVerifier.authenticateIntrospectableAccessToken(tokenAuthenticationContext, assertionToken);
         } catch (AccessTokenVerificationException e) {
             LOG.log(WARNING, "Error validating a token", e);
             return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();

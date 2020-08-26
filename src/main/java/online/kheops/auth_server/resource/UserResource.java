@@ -10,6 +10,7 @@ import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.*;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
@@ -81,6 +82,9 @@ public class UserResource {
 
     @Context
     private ServletContext servletContext;
+
+    @Context
+    private TokenAuthenticationContext tokenAuthenticationContext;
 
     @HeaderParam(X_FORWARDED_FOR)
     private String headerXForwardedFor;
@@ -214,7 +218,7 @@ public class UserResource {
 
         final OidcAccessToken accessToken;
         try {
-            accessToken = new OidcAccessToken.Builder(servletContext).build(token);
+            accessToken = new OidcAccessToken.Builder(tokenAuthenticationContext).build(token);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Access token error", e);
             return Response.status(BAD_REQUEST).build();
@@ -282,7 +286,7 @@ public class UserResource {
 
         final AccessToken accessToken;
         try {
-            accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token);
+            accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, token);
         } catch (online.kheops.auth_server.accesstoken.AccessTokenVerificationException e) {
             LOG.log(Level.INFO, "bad accesstoken", e);
             throw new NotAuthorizedException("Bad AccessToken");

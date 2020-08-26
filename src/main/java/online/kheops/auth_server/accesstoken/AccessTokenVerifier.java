@@ -1,5 +1,7 @@
 package online.kheops.auth_server.accesstoken;
 
+import online.kheops.auth_server.token.TokenAuthenticationContext;
+
 import javax.servlet.ServletContext;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -19,21 +21,21 @@ public abstract class AccessTokenVerifier {
 
     private AccessTokenVerifier() {}
 
-    public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
+    public static AccessToken authenticateAccessToken(TokenAuthenticationContext tokenAuthenticationContext, String accessToken)
             throws AccessTokenVerificationException {
-        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken);
+        return authenticateAccessTokens(accessTokenBuilderClasses, tokenAuthenticationContext, accessToken);
     }
 
-    public static AccessToken authenticateIntrospectableAccessToken(ServletContext servletContext, String accessToken)
+    public static AccessToken authenticateIntrospectableAccessToken(TokenAuthenticationContext tokenAuthenticationContext, String accessToken)
             throws AccessTokenVerificationException {
 
         List<Class<?>> introspectableAccessTokenBuilderClasses = new ArrayList<>(accessTokenBuilderClasses);
         introspectableAccessTokenBuilderClasses.add(pepAccessTokenClass);
 
-        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken);
+        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, tokenAuthenticationContext, accessToken);
     }
 
-    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken)
+    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, TokenAuthenticationContext tokenAuthenticationContext, String accessToken)
             throws AccessTokenVerificationException {
 
         List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
@@ -42,14 +44,14 @@ public abstract class AccessTokenVerifier {
             final AccessTokenBuilder accessTokenBuilder;
             Constructor<?> servletContextConstructor;
             try {
-                servletContextConstructor = builderClass.getDeclaredConstructor((ServletContext.class));
+                servletContextConstructor = builderClass.getDeclaredConstructor((TokenAuthenticationContext.class));
             } catch (NoSuchMethodException e) {
                 servletContextConstructor = null;
             }
 
             try {
                 if (servletContextConstructor != null) {
-                    accessTokenBuilder = (AccessTokenBuilder) servletContextConstructor.newInstance(servletContext);
+                    accessTokenBuilder = (AccessTokenBuilder) servletContextConstructor.newInstance(tokenAuthenticationContext);
                 } else {
                     accessTokenBuilder = (AccessTokenBuilder) builderClass.getDeclaredConstructor().newInstance();
                 }

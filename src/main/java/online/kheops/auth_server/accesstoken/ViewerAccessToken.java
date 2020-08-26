@@ -3,12 +3,12 @@ package online.kheops.auth_server.accesstoken;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.ViewerPrincipal;
+import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.util.Consts;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import javax.servlet.ServletContext;
 import java.io.StringReader;
 import java.util.Optional;
 
@@ -19,10 +19,10 @@ public final class ViewerAccessToken implements AccessToken {
     private final String originalToken;
 
     static final class Builder {
-        private final ServletContext servletContext;
+        private final TokenAuthenticationContext tokenAuthenticatorContext;
 
-        private Builder(ServletContext servletContext) {
-            this.servletContext = servletContext;
+        private Builder(TokenAuthenticationContext tokenAuthenticationContext) {
+            this.tokenAuthenticatorContext = tokenAuthenticationContext;
         }
 
         ViewerAccessToken build(String assertionToken, String jwePayloadJson)
@@ -30,18 +30,18 @@ public final class ViewerAccessToken implements AccessToken {
 
             try(JsonReader jsonReader = Json.createReader(new StringReader(jwePayloadJson))) {
                 JsonObject jwe = jsonReader.readObject();
-                return new ViewerAccessToken(servletContext, jwe, assertionToken);
+                return new ViewerAccessToken(tokenAuthenticatorContext, jwe, assertionToken);
             }
         }
     }
 
-    static Builder getBuilder(ServletContext servletContext) { return new Builder(servletContext); }
+    static Builder getBuilder(TokenAuthenticationContext tokenAuthenticationContext) { return new Builder(tokenAuthenticationContext); }
 
-    private ViewerAccessToken(ServletContext servletContext, JsonObject jwe, String originalToken)
+    private ViewerAccessToken(TokenAuthenticationContext tokenAuthenticationContext, JsonObject jwe, String originalToken)
             throws AccessTokenVerificationException {
 
         this.jwe = jwe;
-        this.accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN));
+        this.accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, jwe.getString(Consts.JWE.TOKEN));
         this.originalToken = originalToken;
     }
 
@@ -98,8 +98,8 @@ public final class ViewerAccessToken implements AccessToken {
     }
 
     @Override
-    public KheopsPrincipal newPrincipal(ServletContext servletContext, User user) {
-        return new ViewerPrincipal(servletContext, this, originalToken);
+    public KheopsPrincipal newPrincipal(TokenAuthenticationContext tokenAuthenticationContext, User user) {
+        return new ViewerPrincipal(tokenAuthenticationContext, this, originalToken);
     }
 
 }

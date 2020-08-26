@@ -2,10 +2,8 @@ package online.kheops.auth_server.token;
 
 import online.kheops.auth_server.report_provider.ClientMetadata;
 import online.kheops.auth_server.report_provider.ReportProvider;
-import online.kheops.auth_server.report_provider.ReportProviderCatalogue;
 import online.kheops.auth_server.report_provider.ReportProviderNotFoundException;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MultivaluedMap;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +19,7 @@ import static online.kheops.auth_server.token.TokenRequestException.Error.INVALI
 public enum TokenClientAuthenticationType {
 
     CLIENT_SECRET_BASIC("client_secret_basic") {
-        public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(TokenAuthenticationContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
             final String encodedAuthorization = headers.getFirst(AUTHORIZATION).substring(6);
 
             final String decoded;
@@ -38,12 +36,12 @@ public enum TokenClientAuthenticationType {
             final String clientId = split[0];
             final String clientSecret = split[1];
 
-            return TokenBasicAuthenticator.newAuthenticator(context).clientId(clientId).password(clientSecret).authenticate();
+            return context.newTokenBasicAuthenticator().clientId(clientId).password(clientSecret).authenticate();
         }
     },
 
     PRIVATE_KEY_JWT("private_key_jwt") {
-        public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(TokenAuthenticationContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
             MultivaluedMap<String, String> formParams = form.asMap();
 
             verifySingleHeader(formParams, CLIENT_ASSERTION);
@@ -54,7 +52,7 @@ public enum TokenClientAuthenticationType {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown client accesstoken type");
             }
 
-            return PrivateKeyJWTAuthenticator.newAuthenticator(context)
+            return context.newPrivateKeyJWTAuthenticator()
                     .clientJWT(formParams.getFirst(CLIENT_ASSERTION))
                     .clientId(formParams.getFirst(CLIENT_ID))
                     .requestPath(requestPath)
@@ -63,14 +61,13 @@ public enum TokenClientAuthenticationType {
     },
 
     NONE("none") {
-        public TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
+        public TokenPrincipal authenticate(TokenAuthenticationContext context, String requestPath, MultivaluedMap<String, String> headers, Form form) {
             MultivaluedMap<String, String> formParams = form.asMap();
 
             verifySingleHeader(formParams, CLIENT_ID);
 
-            final ReportProviderCatalogue reportProviderCatalogue = new ReportProviderCatalogue();
             try {
-                final ReportProvider reportProvider = reportProviderCatalogue.getReportProvider(formParams.getFirst(CLIENT_ID));
+                final ReportProvider reportProvider = context.getReportProviderCatalogue().getReportProvider(formParams.getFirst(CLIENT_ID));
                 final ClientMetadata clientMetadata = reportProvider.getClientMetadata();
 
                 if (!NONE.equals(clientMetadata.getValue(TOKEN_ENDPOINT_AUTH_METHOD).orElse(null))) {
@@ -182,5 +179,5 @@ public enum TokenClientAuthenticationType {
         }
     }
 
-    public abstract TokenPrincipal authenticate(ServletContext context, String requestPath, MultivaluedMap<String, String> headers, Form form);
+    public abstract TokenPrincipal authenticate(TokenAuthenticationContext context, String requestPath, MultivaluedMap<String, String> headers, Form form);
 }

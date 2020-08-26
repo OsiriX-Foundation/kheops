@@ -9,7 +9,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.util.JWTs;
 import online.kheops.auth_server.util.Source;
 
-import javax.servlet.ServletContext;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,16 +20,16 @@ import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 public class AuthCodeValidator {
   private static final String HMAC_SECRET_PARAMETER = "online.kheops.auth.hmacsecret";
 
-  private final ServletContext servletContext;
+  private final TokenAuthenticationContext tokenAthenticationContext;
   private String codeVerifier;
   private String clientId;
 
-  public static AuthCodeValidator createAuthorizer(ServletContext servletContext) {
-    return new AuthCodeValidator(servletContext);
+  public static AuthCodeValidator createAuthorizer(TokenAuthenticationContext tokenAuthenticationContext) {
+    return new AuthCodeValidator(tokenAuthenticationContext);
   }
 
-  private AuthCodeValidator(ServletContext servletContext) {
-    this.servletContext = servletContext;
+  private AuthCodeValidator(TokenAuthenticationContext tokenAthenticationContext) {
+    this.tokenAthenticationContext = tokenAthenticationContext;
   }
 
   public AuthCodeValidator withClientId(final String clientId) {
@@ -133,10 +132,10 @@ public class AuthCodeValidator {
   }
 
   private String getHMAC256Secret() {
-    return servletContext.getInitParameter(HMAC_SECRET_PARAMETER);
+    return tokenAthenticationContext.getServletContext().getInitParameter(HMAC_SECRET_PARAMETER);
   }
 
   private String getIssuerHost() {
-    return servletContext.getInitParameter(HOST_ROOT_PARAMETER);
+    return tokenAthenticationContext.getServletContext().getInitParameter(HOST_ROOT_PARAMETER);
   }
 }
