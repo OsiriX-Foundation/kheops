@@ -7,6 +7,7 @@ import java.net.URI;
 public enum URIParameter implements Parameter<URI> {
     INITIATE_LOGIN_URI("initiate_login_uri"),
     ISSUER("issuer"),
+    TOKEN_ENDPOINT("token_endpoint"),
     AUTHORIZATION_ENDPOINT("authorization_endpoint");
 
     private final String key;

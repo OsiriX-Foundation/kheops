@@ -9,7 +9,7 @@ public enum OptionalUriParameter implements OptionalParameter<URI> {
     TOS_URI("tos_uri", true),
     JWKS_URI("jwks_uri", false),
     SECTOR_IDENTIFIER_URI("sector_identifier_uri", false),
-    USERINFO_ENDPOINT_URI("userinfo_endpoint", false),
+    USERINFO_ENDPOINT("userinfo_endpoint", false),
     REGISTRATION_ENDPOINT("registration_endpoint", false),
     SERVICE_DOCUMENTATION("service_documentation", false),
     OP_POLICY_URI("op_policy_uri", false),
