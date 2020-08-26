@@ -9,4 +9,6 @@ public interface TokenAuthenticationContext {
   ReportProviderCatalogue getReportProviderCatalogue();
   TokenBasicAuthenticator newTokenBasicAuthenticator();
   PrivateKeyJWTAuthenticator newPrivateKeyJWTAuthenticator();
+  String getOIDCProvider();
+  String getOIDCConfigurationString();
 }

@@ -9,7 +9,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
-import online.kheops.auth_server.OIDCProviderContextListener;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.principal.UserPrincipal;
@@ -77,12 +76,13 @@ public final class OidcAccessToken implements AccessToken {
     }
 
     public static final class Builder implements AccessTokenBuilder {
-        private final String configurationUrl = OIDCProviderContextListener.getOIDCConfigurationString();
+        private final String configurationUrl;
 
         private final TokenAuthenticationContext tokenAuthenticationContext;
 
         public Builder(TokenAuthenticationContext tokenAuthenticationContext) {
             this.tokenAuthenticationContext = tokenAuthenticationContext;
+            configurationUrl = tokenAuthenticationContext.getOIDCConfigurationString();
         }
 
         public OidcAccessToken build(String assertionToken) throws AccessTokenVerificationException {

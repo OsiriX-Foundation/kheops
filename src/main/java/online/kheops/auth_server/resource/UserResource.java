@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.OIDCProviderContextListener;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.OidcAccessToken;
 import online.kheops.auth_server.album.AlbumNotFoundException;
@@ -224,10 +223,10 @@ public class UserResource {
             return Response.status(BAD_REQUEST).build();
         }
 
-        final String oidcProvider = OIDCProviderContextListener.getOIDCProvider();
+        final String oidcProvider = tokenAuthenticationContext.getOIDCProvider();
         String userInfoUrl = userInfoURLsCache.get(oidcProvider);
         if (userInfoUrl == null) {
-            final String openidConfiguration = OIDCProviderContextListener.getOIDCConfigurationString();
+            final String openidConfiguration = tokenAuthenticationContext.getOIDCConfigurationString();
             final URI openidConfigurationURI;
 
             try {

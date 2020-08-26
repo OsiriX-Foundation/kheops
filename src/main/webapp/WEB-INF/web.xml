@@ -15,10 +15,6 @@
         </init-param>
     </servlet>
 
-
-    <listener>
-        <listener-class>online.kheops.auth_server.OIDCProviderContextListener</listener-class>
-    </listener>
     <listener>
         <listener-class>online.kheops.auth_server.EntityManagerListener</listener-class>
     </listener>

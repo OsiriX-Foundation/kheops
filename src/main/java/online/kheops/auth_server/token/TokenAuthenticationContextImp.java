@@ -34,4 +34,14 @@ public class TokenAuthenticationContextImp implements TokenAuthenticationContext
   public PrivateKeyJWTAuthenticator newPrivateKeyJWTAuthenticator() {
     return PrivateKeyJWTAuthenticator.newAuthenticator(servletContext);
   }
+
+  @Override
+  public String getOIDCProvider() {
+    return servletContext.getInitParameter("online.kheops.oidc.provider");
+  }
+
+  @Override
+  public String getOIDCConfigurationString() {
+    return getOIDCProvider() + "/.well-known/openid-configuration";
+  }
 }
