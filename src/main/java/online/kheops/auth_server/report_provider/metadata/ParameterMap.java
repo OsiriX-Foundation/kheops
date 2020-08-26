@@ -2,14 +2,34 @@ package online.kheops.auth_server.report_provider.metadata;
 
 import java.util.Map;
 
-public interface ParameterMap {
+public interface ParameterMap extends OidcMetadata {
   Map<Parameter<?>, Object> getMap();
 
-  <T> void put(Parameter<T> parameter, T value);
+  <T> void put(Parameter<? extends T> parameter, T value);
 
   void putAll(ParameterMap parameterMap);
 
-  <T> T get(Parameter<T> parameter);
+  <T> T get(Parameter<? extends T> parameter);
 
   boolean containsKey(Parameter<?> parameter);
+
+  boolean containsValue(Object value);
+
+  int size();
+
+  boolean isEmpty();
+
+  boolean equals(Object var1);
+
+  int hashCode();
+
+  default <T, S extends T> T getOrDefault(Parameter<? extends T> parameter, S defaultValue) {
+    T v;
+    return (v = this.get(parameter)) == null && !this.containsKey(parameter) ? defaultValue : v;
+  }
+
+  default <T> T getOrEmptyValue(Parameter<? extends T> parameter) {
+    T v;
+    return (v = this.get(parameter)) == null && !this.containsKey(parameter) ? parameter.getEmptyValue() : v;
+  }
 }

@@ -1,5 +1,7 @@
 package online.kheops.auth_server.report_provider.metadata.parameters;
 
+import javax.json.JsonValue;
+
 public enum OptionalBooleanParameter implements OptionalParameter<Boolean> {
     REQUIRE_AUTH_TIME("require_auth_time"),
     CLAIMS_PARAMETER_SUPPORTED("claims_parameter_supported"),
@@ -16,5 +18,21 @@ public enum OptionalBooleanParameter implements OptionalParameter<Boolean> {
     @Override
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public Boolean innerValueFrom(JsonValue jsonValue) {
+        if (jsonValue.equals(JsonValue.TRUE)) {
+            return true;
+        } else if (jsonValue.equals(JsonValue.FALSE)) {
+            return false;
+        } else {
+            throw new IllegalArgumentException("Not a boolean value");
+        }
+    }
+
+    @Override
+    public JsonValue jsonFromInnerValue(Boolean value) {
+        return null;
     }
 }

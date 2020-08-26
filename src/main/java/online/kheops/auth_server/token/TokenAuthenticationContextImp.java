@@ -1,5 +1,7 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.report_provider.OidcProvider;
+import online.kheops.auth_server.report_provider.OidcProviderImp;
 import online.kheops.auth_server.report_provider.ReportProviderCatalogue;
 import online.kheops.auth_server.report_provider.ReportProviderCatalogueImp;
 
@@ -9,10 +11,12 @@ import java.util.Objects;
 public class TokenAuthenticationContextImp implements TokenAuthenticationContext {
   private final ServletContext servletContext;
   private final ReportProviderCatalogue reportProviderCatalogue;
+  private final OidcProviderImp oidcProviderImp;
 
   public TokenAuthenticationContextImp(ServletContext servletContext) {
     this.servletContext = Objects.requireNonNull(servletContext);
     reportProviderCatalogue = new ReportProviderCatalogueImp();
+    oidcProviderImp = new OidcProviderImp(this);
   }
 
   @Override
@@ -43,5 +47,10 @@ public class TokenAuthenticationContextImp implements TokenAuthenticationContext
   @Override
   public String getOIDCConfigurationString() {
     return getOIDCProvider() + "/.well-known/openid-configuration";
+  }
+
+  @Override
+  public OidcProvider getOidcProvider() {
+    return oidcProviderImp;
   }
 }

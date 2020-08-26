@@ -7,12 +7,12 @@ public final class EmptyOidcMetadata implements OidcMetadata {
     final public static EmptyOidcMetadata EMPTY_OIDC_METADATA = new EmptyOidcMetadata();
 
     @Override
-    public <T> T getValue(Parameter<T> parameter) {
+    public <T> T getValue(Parameter<? extends T> parameter) {
         return parameter.getEmptyValue();
     }
 
     @Override
-    public <T> T getValue(Parameter<T> parameter, Locale local) {
+    public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
         return getValue(parameter);
     }
 }

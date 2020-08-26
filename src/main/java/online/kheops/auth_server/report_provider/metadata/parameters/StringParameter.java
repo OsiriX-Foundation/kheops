@@ -3,6 +3,10 @@ package online.kheops.auth_server.report_provider.metadata.parameters;
 
 import online.kheops.auth_server.report_provider.metadata.Parameter;
 
+import javax.json.Json;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+
 public enum StringParameter implements Parameter<String> {
     CLIENT_ID("client_id", false);
 
@@ -26,5 +30,19 @@ public enum StringParameter implements Parameter<String> {
 
     @Override public boolean isLocalizable() {
         return localizable;
+    }
+
+    @Override
+    public String valueFrom(JsonValue jsonValue) {
+        if (jsonValue instanceof JsonString) {
+            return ((JsonString) jsonValue).getString();
+        } else {
+            throw new IllegalArgumentException("Not a string");
+        }
+    }
+
+    @Override
+    public JsonValue jsonFrom(String value) {
+        return Json.createValue(value);
     }
 }

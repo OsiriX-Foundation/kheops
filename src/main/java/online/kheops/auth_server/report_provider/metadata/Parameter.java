@@ -1,5 +1,7 @@
 package online.kheops.auth_server.report_provider.metadata;
 
+import javax.json.JsonException;
+import javax.json.JsonValue;
 import java.lang.reflect.ParameterizedType;
 
 public interface Parameter<T> {
@@ -14,6 +16,22 @@ public interface Parameter<T> {
     return false;
   }
 
+  static Parameter<?> valueOf(String value) {
+    return null;
+  }
+
+  /**
+   * @throws JsonException if a JSON object cannot be created
+   * @throws IllegalArgumentException if the JSON object is not appropriate
+   * @param jsonValue
+   */
+  T valueFrom(JsonValue jsonValue);
+
+  JsonValue jsonFrom(T value);
+
+  /**
+   * @throws ClassCastException if the value can not be cast
+   */
   @SuppressWarnings("unchecked")
   default T cast(Object value) {
     if (!getValueType().isAssignableFrom(value.getClass())) {

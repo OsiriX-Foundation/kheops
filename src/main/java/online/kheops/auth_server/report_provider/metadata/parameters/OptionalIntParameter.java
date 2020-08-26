@@ -2,6 +2,9 @@ package online.kheops.auth_server.report_provider.metadata.parameters;
 
 import online.kheops.auth_server.report_provider.metadata.Parameter;
 
+import javax.json.Json;
+import javax.json.JsonNumber;
+import javax.json.JsonValue;
 import java.util.OptionalInt;
 
 public enum OptionalIntParameter implements Parameter<OptionalInt> {
@@ -21,5 +24,19 @@ public enum OptionalIntParameter implements Parameter<OptionalInt> {
     @Override
     public OptionalInt getEmptyValue() {
         return OptionalInt.empty();
+    }
+
+    @Override
+    public OptionalInt valueFrom(JsonValue jsonValue) {
+        if (jsonValue instanceof JsonNumber) {
+            return OptionalInt.of(((JsonNumber) jsonValue).intValue());
+        } else {
+            throw new IllegalArgumentException("Not a number");
+        }
+    }
+
+    @Override
+    public JsonValue jsonFrom(OptionalInt value) {
+        return Json.createValue(value.orElseThrow(() -> new IllegalArgumentException("Empty optional")));
     }
 }

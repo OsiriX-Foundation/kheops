@@ -1,6 +1,13 @@
 package online.kheops.auth_server.report_provider.metadata.parameters;
 
 import online.kheops.auth_server.report_provider.Algorithm;
+import online.kheops.auth_server.report_provider.NoKeyException;
+
+import javax.json.Json;
+import javax.json.JsonString;
+import javax.json.JsonValue;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public enum OptionalAlgorithmParameter implements OptionalParameter<Algorithm> {
     ID_TOKEN_SIGNED_RESPONSE_ALG("id_token_signed_response_alg"),
@@ -20,5 +27,23 @@ public enum OptionalAlgorithmParameter implements OptionalParameter<Algorithm> {
     @Override
     public String getKey() {
         return key;
+    }
+
+    @Override
+    public Algorithm innerValueFrom(JsonValue jsonValue) {
+        if (jsonValue instanceof JsonString) {
+            return Algorithm.fromKey(((JsonString) jsonValue).getString());
+        } else {
+            throw new IllegalArgumentException("Not a string");
+        }
+    }
+
+    @Override
+    public JsonValue jsonFromInnerValue(Algorithm value) {
+        try {
+            return Json.createValue(value.getKey());
+        } catch (NoKeyException e) {
+            throw new IllegalArgumentException("Algorithm has no key", e);
+        }
     }
 }

@@ -31,7 +31,7 @@ public final class ClientMetadataWithDefaults implements OidcMetadata {
     private static final ParameterMap DEFAULT_VALUES = defaultValues();
 
     @Override
-    public <T> T getValue(Parameter<T> parameter) {
+    public <T> T getValue(Parameter<? extends T> parameter) {
         T value = oidcMetadata.getValue(parameter);
         if (DEFAULT_VALUES.containsKey(parameter)) {
             if ((value instanceof Optional && ((Optional<?>) value).isEmpty())
@@ -43,7 +43,7 @@ public final class ClientMetadataWithDefaults implements OidcMetadata {
     }
 
     @Override
-    public <T> T getValue(Parameter<T> parameter, Locale local) {
+    public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
         // none of the localizable parameters have defaults
         return oidcMetadata.getValue(parameter, local);
     }

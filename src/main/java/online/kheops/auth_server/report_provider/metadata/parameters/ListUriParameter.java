@@ -1,6 +1,10 @@
 package online.kheops.auth_server.report_provider.metadata.parameters;
 
+import javax.json.Json;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 public enum ListUriParameter implements ListParameter<URI>
 {
@@ -17,5 +21,24 @@ public enum ListUriParameter implements ListParameter<URI>
     @Override
     public String getKey() {
         return key;
+    }
+
+
+    @Override
+    public URI innerValueFrom(JsonValue jsonValue) {
+        if (jsonValue instanceof JsonString) {
+            try {
+                return new URI(((JsonString) jsonValue).getString());
+            } catch (URISyntaxException e) {
+                throw new IllegalArgumentException("bad URI", e);
+            }
+        } else {
+            throw new IllegalArgumentException("Not a string");
+        }
+    }
+
+    @Override
+    public JsonValue jsonFromInnerValue(URI value) {
+        return Json.createValue(value.toString());
     }
 }
