@@ -8,11 +8,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.List;
-
-import static javax.xml.bind.JAXBIntrospector.getValue;
-import static online.kheops.auth_server.report_provider.metadata.parameters.ListStringParameter.CONTACTS;
 
 public class ParameterMapReader implements MessageBodyReader<ParameterMap> {
   @Override
@@ -35,13 +30,17 @@ public class ParameterMapReader implements MessageBodyReader<ParameterMap> {
 
     try (InputStreamReader inputStreamReader =
             new InputStreamReader(
-                new FilterInputStream(entityStream) {@Override public void close() {}});
+                new FilterInputStream(entityStream) {
+                  @Override
+                  public void close() {}
+                });
         JsonReader jsonReader = Json.createReader(inputStreamReader)) {
 
       JsonObject jsonObject = jsonReader.readObject();
 
-      for (String key: jsonObject.keySet()) {
-        @SuppressWarnings("unchecked") Parameter<Object> parameter = (Parameter<Object>) Parameters.parameterFromKey(key);
+      for (String key : jsonObject.keySet()) {
+        @SuppressWarnings("unchecked")
+        Parameter<Object> parameter = (Parameter<Object>) Parameters.parameterFromKey(key);
         parameterMap.put(parameter, parameter.valueFrom(jsonObject.getJsonObject(key)));
       }
     } catch (JsonException | IllegalArgumentException e) {

@@ -1,8 +1,10 @@
 package online.kheops.auth_server.report_provider;
 
+import online.kheops.auth_server.report_provider.metadata.InnerValueSerialization;
+
 import java.util.*;
 
-public enum Algorithm {
+public enum Algorithm implements InnerValueSerialization<Algorithm> {
   NONE("none"),
   ANY_SUPPORTED(null),
   UNDECLARED(null),
@@ -30,6 +32,11 @@ public enum Algorithm {
     } else {
       throw new IllegalArgumentException("unknown key");
     }
+  }
+
+  static <U> Map<String, U> getKeyMap(Class<U> clazz) {
+    if (clazz.is)
+    return KEY_MAP;
   }
 
   private static Map<String, Algorithm> keyMap() {
