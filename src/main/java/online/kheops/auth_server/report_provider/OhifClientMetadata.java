@@ -36,7 +36,7 @@ public class OhifClientMetadata implements OidcMetadata {
     }
 
     @Override
-    public <T> T getValue(Parameter<T> parameter) {
+    public <T> T getValue(Parameter<? extends T> parameter) {
         if (metadata.containsKey(parameter)) {
             return metadata.get(parameter);
         } else {
@@ -45,7 +45,7 @@ public class OhifClientMetadata implements OidcMetadata {
     }
 
     @Override
-    public <T> T getValue(Parameter<T> parameter, Locale local) {
+    public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
         return getValue(parameter);
     }
 

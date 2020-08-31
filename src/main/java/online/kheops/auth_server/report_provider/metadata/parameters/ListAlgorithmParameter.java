@@ -2,7 +2,6 @@ package online.kheops.auth_server.report_provider.metadata.parameters;
 
 import online.kheops.auth_server.report_provider.Algorithm;
 import online.kheops.auth_server.report_provider.NoKeyException;
-import online.kheops.auth_server.report_provider.metadata.InnerValueSerialization;
 
 import javax.json.Json;
 import javax.json.JsonString;

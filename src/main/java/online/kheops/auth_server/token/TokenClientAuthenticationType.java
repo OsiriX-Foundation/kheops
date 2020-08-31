@@ -123,6 +123,15 @@ public enum TokenClientAuthenticationType {
         return schemeString;
     }
 
+    public static TokenClientAuthenticationType fromSchemeString(String schemeString) {
+        for (TokenClientAuthenticationType type: values()) {
+            if (type.getSchemeString().equals(schemeString)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("No such scheme string");
+    }
+
     public static TokenClientAuthenticationType getAuthenticationType(MultivaluedMap<String, String> headers, Form form)
     {
         MultivaluedMap<String, String> formMap = form.asMap();
