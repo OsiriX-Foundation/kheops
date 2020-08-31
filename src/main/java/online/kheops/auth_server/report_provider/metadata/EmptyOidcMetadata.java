@@ -1,5 +1,6 @@
 package online.kheops.auth_server.report_provider.metadata;
 
+import java.util.List;
 import java.util.Locale;
 
 public final class EmptyOidcMetadata implements OidcMetadata {
@@ -12,7 +13,7 @@ public final class EmptyOidcMetadata implements OidcMetadata {
     }
 
     @Override
-    public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
+    public <T> T getValue(Parameter<? extends T> parameter, List<Locale.LanguageRange> priorityList) {
         return getValue(parameter);
     }
 }

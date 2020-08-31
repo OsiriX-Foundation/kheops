@@ -43,9 +43,9 @@ public final class ClientMetadataWithDefaults implements OidcMetadata {
     }
 
     @Override
-    public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
+    public <T> T getValue(Parameter<? extends T> parameter, List<Locale.LanguageRange> priorityList) {
         // none of the localizable parameters have defaults
-        return oidcMetadata.getValue(parameter, local);
+        return oidcMetadata.getValue(parameter, priorityList);
     }
 
     private static ParameterMap defaultValues() {

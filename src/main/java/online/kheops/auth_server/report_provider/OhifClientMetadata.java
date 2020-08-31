@@ -8,6 +8,7 @@ import online.kheops.auth_server.report_provider.metadata.ParameterMap;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -45,7 +46,7 @@ public class OhifClientMetadata implements OidcMetadata {
     }
 
     @Override
-    public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
+    public <T> T getValue(Parameter<? extends T> parameter, List<Locale.LanguageRange> priorityList) {
         return getValue(parameter);
     }
 

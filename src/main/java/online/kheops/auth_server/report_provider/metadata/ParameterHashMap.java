@@ -1,6 +1,7 @@
 package online.kheops.auth_server.report_provider.metadata;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class ParameterHashMap implements ParameterMap {
   }
 
   @Override
-  public <T> T getValue(Parameter<? extends T> parameter, Locale local) {
+  public <T> T getValue(Parameter<? extends T> parameter, List<Locale.LanguageRange> priorityList) {
     return getValue(parameter);
   }
 
