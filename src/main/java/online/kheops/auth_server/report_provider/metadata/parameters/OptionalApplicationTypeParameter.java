@@ -1,6 +1,5 @@
 package online.kheops.auth_server.report_provider.metadata.parameters;
 
-import online.kheops.auth_server.report_provider.Algorithm;
 import online.kheops.auth_server.report_provider.ApplicationType;
 import online.kheops.auth_server.report_provider.NoKeyException;
 
@@ -25,7 +24,7 @@ public enum OptionalApplicationTypeParameter implements OptionalParameter<Applic
     @Override
     public ApplicationType innerValueFrom(JsonValue jsonValue) {
         if (jsonValue instanceof JsonString) {
-            return ApplicationType.fromKey(((JsonString) jsonValue).getString());
+            return ApplicationType.fromString(((JsonString) jsonValue).getString());
         } else {
             throw new IllegalArgumentException("Not a string");
         }
@@ -33,10 +32,6 @@ public enum OptionalApplicationTypeParameter implements OptionalParameter<Applic
 
     @Override
     public JsonValue jsonFromInnerValue(ApplicationType value) {
-        try {
-            return Json.createValue(value.getKey());
-        } catch (NoKeyException e) {
-            throw new IllegalArgumentException("ApplicationType has no key with this value", e);
-        }
+        return Json.createValue(value.toString());
     }
 }

@@ -8,35 +8,32 @@ public enum ApplicationType {
     WEB("web"),
     NATIVE("native");
 
-    private final String key;
+    private final String string;
 
-    private static final Map<String, ApplicationType> KEY_MAP = Collections.unmodifiableMap(keyMap());
+    private static final Map<String, ApplicationType> STRING_MAP = Collections.unmodifiableMap(stringMap());
 
-    ApplicationType(String key) {
-        this.key = key;
+    ApplicationType(String string) {
+        this.string = string;
     }
 
-    public String getKey() throws NoKeyException {
-        if (key != null) {
-            return key;
+    @Override
+    public String toString() {
+        return string;
+    }
+
+    public static ApplicationType fromString(String string) {
+        if (STRING_MAP.containsKey(string)) {
+            return STRING_MAP.get(string);
         } else {
-            throw new NoKeyException();
+            throw new IllegalArgumentException("unknown string value");
         }
     }
 
-    public static ApplicationType fromKey(String key) {
-        if (KEY_MAP.containsKey(key)) {
-            return KEY_MAP.get(key);
-        } else {
-            throw new IllegalArgumentException("unknown key");
-        }
-    }
-
-    private static Map<String, ApplicationType> keyMap() {
+    private static Map<String, ApplicationType> stringMap() {
         Map<String, ApplicationType> map = new HashMap<>();
         for (ApplicationType applicationType : ApplicationType.values()) {
-            if (applicationType.key != null) {
-                map.put(applicationType.key, applicationType);
+            if (applicationType.string != null) {
+                map.put(applicationType.string, applicationType);
             }
         }
         return map;
