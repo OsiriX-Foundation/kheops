@@ -79,8 +79,8 @@
         <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
     </context-param>
     <context-param>
-        <description>Define if the scope 'kheops' must be present in the access_token</description>
-        <param-name>online.kheops.use.scope</param-name>
+        <description>Define the scope that must be present in the access_token</description>
+        <param-name>online.kheops.oauth.scope</param-name>
         <param-value>true</param-value>
     </context-param>
     <context-param>

@@ -114,13 +114,13 @@ public final class OidcAccessToken implements AccessToken {
                 throw new AccessTokenVerificationException("No subject present in the token, configuration URL:" + configurationUrl);
             }
 
-            final boolean verifyScope = Boolean.parseBoolean(tokenAuthenticationContext.getServletContext().getInitParameter("online.kheops.use.scope"));
-            if (verifyScope) {
+            final String oauthScope = tokenAuthenticationContext.getServletContext().getInitParameter("online.kheops.oauth.scope");
+            if (oauthScope != null && !oauthScope.isEmpty()) {
                 final Claim scopeClaim = jwt.getClaim("scope");
                 if (scopeClaim.isNull() || scopeClaim.asString() == null) {
                     throw new AccessTokenVerificationException("Missing scope claim in token");
                 } else {
-                    if (!scopeClaim.asString().contains("kheops")) {
+                    if (!scopeClaim.asString().contains(oauthScope)) {
                         throw new AccessTokenVerificationException("Missing scope 'kheops' in token");
                     }
                 }

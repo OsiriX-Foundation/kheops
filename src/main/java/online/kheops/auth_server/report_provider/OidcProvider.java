@@ -8,5 +8,7 @@ public interface OidcProvider {
 
   OidcMetadata getOidcMetadata() throws OidcProviderException;
 
+
+
   Map<String, String> getUserInfo(String token) throws OidcProviderException;
 }
