@@ -21,7 +21,7 @@
                override="false"/>
     <Parameter name="online.kheops.client.zippersecret" value="${kheops_client_zippersecret}"
                override="false"/>
-    <Parameter name="online.kheops.use.scope" value="${kheops_use_kheops_scope}"
+    <Parameter name="online.kheops.oauth.scope" value="${kheops_oauth_scope}"
                override="false"/>
     <Parameter name="online.kheops.welcomebot.webhook" value="${kheops_welcomebot_webhook}"
                override="false"/>
