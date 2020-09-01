@@ -3,9 +3,9 @@ package online.kheops.auth_server;
 import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.token.TokenAuthenticationContextFactory;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import javax.inject.Singleton;
 import javax.ws.rs.ApplicationPath;
 
 @ApplicationPath("/*")
@@ -19,7 +19,7 @@ public class AuthApplication extends ResourceConfig {
             bindFactory(TokenAuthenticationContextFactory.class)
                 .to(TokenAuthenticationContext.class)
                 .proxy(true)
-                .in(RequestScoped.class);
+                .in(Singleton.class);
           }
         });
 

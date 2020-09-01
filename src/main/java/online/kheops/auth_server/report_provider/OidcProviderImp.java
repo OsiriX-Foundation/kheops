@@ -10,24 +10,15 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.report_provider.metadata.OidcMetadata;
 import online.kheops.auth_server.report_provider.metadata.ParameterMap;
-import online.kheops.auth_server.report_provider.metadata.ParameterMapReader;
 import online.kheops.auth_server.token.TokenAuthenticationContext;
 
 import javax.cache.Cache;
 import javax.cache.CacheException;
-import javax.cache.CacheManager;
-import javax.cache.Caching;
-import javax.cache.configuration.FactoryBuilder;
-import javax.cache.configuration.MutableConfiguration;
-import javax.cache.expiry.CreatedExpiryPolicy;
-import javax.cache.expiry.Duration;
 import javax.cache.integration.CacheLoader;
 import javax.cache.integration.CacheLoaderException;
-import javax.cache.spi.CachingProvider;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -42,59 +33,35 @@ import static online.kheops.auth_server.report_provider.metadata.parameters.Opti
 
 public class OidcProviderImp implements OidcProvider {
 
-  public static final CacheLoader<String, OidcMetadata> OIDC_METADATA_CACHE_LOADER = new OidcMetadataLoader();
-  public static final CacheLoader<String, RSAPublicKey> PUBLIC_JWK_CACHE_LOADER = new JwkPublicKeyLoader();
+  public static CacheLoader<String, OidcMetadata> getOidcMetadataCacheLoader(Client client) {
+    return new OidcMetadataLoader(client);
+  }
 
-  private static final Client CLIENT = ClientBuilder.newClient().register(ParameterMapReader.class);
+  public static CacheLoader<String, RSAPublicKey> getPublicJwkCacheLoader(Client client) {
+    return new JwkPublicKeyLoader(client);
+  }
 
   private final TokenAuthenticationContext context;
+  private final Client client;
+  private final Cache<String, OidcMetadata> configurationCache;
+  private final Cache<String, RSAPublicKey> publicJwkCache;
 
-  public OidcProviderImp(TokenAuthenticationContext context) {
+  public OidcProviderImp(TokenAuthenticationContext context, Client client, Cache<String, OidcMetadata> configurationCache, Cache<String, RSAPublicKey> publicJwkCache) {
     this.context = context;
+    this.client = client;
+    this.configurationCache = configurationCache;
+    this.publicJwkCache = publicJwkCache;
   }
 
-  private static final Cache<String, OidcMetadata> OIDC_METADATA_CACHE = getOidcMetadataCache();
-  private static final Cache<String, RSAPublicKey> PUBLIC_JWK_CACHE = getPublicJwkCache();
+  private static class OidcMetadataLoader implements CacheLoader<String, OidcMetadata> {
+    final Client client;
 
-  private static CacheManager getCacheManager() {
-    CachingProvider cachingProvider = Caching.getCachingProvider();
-    return cachingProvider.getCacheManager();
-  }
-
-  private static Cache<String, OidcMetadata> getOidcMetadataCache() {
-
-    MutableConfiguration<String, OidcMetadata> configuration =
-        new MutableConfiguration<String, OidcMetadata>()
-            .setTypes(String.class, OidcMetadata.class)
-            .setStoreByValue(false)
-            .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.TEN_MINUTES))
-            .setReadThrough(true)
-            .setCacheLoaderFactory(new FactoryBuilder.SingletonFactory<>(OIDC_METADATA_CACHE_LOADER));
-
-    return getCacheManager().createCache("oidc_metadata_cache", configuration);
-  }
-
-  private static Cache<String, RSAPublicKey> getPublicJwkCache() {
-
-    MutableConfiguration<String, RSAPublicKey> configuration =
-        new MutableConfiguration<String, RSAPublicKey>()
-            .setTypes(String.class, RSAPublicKey.class)
-            .setStoreByValue(false)
-            .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.TEN_MINUTES))
-            .setReadThrough(true)
-            .setCacheLoaderFactory(new FactoryBuilder.SingletonFactory<>(PUBLIC_JWK_CACHE_LOADER));
-
-    return getCacheManager().createCache("jwk_public_key_cache", configuration);
-  }
-
-  private static class OidcMetadataLoader
-      implements CacheLoader<String, OidcMetadata> {
+    OidcMetadataLoader(Client client) {
+      this.client = client;
+    }
 
     public OidcMetadata load(String key) {
-      return CLIENT
-          .target(URI.create(key))
-          .request(APPLICATION_JSON_TYPE)
-          .get(ParameterMap.class);
+      return client.target(URI.create(key)).request(APPLICATION_JSON_TYPE).get(ParameterMap.class);
     }
 
     public Map<String, OidcMetadata> loadAll(Iterable<? extends String> keys) {
@@ -106,13 +73,16 @@ public class OidcProviderImp implements OidcProvider {
     }
   }
 
-  private static class JwkPublicKeyLoader
-      implements CacheLoader<String, RSAPublicKey> {
+  private static class JwkPublicKeyLoader implements CacheLoader<String, RSAPublicKey> {
 
-    public RSAPublicKey load(String key) throws CacheLoaderException  {
+    @SuppressWarnings("unused")
+    JwkPublicKeyLoader(Client client) {}
+
+    public RSAPublicKey load(String key) throws CacheLoaderException {
       String[] urlAndId = key.split(" ", 2);
       try {
-        return (RSAPublicKey) new UrlJwkProvider(new URL(urlAndId[0])).get(urlAndId[1]).getPublicKey();
+        return (RSAPublicKey)
+            new UrlJwkProvider(new URL(urlAndId[0])).get(urlAndId[1]).getPublicKey();
       } catch (MalformedURLException | JwkException e) {
         throw new CacheLoaderException("Unable to get JWK", e);
       }
@@ -130,7 +100,7 @@ public class OidcProviderImp implements OidcProvider {
   @Override
   public OidcMetadata getOidcMetadata() throws OidcProviderException {
     try {
-      return OIDC_METADATA_CACHE.get(context.getOIDCConfigurationString());
+      return configurationCache.get(context.getOIDCConfigurationUri().toString());
     } catch (CacheException e) {
       throw new OidcProviderException("unable to get metadata", e);
     }
@@ -139,9 +109,11 @@ public class OidcProviderImp implements OidcProvider {
   @Override
   public OidcMetadata getUserInfo(String token) throws OidcProviderException {
     try {
-      return CLIENT
-          .target(getOidcMetadata().getValue(USERINFO_ENDPOINT)
-              .orElseThrow(() -> new OidcProviderException("No Userinfo endpoint")))
+      return client
+          .target(
+              getOidcMetadata()
+                  .getValue(USERINFO_ENDPOINT)
+                  .orElseThrow(() -> new OidcProviderException("No Userinfo endpoint")))
           .request(APPLICATION_JSON_TYPE)
           .header("Authorization", "Bearer " + token)
           .get(ParameterMap.class);
@@ -152,38 +124,57 @@ public class OidcProviderImp implements OidcProvider {
 
   @Override
   public DecodedJWT validateAccessToken(String accessToken) throws OidcProviderException {
-    final URI jwksUri = getOidcMetadata().getValue(JWKS_URI)
-        .orElseThrow(() -> new OidcProviderException("No jwks_uri"));
-    final URI issuer = getOidcMetadata().getValue(ISSUER)
-        .orElseThrow(() -> new OidcProviderException("No issuer"));
+    final URI jwksUri =
+        getOidcMetadata()
+            .getValue(JWKS_URI)
+            .orElseThrow(() -> new OidcProviderException("No jwks_uri"));
+    final URI issuer =
+        getOidcMetadata()
+            .getValue(ISSUER)
+            .orElseThrow(() -> new OidcProviderException("No issuer"));
 
-    final RSAKeyProvider keyProvider = new RSAKeyProvider() {
-      @Override
-      public RSAPublicKey getPublicKeyById(String keyId) {
-        return PUBLIC_JWK_CACHE.get(jwksUri.toString() + " " + keyId);
-      }
-      // implemented to get rid of warnings
-      @Override public RSAPrivateKey getPrivateKey() {return null;}
-      @Override public String getPrivateKeyId() {return null;}
-    };
+    final RSAKeyProvider keyProvider =
+        new RSAKeyProvider() {
+          @Override
+          public RSAPublicKey getPublicKeyById(String keyId) {
+            return publicJwkCache.get(jwksUri.toString() + " " + keyId);
+          }
+
+          @Override
+          public RSAPrivateKey getPrivateKey() {
+            return null;
+          }
+
+          @Override
+          public String getPrivateKeyId() {
+            return null;
+          }
+        };
 
     final DecodedJWT jwt;
     try {
-      jwt = JWT.require(Algorithm.RSA256(keyProvider))
-          .acceptLeeway(120)
-          .withIssuer(issuer.toString())
-          .acceptLeeway(60)
-          .build()
-          .verify(accessToken);
+      jwt =
+          JWT.require(Algorithm.RSA256(keyProvider))
+              .acceptLeeway(120)
+              .withIssuer(issuer.toString())
+              .acceptLeeway(60)
+              .build()
+              .verify(accessToken);
     } catch (JWTVerificationException e) {
-      throw new OidcProviderException("Verification of the token failed, configuration URL:" + context.getOIDCConfigurationString(), e);
+      throw new OidcProviderException(
+          "Verification of the token failed, configuration URL:"
+              + context.getOIDCConfigurationUri(),
+          e);
     }
 
     if (jwt.getSubject() == null) {
-      throw new OidcProviderException("No subject present in the token, configuration URL:" + context.getOIDCConfigurationString());
+      throw new OidcProviderException(
+          "No subject present in the token, configuration URL:"
+              + context.getOIDCConfigurationUri());
     }
 
-    final String oauthScope = context.getServletContext().getInitParameter("online.kheops.oauth.scope");
+    final String oauthScope =
+        context.getServletContext().getInitParameter("online.kheops.oauth.scope");
     if (oauthScope != null && !oauthScope.isEmpty()) {
       final Claim scopeClaim = jwt.getClaim("scope");
       if (scopeClaim.isNull() || scopeClaim.asString() == null) {
