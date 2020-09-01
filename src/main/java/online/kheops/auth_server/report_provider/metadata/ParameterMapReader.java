@@ -64,7 +64,7 @@ public class ParameterMapReader implements MessageBodyReader<ParameterMap> {
       return;
     }
     try {
-      parameterMap.put(parameter, parameter.valueFrom(jsonObject.getJsonObject(key)));
+      parameterMap.put(parameter, parameter.valueFrom(jsonObject.get(key)));
     } catch (JsonException | IllegalArgumentException e) {
       LOG.log(WARNING, "unable to read parameter key: " + key + " is unknown, skipping", e);
     }

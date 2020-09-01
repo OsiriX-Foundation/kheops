@@ -7,6 +7,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public enum OptionalUriParameter implements OptionalParameter<URI> {
+    ISSUER("issuer", false),
+    TOKEN_ENDPOINT("token_endpoint", false),
+    AUTHORIZATION_ENDPOINT("authorization_endpoint", false),
     LOGO_URI("logo_uri", true),
     CLIENT_URI("client_uri", true),
     POLICY_URI("policy_uri", true),

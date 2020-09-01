@@ -9,10 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public enum URIParameter implements Parameter<URI> {
-    INITIATE_LOGIN_URI("initiate_login_uri"),
-    ISSUER("issuer"),
-    TOKEN_ENDPOINT("token_endpoint"),
-    AUTHORIZATION_ENDPOINT("authorization_endpoint");
+    INITIATE_LOGIN_URI("initiate_login_uri");
 
     private final String key;
 

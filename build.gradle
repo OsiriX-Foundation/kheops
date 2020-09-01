@@ -46,7 +46,8 @@ dependencies {
     api group: 'org.jooq', name: 'jooq-meta', version: '3.13.3'
     api group: 'org.jooq', name: 'jooq-codegen', version: '3.13.3'
 
-    api group: 'org.ehcache', name: 'ehcache', version: '3.6.3'
+    api group: 'javax.cache', name: 'cache-api', version: '1.1.0'
+    api group: 'org.ehcache', name: 'ehcache', version: '3.8.1'
 
     api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.3') {
         exclude module: 'slf4j-log4j12'
