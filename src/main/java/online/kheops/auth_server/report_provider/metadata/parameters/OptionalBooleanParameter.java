@@ -7,7 +7,9 @@ public enum OptionalBooleanParameter implements OptionalParameter<Boolean> {
     CLAIMS_PARAMETER_SUPPORTED("claims_parameter_supported"),
     REQUEST_PARAMETER_SUPPORTED("request_parameter_supported"),
     REQUEST_URI_PARAMETER_SUPPORTED("request_uri_parameter_supported"),
-    REQUIRE_REQUEST_URI_REGISTRATION("require_request_uri_registration");
+    REQUIRE_REQUEST_URI_REGISTRATION("require_request_uri_registration"),
+    EMAIL_VERIFIED("email_verified"),
+    PHONE_NUMBER_VERIFIED("phone_number_verified");
 
     private final String key;
 

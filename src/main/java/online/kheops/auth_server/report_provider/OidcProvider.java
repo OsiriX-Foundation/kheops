@@ -11,5 +11,5 @@ public interface OidcProvider {
 
   DecodedJWT validateAccessToken(String accessToken) throws OidcProviderException;
 
-  Map<String, String> getUserInfo(String token) throws OidcProviderException;
+  OidcMetadata getUserInfo(String token) throws OidcProviderException;
 }

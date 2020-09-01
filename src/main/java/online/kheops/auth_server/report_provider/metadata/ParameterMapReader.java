@@ -42,9 +42,9 @@ public class ParameterMapReader implements MessageBodyReader<ParameterMap> {
                   @Override
                   public void close() {}
                 });
-        JsonReader jsonReader = Json.createReader(inputStreamReader)) {
-
-      JsonObject jsonObject = jsonReader.readObject();
+         final JsonReader jsonReader = Json.createReader(inputStreamReader))
+    {
+      final JsonObject jsonObject = jsonReader.readObject();
 
       for (String key : jsonObject.keySet()) {
         writeKey(key, jsonObject, parameterMap);

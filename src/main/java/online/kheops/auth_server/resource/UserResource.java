@@ -9,30 +9,23 @@ import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
+import online.kheops.auth_server.report_provider.OidcProviderException;
+import online.kheops.auth_server.report_provider.metadata.OidcMetadata;
+import online.kheops.auth_server.report_provider.metadata.parameters.OptionalStringParameter;
 import online.kheops.auth_server.token.TokenAuthenticationContext;
 import online.kheops.auth_server.user.*;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.util.KheopsLogBuilder;
-import org.ehcache.Cache;
-import org.ehcache.CacheManager;
-import org.ehcache.config.builders.CacheConfigurationBuilder;
-import org.ehcache.config.builders.CacheManagerBuilder;
-import org.ehcache.config.builders.ExpiryPolicyBuilder;
-import org.ehcache.config.builders.ResourcePoolsBuilder;
 
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 import javax.xml.bind.annotation.XmlElement;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.time.Duration;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -141,7 +134,7 @@ public class UserResource {
                 return Response.status(NO_CONTENT).build();
             }
 
-            final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<List<UserResponse>>(result) {};
+            final GenericEntity<List<UserResponse>> genericUsersResponsesList = new GenericEntity<>(result) {};
             return Response.status(OK).entity(genericUsersResponsesList).build();
         } else if(reference != null && search == null) {
             final UserResponseBuilder userResponseBuilder;
@@ -173,33 +166,6 @@ public class UserResource {
         }
     }
 
-    private static class ConfigurationEntity {
-        @XmlElement(name="userinfo_endpoint")
-        String userinfoEndpoint;
-    }
-    private static class UserInfoEntity {
-        @XmlElement(name="name")
-        String name;
-        @XmlElement(name="sub")
-        String sub;
-        @XmlElement(name="email")
-        String email;
-    }
-    private static final Client CLIENT = ClientBuilder.newClient();
-
-    private static final String USER_INFO_URLS_CACHE_ALIAS = "userInfoURLsCache";
-    private static CacheManager userInfoCacheManager = getUserInfoCacheManager();
-    private static Cache<String, String> userInfoURLsCache = userInfoCacheManager.getCache(USER_INFO_URLS_CACHE_ALIAS, String.class, String.class);
-
-    private static CacheManager getUserInfoCacheManager() {
-        CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(USER_INFO_URLS_CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class, ResourcePoolsBuilder.heap(10))
-                        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofMinutes(10))))
-                .build();
-        cacheManager.init();
-        return cacheManager;
-    }
-
     @POST
     @Path("register")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -223,33 +189,17 @@ public class UserResource {
             return Response.status(BAD_REQUEST).build();
         }
 
-        final String oidcProvider = tokenAuthenticationContext.getOIDCProvider();
-        String userInfoUrl = userInfoURLsCache.get(oidcProvider);
-        if (userInfoUrl == null) {
-            final String openidConfiguration = tokenAuthenticationContext.getOIDCConfigurationString();
-            final URI openidConfigurationURI;
-
-            try {
-                openidConfigurationURI = new URI(openidConfiguration);
-                ConfigurationEntity res = CLIENT.target(openidConfigurationURI).request(MediaType.APPLICATION_JSON).get(ConfigurationEntity.class);
-                userInfoUrl = res.userinfoEndpoint;
-                userInfoURLsCache.put(oidcProvider, userInfoUrl);
-            } catch (ProcessingException | WebApplicationException e) {
-                LOG.log(Level.SEVERE, "Unable to get userInfoURL", e);
-                return Response.status(BAD_GATEWAY).build();
-            } catch (URISyntaxException e) {
-                LOG.log(Level.SEVERE, "bad configuration URL", e);
-                return Response.status(INTERNAL_SERVER_ERROR).build();
-            }
-        }
         try {
-            final URI userinfoEndpointURI;
-            userinfoEndpointURI = new URI(userInfoUrl);
-            UserInfoEntity userInfoEntity = CLIENT.target(userinfoEndpointURI).request(MediaType.APPLICATION_JSON).header("Authorization", "Bearer " + token).get(UserInfoEntity.class);
+            OidcMetadata userInfo = tokenAuthenticationContext.getOidcProvider().getUserInfo(token);
 
             final String welcomebotWebhook = servletContext.getInitParameter("online.kheops.welcomebot.webhook");
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder();
-            final User user = upsertUser(userInfoEntity.sub, userInfoEntity.name, userInfoEntity.email, welcomebotWebhook, logBuilder);
+            final User user = upsertUser(
+                userInfo.getValue(OptionalStringParameter.SUB).orElseThrow(),
+                userInfo.getValue(OptionalStringParameter.NAME).orElseThrow(),
+                userInfo.getValue(OptionalStringParameter.EMAIL).orElseThrow(),
+                welcomebotWebhook,
+                logBuilder);
 
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
 
@@ -261,12 +211,12 @@ public class UserResource {
             logBuilder.log();
 
             return Response.ok().entity(userResponse).build();
-        } catch (ProcessingException | WebApplicationException e) {
+        } catch (ProcessingException | WebApplicationException | NoSuchElementException e) {
             LOG.log(Level.SEVERE, "Unable to get user response", e);
             return Response.status(BAD_GATEWAY).build();
-        } catch (URISyntaxException e) {
-            LOG.log(Level.SEVERE, "bad configuration URL", e);
-            return Response.status(INTERNAL_SERVER_ERROR).build();
+        } catch (OidcProviderException e) {
+            LOG.log(Level.WARNING, "Access token error", e);
+            return Response.status(BAD_REQUEST).build();
         }
     }
 

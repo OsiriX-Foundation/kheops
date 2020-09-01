@@ -1,14 +1,21 @@
 package online.kheops.auth_server.report_provider.metadata.parameters;
 
+import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.report_provider.metadata.Parameter;
 
 import javax.json.Json;
 import javax.json.JsonArray;
+import javax.json.JsonException;
 import javax.json.JsonValue;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static java.util.logging.Level.WARNING;
 
 public interface ListParameter<T> extends Parameter<List<T>> {
 
@@ -58,8 +65,15 @@ public interface ListParameter<T> extends Parameter<List<T>> {
   @Override
   default List<T> valueFrom(JsonValue jsonValue) {
     if (jsonValue instanceof JsonArray) {
-      return ((JsonArray) jsonValue)
-          .stream().map(this::innerValueFrom).collect(Collectors.toList());
+      final List<T> list = new ArrayList<>();
+      for (JsonValue value: jsonValue.asJsonArray()) {
+        try {
+          list.add(innerValueFrom(value));
+        } catch (IllegalArgumentException | JsonException e) {
+          Logger.getLogger(ListParameter.class.getName()).log(WARNING, "unknown value: " + value.toString(), e);
+        }
+      }
+      return list;
     } else {
       throw new IllegalArgumentException("Not an array");
     }

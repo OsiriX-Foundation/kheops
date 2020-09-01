@@ -6,7 +6,16 @@ import javax.json.JsonValue;
 
 public enum OptionalStringParameter implements OptionalParameter<String> {
     CLIENT_NAME("client_name", true),
-    CLIENT_SECRET("client_secret", false);
+    CLIENT_SECRET("client_secret", false),
+    SUB("sub", false),
+    NAME("name", false),
+    GIVEN_NAME("given_name", false),
+    FAMILY_NAME("family_name", false),
+    MIDDLE_NAME("middle_name", false),
+    NICKNAME("nickname", false),
+    PREFERRED_USERNAME("preferred_username", false),
+    EMAIL("email", false),
+    GENDER("gender", false);
 
     private final String key;
     private final boolean localizable;

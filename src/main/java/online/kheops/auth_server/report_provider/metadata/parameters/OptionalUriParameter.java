@@ -20,7 +20,10 @@ public enum OptionalUriParameter implements OptionalParameter<URI> {
     REGISTRATION_ENDPOINT("registration_endpoint", false),
     SERVICE_DOCUMENTATION("service_documentation", false),
     OP_POLICY_URI("op_policy_uri", false),
-    OP_TOS_URI("op_tos_uri", false);
+    OP_TOS_URI("op_tos_uri", false),
+    PROFILE("profile", false),
+    PICTURE("picture", false),
+    WEBSITE("website", false);
 
     private final String key;
     private final boolean localizable;

@@ -24,6 +24,8 @@ import javax.cache.expiry.Duration;
 import javax.cache.integration.CacheLoader;
 import javax.cache.integration.CacheLoaderException;
 import javax.cache.spi.CachingProvider;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import java.net.MalformedURLException;
@@ -31,14 +33,17 @@ import java.net.URI;
 import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
-import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalUriParameter.ISSUER;
-import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalUriParameter.JWKS_URI;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalUriParameter.*;
 
 public class OidcProviderImp implements OidcProvider {
+
+  public static final CacheLoader<String, OidcMetadata> OIDC_METADATA_CACHE_LOADER = new OidcMetadataLoader();
+  public static final CacheLoader<String, RSAPublicKey> PUBLIC_JWK_CACHE_LOADER = new JwkPublicKeyLoader();
 
   private static final Client CLIENT = ClientBuilder.newClient().register(ParameterMapReader.class);
 
@@ -64,8 +69,7 @@ public class OidcProviderImp implements OidcProvider {
             .setStoreByValue(false)
             .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.TEN_MINUTES))
             .setReadThrough(true)
-            .setCacheLoaderFactory(new FactoryBuilder.SingletonFactory<>(
-                new OidcMetadataLoader()));
+            .setCacheLoaderFactory(new FactoryBuilder.SingletonFactory<>(OIDC_METADATA_CACHE_LOADER));
 
     return getCacheManager().createCache("oidc_metadata_cache", configuration);
   }
@@ -78,13 +82,12 @@ public class OidcProviderImp implements OidcProvider {
             .setStoreByValue(false)
             .setExpiryPolicyFactory(CreatedExpiryPolicy.factoryOf(Duration.TEN_MINUTES))
             .setReadThrough(true)
-            .setCacheLoaderFactory(new FactoryBuilder.SingletonFactory<>(
-                new JwkPublicKeyLoader()));
+            .setCacheLoaderFactory(new FactoryBuilder.SingletonFactory<>(PUBLIC_JWK_CACHE_LOADER));
 
     return getCacheManager().createCache("jwk_public_key_cache", configuration);
   }
 
-  public static class OidcMetadataLoader
+  private static class OidcMetadataLoader
       implements CacheLoader<String, OidcMetadata> {
 
     public OidcMetadata load(String key) {
@@ -103,7 +106,7 @@ public class OidcProviderImp implements OidcProvider {
     }
   }
 
-  public static class JwkPublicKeyLoader
+  private static class JwkPublicKeyLoader
       implements CacheLoader<String, RSAPublicKey> {
 
     public RSAPublicKey load(String key) throws CacheLoaderException  {
@@ -134,9 +137,17 @@ public class OidcProviderImp implements OidcProvider {
   }
 
   @Override
-  public Map<String, String> getUserInfo(String token) throws OidcProviderException {
-    // TODO
-    throw new UnsupportedOperationException();
+  public OidcMetadata getUserInfo(String token) throws OidcProviderException {
+    try {
+      return CLIENT
+          .target(getOidcMetadata().getValue(USERINFO_ENDPOINT)
+              .orElseThrow(() -> new OidcProviderException("No Userinfo endpoint")))
+          .request(APPLICATION_JSON_TYPE)
+          .header("Authorization", "Bearer " + token)
+          .get(ParameterMap.class);
+    } catch (WebApplicationException | ProcessingException e) {
+      throw new OidcProviderException("Unable to get user info", e);
+    }
   }
 
   @Override
@@ -178,8 +189,9 @@ public class OidcProviderImp implements OidcProvider {
       if (scopeClaim.isNull() || scopeClaim.asString() == null) {
         throw new OidcProviderException("Missing scope claim in token");
       } else {
-        if (!scopeClaim.asString().contains(oauthScope)) {
-          throw new OidcProviderException("Missing scope 'kheops' in token");
+        final String[] words = scopeClaim.asString().split("\\s+", 40);
+        if (!Arrays.asList(words).contains(oauthScope)) {
+          throw new OidcProviderException("Missing required scope in token");
         }
       }
     }
