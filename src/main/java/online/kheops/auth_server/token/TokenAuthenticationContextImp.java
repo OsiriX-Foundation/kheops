@@ -1,6 +1,5 @@
 package online.kheops.auth_server.token;
 
-import online.kheops.auth_server.fetch.FetchContextListener;
 import online.kheops.auth_server.report_provider.OidcProvider;
 import online.kheops.auth_server.report_provider.OidcProviderImp;
 import online.kheops.auth_server.report_provider.ReportProviderCatalogue;
@@ -23,8 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TokenAuthenticationContextImp implements TokenAuthenticationContext {
   private final Client client;

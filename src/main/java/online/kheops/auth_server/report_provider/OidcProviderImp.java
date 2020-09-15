@@ -53,19 +53,15 @@ public class OidcProviderImp implements OidcProvider {
     this.publicJwkCache = publicJwkCache;
   }
 
-  private static class OidcMetadataLoader implements CacheLoader<String, OidcMetadata> {
+  private static abstract class Loader<V> implements CacheLoader<String, V> {
     final Client client;
 
-    OidcMetadataLoader(Client client) {
+    Loader(Client client) {
       this.client = client;
     }
 
-    public OidcMetadata load(String key) {
-      return client.target(URI.create(key)).request(APPLICATION_JSON_TYPE).get(ParameterMap.class);
-    }
-
-    public Map<String, OidcMetadata> loadAll(Iterable<? extends String> keys) {
-      Map<String, OidcMetadata> data = new HashMap<>();
+    public Map<String, V> loadAll(Iterable<? extends String> keys) {
+      Map<String, V> data = new HashMap<>();
       for (String key : keys) {
         data.put(key, load(key));
       }
@@ -73,10 +69,22 @@ public class OidcProviderImp implements OidcProvider {
     }
   }
 
-  private static class JwkPublicKeyLoader implements CacheLoader<String, RSAPublicKey> {
+  private static class OidcMetadataLoader extends Loader<OidcMetadata> {
 
-    @SuppressWarnings("unused")
-    JwkPublicKeyLoader(Client client) {}
+    OidcMetadataLoader(Client client) {
+      super(client);
+    }
+
+    public OidcMetadata load(String key) {
+      return client.target(URI.create(key)).request(APPLICATION_JSON_TYPE).get(ParameterMap.class);
+    }
+  }
+
+  private static class JwkPublicKeyLoader extends Loader<RSAPublicKey> {
+
+    JwkPublicKeyLoader(Client client) {
+      super(client);
+    }
 
     public RSAPublicKey load(String key) throws CacheLoaderException {
       String[] urlAndId = key.split(" ", 2);
@@ -86,14 +94,6 @@ public class OidcProviderImp implements OidcProvider {
       } catch (MalformedURLException | JwkException e) {
         throw new CacheLoaderException("Unable to get JWK", e);
       }
-    }
-
-    public Map<String, RSAPublicKey> loadAll(Iterable<? extends String> keys) {
-      Map<String, RSAPublicKey> data = new HashMap<>();
-      for (String key : keys) {
-        data.put(key, load(key));
-      }
-      return data;
     }
   }
 
