@@ -13,7 +13,4 @@ public interface TokenAuthenticationContext {
   PrivateKeyJWTAuthenticator newPrivateKeyJWTAuthenticator();
 
   OidcProvider getOidcProvider();
-
-  String getOIDCProvider();
-  URI getOIDCConfigurationUri();
 }

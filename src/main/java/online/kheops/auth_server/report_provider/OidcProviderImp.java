@@ -10,17 +10,18 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.RSAKeyProvider;
 import online.kheops.auth_server.report_provider.metadata.OidcMetadata;
 import online.kheops.auth_server.report_provider.metadata.ParameterMap;
-import online.kheops.auth_server.token.TokenAuthenticationContext;
 
 import javax.cache.Cache;
 import javax.cache.CacheException;
 import javax.cache.integration.CacheLoader;
 import javax.cache.integration.CacheLoaderException;
+import javax.servlet.ServletContext;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -41,19 +42,23 @@ public class OidcProviderImp implements OidcProvider {
     return new JwkPublicKeyLoader(client);
   }
 
-  private final TokenAuthenticationContext context;
+  private final ServletContext servletContext;
   private final Client client;
   private final Cache<String, OidcMetadata> configurationCache;
   private final Cache<String, RSAPublicKey> publicJwkCache;
 
-  public OidcProviderImp(TokenAuthenticationContext context, Client client, Cache<String, OidcMetadata> configurationCache, Cache<String, RSAPublicKey> publicJwkCache) {
-    this.context = context;
+  public OidcProviderImp(
+      ServletContext servletContext,
+      Client client,
+      Cache<String, OidcMetadata> configurationCache,
+      Cache<String, RSAPublicKey> publicJwkCache) {
+    this.servletContext = servletContext;
     this.client = client;
     this.configurationCache = configurationCache;
     this.publicJwkCache = publicJwkCache;
   }
 
-  private static abstract class Loader<V> implements CacheLoader<String, V> {
+  private abstract static class Loader<V> implements CacheLoader<String, V> {
     final Client client;
 
     Loader(Client client) {
@@ -100,7 +105,7 @@ public class OidcProviderImp implements OidcProvider {
   @Override
   public OidcMetadata getOidcMetadata() throws OidcProviderException {
     try {
-      return configurationCache.get(context.getOIDCConfigurationUri().toString());
+      return configurationCache.get(getOIDCConfigurationUri().toString());
     } catch (CacheException e) {
       throw new OidcProviderException("unable to get metadata", e);
     }
@@ -162,19 +167,15 @@ public class OidcProviderImp implements OidcProvider {
               .verify(accessToken);
     } catch (JWTVerificationException e) {
       throw new OidcProviderException(
-          "Verification of the token failed, configuration URL:"
-              + context.getOIDCConfigurationUri(),
-          e);
+          "Verification of the token failed, configuration URL:" + getOIDCConfigurationUri(), e);
     }
 
     if (jwt.getSubject() == null) {
       throw new OidcProviderException(
-          "No subject present in the token, configuration URL:"
-              + context.getOIDCConfigurationUri());
+          "No subject present in the token, configuration URL:" + getOIDCConfigurationUri());
     }
 
-    final String oauthScope =
-        context.getServletContext().getInitParameter("online.kheops.oauth.scope");
+    final String oauthScope = getOauthScope();
     if (oauthScope != null && !oauthScope.isEmpty()) {
       final Claim scopeClaim = jwt.getClaim("scope");
       if (scopeClaim.isNull() || scopeClaim.asString() == null) {
@@ -188,5 +189,21 @@ public class OidcProviderImp implements OidcProvider {
     }
 
     return jwt;
+  }
+
+  private URI getOIDCConfigurationUri() {
+    try {
+      return new URI(getOIDCProviderUriString() + "/.well-known/openid-configuration");
+    } catch (URISyntaxException e) {
+      throw new AssertionError("Unable to build an OIDC configuration URI", e);
+    }
+  }
+
+  private String getOIDCProviderUriString() {
+    return servletContext.getInitParameter("online.kheops.oidc.provider");
+  }
+
+  private String getOauthScope() {
+    return servletContext.getInitParameter("online.kheops.oauth.scope");
   }
 }
