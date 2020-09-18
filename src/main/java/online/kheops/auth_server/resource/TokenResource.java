@@ -7,13 +7,17 @@ import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.capability.CapabilityNotFoundException;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
+import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.token.*;
+import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
@@ -28,8 +32,10 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.getCapabilityWithID;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getRedirectUri;
+import static online.kheops.auth_server.series.Series.canAccessSeries;
 import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
+import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 
 
@@ -73,7 +79,20 @@ public class TokenResource
 
         try {
             final TokenGrantResult result = grantType.processGrant(securityContext, context, form);
-            final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
+            AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, form.getFirst("subject_token"));
+            final User user;
+            final EntityManager em = EntityManagerListener.createEntityManager();
+            try {
+                user = getUser(accessToken.getSubject(), em);
+            } catch (UserNotFoundException e) {
+                throw new IllegalStateException(e);
+            } finally {
+                em.close();
+            }
+
+            KheopsPrincipal kheopsPrincipal = accessToken.newPrincipal(context, user);
+
+            final KheopsLogBuilder logBuilder = kheopsPrincipal.getKheopsLogBuilder()
                     .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(grantType.getLogActionType())
@@ -87,6 +106,8 @@ public class TokenResource
             logBuilder.log();
 
             return Response.ok(result.getTokenResponseEntity()).build();
+        } catch (AccessTokenVerificationException e) {
+            throw new IllegalStateException(e);
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e; //NOSONAR
