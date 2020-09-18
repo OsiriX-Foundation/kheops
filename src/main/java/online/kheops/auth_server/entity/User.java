@@ -15,12 +15,12 @@ import java.util.logging.Logger;
                 query = "SELECT u FROM User u WHERE u.sub = :userId"),
         @NamedQuery(name = "User.findByEmail",
                 query = "SELECT u FROM User u WHERE u.email = :email"),
-        @NamedQuery(name = "User.searchByEmailInAlbumId",
-                query = "SELECT u FROM User u JOIN AlbumUser au WHERE au.id = :albumId AND u.email LIKE :search"),
+        @NamedQuery(name = "User.searchByEmailOrNameInAlbumId",
+                query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a WHERE a.id = :albumId AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
         @NamedQuery(name = "User.searchByEmailWithStudyAccess",
-                query = "SELECT u FROM User u JOIN AlbumUser au JOIN Album a JOIN AlbumSeries als JOIN Series se JOIN Study st WHERE st.studyInstanceUID = :studyUID AND u.email LIKE :search"),
-        @NamedQuery(name = "User.searchByEmail",
-                query = "SELECT u FROM User u WHERE u.email LIKE :search")
+                query = "SELECT DISTINCT u FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries als JOIN als.series se JOIN se.study st WHERE st.studyInstanceUID = :studyUID AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
+        @NamedQuery(name = "User.searchByEmailOrName",
+                query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname)")
 })
 
 @Entity

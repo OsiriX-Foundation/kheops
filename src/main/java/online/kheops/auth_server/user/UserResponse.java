@@ -94,7 +94,6 @@ public class UserResponse  implements Comparable<UserResponse> {
         if (obj instanceof UserResponse) {
             final UserResponse userAlbumResponse = (UserResponse) obj;
             return  userAlbumResponse.sub.compareTo(sub) == 0 &&
-                    userAlbumResponse.isAdmin == isAdmin &&
                     userAlbumResponse.email.compareTo(email) == 0;
         }
         return false;
@@ -106,7 +105,6 @@ public class UserResponse  implements Comparable<UserResponse> {
         int result = hashCode;
         if(result == 0) {
             result = sub.hashCode();
-            result = 31 * result + isAdmin.hashCode();
             result = 31 * result + email.hashCode();
             hashCode = result;
         }
