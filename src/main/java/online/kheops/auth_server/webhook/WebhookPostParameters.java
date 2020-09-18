@@ -18,10 +18,12 @@ public class WebhookPostParameters {
     private String albumId;
     private boolean useSecret;
     private boolean newSeries;
+    private boolean removeSeries;
     private boolean newUser;
 
     public WebhookPostParameters() {
         newSeries = false;
+        removeSeries = false;
         newUser = false;
     }
 
@@ -62,6 +64,8 @@ public class WebhookPostParameters {
         for (String event : events) {
             if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
                 newSeries = true;
+            } else if (event.equalsIgnoreCase(WebhookType.REMOVE_SERIES.name())) {
+                removeSeries = true;
             } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
                 newUser = true;
             } else {
@@ -87,5 +91,6 @@ public class WebhookPostParameters {
     public String getAlbumId() { return albumId; }
     public boolean isUseSecret() { return useSecret; }
     public boolean isNewSeries() { return newSeries; }
+    public boolean isRemoveSeries() { return removeSeries; }
     public boolean isNewUser() { return newUser; }
 }

@@ -40,4 +40,8 @@ public class SeriesResponse {
     public SeriesResponse(Series series) {
         seriesUid = series.getSeriesInstanceUID();
     }
+
+    public void hideRetrieveUrl() {
+        retrieveUrl = null;
+    }
 }

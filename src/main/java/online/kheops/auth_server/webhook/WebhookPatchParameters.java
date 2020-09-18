@@ -21,6 +21,7 @@ public class WebhookPatchParameters {
         private Optional<String> secret;
         private Optional<Boolean> enabled;
         private Optional<Boolean> newSeries;
+        private Optional<Boolean> removeSeries;
         private Optional<Boolean> newUser;
 
         private boolean removeSecret;
@@ -173,6 +174,7 @@ public class WebhookPatchParameters {
     private String webhookId;
     private boolean removeSecret;
     private Optional<Boolean> newSeries;
+    private Optional<Boolean> removeSeries;
     private Optional<Boolean> newUser;
 
     private WebhookPatchParameters(WebhookPatchParametersBuilder builder) {
@@ -182,6 +184,7 @@ public class WebhookPatchParameters {
         enabled = builder.enabled;
         removeSecret = builder.removeSecret;
         newSeries = builder.newSeries;
+        removeSeries = builder.removeSeries;
         newUser = builder.newUser;
         albumId = builder.albumId;
         webhookId = builder.webhookId;
@@ -195,5 +198,6 @@ public class WebhookPatchParameters {
     public  String getwebhookId() { return webhookId; }
     public boolean isRemoveSecret() { return removeSecret; }
     public  Optional<Boolean> isNewSeries() { return newSeries; }
+    public  Optional<Boolean> isRemoveSeries() { return removeSeries; }
     public  Optional<Boolean> isNewUser() { return newUser; }
 }
