@@ -62,6 +62,10 @@ public class Webhook {
     private Boolean removeSeries;
 
     @Basic(optional = false)
+    @Column(name = "delete_album")
+    private Boolean deleteAlbum;
+
+    @Basic(optional = false)
     @Column(name = "new_user")
     private Boolean newUser;
 
@@ -96,6 +100,7 @@ public class Webhook {
         this.newSeries = webhookPostParameters.isNewSeries();
         this.removeSeries = webhookPostParameters.isRemoveSeries();
         this.newUser = webhookPostParameters.isNewUser();
+        this.deleteAlbum = webhookPostParameters.isDeleteAlbum();
         this.album = album;
         this.user = user;
         this.enabled = webhookPostParameters.isEnabled();
@@ -132,6 +137,8 @@ public class Webhook {
     public boolean getNewUser() {
         return newUser;
     }
+
+    public boolean getDeleteAlbum() { return deleteAlbum; }
 
     public Boolean isEnabled() { return enabled; }
 
@@ -174,6 +181,8 @@ public class Webhook {
     public void setNewUser(Boolean newUser) {
         this.newUser = newUser;
     }
+
+    public void setDeleteAlbum(Boolean deleteAlbum) { this.deleteAlbum = deleteAlbum; }
 
     public void setEnabled(Boolean enabled) { this.enabled = enabled; }
 

@@ -258,11 +258,11 @@ public class AlbumResource {
     @Path("albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response deleteAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId)
-            throws AlbumNotFoundException {
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        Albums.deleteAlbum(kheopsPrincipal.getUser(), albumId);
+        Albums.deleteAlbum(context, kheopsPrincipal.getUser(), albumId);
 
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumId)
@@ -394,7 +394,7 @@ public class AlbumResource {
         final User targetUser;
 
         try {
-            targetUser = Albums.deleteUser(kheopsPrincipal.getUser(), user, albumId);
+            targetUser = Albums.deleteUser(context, kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotMemberException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }

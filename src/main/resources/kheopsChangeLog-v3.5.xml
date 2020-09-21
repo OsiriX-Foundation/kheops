@@ -28,8 +28,21 @@
         </addColumn>
     </changeSet>
 
-
     <changeSet author="kheops" id="v3.5-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="webhooks" columnName="delete_album"/>
+            </not>
+        </preConditions>
+        <addColumn schemaName= "public" tableName="webhooks" >
+            <column name="delete_album" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v3.5-4">
        <tagDatabase tag="v3.5"/>
     </changeSet>
 

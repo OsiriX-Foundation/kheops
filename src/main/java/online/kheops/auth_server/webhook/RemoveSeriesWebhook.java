@@ -26,7 +26,7 @@ public class RemoveSeriesWebhook implements WebhookResult{
     @XmlElement(name = "removed_study")
     private StudyResponse removedStudy;
 
-    
+
     private RemoveSeriesWebhook() { /*empty*/ }
 
     public RemoveSeriesWebhook(String albumId, AlbumUser sourceUser, Series series, String instance, boolean isManualTrigger) {

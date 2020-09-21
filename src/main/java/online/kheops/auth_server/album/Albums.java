@@ -8,6 +8,7 @@ import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
 import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.webhook.*;
 
@@ -128,8 +129,8 @@ public class Albums {
         return findAlbumsByUserPk(albumQueryParams);
     }
 
-    public static void deleteAlbum(User callingUser, String albumId)
-            throws AlbumNotFoundException {
+    public static void deleteAlbum(ServletContext context, User callingUser, String albumId)
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -139,6 +140,16 @@ public class Albums {
 
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
+            final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);
+
+            final DeleteAlbumWebhook deleteAlbumWebhook = new DeleteAlbumWebhook(albumId, callingAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+            final List<WebhookAsyncRequestDeleteAlbum> webhookAsyncRequests = new ArrayList<>();
+
+            for (Webhook webhook : album.getWebhooks()) {
+                if (webhook.getDeleteAlbum() && webhook.isEnabled()) {
+                    webhookAsyncRequests.add(new WebhookAsyncRequestDeleteAlbum(webhook.getUrl(), deleteAlbumWebhook, webhook.getSecret()));
+                }
+            }
 
             if (album.getPk() == callingUser.getInbox().getPk()) {
                 throw new AlbumNotFoundException();
@@ -173,6 +184,9 @@ public class Albums {
             em.remove(album);
 
             tx.commit();
+
+            webhookAsyncRequests.forEach(WebhookAsyncRequestDeleteAlbum::firstRequest);
+
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -298,7 +312,7 @@ public class Albums {
         }
     }
 
-    public static User deleteUser(User callingUser, String userName,  String albumId)
+    public static User deleteUser(ServletContext context, User callingUser, String userName,  String albumId)
             throws UserNotFoundException, AlbumNotFoundException, UserNotMemberException, AlbumForbiddenException{
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -313,7 +327,7 @@ public class Albums {
 
             //Delete the album if it is the last User
             if (album.getAlbumUser().size() == 1) {
-                deleteAlbum(callingUser, albumId);
+                deleteAlbum(context, callingUser, albumId);
             } else {
 
                 final AlbumUser callingAlbumUser = getAlbumUser(album, callingUser, em);

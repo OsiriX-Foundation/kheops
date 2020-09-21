@@ -22,6 +22,7 @@ public class WebhookPatchParameters {
         private Optional<Boolean> enabled;
         private Optional<Boolean> newSeries;
         private Optional<Boolean> removeSeries;
+        private Optional<Boolean> deleteAlbum;
         private Optional<Boolean> newUser;
 
         private boolean removeSecret;
@@ -37,6 +38,8 @@ public class WebhookPatchParameters {
             enabled = Optional.empty();
             newSeries = Optional.empty();
             newUser = Optional.empty();
+            removeSeries = Optional.empty();
+            deleteAlbum = Optional.empty();
             removeSecret = false;
         }
 
@@ -122,6 +125,10 @@ public class WebhookPatchParameters {
                         newSeries = Optional.of(true);
                     } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
                         newUser = Optional.of(true);
+                    } else if (event.equalsIgnoreCase(WebhookType.REMOVE_SERIES.name())) {
+                        removeSeries = Optional.of(true);
+                    } else if (event.equalsIgnoreCase(WebhookType.DELETE_ALBUM.name())) {
+                        deleteAlbum = Optional.of(true);
                     } else if (!event.equalsIgnoreCase("")) {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message(BAD_FORM_PARAMETER)
@@ -136,6 +143,10 @@ public class WebhookPatchParameters {
                         newSeries = Optional.of(true);
                     } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
                         newUser = Optional.of(true);
+                    } else if (event.equalsIgnoreCase(WebhookType.REMOVE_SERIES.name())) {
+                        removeSeries = Optional.of(true);
+                    } else if (event.equalsIgnoreCase(WebhookType.DELETE_ALBUM.name())) {
+                        deleteAlbum = Optional.of(true);
                     } else {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message(BAD_FORM_PARAMETER)
@@ -150,6 +161,10 @@ public class WebhookPatchParameters {
                         newSeries = Optional.of(false);
                     } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
                         newUser = Optional.of(false);
+                    } else if (event.equalsIgnoreCase(WebhookType.REMOVE_SERIES.name())) {
+                        removeSeries = Optional.of(false);
+                    } else if (event.equalsIgnoreCase(WebhookType.DELETE_ALBUM.name())) {
+                        deleteAlbum = Optional.of(false);
                     } else {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message(BAD_FORM_PARAMETER)
@@ -176,6 +191,7 @@ public class WebhookPatchParameters {
     private Optional<Boolean> newSeries;
     private Optional<Boolean> removeSeries;
     private Optional<Boolean> newUser;
+    private Optional<Boolean> deleteAlbum;
 
     private WebhookPatchParameters(WebhookPatchParametersBuilder builder) {
         url = builder.url;
@@ -185,6 +201,7 @@ public class WebhookPatchParameters {
         removeSecret = builder.removeSecret;
         newSeries = builder.newSeries;
         removeSeries = builder.removeSeries;
+        deleteAlbum = builder.deleteAlbum;
         newUser = builder.newUser;
         albumId = builder.albumId;
         webhookId = builder.webhookId;
@@ -200,4 +217,5 @@ public class WebhookPatchParameters {
     public  Optional<Boolean> isNewSeries() { return newSeries; }
     public  Optional<Boolean> isRemoveSeries() { return removeSeries; }
     public  Optional<Boolean> isNewUser() { return newUser; }
+    public  Optional<Boolean> isDeleteAlbum() { return deleteAlbum; }
 }

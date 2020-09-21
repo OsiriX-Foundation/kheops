@@ -97,6 +97,7 @@ public class Webhooks {
             webhookPatchParameters.isNewSeries().ifPresent(webhook::setNewSeries);
             webhookPatchParameters.isRemoveSeries().ifPresent(webhook::setRemoveSeries);
             webhookPatchParameters.isNewUser().ifPresent(webhook::setNewUser);
+            webhookPatchParameters.isDeleteAlbum().ifPresent(webhook::setDeleteAlbum);
             webhookPatchParameters.isEnabled().ifPresent(webhook::setEnabled);
 
             if(webhookPatchParameters.isRemoveSecret()) {
