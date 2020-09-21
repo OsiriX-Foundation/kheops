@@ -149,6 +149,7 @@ public class Sending {
                 removeSeriesWebhook.addSeries(series);
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
+            removeSeriesWebhook.setRemoveAllSeries(true);
 
             em.persist(mutation);
 
@@ -204,6 +205,12 @@ public class Sending {
                 removeSeriesWebhook.setCapabilityToken(capability);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
+            }
+
+            if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).size() == 1) {
+                removeSeriesWebhook.setRemoveAllSeries(true);
+            } else {
+                removeSeriesWebhook.setRemoveAllSeries(false);
             }
 
             em.persist(mutation);

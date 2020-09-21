@@ -20,11 +20,13 @@ public class RemoveSeriesWebhook implements WebhookResult{
     private UserResponse sourceUser;
     @XmlElement(name = "is_manual_trigger")
     private boolean isManualTrigger;
+    @XmlElement(name = "remove_all_series")
+    private boolean removeAllSeries;
 
     @XmlElement(name = "removed_study")
     private StudyResponse removedStudy;
 
-
+    
     private RemoveSeriesWebhook() { /*empty*/ }
 
     public RemoveSeriesWebhook(String albumId, AlbumUser sourceUser, Series series, String instance, boolean isManualTrigger) {
@@ -42,14 +44,6 @@ public class RemoveSeriesWebhook implements WebhookResult{
         this.isManualTrigger = isManualTrigger;
     }
 
-    public RemoveSeriesWebhook(String albumId, User user, String instance, boolean isManualTrigger) {
-        this.instance = instance;
-        this.albumId = albumId;
-        this.eventTime = LocalDateTime.now();
-        this.sourceUser = new UserResponse(user);
-        this.isManualTrigger = isManualTrigger;
-    }
-
     public void addSeries(Series series) {
         if(removedStudy == null) {
             removedStudy = new StudyResponse(series.getStudy(), instance);
@@ -58,14 +52,11 @@ public class RemoveSeriesWebhook implements WebhookResult{
         removedStudy.hideRetrieveUrl();
     }
 
+    public void setRemoveAllSeries(boolean removeAllSeries) { this.removeAllSeries = removeAllSeries; }
+
     public void setReportProvider(ReportProvider reportProvider) { sourceUser.setReportProvider(reportProvider, ReportProviderResponse.Type.WEBHOOK); }
 
     public void setCapabilityToken(Capability capability) { sourceUser.setCapabilityToken(capability); }
-
-    public boolean containSeries() {
-        return removedStudy.containSeries();
-    }
-
 
     @Override
     public WebhookType getType() {
