@@ -581,11 +581,11 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteStudyFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
