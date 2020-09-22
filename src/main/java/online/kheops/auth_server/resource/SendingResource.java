@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.HttpHeaders.WWW_AUTHENTICATE;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
@@ -572,8 +573,7 @@ public class SendingResource
 
         return Response.status(CREATED).build();
     }
-
-
+    
     @DELETE
     @Secured
     @AlbumAccessSecured
@@ -607,8 +607,13 @@ public class SendingResource
 
     private KheopsPrincipal getPrincipalFromHeadersXTokenSource(String token)
             throws AccessTokenVerificationException, UserNotFoundException {
-
-        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, getToken(token).getAccessToken());
+        final AccessToken accessToken;
+        try {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(context, getToken(token).getAccessToken());
+        } catch (IllegalArgumentException e) {
+            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
+                    .header(WWW_AUTHENTICATE,"Basic").header(WWW_AUTHENTICATE,"Bearer").build());
+        }
         final User user = getUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);
