@@ -14,4 +14,4 @@ script:
 after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker push osirixfoundation/kheops-authorization:$TRAVIS_BRANCH
-  - docker run --rm sonarqube gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.projectName=test_name -Dsonar.projectVersion=test_version -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --no-daemon
+  - docker run --rm sonarqube gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.projectName=test_name -Dsonar.branch.name=test_name_branch -Dsonar.projectVersion=test_version -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --no-daemon
