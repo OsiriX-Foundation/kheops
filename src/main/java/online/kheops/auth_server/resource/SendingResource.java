@@ -573,7 +573,7 @@ public class SendingResource
 
         return Response.status(CREATED).build();
     }
-    
+
     @DELETE
     @Secured
     @AlbumAccessSecured
