@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import online.kheops.auth_server.util.JWTs;
 
 import javax.servlet.ServletContext;
+import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -20,6 +21,9 @@ public class ReportProviderAuthCodeGenerator {
 
   private DecodedToken decodedToken;
   private String codeChallenge;
+  private String nonce;
+  private String state;
+  private URI redirectUri;
 
   private ReportProviderAuthCodeGenerator(final ServletContext servletContext) {
     this.servletContext = servletContext;
@@ -36,6 +40,21 @@ public class ReportProviderAuthCodeGenerator {
 
   public ReportProviderAuthCodeGenerator withCodeChallenge(final String codeChallenge) {
     this.codeChallenge = Objects.requireNonNull(codeChallenge);
+    return this;
+  }
+
+  public ReportProviderAuthCodeGenerator withState(final String state) {
+    this.state = Objects.requireNonNull(state);
+    return this;
+  }
+
+  public ReportProviderAuthCodeGenerator withNonce(final String nonce) {
+    this.nonce = Objects.requireNonNull(nonce);
+    return this;
+  }
+
+  public ReportProviderAuthCodeGenerator withRedirectUri(final URI redirectUri) {
+    this.redirectUri = Objects.requireNonNull(redirectUri);
     return this;
   }
 
@@ -68,6 +87,18 @@ public class ReportProviderAuthCodeGenerator {
 
     if (codeChallenge != null) {
       jwtBuilder.withClaim("code_challenge", codeChallenge);
+    }
+
+    if (nonce != null) {
+      jwtBuilder.withClaim("nonce", nonce);
+    }
+
+    if (state != null) {
+      jwtBuilder.withClaim("state", state);
+    }
+
+    if (redirectUri != null) {
+      jwtBuilder.withClaim("redirect_uri", redirectUri.toString());
     }
 
     return jwtBuilder.sign(algorithmHMAC);

@@ -1,5 +1,7 @@
 package online.kheops.auth_server.resource;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
@@ -30,7 +32,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -42,6 +47,7 @@ import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PAT
 import static online.kheops.auth_server.report_provider.metadata.parameters.ListUriParameter.REDIRECT_URIS;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.*;
+import static online.kheops.auth_server.report_provider.metadata.parameters.OptionalUriParameter.AUTHORIZATION_ENDPOINT;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.user.AlbumUserPermissions.*;
 import static online.kheops.auth_server.user.Users.getUser;
@@ -61,7 +67,26 @@ public class ReportProviderResource {
 
   @Context private ServletContext context;
 
+  @Context private OidcProvider oidcProvider;
+
   @Context private TokenAuthenticationContext tokenAuthenticationContext;
+
+  private static final NonceGenerator nonceGenerator = new NonceGenerator();
+
+  private static class NonceGenerator {
+    private static final String DICT = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    private static final int NONCE_LENGTH = 11;
+    private static final Random random = new SecureRandom();
+
+    String getNonce() {
+      StringBuilder stringBuilder = new StringBuilder(11);
+
+      while (stringBuilder.length() < NONCE_LENGTH) {
+        stringBuilder.append(DICT.charAt(random.nextInt(DICT.length())));
+      }
+      return stringBuilder.toString();
+    }
+  }
 
   @POST
   @Secured
@@ -135,7 +160,8 @@ public class ReportProviderResource {
 
     final AccessToken accessToken;
     try {
-      accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, tokenParam);
+      accessToken =
+          AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, tokenParam);
     } catch (AccessTokenVerificationException e) {
       final ErrorResponse errorResponse =
           new ErrorResponse.ErrorResponseBuilder()
@@ -357,7 +383,6 @@ public class ReportProviderResource {
 
   @GET
   @Path("authorize")
-  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces(MediaType.TEXT_HTML)
   public Response authorize(
       @QueryParam("response_type") @NotNull @NotEmpty final String tokenParam,
@@ -371,7 +396,8 @@ public class ReportProviderResource {
 
     final online.kheops.auth_server.report_provider.ReportProvider reportProvider;
     try {
-      reportProvider = tokenAuthenticationContext.getReportProviderCatalogue().getReportProvider(clientId);
+      reportProvider =
+          tokenAuthenticationContext.getReportProviderCatalogue().getReportProvider(clientId);
     } catch (ReportProviderNotFoundException e) {
       // TODO show the user a page with the error
       throw new BadRequestException();
@@ -396,13 +422,17 @@ public class ReportProviderResource {
       decodedToken =
           LoginHintValidator.createAuthorizer(context).withClientId(clientId).validate(loginHint);
     } catch (TokenRequestException e) {
-      UriBuilder redirectUriBuilder = UriBuilder.fromUri(redirectUri)
-          .queryParam("error", e.getError());
-      e.getErrorDescription().ifPresent(errorDescription -> redirectUriBuilder.queryParam("error_description", errorDescription));
+      UriBuilder redirectUriBuilder =
+          UriBuilder.fromUri(redirectUri).queryParam("error", e.getError());
+      e.getErrorDescription()
+          .ifPresent(
+              errorDescription ->
+                  redirectUriBuilder.queryParam("error_description", errorDescription));
       return Response.seeOther(redirectUriBuilder.build()).build();
     }
 
-    ReportProviderAuthCodeGenerator generator = ReportProviderAuthCodeGenerator.createGenerator(context).withDecodedLoginHint(decodedToken);
+    ReportProviderAuthCodeGenerator generator =
+        ReportProviderAuthCodeGenerator.createGenerator(context).withDecodedLoginHint(decodedToken);
     if (codeChallenge != null && !codeChallenge.isEmpty()) {
       if (!"S256".equals(codeChallengeMethod)) {
         // TODO show the user a page with the error
@@ -411,13 +441,47 @@ public class ReportProviderResource {
       generator.withCodeChallenge(codeChallenge);
     }
 
-    UriBuilder redirectUriBuilder = UriBuilder.fromUri(redirectUri).queryParam("code", generator.generate(300));
+    final String nonce = nonceGenerator.getNonce();
+    generator.withNonce(nonce);
 
-    if (state != null) {
-      redirectUriBuilder.queryParam("state", state);
+    generator.withRedirectUri(redirectUri);
+    generator.withState(state);
+
+    final UriBuilder authorizationEndpoint;
+    try {
+      authorizationEndpoint =
+          UriBuilder.fromUri(
+              oidcProvider.getOidcMetadata().getValue(AUTHORIZATION_ENDPOINT).orElseThrow());
+    } catch (OidcProviderException | NoSuchElementException e) {
+      // TODO show the user a page with the error
+      throw new ServerErrorException(BAD_GATEWAY);
     }
 
-    return Response.seeOther(redirectUriBuilder.build()).build();
+    authorizationEndpoint.queryParam("scope", "openid");
+    authorizationEndpoint.queryParam("response_type", "code");
+    authorizationEndpoint.queryParam("client_id", "loginConnect");
+    authorizationEndpoint.queryParam("redirect_uri", getHostRoot() + "/api/login-callback");
+    authorizationEndpoint.queryParam("state", generator.generate(300));
+    authorizationEndpoint.queryParam("nonce", nonce);
+    authorizationEndpoint.queryParam("login_hint", decodedToken.getSubject());
+
+    return Response.temporaryRedirect(authorizationEndpoint.build()).build();
+  }
+
+  @GET
+  @Path("login-callback")
+  @Produces(MediaType.TEXT_HTML)
+  public Response loginCallback(
+      @QueryParam("state") @NotNull @NotEmpty final String state,
+      @QueryParam("code") @NotNull @NotEmpty final String code) {
+
+    DecodedJWT decodedJWT = JWT.decode(state);
+
+    UriBuilder redirectUriBuilder = UriBuilder.fromUri(decodedJWT.getClaim("redirect_uri").asString()).queryParam("code", state);
+
+    redirectUriBuilder.queryParam("state", decodedJWT.getClaim("state").asString());
+
+    return Response.temporaryRedirect(redirectUriBuilder.build()).build();
   }
 
   @GET

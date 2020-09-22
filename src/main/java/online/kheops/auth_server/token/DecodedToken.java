@@ -40,7 +40,7 @@ public class DecodedToken {
     this.source = source;
   }
 
-  String getSubject() {
+  public String getSubject() {
     return subject;
   }
 
