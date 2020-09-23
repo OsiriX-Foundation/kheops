@@ -237,7 +237,7 @@ public class Sending {
                 ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
                 reportProvider = em.merge(reportProvider);
                 newSeriesWebhook.setReportProvider(reportProvider);
-                mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.NEW_REPORT, availableSeries);
+                mutation = Events.newReport(callingUser, targetAlbum, reportProvider, Events.MutationType.IMPORT_SERIES, availableSeries);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, Events.MutationType.IMPORT_SERIES, availableSeries);
             }
