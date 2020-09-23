@@ -226,15 +226,6 @@ public class ViewerPrincipal implements KheopsPrincipal {
         return Optional.of(Collections.singletonList(viewerAccessToken.getStudyInstanceUID()));
     }
 
-    private boolean linkAuthorization;
-    @Override
-    public void setLink(boolean linkAuthorization) {
-        this.linkAuthorization = linkAuthorization;
-    }
-
-    @Override
-    public boolean isLink() { return linkAuthorization;  }
-
     @Override
     public String getOriginalToken() {
         return originalToken;

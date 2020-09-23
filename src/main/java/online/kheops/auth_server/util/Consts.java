@@ -1,9 +1,8 @@
 package online.kheops.auth_server.util;
 
-import com.google.common.collect.ImmutableList;
-
 import javax.ws.rs.Priorities;
 import java.time.Duration;
+import java.util.List;
 
 public class Consts {
 
@@ -33,7 +32,7 @@ public class Consts {
 
     public static final int NUMBER_OF_RETRY_WEBHOOK = 5;
     public static final int SECONDE_BEFORE_RETRY_WEBHOOK = 5;
-    public static final ImmutableList<String> VALID_SCHEMES_WEBHOOK_URL = ImmutableList.of("http", "https");
+    public static final List<String> VALID_SCHEMES_WEBHOOK_URL = List.of("http", "https");
 
     public static final String HOST_ROOT_PARAMETER = "online.kheops.root.uri";
 

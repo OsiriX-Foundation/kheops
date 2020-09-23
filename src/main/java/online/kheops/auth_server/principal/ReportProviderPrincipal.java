@@ -30,8 +30,8 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
 
     private boolean linkAuthorization;
 
-    private List<String> studyUids;
-    private String clientId;
+    private final List<String> studyUids;
+    private final String clientId;
     private Album album;
     private final String originalToken;
 
@@ -193,14 +193,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
     public Optional<String> getCapabilityTokenId() {
         return Optional.ofNullable(capabilityTokenId);
     }
-
-    @Override
-    public void setLink(boolean linkAuthorization) {
-        this.linkAuthorization = linkAuthorization;
-    }
-
-    @Override
-    public boolean isLink() { return linkAuthorization;  }
 
     @Override
     public String getOriginalToken() {
