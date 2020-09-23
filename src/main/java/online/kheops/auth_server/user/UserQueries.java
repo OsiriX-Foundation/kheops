@@ -36,9 +36,10 @@ public class UserQueries {
 
     public static List<User> SearchUserByAlbumId(String search, String albumId, Integer limit, Integer offset, EntityManager em) {
 
-        TypedQuery<User> query = em.createNamedQuery("User.searchByEmailInAlbumId", User.class);
+        TypedQuery<User> query = em.createNamedQuery("User.searchByEmailOrNameInAlbumId", User.class);
         query.setParameter("albumId", albumId);
-        query.setParameter("search", "%" + search + "%");
+        query.setParameter("searchmail", searchByMail(search));
+        query.setParameter("searchname", searchByName(search));
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();
@@ -48,7 +49,8 @@ public class UserQueries {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailWithStudyAccess", User.class);
         query.setParameter("studyUID", studyUID);
-        query.setParameter("search", "%" + search + "%");
+        query.setParameter("searchmail", searchByMail(search));
+        query.setParameter("searchname", searchByName(search));
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();
@@ -57,13 +59,25 @@ public class UserQueries {
 
     public static List<User> SearchUser(String search, Integer limit, Integer offset, EntityManager em) {
 
-        TypedQuery<User> query = em.createNamedQuery("User.searchByEmail", User.class);
-        query.setParameter("search", "%" + search + "%");
+        TypedQuery<User> query = em.createNamedQuery("User.searchByEmailOrName", User.class);
+        query.setParameter("searchmail", searchByMail(search));
+        query.setParameter("searchname", searchByName(search));
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();
     }
 
+    private static String searchByName(String search) {
+        search = search.replace("_", "\\_").replace("%", "\\%");
+        return "%" + search + "%";
+    }
 
-
+    private static String searchByMail(String search) {
+        search = search.replace("_", "\\_").replace("%", "\\%");
+        if(search.contains("@")) {
+            return search + "%";
+        } else {
+            return "%" + search + "%@%";
+        }
+    }
 }

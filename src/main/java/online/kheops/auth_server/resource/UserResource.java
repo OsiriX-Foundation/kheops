@@ -105,10 +105,10 @@ public class UserResource {
         final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
         if(reference == null && search != null) {
-            if (search.length() < 1) {
+            if (search.length() < 3) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_QUERY_PARAMETER)
-                        .detail("'search' query param must have minimum 1 characters")
+                        .detail("'search' query param must have minimum 3 characters")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
@@ -131,6 +131,8 @@ public class UserResource {
             } else {
                 result = searchUsers(search, limit, offset);
             }
+
+            result.remove(new UserResponse(kheopsPrincipal.getUser()));
 
             kheopsLogBuilder.log();
 
