@@ -158,6 +158,7 @@ public class Events {
 
             final Album album = getAlbum(albumId, em);
             final HashMap<String, Boolean> userMember = new HashMap<>();
+
             for (AlbumUser albumUser : album.getAlbumUser()) {
                 userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }

@@ -142,7 +142,7 @@ public class ReportProviders {
     }
 
     public static ReportProviderClientMetadata getClientMetadata (String configUrl)
-    throws ReportProviderUriNotValidException {
+            throws ReportProviderUriNotValidException {
         try {
             new URI(configUrl);
         } catch (URISyntaxException e) {
