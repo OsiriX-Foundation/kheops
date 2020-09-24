@@ -1,11 +1,11 @@
-#language: minimal
-#sudo: required
+language: minimal
+sudo: required
 
-#notifications:
-#  email: false
+notifications:
+  email: false
 
-#before_install:
-#  - git fetch --unshallow
+before_install:
+  - git fetch --unshallow
 
 #script:
 #  - docker build -f sonarqube.Dockerfile -t sonarqube .
@@ -26,8 +26,8 @@ jobs:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push osirixfoundation/kheops-authorization:$TRAVIS_BRANCH
     - stage: sonar
-       script:
-         - docker build -f sonarqube.Dockerfile -t sonarqube .
+      script:
+        - docker build -f sonarqube.Dockerfile -t sonarqube .
       #after_success:
         - docker run --rm sonarqube gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --no-daemon
 
