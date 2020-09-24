@@ -79,20 +79,8 @@ public class TokenResource
 
         try {
             final TokenGrantResult result = grantType.processGrant(securityContext, context, form);
-            AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(context, form.getFirst("subject_token"));
-            final User user;
-            final EntityManager em = EntityManagerListener.createEntityManager();
-            try {
-                user = getUser(accessToken.getSubject(), em);
-            } catch (UserNotFoundException e) {
-                throw new IllegalStateException(e);
-            } finally {
-                em.close();
-            }
 
-            KheopsPrincipal kheopsPrincipal = accessToken.newPrincipal(context, user);
-
-            final KheopsLogBuilder logBuilder = kheopsPrincipal.getKheopsLogBuilder()
+            final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(grantType.getLogActionType())
@@ -106,8 +94,6 @@ public class TokenResource
             logBuilder.log();
 
             return Response.ok(result.getTokenResponseEntity()).build();
-        } catch (AccessTokenVerificationException e) {
-            throw new IllegalStateException(e);
         } catch (WebApplicationException e) {
             LOG.log(WARNING, "error processing grant", e); //NOSONAR
             throw e; //NOSONAR

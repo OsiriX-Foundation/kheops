@@ -23,7 +23,7 @@ import java.util.Set;
         @NamedQuery(name = "Webhook.countByAlbumAndUrl",
         query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url"),
         @NamedQuery(name = "Webhook.findAllEnabledAndForNewSeriesByStudyUID",
-        query = "SELECT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :StudyInstanceUID AND w.enabled = true AND w.newSeries = true")
+        query = "SELECT DISTINCT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :StudyInstanceUID AND w.enabled = true AND w.newSeries = true")
 })
 
 @Entity
