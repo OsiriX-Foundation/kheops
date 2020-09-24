@@ -120,6 +120,8 @@ public class WebhookPatchParameters {
             if(!events.isEmpty()) {
                 newSeries = Optional.of(false);
                 newUser = Optional.of(false);
+                deleteAlbum = Optional.of(false);
+                removeSeries = Optional.of(false);
                 for (String event : events) {
                     if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
                         newSeries = Optional.of(true);
@@ -174,7 +176,6 @@ public class WebhookPatchParameters {
                     }
                 }
             }
-
             return new WebhookPatchParameters(this);
         }
 
