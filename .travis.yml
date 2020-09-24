@@ -1,5 +1,5 @@
-language: minimal
-sudo: required
+#language: minimal
+#sudo: required
 
 #notifications:
 #  email: false
