@@ -1,11 +1,11 @@
 language: minimal
 sudo: required
 
-notifications:
-  email: false
+#notifications:
+#  email: false
 
-before_install:
-  - git fetch --unshallow
+#before_install:
+#  - git fetch --unshallow
 
 #script:
 #  - docker build -f sonarqube.Dockerfile -t sonarqube .
