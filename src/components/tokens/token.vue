@@ -87,6 +87,18 @@
           <dd>{{ permissions }}</dd>
         </div>
       </div>
+      <div
+        class="row"
+      >
+        <div class="col-xs-12 col-sm-3">
+          <dt class="token-title">
+            {{ $t('token.tokenid') }}
+          </dt>
+        </div>
+        <div class="col-xs-12 col-sm-9">
+          <dd>{{ token.id }}</dd>
+        </div>
+      </div>
       <div class="row">
         <div class="col-xs-12 col-sm-3">
           <dt class="token-title">

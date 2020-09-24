@@ -126,6 +126,11 @@
           </form>
         </div>
       </dd>
+      <dd
+        class="font-small font-grey"
+      >
+        {{ $t('albumsettings.id') }}: {{ album.album_id }}
+      </dd>
     </dl>
     <album-buttons
       :album="album"

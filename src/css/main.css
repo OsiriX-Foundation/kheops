@@ -108,6 +108,14 @@ a.navbar-brand {
 	}
 }
 
+.font-small {
+	font-size: 80%;
+}
+
+.font-grey {
+	color: grey;
+}
+
 .font-large {
 	font-size: 125%;
 }

@@ -70,6 +70,14 @@
     </div>
     <div class="row mb-3">
       <div :class="classColRight">
+        <b>{{ $t('webhook.id') }}</b>
+      </div>
+      <div :class="classColLeft">
+        {{ webhook.id }}
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div :class="classColRight">
         <b>{{ $t('webhook.state') }}</b>
       </div>
       <div :class="classColLeft">
