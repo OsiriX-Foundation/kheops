@@ -133,6 +133,8 @@ export default {
       eventsDefined: [
         { value: 'new_series', text: this.$t('webhook.new_series') },
         { value: 'new_user', text: this.$t('webhook.new_user') },
+        { value: 'remove_series', text: this.$t('webhook.remove_series') },
+        { value: 'delete_album', text: this.$t('webhook.delete_album') },
       ],
       webhook: {
         url: '',

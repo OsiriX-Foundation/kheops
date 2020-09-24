@@ -354,6 +354,8 @@
 		"warningtrigger": "Veuillez vérifier si vous avez toujours accès à l'étude ou aux séries depuis cet album.",
 		"webhook": "Webhook",
 		"webhookdisabled": "Ce webhook est désactivé",
-		"webhookenabled": "Ce webhook est activé"
+		"webhookenabled": "Ce webhook est activé",
+		"remove_series": "Suppression série",
+        "delete_album": "Suppression album"
 	}
 }
