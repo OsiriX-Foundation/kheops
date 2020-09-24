@@ -16,6 +16,7 @@ before_install:
 #  - docker push osirixfoundation/kheops-authorization:$TRAVIS_BRANCH
 #  - docker run --rm sonarqube gradle sonarqube "-Dsonar.organization=$SONAR_ORGANIZATION" -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=$SONAR_LOGIN" --no-daemon
 
+
 jobs:
   include:
     - stage: build push
