@@ -130,24 +130,29 @@ public class Sending {
                 throw new SeriesNotFoundException(errorResponse);
             }
 
-            final RemoveSeriesWebhook removeSeriesWebhook = new RemoveSeriesWebhook(albumId, callingAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+            final RemoveSeriesWebhook.Builder removeSeriesWebhookBuilder = new RemoveSeriesWebhook.Builder()
+                    .albumId(albumId)
+                    .sourceUser(callingAlbumUser)
+                    .instance(context.getInitParameter(HOST_ROOT_PARAMETER))
+                    .isManualTrigger(false);
 
             final Study study = availableSeries.get(0).getStudy();
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
                 mutation = Events.albumPostStudyMutation(capability, callingAlbum, MutationType.REMOVE_STUDY, study, availableSeries);
-                removeSeriesWebhook.setCapabilityToken(capability);
+                removeSeriesWebhookBuilder.capabilityToken(capability);
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, MutationType.REMOVE_STUDY, study, availableSeries);
             }
 
+            removeSeriesWebhookBuilder.study(study);
             for(Series series : availableSeries) {
                 callingAlbum.removeSeries(series, em);
-                removeSeriesWebhook.addSeries(series);
+                removeSeriesWebhookBuilder.addSeries(series);
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
-            removeSeriesWebhook.setRemoveAllSeries(true);
+            removeSeriesWebhookBuilder.removeAllSeries(true);
 
             em.persist(mutation);
 
@@ -159,7 +164,7 @@ public class Sending {
                     final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.REMOVE_SERIES, webhook);
                     em.persist(webhookTrigger);
                     availableSeries.forEach(webhookTrigger::addSeries);
-                    webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, removeSeriesWebhook, webhookTrigger));
+                    webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, removeSeriesWebhookBuilder.build(), webhookTrigger));
                 }
             }
             tx.commit();
@@ -193,22 +198,28 @@ public class Sending {
 
             final Series availableSeries = findSeriesByStudyUIDandSeriesUIDFromAlbum(callingAlbum, studyInstanceUID, seriesInstanceUID, em);
 
-            final RemoveSeriesWebhook removeSeriesWebhook = new RemoveSeriesWebhook(albumId, callingAlbumUser, availableSeries, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+            final RemoveSeriesWebhook.Builder removeSeriesWebhookBuilder = new RemoveSeriesWebhook.Builder()
+                    .albumId(albumId)
+                    .sourceUser(callingAlbumUser)
+                    .instance(context.getInitParameter(HOST_ROOT_PARAMETER))
+                    .isManualTrigger(false)
+                    .study(availableSeries.getStudy())
+                    .addSeries(availableSeries);
 
             callingAlbum.removeSeries(availableSeries, em);
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
                 mutation = Events.albumPostSeriesMutation(capability, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
-                removeSeriesWebhook.setCapabilityToken(capability);
+                removeSeriesWebhookBuilder.capabilityToken(capability);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
             }
 
-            if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).size() == 1) {
-                removeSeriesWebhook.setRemoveAllSeries(true);
+            if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).size() == 0) {
+                removeSeriesWebhookBuilder.removeAllSeries(true);
             } else {
-                removeSeriesWebhook.setRemoveAllSeries(false);
+                removeSeriesWebhookBuilder.removeAllSeries(false);
             }
 
             em.persist(mutation);
@@ -221,7 +232,7 @@ public class Sending {
                     final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.REMOVE_SERIES, webhook);
                     em.persist(webhookTrigger);
                     webhookTrigger.addSeries(availableSeries);
-                    webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, removeSeriesWebhook, webhookTrigger));
+                    webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, removeSeriesWebhookBuilder.build(), webhookTrigger));
                 }
             }
             tx.commit();

@@ -32,7 +32,7 @@ public class NewSeriesWebhook implements WebhookResult{
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, Series series, String instance, boolean isManualTrigger) {
         this(albumId, sourceUser, instance, isManualTrigger);
         updatedStudy = new StudyResponse(series.getStudy(), instance);
-        updatedStudy.addSeries(series);
+        updatedStudy.addSeries(series, false);
     }
 
     public NewSeriesWebhook(String albumId, AlbumUser sourceUser, String instance, boolean isManualTrigger) {
@@ -57,7 +57,7 @@ public class NewSeriesWebhook implements WebhookResult{
         if(updatedStudy == null) {
             updatedStudy = new StudyResponse(series.getStudy(), instance);
         }
-        updatedStudy.addSeries(series);
+        updatedStudy.addSeries(series, false);
     }
 
     public void setReportProvider(ReportProvider reportProvider) { sourceUser.setReportProvider(reportProvider, ReportProviderResponse.Type.WEBHOOK); }

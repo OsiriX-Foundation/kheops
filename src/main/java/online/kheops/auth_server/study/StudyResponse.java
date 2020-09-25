@@ -65,15 +65,20 @@ public class StudyResponse {
         studyInstanceUID = study.getStudyInstanceUID();
     }
 
-    public void addSeries(Series series) {
+    public void addSeries(Series series, boolean hideRetrieveUrl) {
         if(this.series == null) {
             this.series = new ArrayList<>();
         }
+        final SeriesResponse seriesResponse;
         if (instance != null) {
-            this.series.add(new SeriesResponse(series, instance));
+            seriesResponse = new SeriesResponse(series, instance);
         } else {
-            this.series.add(new SeriesResponse(series));
+            seriesResponse = new SeriesResponse(series);
         }
+        if (hideRetrieveUrl) {
+            seriesResponse.hideRetrieveUrl();
+        }
+        this.series.add(seriesResponse);
     }
 
     public boolean containSeries() {
@@ -86,8 +91,5 @@ public class StudyResponse {
 
     public void hideRetrieveUrl() {
         retrieveUrl = null;
-        for (SeriesResponse s:series) {
-            s.hideRetrieveUrl();
-        }
     }
 }

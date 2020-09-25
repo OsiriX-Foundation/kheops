@@ -41,7 +41,7 @@ public class WebhookTriggerResponse {
                 if (studyResponse == null) {
                     studyResponse = new StudyResponse(series.getStudy());
                 }
-                studyResponse.addSeries(series);
+                studyResponse.addSeries(series, false);
             }
         } else if(webhookTrigger.getNewUser()) {
             event = WebhookType.NEW_USER.name().toLowerCase();
@@ -56,7 +56,7 @@ public class WebhookTriggerResponse {
                 if (studyResponse == null) {
                     studyResponse = new StudyResponse(series.getStudy());
                 }
-                studyResponse.addSeries(series);
+                studyResponse.addSeries(series, false);
             }
         }
 
