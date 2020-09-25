@@ -14,6 +14,7 @@ import online.kheops.auth_server.generated.tables.AlbumSeries;
 import online.kheops.auth_server.generated.tables.AlbumUser;
 import online.kheops.auth_server.generated.tables.Albums;
 import online.kheops.auth_server.generated.tables.Capabilities;
+import online.kheops.auth_server.generated.tables.EventSeries;
 import online.kheops.auth_server.generated.tables.Events;
 import online.kheops.auth_server.generated.tables.ReportProviders;
 import online.kheops.auth_server.generated.tables.Series;
@@ -42,7 +43,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = -1398368795;
+    private static final long serialVersionUID = -1403191217;
 
     /**
      * The reference instance of <code>public</code>
@@ -68,6 +69,11 @@ public class Public extends SchemaImpl {
      * The table <code>public.capabilities</code>.
      */
     public final Capabilities CAPABILITIES = online.kheops.auth_server.generated.tables.Capabilities.CAPABILITIES;
+
+    /**
+     * The table <code>public.event_series</code>.
+     */
+    public final EventSeries EVENT_SERIES = online.kheops.auth_server.generated.tables.EventSeries.EVENT_SERIES;
 
     /**
      * The table <code>public.events</code>.
@@ -143,6 +149,7 @@ public class Public extends SchemaImpl {
             AlbumUser.ALBUM_USER,
             Albums.ALBUMS,
             Capabilities.CAPABILITIES,
+            EventSeries.EVENT_SERIES,
             Events.EVENTS,
             ReportProviders.REPORT_PROVIDERS,
             Series.SERIES,

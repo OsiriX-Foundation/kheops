@@ -14,12 +14,14 @@ import online.kheops.auth_server.util.PairListXTotalCount;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.isMemberOfAlbum;
+import static online.kheops.auth_server.event.EventQueries.getMutationByAlbum;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
@@ -30,13 +32,6 @@ public class Events {
     private Events() {
         throw new IllegalStateException("Utility class");
     }
-
-    public enum MutationType {ADD_USER, ADD_ADMIN, REMOVE_USER, PROMOTE_ADMIN, DEMOTE_ADMIN,
-        CREATE_ALBUM, LEAVE_ALBUM,
-        IMPORT_STUDY, IMPORT_SERIES, REMOVE_STUDY, REMOVE_SERIES,
-        EDIT_ALBUM, ADD_FAV, REMOVE_FAV,
-        CREATE_REPORT_PROVIDER, EDIT_REPORT_PROVIDER, DELETE_REPORT_PROVIDER, NEW_REPORT,
-        CREATE_WEBHOOK, DELETE_WEBHOOK, EDIT_WEBHOOK, TRIGGER_WEBHOOK}
 
     public static void albumPostComment(User callingUser, String albumId, String commentContent, String user)
             throws UserNotFoundException, AlbumNotFoundException {
@@ -86,16 +81,16 @@ public class Events {
         return new Mutation(callingUser, album, mutationType, targetUser);
     }
 
-    public static Mutation reportProviderMutation(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType) {
+    public static Mutation reportProviderMutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType) {
         return new Mutation(callingUser, album, reportProvider, mutationType);
     }
 
-    public static Mutation newReport(User callingUser, Album album, ReportProvider reportProvider, Events.MutationType mutationType, Series series) {
+    public static Mutation newReport(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType, Series series) {
         return new Mutation(callingUser, album, reportProvider, mutationType, series);
     }
 
     public static Mutation albumPostNewAlbumMutation(User callingUser, Album album) {
-        return new Mutation(callingUser, album, Events.MutationType.CREATE_ALBUM);
+        return new Mutation(callingUser, album, MutationType.CREATE_ALBUM);
     }
 
     public static Mutation albumPostSeriesMutation(User callingUser, Album album, MutationType mutationType, Series series) {
@@ -106,12 +101,12 @@ public class Events {
         return new Mutation(capability, album, mutationType, series);
     }
 
-    public static Mutation albumPostStudyMutation(User callingUser, Album album, MutationType mutationType, Study study) {
-        return new Mutation(callingUser, album, mutationType, study);
+    public static Mutation albumPostStudyMutation(User callingUser, Album album, MutationType mutationType, Study study, List<Series> seriesList) {
+        return new Mutation(callingUser, album, mutationType, study, seriesList);
     }
 
-    public static Mutation albumPostStudyMutation(Capability capability, Album album, MutationType mutationType, Study study) {
-        return new Mutation(capability, album, mutationType, study);
+    public static Mutation albumPostStudyMutation(Capability capability, Album album, MutationType mutationType, Study study, List<Series> seriesList) {
+        return new Mutation(capability, album, mutationType, study, seriesList);
     }
 
     public static Mutation albumPostEditMutation(User callingUser, Album album) {
@@ -135,22 +130,12 @@ public class Events {
             final Album album = getAlbum(albumId, em);
 
             final HashMap<String, Boolean> userMember = new HashMap<>();
+            for(AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
+            }
 
             for (Event e : EventQueries.getEventsByAlbum(callingUser, album, offset, limit, em)) {
-                if (!userMember.containsKey(e.getUser().getSub())) {
-                    userMember.put(e.getUser().getSub(), isMemberOfAlbum(e.getUser(), album, em));
-                }
-                if (e instanceof Comment) {
-                    if (e.getPrivateTargetUser() != null && !userMember.containsKey(e.getPrivateTargetUser().getSub())) {
-                        userMember.put(e.getPrivateTargetUser().getSub(), isMemberOfAlbum(e.getPrivateTargetUser(), album, em));
-                    }
-                    eventResponses.add(new EventResponse((Comment)e, userMember));
-                } else if (e instanceof Mutation) {
-                    if (((Mutation) e).getToUser() != null && !userMember.containsKey(((Mutation) e).getToUser().getSub())) {
-                        userMember.put(((Mutation) e).getToUser().getSub(), isMemberOfAlbum(((Mutation) e).getToUser(), album, em));
-                    }
-                    eventResponses.add(new EventResponse((Mutation) e, userMember));
-                }
+                eventResponses.add(new EventResponse(e, userMember, em));
             }
 
             XTotalCount = EventQueries.getTotalEventsByAlbum(callingUser, album, em);
@@ -160,8 +145,8 @@ public class Events {
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
 
-    public static PairListXTotalCount<EventResponse> getMutationsAlbum(String albumId, Integer offset, Integer limit)
-            throws AlbumNotFoundException {
+    public static PairListXTotalCount<EventResponse> getMutationsAlbum(String albumId, MultivaluedMap<String, String> queryParameters, Integer offset, Integer limit)
+            throws AlbumNotFoundException, BadQueryParametersException {
 
         final List<EventResponse> eventResponses = new ArrayList<>();
         final long XTotalCount;
@@ -169,20 +154,22 @@ public class Events {
         final EntityManager em = EntityManagerListener.createEntityManager();
 
         try {
+            MutationQueryParams mutationQueryParams = new MutationQueryParams(queryParameters, albumId, em);
+
             final Album album = getAlbum(albumId, em);
             final HashMap<String, Boolean> userMember = new HashMap<>();
 
-            for (Mutation m : EventQueries.getMutationByAlbum(album, offset, limit, em)) {
-                if (!userMember.containsKey(m.getUser().getSub())) {
-                    userMember.put(m.getUser().getSub(), isMemberOfAlbum(m.getUser(), album, em));
-                }
-                if (m.getToUser() != null && !userMember.containsKey(m.getToUser().getSub())) {
-                    userMember.put(m.getToUser().getSub(), isMemberOfAlbum(m.getToUser(), album, em));
-                }
-                    eventResponses.add(new EventResponse(m, userMember));
+            for (AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
             }
 
-            XTotalCount = EventQueries.getTotalMutationByAlbum(album, em);
+            final List<Mutation> mutationLst = getMutationByAlbum(albumId, mutationQueryParams, offset, limit, em);
+
+            for (Mutation m : mutationLst) {
+                eventResponses.add(new EventResponse(m, userMember, em));
+            }
+
+            XTotalCount = EventQueries.getTotalMutationByAlbum(albumId, mutationQueryParams, em);
         } finally {
             em.close();
         }
@@ -196,20 +183,18 @@ public class Events {
         final long XTotalCount;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final HashMap<String, Boolean> userMember = new HashMap<>();
 
         try {
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
 
+            final HashMap<String, Boolean> userMember = new HashMap<>();
+            for(AlbumUser albumUser : album.getAlbumUser()) {
+                userMember.put(albumUser.getUser().getSub(), albumUser.isAdmin());
+            }
+
             for (Comment c : EventQueries.getCommentByAlbum(callingUser, album, offset, limit, em)) {
-                if (!userMember.containsKey(c.getUser().getSub())) {
-                    userMember.put(c.getUser().getSub(), isMemberOfAlbum(c.getUser(), album, em));
-                }
-                if (c.getPrivateTargetUser() != null && !userMember.containsKey(c.getPrivateTargetUser().getSub())) {
-                    userMember.put(c.getPrivateTargetUser().getSub(), isMemberOfAlbum(c.getPrivateTargetUser(), album, em));
-                }
-                eventResponses.add(new EventResponse(c, userMember));
+                eventResponses.add(new EventResponse(c, userMember, em));
             }
             XTotalCount = EventQueries.getTotalCommentsByAlbum(callingUser, album, em);
         } finally {
@@ -241,13 +226,13 @@ public class Events {
             }
 
             for (Comment c : comments) {
-                if (!userMember.containsKey(c.getUser().getSub())) {
-                    userMember.put(c.getUser().getSub(), canAccessStudy(c.getUser(), c.getStudy(), em));
+                if (!userMember.containsKey(c.getUser().getSub()) && canAccessStudy(c.getUser(), c.getStudy(), em)) {
+                    userMember.put(c.getUser().getSub(), null);
                 }
-                if (c.getPrivateTargetUser() != null && isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub())) {
-                    userMember.put(c.getPrivateTargetUser().getSub(), canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em));
+                if (c.getPrivateTargetUser() != null && !isAlbumCapabilityToken && !userMember.containsKey(c.getPrivateTargetUser().getSub()) && canAccessStudy(c.getPrivateTargetUser(), c.getStudy(), em)) {
+                    userMember.put(c.getPrivateTargetUser().getSub(), null);
                 }
-                eventResponses.add(new EventResponse(c, userMember));
+                eventResponses.add(new EventResponse(c, userMember, em));
             }
 
         } finally {
@@ -255,7 +240,6 @@ public class Events {
         }
         return new PairListXTotalCount<>(XTotalCount, eventResponses);
     }
-
 
     public static void studyPostComment(User callingUser, String studyInstanceUID, String commentContent, String targetUserPk)
             throws UserNotFoundException, StudyNotFoundException, BadQueryParametersException {

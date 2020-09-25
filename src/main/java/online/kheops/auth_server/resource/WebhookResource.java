@@ -80,7 +80,7 @@ public class WebhookResource {
     @Path("albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}/webhooks/{webhook:"+ WebhookId.ID_PATTERN+"}")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response newWebHook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+    public Response editWebHook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                @SuppressWarnings("RSReferenceInspection") @PathParam("webhook") String webhookId,
                                @FormParam("url") String url,
                                @FormParam("name") String name,

@@ -20,7 +20,7 @@ public class CapabilitiesQueries {
             throws CapabilityNotFoundException {
 
         try {
-            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where c.secret = :secret", Capability.class);
+            TypedQuery<Capability> query = em.createNamedQuery("Capability.findBySecret", Capability.class);
             query.setParameter("secret", secret);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -36,7 +36,7 @@ public class CapabilitiesQueries {
             throws CapabilityNotFoundException {
 
         try {
-            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c left join c.album a left join a.albumUser au where ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id", Capability.class);
+            TypedQuery<Capability> query = em.createNamedQuery("Capability.findByIdAndUser", Capability.class);
             query.setParameter("user", user);
             query.setParameter("capabilityId", capabilityId);
             return query.getSingleResult();
@@ -53,8 +53,24 @@ public class CapabilitiesQueries {
             throws CapabilityNotFoundException {
 
         try {
-            TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :capabilityId = c.id", Capability.class);
+            TypedQuery<Capability> query = em.createNamedQuery("Capability.findById", Capability.class);
             query.setParameter("capabilityId", capabilityId);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message("Not Found")
+                    .detail("Capability token not found")
+                    .build();
+            throw new CapabilityNotFoundException(errorResponse);
+        }
+    }
+    public static Capability findCapabilityByCapabilityIDAndAlbumId(String capabilityId, String albumId, EntityManager em)
+            throws CapabilityNotFoundException {
+
+        try {
+            TypedQuery<Capability> query = em.createNamedQuery("Capability.findByIdAndAlbumId", Capability.class);
+            query.setParameter("capabilityId", capabilityId);
+            query.setParameter("albumId", albumId);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -67,14 +83,14 @@ public class CapabilitiesQueries {
 
 
     public static List<Capability> findAllCapabilitiesByUser(User user, Integer limit, Integer offset, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user order by c.issuedAtTime desc", Capability.class);
+        TypedQuery<Capability> query = em.createNamedQuery("Capability.findAllByUser", Capability.class);
         query.setParameter("user", user);
         query.setFirstResult(offset).setMaxResults(limit);
         return query.getResultList();
     }
 
     public static List<Capability> findCapabilitiesByUserValidOnly(User user, Integer limit, Integer offset, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :user = c.user and c.revokedTime = null and c.expirationTime > :dateTimeNow  order by c.issuedAtTime desc", Capability.class);
+        TypedQuery<Capability> query = em.createNamedQuery("Capability.findAllValidByUser", Capability.class);
         query.setParameter("user", user);
         query.setParameter("dateTimeNow", LocalDateTime.now());
         query.setFirstResult(offset).setMaxResults(limit);
@@ -82,14 +98,14 @@ public class CapabilitiesQueries {
     }
 
     public static List<Capability> findAllCapabilitiesByAlbum(String albumId, Integer limit, Integer offset, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :albumId = c.album.id order by c.issuedAtTime desc", Capability.class);
+        TypedQuery<Capability> query = em.createNamedQuery("Capability.findAllByAlbum", Capability.class);
         query.setParameter("albumId", albumId);
         query.setFirstResult(offset).setMaxResults(limit);
         return query.getResultList();
     }
 
     public static List<Capability> findCapabilitiesByAlbumValidOnly(String albumId, Integer limit, Integer offset, EntityManager em) {
-        TypedQuery<Capability> query = em.createQuery("SELECT c from Capability c where :albumId = c.album.id and c.revokedTime = null and c.expirationTime > :dateTimeNow order by c.issuedAtTime desc", Capability.class);
+        TypedQuery<Capability> query = em.createNamedQuery("Capability.findAllValidByAlbum", Capability.class);
         query.setParameter("albumId", albumId);
         query.setParameter("dateTimeNow", LocalDateTime.now());
         query.setFirstResult(offset).setMaxResults(limit);
@@ -97,26 +113,26 @@ public class CapabilitiesQueries {
     }
 
     public static long countAllCapabilitiesByUser(User user, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Capability c where :user = c.user", Long.class);
+        TypedQuery<Long> query = em.createNamedQuery("Capability.countAllByUser", Long.class);
         query.setParameter("user", user);
         return query.getSingleResult();
     }
 
     public static long countCapabilitiesByUserValidOnly(User user, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Capability c where :user = c.user and c.revokedTime = null and c.expirationTime > :dateTimeNow", Long.class);
+        TypedQuery<Long> query = em.createNamedQuery("Capability.countAllValidByUser", Long.class);
         query.setParameter("user", user);
         query.setParameter("dateTimeNow", LocalDateTime.now());
         return query.getSingleResult();
     }
 
     public static long countAllCapabilitiesByAlbum(String albumId, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Capability c where :albumId = c.album.id", Long.class);
+        TypedQuery<Long> query = em.createNamedQuery("Capability.countAllByAlbum", Long.class);
         query.setParameter("albumId", albumId);
         return query.getSingleResult();
     }
 
     public static long countCapabilitiesByAlbumValidOnly(String albumId, EntityManager em) {
-        TypedQuery<Long> query = em.createQuery("SELECT count(c) from Capability c where :albumId = c.album.id and c.revokedTime = null and c.expirationTime > :dateTimeNow", Long.class);
+        TypedQuery<Long> query = em.createNamedQuery("Capability.countAllValidByAlbum", Long.class);
         query.setParameter("albumId", albumId);
         query.setParameter("dateTimeNow", LocalDateTime.now());
         return query.getSingleResult();

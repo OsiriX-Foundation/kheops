@@ -6,6 +6,7 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -21,8 +22,6 @@ import org.jooq.impl.DSL;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
-import javax.persistence.metamodel.EntityType;
-import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -31,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
@@ -554,15 +552,15 @@ public class Studies {
                 kheopsLogBuilder.series(s.getSeriesInstanceUID());
             }
             final Study study = getStudy(studyInstanceUID, em);
-            final Events.MutationType mutation;
+            final MutationType mutation;
             if (favorite) {
-                mutation = Events.MutationType.ADD_FAV;
+                mutation = MutationType.ADD_FAV;
                 kheopsLogBuilder.action(ActionType.ADD_FAVORITE_STUDY);
             } else {
-                mutation = Events.MutationType.REMOVE_FAV;
+                mutation = MutationType.REMOVE_FAV;
                 kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_STUDY);
             }
-            final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study);
+            final Mutation favAlbumMutation = Events.albumPostStudyMutation(callingUser, album, mutation, study, seriesList);
             em.persist(favAlbumMutation);
             album.updateLastEventTime();
             tx.commit();

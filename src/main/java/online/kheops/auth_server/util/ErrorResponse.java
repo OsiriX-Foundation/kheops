@@ -14,6 +14,7 @@ public class ErrorResponse {
         public static final String WEBHOOK_NOT_FOUND = "Webhook Not Found";
         public static final String SERIES_NOT_FOUND = "Series Not Found";
         public static final String STUDY_NOT_FOUND = "Study Not Found";
+        public static final String REPORT_PROVIDER_NOT_FOUND = "Report Provider Not Found";
         public static final String AUTHORIZATION_ERROR = "Authorization error";
 
     }

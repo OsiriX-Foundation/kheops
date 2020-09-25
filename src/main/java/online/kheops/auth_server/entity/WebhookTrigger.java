@@ -8,6 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "WebhookTrigger.findById",
+                query = "SELECT w FROM WebhookTrigger w WHERE :webhookTriggerId = w.id")
+})
+
 @Entity
 @Table(name = "webhook_triggers")
 public class WebhookTrigger {
@@ -29,26 +35,30 @@ public class WebhookTrigger {
     private Boolean newSeries;
 
     @Basic(optional = false)
+    @Column(name = "remove_series")
+    private Boolean removeSeries;
+
+    @Basic(optional = false)
     @Column(name = "new_user")
     private Boolean newUser;
 
-    @OneToMany
-    @JoinColumn (name = "webhook_trigger_fk", nullable = false)
+    @OneToMany(mappedBy = "webhookTrigger")
     @OrderBy("attempt desc")
     private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
 
+    @ManyToMany()
+    @JoinTable(name = "webhook_trigger_series",
+            joinColumns = @JoinColumn(name = "webhook_trigger_fk"),
+            inverseJoinColumns = @JoinColumn(name = "series_fk"))
+    private Set<Series> series = new HashSet<>();
+
     @ManyToOne
-    @JoinColumn (name = "webhook_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "webhook_fk", nullable=false, insertable = true, updatable = false)
     private Webhook webhook;
 
     @OneToOne
     @JoinColumn(name = "user_fk", unique = false, nullable = true, updatable = false)
     private User user;
-
-    @OneToMany
-    @JoinColumn(name = "webhook_trigger_fk", nullable = false)
-    private Set<WebhookTriggerSeries> webhookTriggersSeries = new HashSet<>();
-
 
 
     public WebhookTrigger() {}
@@ -62,9 +72,15 @@ public class WebhookTrigger {
         if(type.equals(WebhookType.NEW_USER)) {
             this.newUser = true;
             this.newSeries = false;
+            this.removeSeries = false;
         } else if (type.equals(WebhookType.NEW_SERIES)) {
             this.newUser = false;
             this.newSeries = true;
+            this.removeSeries = false;
+        } else if (type.equals(WebhookType.REMOVE_SERIES)) {
+            this.newUser = false;
+            this.newSeries = false;
+            this.removeSeries = true;
         }
     }
 
@@ -78,6 +94,7 @@ public class WebhookTrigger {
 
     public Boolean isManualTrigger() { return isManualTrigger; }
     public Boolean getNewSeries() { return newSeries; }
+    public Boolean getRemoveSeries() { return removeSeries; }
     public Boolean getNewUser() { return newUser; }
     public String getId() { return id; }
     public long getPk() { return pk; }
@@ -93,11 +110,19 @@ public class WebhookTrigger {
         return false;
     }
 
-    public void addWebHookTriggerSeries(WebhookTriggerSeries webhookTriggerSeries) { this.webhookTriggersSeries.add(webhookTriggerSeries); }
-
-    public Set<WebhookTriggerSeries> getWebhookTriggersSeries() {
-        return webhookTriggersSeries;
+    public void addSeries(Series series) {
+        this.series.add(series);
     }
+
+    public void removeSeries(Series series) {
+        this.series.remove(series);
+    }
+
+    public void removeAllSeries() {
+        this.series.clear();
+    }
+
+    public Set<Series> getSeries() { return series; }
 
     public Webhook getWebhook() {
         return webhook;

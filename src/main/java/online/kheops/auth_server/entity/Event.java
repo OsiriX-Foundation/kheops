@@ -3,6 +3,15 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.Set;
+
+@NamedQueries({
+        @NamedQuery(name = "Event.findAllByAlbum",
+        query = "SELECT e FROM Event e WHERE :album = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :user OR e.user = :user) ORDER BY e.eventTime desc"),
+        @NamedQuery(name = "Event.countAllByAlbumAndUser",
+        query = "SELECT count(e) FROM Event e WHERE :album = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :user OR e.user = :user)")
+})
 
 @Entity
 @Table(name = "events")
@@ -19,20 +28,26 @@ public abstract class Event {
     private LocalDateTime eventTime;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=true, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "study_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn (name = "study_fk", nullable=true, insertable = true, updatable = false)
     private Study study;
 
     @ManyToOne
-    @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = false, updatable = false)
+    @JoinColumn(name = "private_target_user_fk", nullable=true, insertable = true, updatable = false)
     private User privateTargetUser;
+
+    @ManyToMany()
+    @JoinTable(name = "event_series",
+            joinColumns = @JoinColumn(name = "event_fk"),
+            inverseJoinColumns = @JoinColumn(name = "series_fk"))
+    private Set<Series> series = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -82,4 +97,19 @@ public abstract class Event {
     public User getPrivateTargetUser() {  return privateTargetUser; }
 
     public void setPrivateTargetUser(User privateTargetUser) { this.privateTargetUser = privateTargetUser; }
+
+    public void addSeries(Series series) {
+        this.series.add(series);
+    }
+
+    public void removeSeries(Series series) {
+        this.series.remove(series);
+    }
+
+    public void removeAllSeries() {
+        this.series.clear();
+    }
+
+    public Set<Series> getSeries() { return series; }
+
 }

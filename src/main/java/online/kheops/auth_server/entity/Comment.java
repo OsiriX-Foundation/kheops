@@ -1,9 +1,21 @@
 package online.kheops.auth_server.entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
+
+@NamedQueries({
+        @NamedQuery(name = "Comment.findAllByAlbum",
+                query = "SELECT c FROM Comment c WHERE :album = c.album AND (c.privateTargetUser = null OR c.privateTargetUser = :user OR c.user = :user) ORDER BY c.eventTime desc"),
+        @NamedQuery(name = "Comment.countAllByAlbumAndUser",
+                query = "SELECT count(c) FROM Comment c WHERE :album = c.album AND (c.privateTargetUser = null OR c.user = :user OR c.privateTargetUser = :user)"),
+        @NamedQuery(name = "Comment.findAllByStudyUIDAndUser",
+                query = "SELECT c FROM Comment c WHERE c.study.studyInstanceUID =  :studyUID AND (c.privateTargetUser = null OR c.privateTargetUser = :user OR c.user = :user) ORDER BY c.eventTime desc"),
+        @NamedQuery(name = "Comment.countAllByStudyUIDAndUser",
+                query = "SELECT count(c) FROM Comment c WHERE c.study.studyInstanceUID = :studyUID AND (c.privateTargetUser = null OR c.privateTargetUser = :user OR c.user = :user)"),
+        @NamedQuery(name = "Comment.findAllPublicByStudyUID",
+                query = "SELECT c FROM Comment c WHERE c.study.studyInstanceUID =  :studyUID AND c.privateTargetUser = null ORDER BY c.eventTime desc"),
+        @NamedQuery(name = "Comment.coundAllPublicByStudyUID",
+                query = "SELECT count(c) FROM Comment c WHERE c.study.studyInstanceUID = :studyUID AND c.privateTargetUser = null")
+})
 
 @Entity(name = "Comment")
 @DiscriminatorValue("Comment")

@@ -21,6 +21,7 @@ import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -88,79 +89,104 @@ public class FetchResource {
 
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
-        String albumId;
-        if(albumIdParam != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
-            String albumIdScope;
-            try {
-                albumIdScope = kheopsPrincipal.getAlbumID();
-            } catch (NotAlbumScopeTypeException e) {
-                albumIdScope = null;
-            }
+        try {
+            tx.begin();
 
-            if (albumIdParam != null && albumIdScope != null && albumIdScope.compareTo(albumIdParam) == 0) {
-                albumId = albumIdParam;
-            } else if (albumIdParam != null && albumIdScope == null) {
-                albumId = albumIdParam;
-            } else if (albumIdParam == null && albumIdScope != null) {
-                albumId = albumIdScope;
-            } else if (albumIdParam == null && albumIdScope == null) {
-                return Response.ok().build();
-            } else {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(ALBUM_NOT_FOUND)
-                        .detail("The album does not exist or you don't have access")
-                        .build();
-                return Response.status(UNAUTHORIZED).entity(errorResponse).build();
-            }
-
-
-            final EntityManager em = EntityManagerListener.createEntityManager();
-            final EntityTransaction tx = em.getTransaction();
-
-            try {
-                tx.begin();
-
-                final User callingUser = em.merge(kheopsPrincipal.getUser());
-                final Album targetAlbum = getAlbum(albumId, em);
-                final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-                final List<Series> seriesList = new ArrayList<>();
-                for (String seriesInstanceUID : seriesInstanceUIDList) {
-                    seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
+            String albumId = null;
+            if(albumIdParam != null || kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                try {
+                    final String albumIdScope = kheopsPrincipal.getAlbumID();
+                    if (albumIdParam != null && albumIdScope.compareTo(albumIdParam) == 0) {
+                        albumId = albumIdParam;
+                    } else if (albumIdParam == null) {
+                        albumId = albumIdScope;
+                    } else if (albumIdParam != null && albumIdScope.compareTo(albumIdParam) != 0) {
+                        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                                .message(ALBUM_NOT_FOUND)
+                                .detail("The album does not exist or you don't have access")
+                                .build();
+                        return Response.status(UNAUTHORIZED).entity(errorResponse).build();
+                    }
+                } catch (NotAlbumScopeTypeException e) {
+                    if (albumIdParam != null) {
+                        albumId = albumIdParam;
+                    }
                 }
-                final Study study = seriesList.get(0).getStudy();
+            }
 
-                final NewSeriesWebhook newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
-                newSeriesWebhook.setFetch();
+            final User callingUser = em.merge(kheopsPrincipal.getUser());
+
+            final Album targetAlbum;
+            AlbumUser targetAlbumUser = null;
+            if (albumId != null) {
+                targetAlbum = getAlbum(albumId, em);
+                targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
+            }
+
+            final List<Series> seriesList = new ArrayList<>();
+            for (String seriesInstanceUID : seriesInstanceUIDList) {
+                seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
+            }
+            final Study study = seriesList.get(0).getStudy();
+
+            if(study.isPopulated()) {
 
                 final List<Series> seriesListWebhook = new ArrayList<>();
                 for (Series series : seriesList) {
                     if (series.isPopulated()) {
-                        newSeriesWebhook.addSeries(series);
                         seriesListWebhook.add(series);
                     }
                 }
 
-                if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                    final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                    newSeriesWebhook.setCapabilityToken(capability);
-                } else if (kheopsPrincipal.getClientId().isPresent()) {
-                    ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
-                    newSeriesWebhook.setReportProvider(reportProvider);
-                }
-
                 final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
-                if (study.isPopulated() && newSeriesWebhook.containSeries()) {
-                    for (Webhook webhook : targetAlbum.getWebhooks()) {
-                        if (webhook.getNewSeries() && webhook.isEnabled()) {
-                            final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                            em.persist(webhookTrigger);
-                            for (Series series : seriesListWebhook) {
-                                final WebhookTriggerSeries webhookTriggerSeries = new WebhookTriggerSeries(webhookTrigger, series);
-                                em.persist(webhookTriggerSeries);
-                            }
-                            webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
+
+                List<Webhook> webhookList = em.createNamedQuery("Webhook.findAllEnabledAndForNewSeriesByStudyUID", Webhook.class)
+                        .setParameter(StudyInstanceUID, studyInstanceUID)
+                        .getResultList();
+
+                for (Webhook webhook : webhookList) {
+
+                    final List<Series> seriesInWebhook = new ArrayList<>();
+                    final NewSeriesWebhook newSeriesWebhook;
+                    if (albumId != null && webhook.getAlbum().getId().compareTo(albumId) == 0) {
+                        newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                        for (Series series : seriesListWebhook) {
+                            newSeriesWebhook.addSeries(series);
+                            seriesInWebhook.add(series);
                         }
+                        if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+                            final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
+                            newSeriesWebhook.setCapabilityToken(capability);
+                        } else if (kheopsPrincipal.getClientId().isPresent()) {
+                            ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
+                            newSeriesWebhook.setReportProvider(reportProvider);
+                        }
+                    } else {
+                        newSeriesWebhook = new NewSeriesWebhook(webhook.getAlbum().getId(), callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                        List<Series> seriesInStudy = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class)
+                                .setParameter(StudyInstanceUID, studyInstanceUID)
+                                .setParameter("album", webhook.getAlbum())
+                                .getResultList();
+
+                        for (Series series : seriesListWebhook) {
+                            if (seriesInStudy.contains(series)) {
+                                newSeriesWebhook.addSeries(series);
+                                seriesInWebhook.add(series);
+                            }
+                        }
+                    }
+                    newSeriesWebhook.setFetch();
+
+                    if (!seriesInWebhook.isEmpty()) {
+                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
+                        em.persist(webhookTrigger);
+                        for (Series series : seriesInWebhook) {
+                            webhookTrigger.addSeries(series);
+                        }
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
                     }
                 }
 
@@ -168,12 +194,12 @@ public class FetchResource {
                 for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
                     webhookAsyncRequest.firstRequest();
                 }
-            } finally {
-                if (tx.isActive()) {
-                    tx.rollback();
-                }
-                em.close();
             }
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
         }
 
         return Response.ok().build();

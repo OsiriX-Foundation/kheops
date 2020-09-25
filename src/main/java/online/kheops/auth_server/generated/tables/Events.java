@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Events extends TableImpl<EventsRecord> {
 
-    private static final long serialVersionUID = 881652132;
+    private static final long serialVersionUID = -636624966;
 
     /**
      * The reference instance of <code>public.events</code>
@@ -112,11 +112,6 @@ public class Events extends TableImpl<EventsRecord> {
     public final TableField<EventsRecord, Long> TO_USER_FK = createField("to_user_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
 
     /**
-     * The column <code>public.events.series_fk</code>.
-     */
-    public final TableField<EventsRecord, Long> SERIES_FK = createField("series_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
      * The column <code>public.events.report_provider_fk</code>.
      */
     public final TableField<EventsRecord, Long> REPORT_PROVIDER_FK = createField("report_provider_fk", org.jooq.impl.SQLDataType.BIGINT, this, "");
@@ -167,7 +162,7 @@ public class Events extends TableImpl<EventsRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.EVENT_PK, Indexes.EVENTS_SERIES_FK_INDEX, Indexes.EVENTS_USER_FK_INDEX);
+        return Arrays.<Index>asList(Indexes.EVENT_PK, Indexes.EVENTS_USER_FK_INDEX);
     }
 
     /**
@@ -191,7 +186,7 @@ public class Events extends TableImpl<EventsRecord> {
      */
     @Override
     public List<ForeignKey<EventsRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<EventsRecord, ?>>asList(Keys.EVENTS__EVENT_ALBUM_FK_FKEY, Keys.EVENTS__EVENT_STUDY_FK_FKEY, Keys.EVENTS__EVENT_USER_FK_FKEY, Keys.EVENTS__EVENT_CAPABILITY_FK_FKEY, Keys.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENTS__EVENT_TO_USER_FK_FKEY, Keys.EVENTS__EVENT_SERIES_FK_FKEY, Keys.EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY);
+        return Arrays.<ForeignKey<EventsRecord, ?>>asList(Keys.EVENTS__EVENT_ALBUM_FK_FKEY, Keys.EVENTS__EVENT_STUDY_FK_FKEY, Keys.EVENTS__EVENT_USER_FK_FKEY, Keys.EVENTS__EVENT_CAPABILITY_FK_FKEY, Keys.EVENTS__EVENT_PRIVATE_TARGET_USER_FK_FKEY, Keys.EVENTS__EVENT_TO_USER_FK_FKEY, Keys.EVENTS__EVENT_REPORT_PROVIDER_FK_FKEY);
     }
 
     public Albums albums() {
@@ -216,10 +211,6 @@ public class Events extends TableImpl<EventsRecord> {
 
     public Users events_EventToUserFkFkey() {
         return new Users(this, Keys.EVENTS__EVENT_TO_USER_FK_FKEY);
-    }
-
-    public Series series() {
-        return new Series(this, Keys.EVENTS__EVENT_SERIES_FK_FKEY);
     }
 
     public ReportProviders reportProviders() {

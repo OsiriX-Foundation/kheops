@@ -4,6 +4,12 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+@NamedQueries({
+
+        @NamedQuery(name = "AlbumSeries.findByAlbumAndSeries",
+                query = "SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album")
+})
+
 @Entity
 @Table(name = "album_series")
 public class AlbumSeries {
@@ -17,11 +23,11 @@ public class AlbumSeries {
     private boolean favorite   = true;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "series_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "series_fk", nullable=false, insertable = true, updatable = false)
     private Series series;
 
     public AlbumSeries() {}

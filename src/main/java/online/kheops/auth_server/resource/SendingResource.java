@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 
 import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.HttpHeaders.WWW_AUTHENTICATE;
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
@@ -317,7 +318,7 @@ public class SendingResource
         }
 
         try {
-            if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+            if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
                     Sending.putStudyInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
@@ -349,7 +350,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 request.getRequestDispatcher("/studies/" + studyInstanceUID + "/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
@@ -377,24 +378,6 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            try {
-                String albumId = kheopsPrincipal.getAlbumID();
-                if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
-                    Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-                    return Response.status(NO_CONTENT).build();
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(AUTHORIZATION_ERROR)
-                            .detail("The token not allow you to delete a study")
-                            .build();
-                    return Response.status(FORBIDDEN).entity(errorResponse).build();
-                }
-            } catch (NotAlbumScopeTypeException e) {
-                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
-            }
-        }
-
         Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
@@ -411,7 +394,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        if(kheopsPrincipal.getScope() == ScopeType.ALBUM) {
+        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
             try {
                 request.getRequestDispatcher("/studies/" + studyInstanceUID + "/series/" + seriesInstanceUID + "/albums/"+kheopsPrincipal.getAlbumID()).forward(request, response);
                 return Response.status(response.getStatus()).entity(response.getOutputStream()).build();
@@ -437,24 +420,6 @@ public class SendingResource
                     .detail("The token not allow you to delete a series")
                     .build();
             return Response.status(FORBIDDEN).entity(errorResponse).build();
-        }
-
-        if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-            try {
-                String albumId = kheopsPrincipal.getAlbumID();
-                if(kheopsPrincipal.hasAlbumPermission(DELETE_SERIES,albumId)) {
-                    Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-                    return Response.status(NO_CONTENT).build();
-                } else {
-                    final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                            .message(AUTHORIZATION_ERROR)
-                            .detail("The token not allow you to delete a study")
-                            .build();
-                    return Response.status(FORBIDDEN).entity(errorResponse).build();
-                }
-            } catch (NotAlbumScopeTypeException e) {
-                return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();
-            }
         }
 
         Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
@@ -613,7 +578,6 @@ public class SendingResource
         return Response.status(CREATED).build();
     }
 
-
     @DELETE
     @Secured
     @AlbumAccessSecured
@@ -621,11 +585,11 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteStudyFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        Sending.deleteStudyFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        Sending.deleteStudyFromAlbum(tokenAuthenticationContext.getServletContext(), kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -637,18 +601,23 @@ public class SendingResource
     public Response deleteSeriesFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                           @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                           @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        Sending.deleteSeriesFromAlbum(kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        Sending.deleteSeriesFromAlbum(tokenAuthenticationContext.getServletContext(), kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
     private KheopsPrincipal getPrincipalFromHeadersXTokenSource(String token)
             throws AccessTokenVerificationException, UserNotFoundException {
-
-        final AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, getToken(token).getAccessToken());
+        final AccessToken accessToken;
+        try {
+            accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, getToken(token).getAccessToken());
+        } catch (IllegalArgumentException e) {
+            throw new NotAuthorizedException(Response.status(Response.Status.UNAUTHORIZED)
+                    .header(WWW_AUTHENTICATE,"Basic").header(WWW_AUTHENTICATE,"Bearer").build());
+        }
         final User user = getUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(tokenAuthenticationContext, user);

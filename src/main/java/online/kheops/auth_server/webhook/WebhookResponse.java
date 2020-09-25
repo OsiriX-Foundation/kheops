@@ -41,8 +41,14 @@ public class WebhookResponse {
         if(webhook.getNewSeries()) {
             events.add(WebhookType.NEW_SERIES.name().toLowerCase());
         }
+        if(webhook.getRemoveSeries()) {
+            events.add(WebhookType.REMOVE_SERIES.name().toLowerCase());
+        }
         if(webhook.getNewUser()) {
             events.add(WebhookType.NEW_USER.name().toLowerCase());
+        }
+        if(webhook.getDeleteAlbum()) {
+            events.add(WebhookType.DELETE_ALBUM.name().toLowerCase());
         }
 
         enabled = webhook.isEnabled();

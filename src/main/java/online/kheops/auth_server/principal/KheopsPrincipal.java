@@ -28,7 +28,6 @@ public interface KheopsPrincipal extends Principal, TokenProvenance {
     default boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {return false;}
     default boolean hasStudyShareAccess(String studyInstanceUID) {return false;}
     default boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {return false;}
-    default boolean hasStudyAddAccess(String studyInstanceUID) {return false;}
 
     boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId);
 

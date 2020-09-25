@@ -28,12 +28,9 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     private final String originalToken;
     private final KheopsLogBuilder kheopsLogBuilder;
 
-    private EntityManager em;
-
     public AlbumCapabilityPrincipal(Capability capability, User user, String originalToken) {
         this.capability = capability;
         this.user = user;
-        this.em = EntityManagerListener.createEntityManager();
         this.originalToken = originalToken;
 
         kheopsLogBuilder = new KheopsLogBuilder()
@@ -53,7 +50,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasSeriesViewAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             if (capability.hasReadPermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
@@ -72,7 +69,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasStudyViewAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             if (capability.hasReadPermission()) {
@@ -92,7 +89,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasSeriesDeleteAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             if (capability.hasReadPermission() && capability.hasWritePermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
@@ -111,7 +108,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasStudyDeleteAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             if (capability.hasReadPermission() && capability.hasWritePermission()) {
@@ -131,7 +128,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasSeriesShareAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             if (capability.hasAppropriatePermission()) {
                 final AlbumUser albumUser = getAlbumUser(capability.getAlbum(), user, em);
@@ -150,7 +147,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasStudyShareAccess(String studyInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Study study = getStudy(studyInstanceUID, em);
             if (capability.hasAppropriatePermission()) {
@@ -170,7 +167,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public boolean hasSeriesAddAccess(String studyInstanceUID, String seriesInstanceUID) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         final User mergeUser = em.merge(user);
         try {
             Capability mergeCapability = em.merge(capability);
@@ -202,21 +199,13 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
     }
 
     @Override
-    public boolean hasStudyAddAccess(String studyInstanceUID) {
-        if (!canAccessStudy(capability.getAlbum(), studyInstanceUID)) {
-            return capability.hasWritePermission();
-        }
-        return capability.hasAppropriatePermission();
-    }
-
-    @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
 
         if (!this.hasAlbumAccess(albumId)) {
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             final Album album = em.merge(capability.getAlbum());
 
@@ -247,7 +236,7 @@ public class AlbumCapabilityPrincipal implements KheopsPrincipal, CapabilityPrin
 
     @Override
     public ScopeType getScope() {
-        return ScopeType.valueOf(capability.getScopeType().toUpperCase());
+        return capability.getScopeType();
     }
 
     @Override

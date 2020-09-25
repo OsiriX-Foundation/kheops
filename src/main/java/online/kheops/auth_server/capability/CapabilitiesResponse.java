@@ -85,7 +85,7 @@ public class CapabilitiesResponse {
             revokeTime = ZonedDateTime.of(capability.getRevokedTime(), ZoneOffset.UTC).toString();
         }
 
-        ScopeType.valueOf(capability.getScopeType().toUpperCase()).setCapabilityResponse(this, capability);
+        capability.getScopeType().setCapabilityResponse(this, capability);
     }
 
     public CapabilitiesResponse(Capability capability) {

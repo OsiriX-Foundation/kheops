@@ -7,6 +7,7 @@ import online.kheops.auth_server.entity.Mutation;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.glassfish.jersey.client.ClientConfig;
@@ -50,10 +51,11 @@ public final class ReportProviders {
             reportProvider = new ReportProvider(url, name, album, new ClientId(em).getClientId());
 
             callingUser = em.merge(callingUser);
-            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.CREATE_REPORT_PROVIDER);
-
-            em.persist(mutation);
             em.persist(reportProvider);
+
+            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, MutationType.CREATE_REPORT_PROVIDER);
+            em.persist(mutation);
+
             album.updateLastEventTime();
             album.updateLastEventTime();
             tx.commit();
@@ -69,7 +71,7 @@ public final class ReportProviders {
                 .action(ActionType.NEW_REPORT_PROVIDER)
                 .clientID(reportProvider.getClientId())
                 .log();
-        return new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
     }
 
     public static ReportProviderClientMetadata callConfigURL(ReportProvider reportProvider)
@@ -140,7 +142,7 @@ public final class ReportProviders {
     }
 
     public static ReportProviderClientMetadata getClientMetadata (String configUrl)
-    throws ReportProviderUriNotValidException {
+            throws ReportProviderUriNotValidException {
         try {
             new URI(configUrl);
         } catch (URISyntaxException e) {
@@ -194,7 +196,7 @@ public final class ReportProviders {
         }
 
         for (ReportProvider reportProvider : reportProvidersEntity) {
-            reportProviders.add(new ReportProviderResponse(reportProvider));
+            reportProviders.add(new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL));
         }
 
         kheopsLogBuilder.album(albumId)
@@ -233,7 +235,7 @@ public final class ReportProviders {
                 .clientID(clientId)
                 .album(albumId)
                 .log();
-        return new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
     }
 
     public static void deleteReportProvider(User callingUser, String albumId, String clientId, KheopsLogBuilder kheopsLogBuilder)
@@ -259,7 +261,7 @@ public final class ReportProviders {
 
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
-            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.DELETE_REPORT_PROVIDER);
+            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, MutationType.DELETE_REPORT_PROVIDER);
             em.persist(mutation);
             album.updateLastEventTime();
             tx.commit();
@@ -312,7 +314,7 @@ public final class ReportProviders {
 
             callingUser = em.merge(callingUser);
             final Album album = getAlbum(albumId, em);
-            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, Events.MutationType.EDIT_REPORT_PROVIDER);
+            final Mutation mutation = reportProviderMutation(callingUser, album, reportProvider, MutationType.EDIT_REPORT_PROVIDER);
             em.persist(mutation);
             album.updateLastEventTime();
             tx.commit();
@@ -332,7 +334,7 @@ public final class ReportProviders {
                 .clientID(clientId)
                 .action(ActionType.EDIT_REPORT_PROVIDER)
                 .log();
-        return new ReportProviderResponse(reportProvider);
+        return new ReportProviderResponse(reportProvider, ReportProviderResponse.Type.FULL);
     }
 
     public static ReportProvider getReportProvider(String clientId)

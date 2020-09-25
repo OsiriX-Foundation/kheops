@@ -14,6 +14,34 @@ import static online.kheops.auth_server.capability.CapabilityToken.hashCapabilit
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
 
 @SuppressWarnings("unused")
+
+@NamedQueries({
+        @NamedQuery(name = "Capability.findBySecret",
+        query = "SELECT c FROM Capability c WHERE c.secret = :secret"),
+        @NamedQuery(name = "Capability.findByIdAndUser",
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id"),
+        @NamedQuery(name = "Capability.findByIdAndAlbumId",
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a WHERE a.id = :albumId AND :capabilityId = c.id"),
+        @NamedQuery(name = "Capability.findById",
+        query = "SELECT c FROM Capability c WHERE :capabilityId = c.id"),
+        @NamedQuery(name = "Capability.findAllByUser",
+        query = "SELECT c FROM Capability c WHERE :user = c.user ORDER BY c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.findAllValidByUser",
+        query = "SELECT c FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow  ORDER BY c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.findAllByAlbum",
+        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id order by c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.findAllValidByAlbum",
+        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow ORDER BY c.issuedAtTime desc"),
+        @NamedQuery(name = "Capability.countAllByUser",
+        query = "SELECT count(c) FROM Capability c WHERE :user = c.user"),
+        @NamedQuery(name = "Capability.countAllValidByUser",
+        query = "SELECT count(c) FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow"),
+        @NamedQuery(name = "Capability.countAllByAlbum",
+        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id"),
+        @NamedQuery(name = "Capability.countAllValidByAlbum",
+        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow")
+})
+
 @Entity
 @Table(name = "capabilities")
 
@@ -60,35 +88,35 @@ public class Capability {
     private String secret;
 
     @Basic(optional = false)
-    @Column(name = "read_permission ", updatable = false)
+    @Column(name = "read_permission", updatable = false)
     private boolean readPermission ;
 
     @Basic
-    @Column(name = "appropriate_permission ", updatable = false)
+    @Column(name = "appropriate_permission", updatable = false)
     private boolean appropriatePermission ;
 
     @Basic
-    @Column(name = "download_permission ", updatable = false)
+    @Column(name = "download_permission", updatable = false)
     private boolean downloadPermission ;
 
     @Basic(optional = false)
-    @Column(name = "write_permission ", updatable = false)
+    @Column(name = "write_permission", updatable = false)
     private boolean writePermission ;
 
     @ManyToOne
-    @JoinColumn(name = "user_fk", insertable=false, updatable=false)
+    @JoinColumn(name = "user_fk", insertable = true, updatable=false)
     private User user;
 
     @Basic(optional = false)
-    @Column(name = "scope_type ", updatable = false)
-    private String scopeType ;
+    @Column(name = "scope_type", updatable = false)
+    @Enumerated(value = EnumType.STRING)
+    private ScopeType scopeType ;
 
     @ManyToOne
-    @JoinColumn(name = "album_fk ", insertable=false, updatable=false)
+    @JoinColumn(name = "album_fk", insertable = true, updatable=false)
     private Album album;
 
-    @OneToMany
-    @JoinColumn (name = "capability_fk")
+    @OneToMany(mappedBy = "capability")
     private Set<Mutation> mutations = new HashSet<>();
 
     @PrePersist
@@ -106,7 +134,7 @@ public class Capability {
         updatedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
-    private Capability() {}
+    public Capability() {}
 
     private Capability(CapabilityBuilder builder) throws BadQueryParametersException {
         this.secretBeforeHash = builder.secretBeforeHash;
@@ -193,11 +221,11 @@ public class Capability {
 
     public boolean hasDownloadButtonPermission() { return downloadPermission; }
 
-    public String getScopeType() { return scopeType; }
+    public ScopeType getScopeType() { return scopeType; }
 
     public Album getAlbum() { return album; }
 
-    public void setScopeType(String scopeType) { this.scopeType = scopeType; }
+    public void setScopeType(ScopeType scopeType) { this.scopeType = scopeType; }
 
     public void setAlbum(Album album) { this.album = album; }
 

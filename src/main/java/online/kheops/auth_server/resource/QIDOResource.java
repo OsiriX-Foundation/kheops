@@ -10,7 +10,6 @@ import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.principal.KheopsPrincipal;
-import online.kheops.auth_server.series.Series;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.util.*;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
@@ -167,7 +166,7 @@ public class QIDOResource {
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_QUERY_PARAMETER)
-                    .detail("Use only '"+ALBUM+"' xor '"+INBOX+"' not both")
+                    .detail("Use only '"+ALBUM+"' or '"+INBOX+"' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -206,7 +205,7 @@ public class QIDOResource {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_STUDY)
+        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder().action(ActionType.QIDO_SERIES)
                 .study(studyInstanceUID);
 
         if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
@@ -264,7 +263,7 @@ public class QIDOResource {
             webTarget = webTarget.queryParam(queryParameterEntry.getKey(), queryParameterEntry.getValue().toArray());
         }
 
-        final Set<String> availableSeriesUIDs;
+        final Map<String, Boolean> availableSeriesUIDs;
         availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
 
         if (availableSeriesUIDs.isEmpty()) {
@@ -294,14 +293,10 @@ public class QIDOResource {
         boolean favoriteValue = false;
         for (Attributes series: allSeries) {
             String seriesInstanceUID = series.getString(Tag.SeriesInstanceUID);
-            if (availableSeriesUIDs.contains(seriesInstanceUID)) {
+            if (availableSeriesUIDs.containsKey(seriesInstanceUID)) {
                 totalAvailableSeries++;
                 if(favoriteFilter != null || includeFieldFavorite) {
-                    if(fromInbox) {
-                        favoriteValue = Series.isFavorite(seriesInstanceUID, kheopsPrincipal.getUser());
-                    } else {
-                        favoriteValue = Series.isFavorite(seriesInstanceUID, fromAlbumId);
-                    }
+                    favoriteValue = availableSeriesUIDs.get(seriesInstanceUID);
                 }
 
                 if (skipped >= offset) {
@@ -432,13 +427,13 @@ public class QIDOResource {
             return Response.status(BAD_GATEWAY).build();
         }
 
-        final Set<String> availableSeriesUIDs;
+        final Map<String, Boolean> availableSeriesUIDs;
         availableSeriesUIDs = availableSeriesUIDs(kheopsPrincipal.getUser(), studyInstanceUID, fromAlbumId, fromInbox);
 
         final StreamingOutput stream = os -> {
             try (final InputStream inputStream = upstreamResponse.readEntity(InputStream.class);
                  final JsonParser parser = Json.createParser(inputStream);
-                 final JsonGenerator generator = Json.createGenerator(os)){
+                 final JsonGenerator generator = Json.createGenerator(os)) {
 
                 final JSONReader jsonReader = new JSONReader(parser);
                 final JSONWriter jsonWriter = new JSONWriter(generator);
@@ -446,7 +441,7 @@ public class QIDOResource {
                 generator.writeStartArray();
 
                 jsonReader.readDatasets((fmi, dataset) -> {
-                    if (availableSeriesUIDs.contains(dataset.getString(Tag.SeriesInstanceUID))) {
+                    if (availableSeriesUIDs.containsKey(dataset.getString(Tag.SeriesInstanceUID))) {
                         jsonWriter.write(dataset);
                         kheopsLogBuilder.series(dataset.getString(Tag.SeriesInstanceUID));
                     }

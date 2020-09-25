@@ -1,12 +1,28 @@
 package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 
 @SuppressWarnings("unused")
+
+@NamedQueries({
+        @NamedQuery(name = "User.findById",
+                query = "SELECT u FROM User u WHERE u.sub = :userId"),
+        @NamedQuery(name = "User.findByEmail",
+                query = "SELECT u FROM User u WHERE u.email = :email"),
+        @NamedQuery(name = "User.searchByEmailOrNameInAlbumId",
+                query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a WHERE a.id = :albumId AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
+        @NamedQuery(name = "User.searchByEmailWithStudyAccess",
+                query = "SELECT DISTINCT u FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries als JOIN als.series se JOIN se.study st WHERE st.studyInstanceUID = :studyUID AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
+        @NamedQuery(name = "User.searchByEmailOrName",
+                query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname)")
+})
+
 @Entity
 @Table(name = "users")
 
@@ -30,28 +46,22 @@ public class User {
     @Column(name = "name")
     private String name;
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<AlbumUser> albumUser = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<Webhook> webhooks = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "user_fk", nullable=false)
+    @OneToMany(mappedBy = "user")
     private Set<Event> events = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "private_target_user_fk", nullable=true)
+    @OneToMany(mappedBy = "privateTargetUser")
     private Set<Event> privateEvent = new HashSet<>();
 
-    @OneToMany
-    @JoinColumn (name = "to_user_fk", nullable=true)
+    @OneToMany(mappedBy = "toUser")
     private Set<Mutation> mutations = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.MERGE)
@@ -83,9 +93,7 @@ public class User {
         return capabilities;
     }
 
-    public Set<AlbumUser> getAlbumUser() {
-        return albumUser;
-    }
+    public Set<AlbumUser> getAlbumUser() { return albumUser; }
 
     public void addAlbumUser(AlbumUser albumUser) { this.albumUser.add(albumUser); }
 

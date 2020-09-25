@@ -4,11 +4,15 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+@NamedQueries({
+        @NamedQuery(name = "AlbumUser.findByAlbumIdAndUser",
+                query = "SELECT au FROM AlbumUser au WHERE :targetUser = au.user AND :targetAlbum = au.album AND au.user.inbox <> album")
+})
+
 @Entity
 @Table(name = "album_user")
 
 public class AlbumUser {
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name = "pk")
@@ -31,11 +35,11 @@ public class AlbumUser {
     private boolean admin = false;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, updatable = false)
     private User user;
 
     public AlbumUser () {}

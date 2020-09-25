@@ -4,6 +4,7 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
+import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import org.dcm4che3.data.Attributes;
@@ -13,7 +14,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 
-import static online.kheops.auth_server.album.AlbumQueries.findAlbumSeriesByAlbumIDAndSeriesUID;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;
@@ -34,6 +34,11 @@ public class Series {
     public static online.kheops.auth_server.entity.Series getSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
             throws SeriesNotFoundException{
         return findSeriesByStudyUIDandSeriesUID(studyInstanceUID, seriesInstanceUID, em);
+    }
+
+    public static online.kheops.auth_server.entity.Series getSeries(String seriesInstanceUID, EntityManager em)
+            throws SeriesNotFoundException{
+        return findSeriesBySeriesUID(seriesInstanceUID, em);
     }
 
     public static online.kheops.auth_server.entity.Series getOrCreateSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
@@ -122,12 +127,12 @@ public class Series {
             final online.kheops.auth_server.entity.Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             editSeriesFavorites(series, album, favorite, em);
 
-            final Events.MutationType mutation;
+            final MutationType mutation;
             if (favorite) {
-                mutation = Events.MutationType.ADD_FAV;
+                mutation = MutationType.ADD_FAV;
                 kheopsLogBuilder.action(ActionType.ADD_FAVORITE_SERIES);
             } else {
-                mutation = Events.MutationType.REMOVE_FAV;
+                mutation = MutationType.REMOVE_FAV;
                 kheopsLogBuilder.action(ActionType.REMOVE_FAVORITE_SERIES);
 
             }
@@ -150,45 +155,6 @@ public class Series {
     public static void editSeriesFavorites(online.kheops.auth_server.entity.Series series, Album album, boolean favorite, EntityManager em) {
         final AlbumSeries albumSeries = getAlbumSeries(album, series, em);
         albumSeries.setFavorite(favorite);
-    }
-
-    public static boolean isFavorite(String seriesUID, User callingUser) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        final boolean isFavorite;
-
-        try {
-            callingUser = em.merge(callingUser);
-            isFavorite = isFavorite(seriesUID, callingUser.getInbox().getId(), em);
-        } finally {
-            em.close();
-        }
-        return isFavorite;
-    }
-
-    private static boolean isFavorite(String seriesUID, String albumID, EntityManager em) {
-
-        final AlbumSeries albumSeries;
-        try {
-            albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
-        } catch (SeriesNotFoundException e) {
-            throw new IllegalStateException("SeriesUID: "+seriesUID+" Not found inside the albumID: "+albumID);
-        }
-        return albumSeries.isFavorite();
-    }
-
-    public static boolean isFavorite(String seriesUID, String albumID) {
-        final EntityManager em = EntityManagerListener.createEntityManager();
-
-        final AlbumSeries albumSeries;
-        try {
-            albumSeries = findAlbumSeriesByAlbumIDAndSeriesUID(seriesUID, albumID, em);
-        } catch (SeriesNotFoundException e) {
-            throw new IllegalStateException("SeriesUID: "+seriesUID+" Not found inside the albumID: "+albumID);
-        } finally {
-            em.close();
-        }
-        return albumSeries.isFavorite();
     }
 
     public static boolean isSeriesInInbox(User callingUser, online.kheops.auth_server.entity.Series series, EntityManager em) {

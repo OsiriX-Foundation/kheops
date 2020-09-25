@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
 public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrincipal {
 
-    private EntityManager em;
     private final User user;
     private final boolean hasReadAccess;
     private final boolean hasWriteAccess;
@@ -73,7 +71,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrinc
 
     @Override
     public boolean hasAlbumPermission(AlbumUserPermissions usersPermission, String albumId) {
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             if (source.isInbox() && !user.getInbox().getId().equals(albumId)) {
                 return false;
@@ -105,7 +103,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrinc
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             Album album;
             if (source.isInbox()) {
@@ -129,7 +127,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrinc
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             Album album;
             if (source.isInbox()) {
@@ -157,7 +155,7 @@ public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrinc
             return false;
         }
 
-        this.em = EntityManagerListener.createEntityManager();
+        final EntityManager em = EntityManagerListener.createEntityManager();
         try {
             Album album;
             if (source.isInbox()) {
@@ -187,36 +185,6 @@ public class ReportProviderPrincipal implements KheopsPrincipal, CapabilityPrinc
             em.close();
         }
         return false;
-    }
-
-    @Override
-    public boolean hasStudyAddAccess(String studyInstanceUID) {
-        if (!hasWriteAccess) {
-            return false;
-        }
-        if (!studyUids.contains(studyInstanceUID)) {
-            return false;
-        }
-        this.em = EntityManagerListener.createEntityManager();
-        try {
-            Album album;
-            if (source.isInbox()) {
-                album = user.getInbox();
-            } else {
-                album = getAlbum(source.getAlbumId(), em);
-            }
-
-            album = em.merge(album);
-            if (!canAccessStudy(album, studyInstanceUID)) {
-                return false;
-            }
-        } catch (AlbumNotFoundException ignored) {
-            return false;
-        } finally {
-            em.close();
-        }
-
-        return true;
     }
 
     @Override

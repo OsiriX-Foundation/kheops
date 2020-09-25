@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.webhook.WebhookId;
 import online.kheops.auth_server.webhook.WebhookPostParameters;
 
 import javax.persistence.*;
@@ -9,6 +8,24 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
+
+@NamedQueries({
+        @NamedQuery(name = "Webhook.findById", 
+        query = "SELECT w FROM Webhook w WHERE :webhookId = w.id"),
+        @NamedQuery(name = "Webhook.findByIdAndAlbum",
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE :webhookId = w.id AND a = :album"),
+        @NamedQuery(name = "Webhook.findAllByAlbum",
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :album ORDER BY w.creationTime desc"),
+        @NamedQuery(name = "Webhook.findAllByAlbumAndUrl",
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url ORDER BY w.creationTime desc"),
+        @NamedQuery(name = "Webhook.countByAlbum",
+        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album"),
+        @NamedQuery(name = "Webhook.countByAlbumAndUrl",
+        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url"),
+        @NamedQuery(name = "Webhook.findAllEnabledAndForNewSeriesByStudyUID",
+        query = "SELECT DISTINCT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :StudyInstanceUID AND w.enabled = true AND w.newSeries = true")
+})
+
 @Entity
 @Table(name = "webhooks")
 public class Webhook {
@@ -41,6 +58,14 @@ public class Webhook {
     private Boolean newSeries;
 
     @Basic(optional = false)
+    @Column(name = "remove_series")
+    private Boolean removeSeries;
+
+    @Basic(optional = false)
+    @Column(name = "delete_album")
+    private Boolean deleteAlbum;
+
+    @Basic(optional = false)
     @Column(name = "new_user")
     private Boolean newUser;
 
@@ -49,19 +74,18 @@ public class Webhook {
     private Boolean enabled;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
     @ManyToOne
-    @JoinColumn (name = "user_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
-    @OneToMany
-    @JoinColumn (name = "webhook_fk", nullable = false)
+    @OneToMany(mappedBy = "webhook")
     @OrderBy("pk DESC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
-    private Webhook() {}
+    public Webhook() {}
 
     public Webhook(WebhookPostParameters webhookPostParameters, String id, Album album, User user) {
         this.name = webhookPostParameters.getName();
@@ -74,7 +98,9 @@ public class Webhook {
         this.id = id;
         this.secret = webhookPostParameters.getSecret();
         this.newSeries = webhookPostParameters.isNewSeries();
+        this.removeSeries = webhookPostParameters.isRemoveSeries();
         this.newUser = webhookPostParameters.isNewUser();
+        this.deleteAlbum = webhookPostParameters.isDeleteAlbum();
         this.album = album;
         this.user = user;
         this.enabled = webhookPostParameters.isEnabled();
@@ -106,9 +132,13 @@ public class Webhook {
 
     public boolean getNewSeries() { return newSeries; }
 
+    public Boolean getRemoveSeries() { return removeSeries; }
+
     public boolean getNewUser() {
         return newUser;
     }
+
+    public boolean getDeleteAlbum() { return deleteAlbum; }
 
     public Boolean isEnabled() { return enabled; }
 
@@ -146,9 +176,13 @@ public class Webhook {
         this.newSeries = newSeries;
     }
 
+    public void setRemoveSeries(Boolean removeSeries) { this.removeSeries = removeSeries; }
+
     public void setNewUser(Boolean newUser) {
         this.newUser = newUser;
     }
+
+    public void setDeleteAlbum(Boolean deleteAlbum) { this.deleteAlbum = deleteAlbum; }
 
     public void setEnabled(Boolean enabled) { this.enabled = enabled; }
 

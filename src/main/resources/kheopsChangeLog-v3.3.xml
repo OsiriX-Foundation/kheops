@@ -1,0 +1,28 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet author="kheops" id="v3.3-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sqlCheck expectedResult="0">SELECT count(*) FROM events WHERE events.series_fk IS NOT NULL</sqlCheck>
+            </not>
+        </preConditions>
+        <sql>INSERT INTO event_series (event_fk, series_fk)
+        SELECT events.pk, events.series_fk
+        FROM events
+        WHERE events.series_fk IS NOT NULL</sql>
+    </changeSet>
+
+    <changeSet author="kheops" id="v3.3-2">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="events" columnName="series_fk"/>
+        </preConditions>
+        <dropColumn  tableName="events" columnName="series_fk"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v3.3-3">
+       <tagDatabase tag="v3.3"/>
+    </changeSet>
+
+</databaseChangeLog>

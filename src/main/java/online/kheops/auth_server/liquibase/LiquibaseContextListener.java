@@ -22,14 +22,14 @@ public class LiquibaseContextListener implements ServletContextListener {
 
     private static final String CHANGE_LOG_FILE = "kheopsChangeLog-master.xml";
     private static final java.util.logging.Logger LOG = Logger.getLogger(LiquibaseContextListener.class.getName());
-    private static final String DB_VERSION = "v3.1";
+    private static final String DB_VERSION = "v3.6";
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         LOG.log(Level.INFO, "Start initializing the DB with Liquibase. Database version : " + DB_VERSION);
 
         JdbcConnection jdbcCon = null;
-        try (Connection con = EntityManagerListener.getConnection()){
+        try (Connection con = EntityManagerListener.getConnection()) {
             try {
                 jdbcCon = new JdbcConnection(con);
 
@@ -37,6 +37,11 @@ public class LiquibaseContextListener implements ServletContextListener {
                 Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
                 Liquibase liquibase = new Liquibase(CHANGE_LOG_FILE, new ClassLoaderResourceAccessor(), database);
                 final String version = DB_VERSION;
+
+                if(liquibase.tagExists("v1.0") && !liquibase.tagExists("v3.0")) {
+                    LOG.log(Level.SEVERE, "WARNING before installing this version of KHEOPS, install the version v0.9.3");
+                    exit(1);
+                }
 
                 if (liquibase.tagExists(version)) {
                     liquibase.rollback(version, "");

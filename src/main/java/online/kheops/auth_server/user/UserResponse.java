@@ -62,11 +62,12 @@ public class UserResponse  implements Comparable<UserResponse> {
         albumAccess = userResponseBuilder.getAlbumAccess();
         studyAccess = userResponseBuilder.getStudyAccess();
         userResponseBuilder.getCanAccess().ifPresent(value -> canAccess = value);
+        userResponseBuilder.getIsAdmin().ifPresent(value -> isAdmin = value);
+
     }
 
-    public void setReportProvider(ReportProvider reportProvider) {
-        this.reportProvider = new ReportProviderResponse(reportProvider);
-        this.reportProvider.webhookResponse();
+    public void setReportProvider(ReportProvider reportProvider, ReportProviderResponse.Type type) {
+        this.reportProvider = new ReportProviderResponse(reportProvider, type);
     }
 
     public void setCapabilityToken(Capability capability) {
@@ -77,7 +78,14 @@ public class UserResponse  implements Comparable<UserResponse> {
 
     @Override
     public int compareTo(UserResponse userResponse) {
-        return email.compareTo(userResponse.email);
+       int res = email.compareTo(userResponse.email);
+       if (res == 0) {
+           res = sub.compareTo(userResponse.sub);
+           if (res == 0) {
+               res = name.compareTo(userResponse.name);
+           }
+       }
+       return res;
     }
 
     @Override
@@ -88,7 +96,6 @@ public class UserResponse  implements Comparable<UserResponse> {
         if (obj instanceof UserResponse) {
             final UserResponse userAlbumResponse = (UserResponse) obj;
             return  userAlbumResponse.sub.compareTo(sub) == 0 &&
-                    userAlbumResponse.isAdmin == isAdmin &&
                     userAlbumResponse.email.compareTo(email) == 0;
         }
         return false;
@@ -100,7 +107,6 @@ public class UserResponse  implements Comparable<UserResponse> {
         int result = hashCode;
         if(result == 0) {
             result = sub.hashCode();
-            result = 31 * result + isAdmin.hashCode();
             result = 31 * result + email.hashCode();
             hashCode = result;
         }

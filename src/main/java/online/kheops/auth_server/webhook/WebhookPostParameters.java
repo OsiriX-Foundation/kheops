@@ -18,11 +18,15 @@ public class WebhookPostParameters {
     private String albumId;
     private boolean useSecret;
     private boolean newSeries;
+    private boolean removeSeries;
     private boolean newUser;
+    private boolean deleteAlbum;
 
     public WebhookPostParameters() {
         newSeries = false;
+        removeSeries = false;
         newUser = false;
+        deleteAlbum = false;
     }
 
     public WebhookPostParameters setUrl(String url)
@@ -62,8 +66,12 @@ public class WebhookPostParameters {
         for (String event : events) {
             if (event.equalsIgnoreCase(WebhookType.NEW_SERIES.name())) {
                 newSeries = true;
+            } else if (event.equalsIgnoreCase(WebhookType.REMOVE_SERIES.name())) {
+                removeSeries = true;
             } else if (event.equalsIgnoreCase(WebhookType.NEW_USER.name())) {
                 newUser = true;
+            } else if (event.equalsIgnoreCase(WebhookType.DELETE_ALBUM.name())) {
+                deleteAlbum = true;
             } else {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
@@ -87,5 +95,7 @@ public class WebhookPostParameters {
     public String getAlbumId() { return albumId; }
     public boolean isUseSecret() { return useSecret; }
     public boolean isNewSeries() { return newSeries; }
+    public boolean isRemoveSeries() { return removeSeries; }
     public boolean isNewUser() { return newUser; }
+    public boolean isDeleteAlbum() { return deleteAlbum; }
 }

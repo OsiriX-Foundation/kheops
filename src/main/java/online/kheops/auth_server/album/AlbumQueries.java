@@ -2,13 +2,12 @@ package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumSeries;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
+import org.jooq.JoinType;
 import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
@@ -28,7 +27,6 @@ import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
-import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
 import static org.jooq.impl.DSL.*;
 
@@ -42,7 +40,7 @@ public class AlbumQueries {
             throws AlbumNotFoundException {
 
         try {
-            return em.createQuery("SELECT a from Album a where :albumId = a.id", Album.class)
+            return em.createNamedQuery("Albums.findById", Album.class)
                     .setParameter("albumId", albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
@@ -54,28 +52,12 @@ public class AlbumQueries {
             throws UserNotMemberException {
 
         try {
-            return em.createQuery("SELECT au from AlbumUser au where :targetUser = au.user and :targetAlbum = au.album and au.user.inbox <> album", AlbumUser.class)
+            return em.createNamedQuery("AlbumUser.findByAlbumIdAndUser", AlbumUser.class)
                     .setParameter("targetUser", user)
                     .setParameter("targetAlbum", album)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new UserNotMemberException();
-        }
-    }
-
-    public static AlbumSeries findAlbumSeriesByAlbumIDAndSeriesUID(String seriesUID, String albumID, EntityManager em)
-            throws SeriesNotFoundException {
-        try {
-            return em.createQuery("SELECT aSeries from Album a join a.albumSeries aSeries join aSeries.series s where :seriesUID = s.seriesInstanceUID and :albumID = a.id", AlbumSeries.class)
-                    .setParameter("seriesUID", seriesUID)
-                    .setParameter("albumID", albumID)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message(SERIES_NOT_FOUND)
-                    .detail("The series does not exist in the album")
-                    .build();
-            throw new SeriesNotFoundException(errorResponse);
         }
     }
 
@@ -301,6 +283,7 @@ public class AlbumQueries {
             throw new JOOQException("Error during request");
         }
     }
+
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
         final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);

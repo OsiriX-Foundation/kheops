@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.report_provider.ClientId;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,6 +8,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings("unused")
+
+@NamedQueries({
+        @NamedQuery(name = "ReportProvider.findByClientId",
+                query = "SELECT dsr FROM ReportProvider dsr WHERE :clientId = dsr.clientId AND dsr.removed = false"),
+        @NamedQuery(name = "ReportProvider.findByClientIdAndAlbumId",
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :clientId = dsr.clientId AND :albumId = a.id"),
+        @NamedQuery(name = "ReportProvider.findAllByAlbumId",
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
+        @NamedQuery(name = "ReportProvider.countAllByAlbumId",
+                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false")
+})
+
 @Entity
 @Table(name = "report_providers")
 
@@ -40,11 +51,10 @@ public class ReportProvider {
     private boolean removed;
 
     @ManyToOne
-    @JoinColumn (name = "album_fk", nullable=false, insertable = false, updatable = false)
+    @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
-    @OneToMany
-    @JoinColumn (name = "report_provider_fk", nullable=true)
+    @OneToMany(mappedBy = "reportProvider")
     private Set<Mutation> mutations = new HashSet<>();
 
     @PrePersist
@@ -52,7 +62,6 @@ public class ReportProvider {
         creationTime = LocalDateTime.now(ZoneOffset.UTC);
         this.removed = false;
     }
-
 
     public ReportProvider() {}
 

@@ -1,17 +1,12 @@
 package online.kheops.auth_server.marshaller;
 
 import online.kheops.auth_server.util.ErrorResponse;
-import org.dcm4che3.data.Attributes;
-import org.dcm4che3.io.SAXTransformer;
-import org.xml.sax.SAXException;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.stream.StreamResult;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;

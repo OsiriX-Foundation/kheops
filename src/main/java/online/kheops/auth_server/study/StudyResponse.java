@@ -83,4 +83,11 @@ public class StudyResponse {
             return !series.isEmpty();
         }
     }
+
+    public void hideRetrieveUrl() {
+        retrieveUrl = null;
+        for (SeriesResponse s:series) {
+            s.hideRetrieveUrl();
+        }
+    }
 }

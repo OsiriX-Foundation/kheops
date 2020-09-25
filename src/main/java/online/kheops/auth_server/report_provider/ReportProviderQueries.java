@@ -2,9 +2,17 @@ package online.kheops.auth_server.report_provider;
 
 
 import online.kheops.auth_server.entity.ReportProvider;
+import online.kheops.auth_server.entity.Series;
+import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.List;
+
+import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
+import static online.kheops.auth_server.util.ErrorResponse.Message.REPORT_PROVIDER_NOT_FOUND;
 
 public class ReportProviderQueries {
 
@@ -14,14 +22,30 @@ public class ReportProviderQueries {
 
     public static ReportProvider getReportProviderWithClientId(String clientId, EntityManager em) {
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr where :clientId = dsr.clientId and dsr.removed = false", ReportProvider.class)
+        return em.createNamedQuery("ReportProvider.findByClientId", ReportProvider.class)
                 .setParameter("clientId", clientId)
                 .getSingleResult();
     }
 
-    public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, Integer limit, Integer offset, EntityManager em) {
+    public static ReportProvider getReportProviderWithClientIdAndAlbumId(String clientId, String albumId, EntityManager em)
+        throws ReportProviderNotFoundException{
 
-        return em.createQuery("SELECT dsr from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false order by dsr.creationTime desc", ReportProvider.class)
+        TypedQuery<ReportProvider> q = em.createNamedQuery("ReportProvider.findByClientIdAndAlbumId", ReportProvider.class)
+                .setParameter("clientId", clientId)
+                .setParameter("albumId", albumId);
+        try {
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(REPORT_PROVIDER_NOT_FOUND)
+                    .detail("The report provider does not exist or not present in this album")
+                    .build();
+            throw new ReportProviderNotFoundException(errorResponse);
+        }
+    }
+
+    public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, Integer limit, Integer offset, EntityManager em) {
+        return em.createNamedQuery("ReportProvider.findAllByAlbumId", ReportProvider.class)
                 .setParameter("albumId", albumId)
                 .setMaxResults(limit)
                 .setFirstResult(offset)
@@ -29,8 +53,7 @@ public class ReportProviderQueries {
     }
 
     public static long countReportProviderWithAlbumId(String albumId, EntityManager em) {
-
-        return em.createQuery("SELECT count(dsr) from ReportProvider dsr join dsr.album a where :albumId = a.id and dsr.removed = false", Long.class)
+        return em.createNamedQuery("ReportProvider.countAllByAlbumId", Long.class)
                 .setParameter("albumId", albumId)
                 .getSingleResult();
     }

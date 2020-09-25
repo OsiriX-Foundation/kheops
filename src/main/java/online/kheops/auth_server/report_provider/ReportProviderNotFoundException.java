@@ -1,22 +1,19 @@
 package online.kheops.auth_server.report_provider;
 
-public class ReportProviderNotFoundException extends Exception {
-    public ReportProviderNotFoundException() {
+import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.KheopsException;
+
+public class ReportProviderNotFoundException extends Exception implements KheopsException {
+
+    private final ErrorResponse errorResponse;
+
+    public ReportProviderNotFoundException(ErrorResponse errorResponse) {
+
+        super();
+        this.errorResponse = errorResponse;
     }
 
-    public ReportProviderNotFoundException(String message) {
-        super(message);
-    }
-
-    public ReportProviderNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ReportProviderNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    protected ReportProviderNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public ErrorResponse getErrorResponse() {
+        return errorResponse;
     }
 }
