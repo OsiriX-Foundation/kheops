@@ -41,7 +41,7 @@ public class WebhookTriggerResponse {
                 if (studyResponse == null) {
                     studyResponse = new StudyResponse(series.getStudy());
                 }
-                studyResponse.addSeries(series);
+                studyResponse.addSeries(series, false);
             }
         } else if(webhookTrigger.getNewUser()) {
             event = WebhookType.NEW_USER.name().toLowerCase();
@@ -50,6 +50,14 @@ public class WebhookTriggerResponse {
                     .setName(webhookTrigger.getUser().getName())
                     .setSub(webhookTrigger.getUser().getSub())
                     .build();
+        } else if(webhookTrigger.getRemoveSeries()) {
+            event = WebhookType.REMOVE_SERIES.name().toLowerCase();
+            for (Series series: webhookTrigger.getSeries()) {
+                if (studyResponse == null) {
+                    studyResponse = new StudyResponse(series.getStudy());
+                }
+                studyResponse.addSeries(series, false);
+            }
         }
 
         if(!webhookTrigger.getWebhookAttempts().isEmpty()) {
