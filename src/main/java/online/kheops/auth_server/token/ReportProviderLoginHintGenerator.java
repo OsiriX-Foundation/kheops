@@ -24,8 +24,10 @@ public class ReportProviderLoginHintGenerator {
     private Source source;
     private String clientId;
     private String subject;
+    private String email;
     private String actingParty;
     private String capabilityTokenId;
+    private Boolean oidcInitiated;
 
     private ReportProviderLoginHintGenerator(final ServletContext servletContext) {
         this.servletContext = servletContext;
@@ -55,16 +57,25 @@ public class ReportProviderLoginHintGenerator {
         return this;
     }
 
+    public ReportProviderLoginHintGenerator withEmail(final String email) {
+        this.email = email;
+        return this;
+    }
+
     public ReportProviderLoginHintGenerator withActingParty(final String actingParty) {
-        this.actingParty = Objects.requireNonNull(actingParty);
+        this.actingParty = actingParty;
         return this;
     }
 
     public ReportProviderLoginHintGenerator withCapabilityTokenId(final String capabilityTokenId) {
-        this.capabilityTokenId = Objects.requireNonNull(capabilityTokenId);
+        this.capabilityTokenId = capabilityTokenId;
         return this;
     }
 
+    public ReportProviderLoginHintGenerator withOidcInitiated(final Boolean oidcInitiated) {
+        this.oidcInitiated = oidcInitiated;
+        return this;
+    }
 
     public String generate(@SuppressWarnings("SameParameterValue") long expiresIn) {
 
@@ -92,8 +103,16 @@ public class ReportProviderLoginHintGenerator {
             jwtBuilder.withClaim("act", actingParty);
         }
 
+        if (email != null) {
+            jwtBuilder.withClaim("email", email);
+        }
+
         if (capabilityTokenId != null) {
             jwtBuilder.withClaim("cap_token", capabilityTokenId);
+        }
+
+        if (oidcInitiated != null) {
+            jwtBuilder.withClaim("oidcInitiated", oidcInitiated);
         }
 
         return jwtBuilder.sign(algorithmHMAC);

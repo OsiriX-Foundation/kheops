@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Level.INFO;
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.KEYCLOAK_TOKEN;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.PATH_PARAM;
 import static online.kheops.auth_server.report_provider.metadata.parameters.ListUriParameter.REDIRECT_URIS;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
@@ -180,9 +181,9 @@ public class ReportProviderResource {
       return Response.status(BAD_GATEWAY).entity(errorResponse).build();
     }
 
-    getUser(accessToken.getSubject());
+    final User user = getUser(accessToken.getSubject());
 
-    if (!(accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN
+    if (!(accessToken.getTokenType() == KEYCLOAK_TOKEN
         || accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN)) {
       final ErrorResponse errorResponse =
           new ErrorResponse.ErrorResponseBuilder()
@@ -201,6 +202,11 @@ public class ReportProviderResource {
               .withStudyInstanceUIDs(studyInstanceUIDs)
               .withSubject(accessToken.getSubject())
               .withSource(source);
+
+      if (accessToken.getTokenType() == KEYCLOAK_TOKEN) {
+        generator = generator.withOidcInitiated(true).withEmail(user.getEmail());
+      }
+
       final ClientRedirectEntity clientRedirectEntity =
           new ClientRedirectEntity(
               reportProvider.getClientMetadata(),
@@ -447,25 +453,35 @@ public class ReportProviderResource {
     generator.withRedirectUri(redirectUri);
     generator.withState(state);
 
-    final UriBuilder authorizationEndpoint;
-    try {
-      authorizationEndpoint =
-          UriBuilder.fromUri(
-              oidcProvider.getOidcMetadata().getValue(AUTHORIZATION_ENDPOINT).orElseThrow());
-    } catch (OidcProviderException | NoSuchElementException e) {
-      // TODO show the user a page with the error
-      throw new ServerErrorException(BAD_GATEWAY);
+    final String authCode = generator.generate(300);
+
+    if (decodedToken.getOidcInitiated().orElse(false)) {
+      final UriBuilder authorizationEndpoint;
+      try {
+        authorizationEndpoint =
+            UriBuilder.fromUri(
+                oidcProvider.getOidcMetadata().getValue(AUTHORIZATION_ENDPOINT).orElseThrow());
+      } catch (OidcProviderException | NoSuchElementException e) {
+        // TODO show the user a page with the error
+        throw new ServerErrorException(BAD_GATEWAY);
+      }
+
+      authorizationEndpoint.queryParam("scope", "openid");
+      authorizationEndpoint.queryParam("response_type", "code");
+      authorizationEndpoint.queryParam("client_id", "loginConnect");
+      authorizationEndpoint.queryParam("redirect_uri", getHostRoot() + "/api/login-callback");
+      authorizationEndpoint.queryParam("state", authCode);
+      authorizationEndpoint.queryParam("nonce", nonce);
+      authorizationEndpoint.queryParam("login_hint", decodedToken.getEmail().orElseThrow());
+
+      return Response.temporaryRedirect(authorizationEndpoint.build()).build();
+    } else {
+      UriBuilder redirectUriBuilder = UriBuilder.fromUri(redirectUri).queryParam("code", authCode);
+
+      redirectUriBuilder.queryParam("state", state);
+
+      return Response.temporaryRedirect(redirectUriBuilder.build()).build();
     }
-
-    authorizationEndpoint.queryParam("scope", "openid");
-    authorizationEndpoint.queryParam("response_type", "code");
-    authorizationEndpoint.queryParam("client_id", "loginConnect");
-    authorizationEndpoint.queryParam("redirect_uri", getHostRoot() + "/api/login-callback");
-    authorizationEndpoint.queryParam("state", generator.generate(300));
-    authorizationEndpoint.queryParam("nonce", nonce);
-    authorizationEndpoint.queryParam("login_hint", decodedToken.getSubject());
-
-    return Response.temporaryRedirect(authorizationEndpoint.build()).build();
   }
 
   @GET

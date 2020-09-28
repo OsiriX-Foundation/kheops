@@ -13,6 +13,9 @@ public class DecodedToken {
   private final String capabilityTokenId;
   private final Set<String> studyInstanceUIDs;
   private final Source source;
+  private final String email;
+  private final Boolean oidcInitiated;
+
 
   public static DecodedToken createDecodedLoginHint(
       final String subject,
@@ -20,9 +23,12 @@ public class DecodedToken {
       final String actingParty,
       final String capabilityTokenId,
       final Set<String> studyInstanceUIDs,
-      final Source source) {
+      final Source source,
+      final String email,
+      final Boolean oidcInitiated
+  ) {
     return new DecodedToken(
-        subject, clientId, actingParty, capabilityTokenId, studyInstanceUIDs, source);
+        subject, clientId, actingParty, capabilityTokenId, studyInstanceUIDs, source, email, oidcInitiated);
   }
 
   private DecodedToken(
@@ -31,13 +37,17 @@ public class DecodedToken {
       final String actingParty,
       final String capabilityTokenId,
       final Set<String> studyInstanceUIDs,
-      final Source source) {
+      final Source source,
+      final String email,
+      final Boolean oidcInitiated) {
     this.subject = Objects.requireNonNull(subject);
     this.clientId = Objects.requireNonNull(clientId);
     this.actingParty = actingParty;
     this.capabilityTokenId = capabilityTokenId;
     this.studyInstanceUIDs = Objects.requireNonNull(studyInstanceUIDs);
     this.source = source;
+    this.email = email;
+    this.oidcInitiated = oidcInitiated;
   }
 
   public String getSubject() {
@@ -54,6 +64,14 @@ public class DecodedToken {
 
   public Optional<String> getCapabilityTokenId() {
     return Optional.ofNullable(capabilityTokenId);
+  }
+
+  public Optional<String> getEmail() {
+    return Optional.ofNullable(email);
+  }
+
+  public Optional<Boolean> getOidcInitiated() {
+    return Optional.ofNullable(oidcInitiated);
   }
 
   Set<String> getStudyInstanceUIDs() {

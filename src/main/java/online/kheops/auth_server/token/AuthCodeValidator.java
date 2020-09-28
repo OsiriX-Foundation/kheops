@@ -128,7 +128,7 @@ public class AuthCodeValidator {
     }
 
     return DecodedToken.createDecodedLoginHint(
-        subject, clientId, actingParty, capabilityTokenId, new HashSet<>(studyUIs), source);
+        subject, clientId, actingParty, capabilityTokenId, new HashSet<>(studyUIs), source, null, null);
   }
 
   private String getHMAC256Secret() {

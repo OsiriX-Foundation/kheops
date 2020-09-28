@@ -93,8 +93,24 @@ public class LoginHintValidator {
       capabilityTokenId = null;
     }
 
+    final String email;
+    Claim emailClaim = jwt.getClaim("email");
+    if (!emailClaim.isNull()) {
+      email = emailClaim.asString();
+    } else {
+      email = null;
+    }
+
+    final Boolean oidcInitiated;
+    Claim oidcInitiatedClaim = jwt.getClaim("oidcInitiated");
+    if (!oidcInitiatedClaim.isNull()) {
+      oidcInitiated = oidcInitiatedClaim.asBoolean();
+    } else {
+      oidcInitiated = null;
+    }
+
     return DecodedToken.createDecodedLoginHint(
-        subject, clientId, actingParty, capabilityTokenId, new HashSet<>(studyUIs), source);
+        subject, clientId, actingParty, capabilityTokenId, new HashSet<>(studyUIs), source, email, oidcInitiated);
   }
 
   private String getHMAC256Secret() {
