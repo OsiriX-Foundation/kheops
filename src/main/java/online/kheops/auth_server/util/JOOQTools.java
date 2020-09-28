@@ -5,10 +5,8 @@ import org.jooq.Condition;
 import org.jooq.Field;
 
 import javax.ws.rs.core.MultivaluedMap;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.OptionalInt;
 
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
@@ -70,10 +68,10 @@ public abstract class JOOQTools {
         }
     }
 
-    public static Condition createDateCondition(String parameter, Field<Timestamp> column)
+    public static Condition createDateCondition(String parameter, Field<LocalDateTime> column)
             throws BadQueryParametersException {
 
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmmss");
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                 .message(BAD_QUERY_PARAMETER)
                 .detail("Bad date format : yyyyMMdd")
@@ -82,46 +80,35 @@ public abstract class JOOQTools {
         if (parameter.contains("-")) {
             String[] parameters = parameter.split("-");
             if (parameters.length == 2) { //case yyyyMMdd-yyyyMMdd
-                try {
-                    if(parameters[0].length() == 0) {//case -yyyyMMdd = all before yyyyMMdd
-                        parameters[0] = "00010101";
-                    }
-                    checkDate(parameters[0]);
-                    checkDate(parameters[1]);
-
-                    Date parsedDateBegin = dateFormat.parse(parameters[0]+"000000");
-                    Timestamp begin = new java.sql.Timestamp(parsedDateBegin.getTime());
-                    Date parsedDateEnd = dateFormat.parse(parameters[1] + "235959");
-                    Timestamp end = new java.sql.Timestamp(parsedDateEnd.getTime());
-                    return column.between(begin, end);
-                } catch (ParseException e) {
-                    throw new BadQueryParametersException(errorResponse);
+                if(parameters[0].length() == 0) {//case -yyyyMMdd = all before yyyyMMdd
+                    parameters[0] = "00010101";
                 }
-            } else if(parameters.length == 1) { //case yyyyMMdd- = all after yyyyMMdd
-                try {
                 checkDate(parameters[0]);
-                Date parsedDateBegin = dateFormat.parse(parameters[0]+"000000");
-                Timestamp begin = new java.sql.Timestamp(parsedDateBegin.getTime());
-                Date parsedDateEnd = dateFormat.parse("99991231235959");
-                Timestamp end = new java.sql.Timestamp(parsedDateEnd.getTime());
+                checkDate(parameters[1]);
+
+                final String strDateBegin = parameters[0]+"000000";
+                final LocalDateTime begin = LocalDateTime.parse(strDateBegin, formatter);
+                final String strDateEnd = parameters[1] + "235959";
+                final LocalDateTime end = LocalDateTime.parse(strDateEnd, formatter);
                 return column.between(begin, end);
-                } catch (ParseException e) {
-                    throw new BadQueryParametersException(errorResponse);
-                }
+            } else if(parameters.length == 1) { //case yyyyMMdd- = all after yyyyMMdd
+                checkDate(parameters[0]);
+
+                final String strDateBegin = parameters[0]+"000000";
+                final LocalDateTime begin = LocalDateTime.parse(strDateBegin, formatter);
+                final String strDateEnd = "99991231235959";
+                final LocalDateTime end = LocalDateTime.parse(strDateEnd, formatter);
+                return column.between(begin, end);
             } else {
                 throw new BadQueryParametersException(errorResponse);
             }
         } else {  //case only at this date yyyyMMdd
-            try {
-                checkDate(parameter);
-                Date parsedDateBegin = dateFormat.parse(parameter+"000000");
-                Timestamp begin = new java.sql.Timestamp(parsedDateBegin.getTime());
-                Date parsedDateEnd = dateFormat.parse(parameter+"235959");
-                Timestamp end = new java.sql.Timestamp(parsedDateEnd.getTime());
-                return column.between(begin, end);
-            } catch (ParseException e) {
-                throw new BadQueryParametersException(errorResponse);
-            }
+            checkDate(parameter);
+            final String strDateBegin = parameter+"000000";
+            final LocalDateTime begin = LocalDateTime.parse(strDateBegin, formatter);
+            final String strDateEnd = parameter+"235959";
+            final LocalDateTime end = LocalDateTime.parse(strDateEnd, formatter);
+            return column.between(begin, end);
         }
     }
 }
