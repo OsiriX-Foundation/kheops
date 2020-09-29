@@ -60,15 +60,12 @@ public class UserResource {
         public String name;
         @XmlElement(name = "email")
         public String email;
-        @XmlElement(name = "preferred_username")
-        public String preferredUsername;
 
         private static OIDCUserInfo from(User user) {
             OIDCUserInfo userInfo = new OIDCUserInfo();
             userInfo.sub = user.getSub();
             userInfo.name = user.getName();
             userInfo.email = user.getEmail();
-            userInfo.preferredUsername = user.getName();
             return userInfo;
         }
     }
