@@ -48,10 +48,10 @@ dependencies {
 
     api group: 'org.ehcache', name: 'ehcache', version: '3.6.3'
 
-    api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.3') {
+    api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.5') {
         exclude module: 'slf4j-log4j12'
     }
-    api (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.22.3') {
+    api (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.22.5') {
         exclude module: 'slf4j-log4j12'
     }
     api group: 'javax.activation', name: 'activation', version: '1.1.1'
