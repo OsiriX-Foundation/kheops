@@ -80,9 +80,7 @@ export default {
       'authenticateOidc',
     ]),
     userSignOut() {
-      if (!this.oidcIsAuthenticated) {
-        this.authenticateOidc();
-      }
+      this.authenticateOidc();
     },
     accessTokenLoaded(accessToken) {
       if (this.userSend === false) {
