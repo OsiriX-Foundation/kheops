@@ -22,15 +22,17 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
-import static javax.ws.rs.core.Response.Status.ACCEPTED;
-import static javax.ws.rs.core.Response.Status.CONFLICT;
+import static javax.ws.rs.core.Response.Status.*;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
-import static javax.ws.rs.core.Response.Status.OK;
 import static online.kheops.proxy.stow.authorization.AuthorizationManagerException.Reason.SERIES_ACCESS_FORBIDDEN;
 import static online.kheops.proxy.stow.authorization.AuthorizationManagerException.Reason.UNKNOWN_CONTENT_LOCATION;
 
@@ -105,10 +107,31 @@ public final class AuthorizationManager {
         processingFailures.add(new ProcessingFailure(fileID));
     }
 
+    private static final Pattern STUDY_URI_PATTERN = Pattern.compile("^.*(/studies/([0-9]+[.])*[0-9]+)$");
+    private static final int URI_PATTERN_GROUP = 1;
+    private static final Pattern INSTANCE_URI_PATTERN = Pattern.compile("^.*(/studies/([0-9]+[.])*[0-9]+/series/([0-9]+[.])*[0-9]+/instances/([0-9]+[.])*[0-9]+)$");
+
     public Response getResponse(Attributes attributes, final int status) {
+
+        final boolean linkAuthorization = headerXLinkAuthorization != null && headerXLinkAuthorization.equalsIgnoreCase("true");
+        final URI rootURI = getRootUri();
+        final UriBuilder retrieveULRBuilder;
+        if (linkAuthorization) {
+            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api/link/" + bearerToken.getToken());
+        } else {
+            retrieveULRBuilder = UriBuilder.fromUri(rootURI).path("/api");
+        }
+
         if (attributes == null) {
             attributes = new Attributes(2);
             attributes.setString(Tag.RetrieveURL, VR.UR, "");
+        } else {
+            patchRetrieveUrl(attributes, STUDY_URI_PATTERN, retrieveULRBuilder);
+        }
+
+        Sequence referencedSOPSequence = attributes.getSequence(Tag.ReferencedSOPSequence);
+        for (Attributes referencedSOP : (referencedSOPSequence != null ? referencedSOPSequence : Collections.<Attributes>emptyList())) {
+            patchRetrieveUrl(referencedSOP, INSTANCE_URI_PATTERN, retrieveULRBuilder);
         }
 
         Sequence failedSOPs = attributes.getSequence(Tag.FailedSOPSequence);
@@ -165,6 +188,19 @@ public final class AuthorizationManager {
         return Response.status(responseStatus).entity(attributes).build();
     }
 
+    private void patchRetrieveUrl(Attributes attributes, Pattern pattern, UriBuilder uriBuilder) {
+        final String retrieveUrl = attributes.getString(Tag.RetrieveURL, "");
+        attributes.remove(Tag.RetrieveURL);
+        final Matcher studyMatcher = pattern.matcher(retrieveUrl);
+        if (studyMatcher.matches()) {
+            final String patchedStudyUri = uriBuilder
+                .path(studyMatcher.group(URI_PATTERN_GROUP))
+                .build()
+                .toString();
+            attributes.setString(Tag.RetrieveURL, VR.UR, patchedStudyUri);
+        }
+    }
+
     private boolean getAuthorization(InstanceID instanceID) throws GatewayException {
         final SeriesID seriesID = instanceID.getSeriesID();
         if (authorizedSeriesIDs.contains(seriesID)) {
@@ -217,4 +253,12 @@ public final class AuthorizationManager {
         authorizedContentLocations.addAll(contentLocations);
     }
 
+    private URI getRootUri() {
+        try {
+            return new URI(System.getProperty("online.kheops.root.uri"));
+        } catch (URISyntaxException e) {
+            LOG.log(Level.SEVERE, "Error with the STOWServiceURI", e);
+            throw new WebApplicationException(INTERNAL_SERVER_ERROR);
+        }
+    }
 }
