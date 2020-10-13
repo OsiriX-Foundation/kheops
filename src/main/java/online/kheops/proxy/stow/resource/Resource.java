@@ -55,7 +55,7 @@ public final class Resource {
     private static final Client CLIENT = newClient();
 
     private static final String CONSUMED_TYPES = MULTIPART_RELATED + "," + MULTIPART_FORM_DATA + "," + APPLICATION_DICOM;
-    private static final String PRODUCED_TYPES = APPLICATION_DICOM_JSON + ";qs=0.9," + "application/dicom+xml;qs=1.0," + APPLICATION_JSON+ ";qs=0.8";
+    private static final String PRODUCED_TYPES = APPLICATION_DICOM_JSON + ";qs=1.0," + "application/dicom+xml;qs=0.9," + APPLICATION_JSON + ";qs=0.8";
 
     private static final String HEADER_X_FORWARDED_FOR = "X-Forwarded-For";
     private static final String HEADER_X_LINK_AUTHORIZATION = "X-Link-Authorization";
