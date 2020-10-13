@@ -130,7 +130,7 @@ sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|g"
 sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|g" /etc/nginx/conf.d/kheops.conf
 
 sed -i "s|\${server_name}|$roothost|g" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${keycloak_url}|$proto$host|g" /etc/nginx/conf.d/kheops.conf
+sed -i "s|\${keycloak_url}|$proto$hostport|g" /etc/nginx/conf.d/kheops.conf
 
 echo "Ending setup NGINX secrets and env var"
 
