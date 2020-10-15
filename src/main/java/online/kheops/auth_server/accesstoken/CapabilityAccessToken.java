@@ -24,7 +24,7 @@ final class CapabilityAccessToken implements AccessToken {
 
     static final class CapabilityAccessTokenBuilder implements AccessTokenBuilder {
         @Override
-        public AccessToken build(String capabilityToken) throws AccessTokenVerificationException {
+        public AccessToken build(String capabilityToken, boolean verifySignature) throws AccessTokenVerificationException {
             if (!CapabilityToken.isValidFormat(capabilityToken)) {
                 throw new AccessTokenVerificationException("Bad capability token format");
             }

@@ -213,7 +213,7 @@ public class UserResource {
 
         final OidcAccessToken accessToken;
         try {
-            accessToken = new OidcAccessToken.Builder(servletContext).build(token);
+            accessToken = new OidcAccessToken.Builder(servletContext).build(token, true);
         } catch (AccessTokenVerificationException e) {
             LOG.log(Level.WARNING, "Access token error", e);
             return Response.status(BAD_REQUEST).build();

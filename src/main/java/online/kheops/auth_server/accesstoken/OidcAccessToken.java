@@ -85,7 +85,7 @@ public final class OidcAccessToken implements AccessToken {
             this.servletContext = servletContext;
         }
 
-        public OidcAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public OidcAccessToken build(String assertionToken, boolean verifySignature) throws AccessTokenVerificationException {
             ConfigurationURLs configurationURL = getJwksURL(configurationUrl);
 
             final RSAKeyProvider keyProvider = new RSAKeyProvider() {
@@ -100,12 +100,20 @@ public final class OidcAccessToken implements AccessToken {
 
             final DecodedJWT jwt;
             try {
-                jwt = JWT.require(Algorithm.RSA256(keyProvider))
-                        .acceptLeeway(120)
-                        .withIssuer(configurationURL.issuer)
-                        .acceptLeeway(60)
-                        .build()
-                        .verify(assertionToken);
+                if (verifySignature) {
+                    jwt = JWT.require(Algorithm.RSA256(keyProvider))
+                            .acceptLeeway(120)
+                            .withIssuer(configurationURL.issuer)
+                            .acceptLeeway(60)
+                            .build()
+                            .verify(assertionToken);
+                } else {
+                    if (assertionToken.indexOf('.') == -1) {
+                        jwt = JWT.decode("eyJhbGciOiJub25lIn0." + assertionToken + ".");
+                    } else {
+                        jwt = JWT.decode(assertionToken);
+                    }
+                }
             } catch (JWTVerificationException e) {
                 throw new AccessTokenVerificationException("Verification of the token failed, configuration URL:" + configurationUrl, e);
             }

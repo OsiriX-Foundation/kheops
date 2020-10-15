@@ -20,8 +20,13 @@ public abstract class AccessTokenVerifier {
     private AccessTokenVerifier() {}
 
     public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken)
-            throws AccessTokenVerificationException {
-        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken);
+        throws AccessTokenVerificationException {
+        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken, true);
+    }
+
+    public static AccessToken authenticateAccessToken(ServletContext servletContext, String accessToken, boolean verifySignature)
+        throws AccessTokenVerificationException {
+        return authenticateAccessTokens(accessTokenBuilderClasses, servletContext, accessToken, verifySignature);
     }
 
     public static AccessToken authenticateIntrospectableAccessToken(ServletContext servletContext, String accessToken)
@@ -30,10 +35,10 @@ public abstract class AccessTokenVerifier {
         List<Class<?>> introspectableAccessTokenBuilderClasses = new ArrayList<>(accessTokenBuilderClasses);
         introspectableAccessTokenBuilderClasses.add(pepAccessTokenClass);
 
-        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken);
+        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, servletContext, accessToken, true);
     }
 
-    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken)
+    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, ServletContext servletContext, String accessToken, boolean verifySignature)
             throws AccessTokenVerificationException {
 
         List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
@@ -58,7 +63,7 @@ public abstract class AccessTokenVerifier {
             }
 
             try {
-                return accessTokenBuilder.build(accessToken);
+                return accessTokenBuilder.build(accessToken, verifySignature);
             } catch (AccessTokenVerificationException e) {
                 exceptionList.add(e);
             }

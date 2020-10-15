@@ -22,6 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static javax.ws.rs.core.Response.Status.*;
+import static online.kheops.auth_server.accesstoken.AccessToken.TokenType.KEYCLOAK_TOKEN;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -106,7 +107,15 @@ class ViewerAccessTokenGenerator {
 
         try {
             final JSONObject data = new JSONObject();
-            data.put(Consts.JWE.TOKEN, token);
+
+            final String encodedToken;
+            if (accessToken.getTokenType() == KEYCLOAK_TOKEN) {
+                encodedToken = token.substring(token.indexOf('.') + 1, token.lastIndexOf('.'));
+            } else {
+                encodedToken = token;
+            }
+
+            data.put(Consts.JWE.TOKEN, encodedToken);
             if (sourceId != null) {
                 data.put(Consts.JWE.SOURCE_ID, sourceId);
             }
