@@ -114,6 +114,8 @@ public class Users {
                     LOG.log(INFO, "About to try to share with the welcomebot");
                     CLIENT.target(welcomebotWebhook)
                             .queryParam("user", user.getSub())
+                            .queryParam("email", email)
+                            .queryParam("name", name)
                             .request()
                             .post(Entity.text(""));
                 } catch (ProcessingException | WebApplicationException e) {
