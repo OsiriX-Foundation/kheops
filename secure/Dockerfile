@@ -16,7 +16,6 @@ RUN dpkg -i filebeat-amd64.deb && \
 COPY filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
-
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
 
