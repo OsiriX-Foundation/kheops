@@ -8,6 +8,7 @@ COPY env_var_script.sh /docker-entrypoint.d/30-env_var_script.sh
 COPY filebeat_script.sh /docker-entrypoint.d/30-filebeat_script.sh
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY chain.pem /etc/nginx/chain.pem
+COPY start_nginx_script.sh /docker-entrypoint.d/60-start_nginx_script.sh
 
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
@@ -21,3 +22,4 @@ RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
 
 RUN chmod +x /docker-entrypoint.d/30-env_var_script.sh
 RUN chmod +x /docker-entrypoint.d/30-filebeat_script.sh
+RUN chmod +x /docker-entrypoint.d/60-start_nginx_script.sh
