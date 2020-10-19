@@ -17,3 +17,9 @@ jobs:
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push osirixfoundation/kheops-reverse-proxy:secure
+    - stage: letsencrypt
+      script:
+        - docker build -t osirixfoundation/kheops-reverse-proxy:letsencrypt -f letsencrypt/Dockerfile .
+      after_success:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push osirixfoundation/kheops-reverse-proxy:letsencrypt
