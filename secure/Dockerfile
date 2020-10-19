@@ -9,8 +9,6 @@ COPY secure/verify_secret_script.sh /docker-entrypoint.d/30-verify_secret_script
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY secure/chain.pem /etc/nginx/chain.pem
 
-RUN chmod +x /etc/nginx/conf.d/script.sh
-
 #FILEBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
 RUN dpkg -i filebeat-amd64.deb && \
