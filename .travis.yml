@@ -5,16 +5,16 @@ notifications:
 
 
 jobs:
-   include:
-      - stage: ci-test
-         script:
-            - docker build -t osirixfoundation/kheops-reverse-proxy:ci-test -f ci-test/Dockerfile .
-         after_success:
-            - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            - docker push osirixfoundation/kheops-reverse-proxy:ci-test
-      - stage: secure
-         script:
-            - docker build -t osirixfoundation/kheops-reverse-proxy:secure -f secure/Dockerfile .
-         after_success:
-            - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-            - docker push osirixfoundation/kheops-reverse-proxy:secure
+  include:
+    - stage: ci-test
+      script:
+        - docker build -t osirixfoundation/kheops-reverse-proxy:ci-test -f ci-test/Dockerfile .
+      after_success:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push osirixfoundation/kheops-reverse-proxy:ci-test
+    - stage: secure
+      script:
+        - docker build -t osirixfoundation/kheops-reverse-proxy:secure -f secure/Dockerfile .
+      after_success:
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push osirixfoundation/kheops-reverse-proxy:secure
