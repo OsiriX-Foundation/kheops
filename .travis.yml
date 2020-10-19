@@ -7,19 +7,19 @@ jobs:
   include:
     - stage: ci-test
       script:
-        - docker build -t osirixfoundation/kheops-reverse-proxy:ci-test -f ci-test/Dockerfile .
+        - docker build -t osirixfoundation/kheops-reverse-proxy:ci-test-$TRAVIS_BRANCH -f ci-test/Dockerfile .
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push osirixfoundation/kheops-reverse-proxy:ci-test
+        - docker push osirixfoundation/kheops-reverse-proxy:ci-test-$TRAVIS_BRANCH
     - stage: secure
       script:
-        - docker build -t osirixfoundation/kheops-reverse-proxy:secure -f secure/Dockerfile .
+        - docker build -t osirixfoundation/kheops-reverse-proxy:secure-$TRAVIS_BRANCH -f secure/Dockerfile .
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push osirixfoundation/kheops-reverse-proxy:secure
+        - docker push osirixfoundation/kheops-reverse-proxy:secure-$TRAVIS_BRANCH
     - stage: letsencrypt
       script:
-        - docker build -t osirixfoundation/kheops-reverse-proxy:letsencrypt -f letsencrypt/Dockerfile .
+        - docker build -t osirixfoundation/kheops-reverse-proxy:letsencrypt-$TRAVIS_BRANCH -f letsencrypt/Dockerfile .
       after_success:
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push osirixfoundation/kheops-reverse-proxy:letsencrypt
+        - docker push osirixfoundation/kheops-reverse-proxy:letsencrypt-$TRAVIS_BRANCH
