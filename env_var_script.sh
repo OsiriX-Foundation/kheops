@@ -1,5 +1,19 @@
 #!/bin/bash
 
+remplace_in_file() {
+  chmod a+w $1
+  sed -i "s|\${root_url}|$proto$host|" $1
+
+  sed -i "s|\${DICOMWebProxy_url}|$KHEOPS_DICOMWEB_PROXY_HOST:$KHEOPS_DICOMWEB_PROXY_PORT|" $1
+  sed -i "s|\${kheopsAuthorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|" $1
+  sed -i "s|\${kheopsAuthorizationProxy_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" $1
+  sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|" $1
+  sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" $1
+
+  sed -i "s|\${server_name}|$roothost|" $1
+  sed -i "s|\${keycloak_url}|$proto$hostport|g" $1
+}
+
 missing_env_var_secret=false
 
 #Verify environment variables
@@ -119,18 +133,7 @@ if /usr/bin/find "/etc/nginx/kheops/" -mindepth 1 -maxdepth 1 -type f -print -qu
     find "/etc/nginx/kheops/" -follow -type f -print | sort -n | while read -r f; do
         case "$f" in
             *.conf)
-                #get env var
-                chmod a+w ${f}
-                sed -i "s|\${root_url}|$proto$host|" ${f}
-
-                sed -i "s|\${DICOMWebProxy_url}|$KHEOPS_DICOMWEB_PROXY_HOST:$KHEOPS_DICOMWEB_PROXY_PORT|" ${f}
-                sed -i "s|\${kheopsAuthorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|" ${f}
-                sed -i "s|\${kheopsAuthorizationProxy_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" ${f}
-                sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|" ${f}
-                sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" ${f}
-
-                sed -i "s|\${server_name}|$roothost|" ${f}
-                sed -i "s|\${keycloak_url}|$proto$hostport|g" ${f}
+                remplace_in_file(${f})
                 ;;
             *) echo >&3 "$0: Ignoring $f";;
         esac
@@ -142,18 +145,6 @@ else
 fi
 
 
-#get env var
-chmod a+w /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${root_url}|$proto$host|" /etc/nginx/conf.d/kheops.conf
-
-sed -i "s|\${DICOMWebProxy_url}|$KHEOPS_DICOMWEB_PROXY_HOST:$KHEOPS_DICOMWEB_PROXY_PORT|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${kheopsAuthorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${kheopsAuthorizationProxy_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${kheopsZipper_url}|http://$KHEOPS_ZIPPER_HOST:$KHEOPS_ZIPPER_PORT|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" /etc/nginx/conf.d/kheops.conf
-
-sed -i "s|\${server_name}|$roothost|" /etc/nginx/conf.d/kheops.conf
-sed -i "s|\${keycloak_url}|$proto$hostport|g" /etc/nginx/conf.d/kheops.conf
-
+remplace_in_file(/etc/nginx/conf.d/kheops.conf)
 
 echo "Ending setup NGINX secrets and env var"
