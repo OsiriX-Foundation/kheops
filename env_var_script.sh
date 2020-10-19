@@ -144,7 +144,6 @@ else
     echo >&3 "$0: No files found in /etc/nginx/kheops/, skipping configuration"
 fi
 
-
 remplace_in_file(/etc/nginx/conf.d/kheops.conf)
 
 echo "Ending setup NGINX secrets and env var"
