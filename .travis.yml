@@ -4,7 +4,7 @@ notifications:
   email: false
 
 script:
-   - docker build -t osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH .
+   - docker build -t osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH -f ci-test/Dockerfile .
    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 after_success:
