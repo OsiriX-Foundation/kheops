@@ -12,4 +12,4 @@ COPY env_var_script.sh /docker-entrypoint.d/30-env_var_script.sh
 
 RUN chmod +x /docker-entrypoint.d/30-env_var_script.sh
 
-CMD ["nginx -g 'daemon off;'"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -22,4 +22,4 @@ RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
 RUN chmod +x /docker-entrypoint.d/30-env_var_script.sh
 RUN chmod +x /docker-entrypoint.d/30-filebeat_script.sh
 
-CMD ["nginx -g 'daemon off;'"]
+CMD ["nginx", "-g", "daemon off;"]
