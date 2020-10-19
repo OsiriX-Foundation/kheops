@@ -6,7 +6,7 @@ COPY secure/kheops.conf /etc/nginx/conf.d/kheops.conf
 COPY locations.conf /etc/nginx/kheops/locations.conf
 COPY env_var_script.sh /docker-entrypoint.d/30-env_var_script.sh
 COPY secure/verify_secret_script.sh /docker-entrypoint.d/30-verify_secret_script.sh
-COPY secure/filebeat_script.sh /docker-entrypoint.d/30-filebeat_script.sh
+COPY filebeat_script.sh /docker-entrypoint.d/30-filebeat_script.sh
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY secure/chain.pem /etc/nginx/chain.pem
 
