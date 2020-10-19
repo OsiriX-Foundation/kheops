@@ -87,13 +87,6 @@ else
    echo -e "environment variable KHEOPS_OIDC_PROVIDER \e[92mOK\e[0m"
 fi
 
-if [[ -z $LETS_ENCRYPT_EMAIL ]]; then
-  echo "Missing LETS_ENCRYPT_EMAIL environment variable"
-  missing_env_var_secret=true
-else
-   echo -e "environment variable LETS_ENCRYPT_EMAIL \e[92mOK\e[0m"
-fi
-
 #if missing env var or secret => exit
 if [[ $missing_env_var_secret = true ]]; then
   exit 1
