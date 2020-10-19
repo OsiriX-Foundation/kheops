@@ -138,12 +138,8 @@ if /usr/bin/find "/etc/nginx/kheops/" -mindepth 1 -maxdepth 1 -type f -print -qu
             *) echo >&3 "$0: Ignoring $f";;
         esac
     done
-
-    echo >&3 "$0: Configuration complete; ready for start up"
-else
-    echo >&3 "$0: No files found in /etc/nginx/kheops/, skipping configuration"
 fi
 
 remplace_in_file /etc/nginx/conf.d/kheops.conf
 
-echo "Ending setup NGINX secrets and env var"
+echo "Ending setup NGINX env var"
