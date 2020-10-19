@@ -130,6 +130,7 @@ if /usr/bin/find "/etc/nginx/kheops/" -mindepth 1 -maxdepth 1 -type f -print -qu
                 sed -i "s|\${kheopsWebUI_url}|http://$KHEOPS_UI_HOST:$KHEOPS_UI_PORT|" ${f}
 
                 sed -i "s|\${server_name}|$roothost|" ${f}
+                sed -i "s|\${keycloak_url}|$proto$hostport|g" ${f}
                 ;;
             *) echo >&3 "$0: Ignoring $f";;
         esac
