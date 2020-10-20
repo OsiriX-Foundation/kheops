@@ -19,7 +19,4 @@ RUN chmod go-w /etc/filebeat/filebeat.yml
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
 
-#RUN chmod +x /docker-entrypoint.d/30-env_var_script.sh
-#RUN chmod +x /docker-entrypoint.d/30-filebeat_script.sh
-
 CMD ["nginx", "-g", "daemon off;"]
