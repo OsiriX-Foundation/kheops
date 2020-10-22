@@ -110,9 +110,9 @@ fi
 
 
 # extract the protocol
-proto="$(echo $KHEOPS_OIDC_PROVIDER | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+proto="$(echo $KHEOPS_ROOT_URL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
 # remove the protocol
-url="$(echo ${KHEOPS_OIDC_PROVIDER/$proto/})"
+url="$(echo ${KHEOPS_ROOT_URL/$proto/})"
 # extract the user (if any)
 user="$(echo $url | grep @ | cut -d@ -f1)"
 # extract the host and port
