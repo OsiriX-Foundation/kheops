@@ -3,7 +3,8 @@ FROM nginx:stable
 ENV SECRET_FILE_PATH=/run/secrets
 
 COPY secure/kheops.conf /etc/nginx/conf.d/kheops.conf
-COPY locations.conf /etc/nginx/kheops/locations.conf
+COPY locations.conf /etc/nginx/kheops/01_locations.conf
+COPY locations_secured_ui.conf /etc/nginx/kheops/03_locations_secured_ui.conf
 COPY env_var_script.sh /docker-entrypoint.d/30-env_var_script.sh
 COPY secure/verify_secret_script.sh /docker-entrypoint.d/30-verify_secret_script.sh
 COPY filebeat_script.sh /docker-entrypoint.d/30-filebeat_script.sh
