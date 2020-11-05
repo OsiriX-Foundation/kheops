@@ -60,7 +60,7 @@
 		"deletewebhook": "{user} deleted a webhook",
 		"editreportprovider": "{user} edited the report provider {reportname}",
 		"editwebhook": "{user} edited a webhook",
-		"hasadd": "has add",
+		"hasadd": "has added",
 		"hascreated": "has created",
 		"hasedited": "has edited",
 		"hasgranted": "has granted",
