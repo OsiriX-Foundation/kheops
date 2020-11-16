@@ -39,9 +39,9 @@ public class WebhookTriggerResponse {
             event = WebhookType.NEW_SERIES.name().toLowerCase();
             for (Series series: webhookTrigger.getSeries()) {
                 if (studyResponse == null) {
-                    studyResponse = new StudyResponse(series.getStudy());
+                    studyResponse = new StudyResponse(series.getStudy(), null, true);
                 }
-                studyResponse.addSeries(series, false);
+                studyResponse.addSeries(series);
             }
         } else if(webhookTrigger.getNewUser()) {
             event = WebhookType.NEW_USER.name().toLowerCase();
@@ -54,9 +54,9 @@ public class WebhookTriggerResponse {
             event = WebhookType.REMOVE_SERIES.name().toLowerCase();
             for (Series series: webhookTrigger.getSeries()) {
                 if (studyResponse == null) {
-                    studyResponse = new StudyResponse(series.getStudy());
+                    studyResponse = new StudyResponse(series.getStudy(), "toto",false); //TODO use instance not toto
                 }
-                studyResponse.addSeries(series, false);
+                studyResponse.addSeries(series);
             }
         }
 

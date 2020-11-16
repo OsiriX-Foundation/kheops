@@ -1,11 +1,14 @@
 package online.kheops.auth_server.study;
 
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.series.SeriesResponse;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
+import java.util.List;
+
 
 public class StudyResponse {
 
@@ -38,15 +41,16 @@ public class StudyResponse {
     private String retrieveUrl;
 
     @XmlElement(name = "series")
-    private ArrayList<SeriesResponse> series;
+    private List<SeriesResponse> series;
 
-    private String instance;
+    private String kheopsInstance = null;
 
     private StudyResponse() { /*empty*/ }
 
-    public StudyResponse(Study study, String instance) {
-        patientName = study.getPatientName();
+    public StudyResponse(Study study, String kheopsInstance, boolean uidOnly) {
         studyInstanceUID = study.getStudyInstanceUID();
+        if (uidOnly) { return; }
+        patientName = study.getPatientName();
         studyDate = study.getStudyDate();
         studyDescription = study.getStudyDescription();
         patientID = study.getPatientID();
@@ -57,29 +61,21 @@ public class StudyResponse {
         studyId = study.getStudyID();
         timezoneOffsetFromUtc = study.getTimezoneOffsetFromUTC();
         studyTime = study.getStudyTime();
-        retrieveUrl = instance + "/api/studies/" + study.getStudyInstanceUID();
-        this.instance = instance;
+        if(kheopsInstance != null) {
+            retrieveUrl = kheopsInstance + "/api/studies/" + studyInstanceUID;
+            this.kheopsInstance = kheopsInstance;
+        }
+
     }
 
-    public StudyResponse(Study study) {
-        studyInstanceUID = study.getStudyInstanceUID();
-    }
-
-    public void addSeries(Series series, boolean hideRetrieveUrl) {
+    public void addSeries(Series series) {
         if(this.series == null) {
             this.series = new ArrayList<>();
         }
-        final SeriesResponse seriesResponse;
-        if (instance != null) {
-            seriesResponse = new SeriesResponse(series, instance);
-        } else {
-            seriesResponse = new SeriesResponse(series);
-        }
-        if (hideRetrieveUrl) {
-            seriesResponse.hideRetrieveUrl();
-        }
+        final SeriesResponse seriesResponse = new SeriesResponse(series, kheopsInstance, true);
         this.series.add(seriesResponse);
     }
+
 
     public boolean containSeries() {
         if (series == null) {

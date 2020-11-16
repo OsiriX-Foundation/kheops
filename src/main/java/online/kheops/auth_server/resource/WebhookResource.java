@@ -8,6 +8,7 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
@@ -193,7 +194,7 @@ public class WebhookResource {
                                    @FormParam(SeriesInstanceUID) List<String> seriesUID,
                                    @FormParam(StudyInstanceUID) @UIDValidator String studyUID,
                                    @FormParam("user") String user)
-            throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
+            throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, StudyNotFoundException, UserNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 

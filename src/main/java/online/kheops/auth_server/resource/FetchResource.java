@@ -14,10 +14,7 @@ import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
-import online.kheops.auth_server.webhook.NewSeriesWebhook;
-import online.kheops.auth_server.webhook.WebhookAsyncRequest;
-import online.kheops.auth_server.webhook.WebhookRequestId;
-import online.kheops.auth_server.webhook.WebhookType;
+import online.kheops.auth_server.webhook.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -150,22 +147,33 @@ public class FetchResource {
                 for (Webhook webhook : webhookList) {
 
                     final List<Series> seriesInWebhook = new ArrayList<>();
-                    final NewSeriesWebhook newSeriesWebhook;
+                    final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder();
+
                     if (albumId != null && webhook.getAlbum().getId().compareTo(albumId) == 0) {
-                        newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                        newSeriesWebhookBuilder.setStudy(study)
+                                .isSent()
+                                .setDestination(albumId)
+                                .isAutomatedTrigger()
+                                .setSource(targetAlbumUser)
+                                .setKheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER));
                         for (Series series : seriesListWebhook) {
-                            newSeriesWebhook.addSeries(series);
+                            newSeriesWebhookBuilder.addSeries(series);
                             seriesInWebhook.add(series);
                         }
                         if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                             final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                            newSeriesWebhook.setCapabilityToken(capability);
+                            newSeriesWebhookBuilder.setCapabilityToken(capability);
                         } else if (kheopsPrincipal.getClientId().isPresent()) {
                             ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
-                            newSeriesWebhook.setReportProvider(reportProvider);
+                            newSeriesWebhookBuilder.setReportProvider(reportProvider);
                         }
                     } else {
-                        newSeriesWebhook = new NewSeriesWebhook(webhook.getAlbum().getId(), callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
+                        newSeriesWebhookBuilder
+                                .setStudy(study)
+                                .isSent()
+                                .setDestination(webhook.getAlbum().getId())
+                                .isAutomatedTrigger()
+                                .setSource(new Source(callingUser));
                         List<Series> seriesInStudy = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class)
                                 .setParameter(StudyInstanceUID, studyInstanceUID)
                                 .setParameter("album", webhook.getAlbum())
@@ -173,12 +181,13 @@ public class FetchResource {
 
                         for (Series series : seriesListWebhook) {
                             if (seriesInStudy.contains(series)) {
-                                newSeriesWebhook.addSeries(series);
+                                newSeriesWebhookBuilder.addSeries(series);
                                 seriesInWebhook.add(series);
                             }
                         }
                     }
-                    newSeriesWebhook.setFetch();
+                    newSeriesWebhookBuilder.isUpload();
+
 
                     if (!seriesInWebhook.isEmpty()) {
                         final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
@@ -186,7 +195,7 @@ public class FetchResource {
                         for (Series series : seriesInWebhook) {
                             webhookTrigger.addSeries(series);
                         }
-                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhookBuilder.build(), webhookTrigger));
                     }
                 }
 

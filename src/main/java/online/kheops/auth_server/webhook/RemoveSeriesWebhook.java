@@ -13,7 +13,7 @@ import java.util.List;
 public class RemoveSeriesWebhook implements WebhookResult{
 
     @XmlElement(name = "host")
-    private String instance;
+    private String kheopsInstance;
     @XmlElement(name = "album_id")
     private String albumId;
     @XmlElement(name = "event_time")
@@ -38,7 +38,7 @@ public class RemoveSeriesWebhook implements WebhookResult{
 
     public static class Builder {
 
-        private String instance;
+        private String kheopsInstance;
         private String albumId;
         private UserResponse sourceUser;
         private ReportProvider reportProvider;
@@ -52,11 +52,6 @@ public class RemoveSeriesWebhook implements WebhookResult{
             seriesList = new ArrayList<>();
         }
 
-        public Builder instance(String instance) {
-            this.instance = instance;
-            return this;
-        }
-
         public Builder albumId(String albumId) {
             this.albumId = albumId;
             return this;
@@ -64,6 +59,11 @@ public class RemoveSeriesWebhook implements WebhookResult{
 
         public Builder isManualTrigger(boolean isManualTrigger) {
             this.isManualTrigger = isManualTrigger;
+            return this;
+        }
+
+        public Builder kheopsInstance(String kheopsInstance) {
+            this.kheopsInstance = kheopsInstance;
             return this;
         }
 
@@ -108,18 +108,18 @@ public class RemoveSeriesWebhook implements WebhookResult{
             }
             removeSeriesWebhook.sourceUser = sourceUser;
 
-            removeSeriesWebhook.instance = instance;
+            removeSeriesWebhook.kheopsInstance = kheopsInstance;
             removeSeriesWebhook.albumId = albumId;
             removeSeriesWebhook.isManualTrigger = isManualTrigger;
             removeSeriesWebhook.eventTime = LocalDateTime.now();
 
-            removeSeriesWebhook.removedStudy = new StudyResponse(study, instance);
+            removeSeriesWebhook.removedStudy = new StudyResponse(study, kheopsInstance, false);
             if (removeAllSeries) {
                 removeSeriesWebhook.removedStudy.hideRetrieveUrl();
                 removeSeriesWebhook.removeAllSeries = true;
             }
             for(Series series:seriesList) {
-                removeSeriesWebhook.removedStudy.addSeries(series, true);
+                removeSeriesWebhook.removedStudy.addSeries(series);
             }
             return removeSeriesWebhook;
 

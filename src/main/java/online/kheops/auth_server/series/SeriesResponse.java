@@ -1,8 +1,11 @@
 package online.kheops.auth_server.series;
 
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
 
 import javax.xml.bind.annotation.XmlElement;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SeriesResponse {
 
@@ -12,7 +15,7 @@ public class SeriesResponse {
     private String seriesDescription;
     @XmlElement(name = "series_uid")
     private String seriesUid;
-    @XmlElement(name = "number_of_series_related_instance")
+    @XmlElement(name = "number_of_series_related_instances")
     private Long numberOfSeriesRelatedInstance;
     @XmlElement(name = "time_zone_offset_from_utc")
     private String timeZoneOffsetFromUTC;
@@ -20,26 +23,24 @@ public class SeriesResponse {
     private Long seriesNumber;
     @XmlElement(name = "body_part_examined")
     private String bodyPartExamined;
-
     @XmlElement(name = "retrieve_url")
     private String retrieveUrl;
 
+
     private SeriesResponse() { /*empty*/ }
 
-    public SeriesResponse(Series series, String instance) {
+    public SeriesResponse(Series series, String kheopsInstance, boolean uidOnly) {
+        seriesUid = series.getSeriesInstanceUID();
+        if (uidOnly) { return; }
         modality = series.getModality();
         numberOfSeriesRelatedInstance = Long.valueOf(series.getNumberOfSeriesRelatedInstances());
         seriesDescription = series.getSeriesDescription();
-        seriesUid = series.getSeriesInstanceUID();
         timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
         seriesNumber = Long.valueOf(series.getSeriesNumber());
         bodyPartExamined = series.getBodyPartExamined();
-        retrieveUrl = instance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
+        retrieveUrl = kheopsInstance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
     }
 
-    public SeriesResponse(Series series) {
-        seriesUid = series.getSeriesInstanceUID();
-    }
 
     public void hideRetrieveUrl() {
         retrieveUrl = null;
