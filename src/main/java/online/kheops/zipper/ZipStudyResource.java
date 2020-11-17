@@ -16,6 +16,7 @@ import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -28,7 +29,7 @@ import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static org.glassfish.jersey.media.multipart.Boundary.BOUNDARY_PARAMETER;
 
-@Path("/studies")
+@javax.ws.rs.Path("/studies")
 public final class ZipStudyResource {
     private static final Logger LOG = Logger.getLogger(ZipStudyResource.class.getName());
 
@@ -48,7 +49,7 @@ public final class ZipStudyResource {
     String headerXForwardedFor;
 
     @GET
-    @Path("/{" + STUDY_INSTANCE_UID +"}")
+    @javax.ws.rs.Path("/{" + STUDY_INSTANCE_UID +"}")
     @Produces("application/zip")
     public Response streamStudy(@PathParam(STUDY_INSTANCE_UID) String studyInstanceUID,
                                 @HeaderParam(AUTHORIZATION) String authorizationHeader,
@@ -103,8 +104,12 @@ public final class ZipStudyResource {
                                     @Override
                                     public void close() {/* close shield */}
                                 }, zipStream)) {
-                        zipStream.putNextEntry(new ZipEntry("DICOM/" + partNumber));
-                        dicomDirGenerator.add(teeInputStream, Paths.get("DICOM", Integer.toString(partNumber)));
+
+                        final Path path = Paths.get("DICOM",
+                                Integer.toString(partNumber/1000),
+                                Integer.toString(partNumber));
+                        zipStream.putNextEntry(new ZipEntry(path.toString()));
+                        dicomDirGenerator.add(teeInputStream, path);
                         teeInputStream.finish();
                         zipStream.closeEntry();
                     }
