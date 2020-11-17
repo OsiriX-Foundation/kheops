@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumsWithEnabledNewSeriesWebhooks;
 import static online.kheops.auth_server.event.Events.albumPostStudyMutation;
 
-public class FooHashMapImpl implements FooHashMap{
+public class FooHashMapImpl implements FooHashMap {
 
     @Inject
     KheopsInstance kheopsInstance;

@@ -10,6 +10,7 @@ import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.stow.FooHashMap;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -17,6 +18,7 @@ import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.*;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
@@ -27,6 +29,7 @@ import java.util.Map;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
@@ -253,7 +256,7 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+    public static void putSeriesInAlbum(FooHashMap fooHashMap, ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, ClientIdNotFoundException, UserNotMemberException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -265,6 +268,14 @@ public class Sending {
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
+
+            Integer oldNumberOfSeriesRelatedInstances;
+            try {
+                final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+                oldNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
+            } catch (SeriesNotFoundException e) {
+                oldNumberOfSeriesRelatedInstances = 0;
+            }
 
             Series availableSeries = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
 
@@ -280,24 +291,13 @@ public class Sending {
             final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, availableSeries);
             em.persist(albumSeries);
 
-            final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
-                    .setStudy(availableSeries.getStudy())
-                    .addSeries(availableSeries)
-                    .isSent()
-                    .setDestination(albumId)
-                    .isAutomatedTrigger()
-                    .setSource(targetAlbumUser)
-                    .setKheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER));
-
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
                 mutation = Events.albumPostSeriesMutation(capability, targetAlbum, MutationType.IMPORT_SERIES, availableSeries);
-                newSeriesWebhookBuilder.setCapabilityToken(capability);
             } else if (kheopsPrincipal.getClientId().isPresent()) {
                 ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
                 reportProvider = em.merge(reportProvider);
-                newSeriesWebhookBuilder.setReportProvider(reportProvider);
                 mutation = Events.newReport(callingUser, targetAlbum, reportProvider, MutationType.IMPORT_SERIES, availableSeries);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, targetAlbum, MutationType.IMPORT_SERIES, availableSeries);
@@ -311,23 +311,14 @@ public class Sending {
                     .series(seriesInstanceUID)
                     .log();
 
-            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
 
-            if (availableSeries.isPopulated() && availableSeries.getStudy().isPopulated()) {
-                final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
-                for (Webhook webhook : targetAlbum.getWebhooks()) {
-                    if (webhook.getNewSeries() && webhook.isEnabled()) {
-                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                        em.persist(webhookTrigger);
-                        webhookTrigger.addSeries(availableSeries);
-                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
-                    }
-                }
-            }
+            final Source source = new Source(kheopsPrincipal.getUser());
+            kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
+            kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
+            fooHashMap.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
+                    !availableSeries.getStudy().isPopulated(), !availableSeries.isPopulated(), source, true);
+
             tx.commit();
-            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
-                webhookAsyncRequest.firstRequest();
-            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -336,7 +327,7 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
+    public static void putStudyInAlbum(FooHashMap fooHashMap, ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -348,13 +339,6 @@ public class Sending {
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
             final Study study = getStudy(studyInstanceUID, em);
-            final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
-                    .setSource(targetAlbumUser)
-                    .setDestination(albumId)
-                    .isAutomatedTrigger()
-                    .isSent()
-                    .setStudy(study)
-                    .setKheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER));
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
             final List<Series> seriesListWebhook = new ArrayList<>();
@@ -367,7 +351,6 @@ public class Sending {
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
                     if(series.isPopulated() && series.getStudy().isPopulated()) {
-                        newSeriesWebhookBuilder.addSeries(series);
                         seriesListWebhook.add(series);
                     }
                     seriesListEvent.add(series);
@@ -392,7 +375,6 @@ public class Sending {
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
                 mutation = Events.albumPostStudyMutation(capability, targetAlbum, MutationType.IMPORT_STUDY, study, seriesListEvent);
-                newSeriesWebhookBuilder.setCapabilityToken(capability);
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, targetAlbum, MutationType.IMPORT_STUDY, study, seriesListEvent);
             }
@@ -411,25 +393,15 @@ public class Sending {
                     .study(studyInstanceUID)
                     .log();
 
-            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
 
-            if(newSeriesWebhookBuilder.containSeries()) {
-                final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
-                for (Webhook webhook : targetAlbum.getWebhooks()) {
-                    if (webhook.getNewSeries() && webhook.isEnabled()) {
-                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                        em.persist(webhookTrigger);
-                        for (Series series : seriesListWebhook) {
-                            webhookTrigger.addSeries(series);
-                        }
-                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
-                    }
-                }
+            final Source source = new Source(kheopsPrincipal.getUser());
+            kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
+            kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
+            for(Series s : seriesListWebhook) {
+                fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
+                        !s.getStudy().isPopulated(), !s.isPopulated(), source, true);
             }
             tx.commit();
-            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
-                webhookAsyncRequest.firstRequest();
-            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

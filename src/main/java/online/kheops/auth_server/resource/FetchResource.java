@@ -12,10 +12,12 @@ import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.stow.FooHashMap;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.*;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.TypedQuery;
@@ -33,6 +35,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.util.Consts.*;
@@ -46,6 +49,9 @@ public class FetchResource {
 
     @Context
     private ServletContext context;
+
+    @Inject
+    FooHashMap fooHashMap;
 
     @POST
     @Secured
@@ -121,6 +127,8 @@ public class FetchResource {
             if (albumId != null) {
                 targetAlbum = getAlbum(albumId, em);
                 targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
+            } else {
+                targetAlbum = kheopsPrincipal.getUser().getInbox();
             }
 
             final List<Series> seriesList = new ArrayList<>();
@@ -128,7 +136,21 @@ public class FetchResource {
                 seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
             }
             final Study study = seriesList.get(0).getStudy();
+            /////////////////////////////////////////////////////
 
+
+            final Source source = new Source(kheopsPrincipal.getUser());
+            kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
+            kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
+            for(Series s : seriesList) {
+                fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
+                        !s.getStudy().isPopulated(), !s.isPopulated(), source, true);
+            }
+
+
+
+
+            //////////////////////////////////////////////////////
             if(study.isPopulated()) {
 
                 final List<Series> seriesListWebhook = new ArrayList<>();
@@ -200,9 +222,9 @@ public class FetchResource {
                 }
 
                 tx.commit();
-                for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
-                    webhookAsyncRequest.firstRequest();
-                }
+                //for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                //    webhookAsyncRequest.firstRequest();
+                //}
             }
         } finally {
             if (tx.isActive()) {

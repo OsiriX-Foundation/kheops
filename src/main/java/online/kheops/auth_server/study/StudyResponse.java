@@ -65,15 +65,18 @@ public class StudyResponse {
             retrieveUrl = kheopsInstance + "/api/studies/" + studyInstanceUID;
             this.kheopsInstance = kheopsInstance;
         }
-
     }
 
     public void addSeries(Series series) {
         if(this.series == null) {
             this.series = new ArrayList<>();
         }
-        final SeriesResponse seriesResponse = new SeriesResponse(series, kheopsInstance, true);
+        final SeriesResponse seriesResponse = new SeriesResponse(series, kheopsInstance, false);
+        if(retrieveUrl == null) {
+            seriesResponse.hideRetrieveUrl();
+        }
         this.series.add(seriesResponse);
+
     }
 
 
@@ -86,6 +89,9 @@ public class StudyResponse {
     }
 
     public void hideRetrieveUrl() {
+        if (series != null) {
+            series.forEach(seriesResponse -> hideRetrieveUrl());
+        }
         retrieveUrl = null;
     }
 }

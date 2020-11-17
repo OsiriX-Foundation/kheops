@@ -144,6 +144,7 @@ public class NewSeriesWebhook implements WebhookResult{
         public boolean containSeries() { return !series.isEmpty(); }
 
         public NewSeriesWebhook build() {
+            series.forEach(updatedStudy::addSeries);
             return new NewSeriesWebhook(this);
         }
 

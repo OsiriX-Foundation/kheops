@@ -125,9 +125,19 @@ public class User {
 
     public String getName() { return this.name; }
 
-
     @Override
     public String toString() {
         return "[User sub:" + getSub() + " email:" + getEmail() + "]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return sub.equals(user.sub);
+    }
+
+    @Override
+    public int hashCode() { return sub.hashCode(); }
 }

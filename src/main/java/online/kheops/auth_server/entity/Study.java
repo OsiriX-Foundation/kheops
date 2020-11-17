@@ -267,6 +267,22 @@ public class Study {
     public void setEvents(Set<Event> events) { this.events = events; }
 
     public void addEvents(Event event) { this.events.add(event); }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Study study = (Study) o;
+        return studyInstanceUID.equals(study.studyInstanceUID);
+    }
+
+    @Override
+    public int hashCode() {
+        return studyInstanceUID.hashCode();
+    }
+
+    @Override
+    public String toString() { return studyInstanceUID; }
 }
 
 
