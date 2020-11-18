@@ -9,16 +9,16 @@ public class Level2_DestinationLevel {
     //             Destination
     private Map<Album, Level3_SeriesLevel> level3;
 
-    public Level2_DestinationLevel(Series series, boolean isNewSeries, Album destination, boolean isInbox, boolean isNewInDestination) {
+    public Level2_DestinationLevel(Series series, boolean isNewSeries, Album destination, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination) {
         level3 = new HashMap<>();
-        level3.put(destination, new Level3_SeriesLevel(series, isNewSeries, isInbox, isNewInDestination));
+        level3.put(destination, new Level3_SeriesLevel(series, isNewSeries, numberOfInstances, isInbox, isNewInDestination));
     }
 
-    public void addDestination(Series series, boolean isNewSeries, Album destination, boolean isInbox, boolean isNewInDestination) {
+    public void addDestination(Series series, boolean isNewSeries, Album destination, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination) {
         if (level3.containsKey(destination)) {
-            level3.get(destination).addSeries(series, isNewSeries, isInbox, isNewInDestination);
+            level3.get(destination).addSeries(series, isNewSeries, numberOfInstances, isInbox, isNewInDestination);
         } else {
-            level3.put(destination, new Level3_SeriesLevel(series, isNewSeries, isInbox, isNewInDestination));
+            level3.put(destination, new Level3_SeriesLevel(series, isNewSeries, numberOfInstances, isInbox, isNewInDestination));
         }
     }
 

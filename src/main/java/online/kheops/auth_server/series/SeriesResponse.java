@@ -3,6 +3,7 @@ package online.kheops.auth_server.series;
 import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
 
+import javax.inject.Inject;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,10 +27,13 @@ public class SeriesResponse {
     @XmlElement(name = "retrieve_url")
     private String retrieveUrl;
 
+    @XmlElement(name = "number_of_new_instances")
+    private Integer numberOfNewInstances;
+
 
     private SeriesResponse() { /*empty*/ }
 
-    public SeriesResponse(Series series, String kheopsInstance, boolean uidOnly) {
+    public SeriesResponse(Series series, String kheopsInstance, Integer numberOfNewInstances, boolean uidOnly) {
         seriesUid = series.getSeriesInstanceUID();
         if (uidOnly) { return; }
         modality = series.getModality();
@@ -39,6 +43,9 @@ public class SeriesResponse {
         seriesNumber = Long.valueOf(series.getSeriesNumber());
         bodyPartExamined = series.getBodyPartExamined();
         retrieveUrl = kheopsInstance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
+        if(numberOfNewInstances != 0) {
+            this.numberOfNewInstances = numberOfNewInstances;
+        }
     }
 
 

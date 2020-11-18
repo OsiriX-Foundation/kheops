@@ -9,17 +9,17 @@ public class Level3_SeriesLevel {
     private Map<Series, Level4_InstancesLevel> series;
     private boolean isInbox;
 
-    public Level3_SeriesLevel(Series series, boolean isNewSeries, boolean isInbox, boolean isNewInDestination) {
+    public Level3_SeriesLevel(Series series, boolean isNewSeries, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination) {
         this.series = new HashMap<>();
-        addSeries(series, isNewSeries, isInbox, isNewInDestination);
+        addSeries(series, isNewSeries, numberOfInstances, isInbox, isNewInDestination);
     }
 
 
-    public void addSeries(Series series, boolean isNewSeries, boolean isInbox, boolean isNewInDestination) {
+    public void addSeries(Series series, boolean isNewSeries, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination) {
         this.isInbox = isInbox;
         if (this.series != null) {
             if (!this.series.containsKey(series)) {
-                this.series.put(series, new Level4_InstancesLevel(isNewSeries, isNewInDestination));
+                this.series.put(series, new Level4_InstancesLevel(isNewSeries, numberOfInstances, isNewInDestination));
             }
         }
     }

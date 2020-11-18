@@ -72,7 +72,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
-            throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException {
         Fetcher.fetchStudy(studyInstanceUID);
         for (String seriesInstanceUID: seriesInstanceUIDList) {
             ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
@@ -123,10 +123,8 @@ public class FetchResource {
             final User callingUser = em.merge(kheopsPrincipal.getUser());
 
             final Album targetAlbum;
-            AlbumUser targetAlbumUser = null;
             if (albumId != null) {
                 targetAlbum = getAlbum(albumId, em);
-                targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
             } else {
                 targetAlbum = kheopsPrincipal.getUser().getInbox();
             }
@@ -135,97 +133,17 @@ public class FetchResource {
             for (String seriesInstanceUID : seriesInstanceUIDList) {
                 seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
             }
-            final Study study = seriesList.get(0).getStudy();
-            /////////////////////////////////////////////////////
 
-
-            final Source source = new Source(kheopsPrincipal.getUser());
+            final Source source = new Source(callingUser);
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesList) {
                 fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
-                        !s.getStudy().isPopulated(), !s.isPopulated(), source, true);
+                        !s.getStudy().isPopulated(), !s.isPopulated(), s.getNumberOfSeriesRelatedInstances(), source, true);
             }
 
 
-
-
-            //////////////////////////////////////////////////////
-            if(study.isPopulated()) {
-
-                final List<Series> seriesListWebhook = new ArrayList<>();
-                for (Series series : seriesList) {
-                    if (series.isPopulated()) {
-                        seriesListWebhook.add(series);
-                    }
-                }
-
-                final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
-
-                List<Webhook> webhookList = em.createNamedQuery("Webhook.findAllEnabledAndForNewSeriesByStudyUID", Webhook.class)
-                        .setParameter(StudyInstanceUID, studyInstanceUID)
-                        .getResultList();
-
-                for (Webhook webhook : webhookList) {
-
-                    final List<Series> seriesInWebhook = new ArrayList<>();
-                    final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder();
-
-                    if (albumId != null && webhook.getAlbum().getId().compareTo(albumId) == 0) {
-                        newSeriesWebhookBuilder.setStudy(study)
-                                .isSent()
-                                .setDestination(albumId)
-                                .isAutomatedTrigger()
-                                .setSource(targetAlbumUser)
-                                .setKheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER));
-                        for (Series series : seriesListWebhook) {
-                            newSeriesWebhookBuilder.addSeries(series);
-                            seriesInWebhook.add(series);
-                        }
-                        if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                            final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                            newSeriesWebhookBuilder.setCapabilityToken(capability);
-                        } else if (kheopsPrincipal.getClientId().isPresent()) {
-                            ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
-                            newSeriesWebhookBuilder.setReportProvider(reportProvider);
-                        }
-                    } else {
-                        newSeriesWebhookBuilder
-                                .setStudy(study)
-                                .isSent()
-                                .setDestination(webhook.getAlbum().getId())
-                                .isAutomatedTrigger()
-                                .setSource(new Source(callingUser));
-                        List<Series> seriesInStudy = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class)
-                                .setParameter(StudyInstanceUID, studyInstanceUID)
-                                .setParameter("album", webhook.getAlbum())
-                                .getResultList();
-
-                        for (Series series : seriesListWebhook) {
-                            if (seriesInStudy.contains(series)) {
-                                newSeriesWebhookBuilder.addSeries(series);
-                                seriesInWebhook.add(series);
-                            }
-                        }
-                    }
-                    newSeriesWebhookBuilder.isUpload();
-
-
-                    if (!seriesInWebhook.isEmpty()) {
-                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                        em.persist(webhookTrigger);
-                        for (Series series : seriesInWebhook) {
-                            webhookTrigger.addSeries(series);
-                        }
-                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhookBuilder.build(), webhookTrigger));
-                    }
-                }
-
-                tx.commit();
-                //for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
-                //    webhookAsyncRequest.firstRequest();
-                //}
-            }
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();

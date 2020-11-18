@@ -256,8 +256,8 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(FooHashMap fooHashMap, ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, ClientIdNotFoundException, UserNotMemberException, SeriesNotFoundException {
+    public static void putSeriesInAlbum(FooHashMap fooHashMap, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+            throws AlbumNotFoundException, ClientIdNotFoundException, SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -267,15 +267,6 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
-
-            Integer oldNumberOfSeriesRelatedInstances;
-            try {
-                final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-                oldNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
-            } catch (SeriesNotFoundException e) {
-                oldNumberOfSeriesRelatedInstances = 0;
-            }
 
             Series availableSeries = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
 
@@ -316,7 +307,7 @@ public class Sending {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             fooHashMap.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
-                    !availableSeries.getStudy().isPopulated(), !availableSeries.isPopulated(), source, true);
+                    !availableSeries.getStudy().isPopulated(), !availableSeries.isPopulated(), availableSeries.getNumberOfSeriesRelatedInstances(), source, true);
 
             tx.commit();
         } finally {
@@ -327,8 +318,8 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(FooHashMap fooHashMap, ServletContext context, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
+    public static void putStudyInAlbum(FooHashMap fooHashMap, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
+            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -337,7 +328,6 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
-            final AlbumUser targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
             final Study study = getStudy(studyInstanceUID, em);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -399,7 +389,7 @@ public class Sending {
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesListWebhook) {
                 fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
-                        !s.getStudy().isPopulated(), !s.isPopulated(), source, true);
+                        !s.getStudy().isPopulated(), !s.isPopulated(), s.getNumberOfSeriesRelatedInstances(), source, true);
             }
             tx.commit();
         } finally {

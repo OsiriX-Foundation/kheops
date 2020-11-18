@@ -67,16 +67,19 @@ public class StudyResponse {
         }
     }
 
-    public void addSeries(Series series) {
+    public void addSeries(Series series, Integer numberOfNewInstances) {
         if(this.series == null) {
             this.series = new ArrayList<>();
         }
-        final SeriesResponse seriesResponse = new SeriesResponse(series, kheopsInstance, false);
+        final SeriesResponse seriesResponse = new SeriesResponse(series, kheopsInstance, numberOfNewInstances, false);
         if(retrieveUrl == null) {
             seriesResponse.hideRetrieveUrl();
         }
         this.series.add(seriesResponse);
+    }
 
+    public void addSeries(Series series) {
+        this.addSeries(series, 0);
     }
 
 
