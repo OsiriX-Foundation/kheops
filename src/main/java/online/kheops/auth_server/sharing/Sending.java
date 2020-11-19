@@ -134,9 +134,10 @@ public class Sending {
                 throw new SeriesNotFoundException(errorResponse);
             }
 
+            final Source source = new Source(callingUser);
+            source.setAlbumUser(callingAlbumUser);
             final RemoveSeriesWebhook.Builder removeSeriesWebhookBuilder = new RemoveSeriesWebhook.Builder()
                     .albumId(albumId)
-                    .sourceUser(callingAlbumUser)
                     .kheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER))
                     .isManualTrigger(false);
 
@@ -144,11 +145,13 @@ public class Sending {
             final Mutation mutation;
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
+                source.setCapabilityToken(capability);
                 mutation = Events.albumPostStudyMutation(capability, callingAlbum, MutationType.REMOVE_STUDY, study, availableSeries);
-                removeSeriesWebhookBuilder.capabilityToken(capability);
+                source.setCapabilityToken(capability);
             } else {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, MutationType.REMOVE_STUDY, study, availableSeries);
             }
+            removeSeriesWebhookBuilder.source(source);
 
             removeSeriesWebhookBuilder.study(study);
             for(Series series : availableSeries) {
@@ -202,9 +205,10 @@ public class Sending {
 
             final Series availableSeries = findSeriesByStudyUIDandSeriesUIDFromAlbum(callingAlbum, studyInstanceUID, seriesInstanceUID, em);
 
+            final Source source = new Source(callingUser);
+            source.setAlbumUser(callingAlbumUser);
             final RemoveSeriesWebhook.Builder removeSeriesWebhookBuilder = new RemoveSeriesWebhook.Builder()
                     .albumId(albumId)
-                    .sourceUser(callingAlbumUser)
                     .kheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER))
                     .isManualTrigger(false)
                     .study(availableSeries.getStudy())
@@ -215,10 +219,11 @@ public class Sending {
             if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
                 mutation = Events.albumPostSeriesMutation(capability, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
-                removeSeriesWebhookBuilder.capabilityToken(capability);
+                source.setCapabilityToken(capability);
             } else {
                 mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
             }
+            removeSeriesWebhookBuilder.source(source);
 
             if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).isEmpty()) {
                 removeSeriesWebhookBuilder.removeAllSeries(true);

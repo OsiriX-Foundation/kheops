@@ -1,7 +1,6 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.report_provider.ReportProviderResponse;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
 
@@ -9,6 +8,8 @@ import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static online.kheops.auth_server.report_provider.ReportProviderResponse.Type.WEBHOOK;
 
 public class RemoveSeriesWebhook implements WebhookResult{
 
@@ -41,12 +42,11 @@ public class RemoveSeriesWebhook implements WebhookResult{
         private String kheopsInstance;
         private String albumId;
         private UserResponse sourceUser;
-        private ReportProvider reportProvider;
-        private Capability capability;
         private boolean isManualTrigger;
         private boolean removeAllSeries;
         private Study study;
         private List<Series> seriesList;
+        private Source source;
 
         public Builder() {
             seriesList = new ArrayList<>();
@@ -67,17 +67,8 @@ public class RemoveSeriesWebhook implements WebhookResult{
             return this;
         }
 
-        public Builder sourceUser(AlbumUser sourceUser) {
-            this.sourceUser = new UserResponse(sourceUser);
-            return this;
-        }
-        public Builder reportProvider(ReportProvider reportProvider) {
-            this.reportProvider = reportProvider;
-            return this;
-        }
-
-        public Builder capabilityToken(Capability capability) {
-            this.capability = capability;
+        public Builder source(Source source) {
+            this.source = source;
             return this;
         }
 
@@ -101,13 +92,6 @@ public class RemoveSeriesWebhook implements WebhookResult{
         public RemoveSeriesWebhook build() {
             final RemoveSeriesWebhook removeSeriesWebhook = new RemoveSeriesWebhook();
 
-            if(reportProvider != null) {
-                sourceUser.setReportProvider(reportProvider, ReportProviderResponse.Type.WEBHOOK);
-            } else if (capability != null) {
-                sourceUser.setCapabilityToken(capability);
-            }
-            removeSeriesWebhook.sourceUser = sourceUser;
-
             removeSeriesWebhook.kheopsInstance = kheopsInstance;
             removeSeriesWebhook.albumId = albumId;
             removeSeriesWebhook.isManualTrigger = isManualTrigger;
@@ -121,8 +105,17 @@ public class RemoveSeriesWebhook implements WebhookResult{
             for(Series series:seriesList) {
                 removeSeriesWebhook.removedStudy.addSeries(series);
             }
-            return removeSeriesWebhook;
 
+            if(source.getAlbumUser().isPresent()) {
+                sourceUser = new UserResponse(source.getAlbumUser().get());
+            } else {
+                sourceUser = new UserResponse(source.getUser());
+            }
+            source.getCapabilityToken().ifPresent(sourceUser::setCapabilityToken);
+            source.getReportProvider().ifPresent(reportProvider -> sourceUser.setReportProvider(reportProvider, WEBHOOK));
+
+            removeSeriesWebhook.sourceUser = sourceUser;
+            return removeSeriesWebhook;
         }
     }
 }
