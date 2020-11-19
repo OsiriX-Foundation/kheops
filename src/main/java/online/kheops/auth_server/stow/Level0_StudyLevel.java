@@ -25,13 +25,13 @@ public class Level0_StudyLevel {
         return studyHashMap.get(study);
     }
 
-    public Level1_SourceLevel put(ScheduledFuture<?> scheduledFuture, Study study, Series series, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination) {
+    public Level1_SourceLevel put(ScheduledFuture<?> scheduledFuture, Study study, Series series, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination, boolean isSend) {
         if (studyHashMap.containsKey(study)) {
-            studyHashMap.get(study).addSeries(scheduledFuture, series, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination);
+            studyHashMap.get(study).addSeries(scheduledFuture, series, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination, isSend);
             return studyHashMap.get(study);
         } else {
             Level1_SourceLevel level1SourceLevel = new Level1_SourceLevel(scheduledFuture, isNewStudy);
-            level1SourceLevel.addSeries(scheduledFuture, series, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination);
+            level1SourceLevel.addSeries(scheduledFuture, series, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination, isSend);
             return studyHashMap.put(study, level1SourceLevel);
         }
     }

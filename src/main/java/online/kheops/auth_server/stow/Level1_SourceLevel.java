@@ -19,12 +19,13 @@ public class Level1_SourceLevel {
         this.isNewStudy = isNewStudy;
     }
 
-    public void addSeries(ScheduledFuture<?> scheduledFuture, Series series, boolean isNewSeries, Integer numberOfInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination) {
+    public void addSeries(ScheduledFuture<?> scheduledFuture, Series series, boolean isNewSeries, Integer numberOfInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination, boolean isSend) {
         this.scheduledFuture = scheduledFuture;
         if (level2.containsKey(source)) {
             level2.get(source).addDestination(series, isNewSeries, destination, numberOfInstances, isInbox, isNewInDestination);
+            level2.get(source).setSend(isSend);
         } else {
-            level2.put(source, new Level2_DestinationLevel(series, isNewSeries, destination, numberOfInstances, isInbox, isNewInDestination));
+            level2.put(source, new Level2_DestinationLevel(series, isNewSeries, destination, numberOfInstances, isInbox, isNewInDestination, isSend));
         }
     }
 

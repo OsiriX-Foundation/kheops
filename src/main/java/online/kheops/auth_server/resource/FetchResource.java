@@ -138,7 +138,7 @@ public class FetchResource {
             for(Map.Entry<Series, Integer> seriesInstance : seriesNumberOfInstance.entrySet())  {
                 final Series series = em.merge(seriesInstance.getKey());
                 fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, false,
-                        !series.getStudy().isPopulated(), !series.isPopulated(), seriesInstance.getValue(), source, true);
+                        !series.getStudy().isPopulated(), !series.isPopulated(), seriesInstance.getValue(), source, true, false);
             }
 
             tx.commit();

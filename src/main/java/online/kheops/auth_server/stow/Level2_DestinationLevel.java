@@ -8,10 +8,13 @@ import java.util.*;
 public class Level2_DestinationLevel {
     //             Destination
     private Map<Album, Level3_SeriesLevel> level3;
+    private boolean isSend;
 
-    public Level2_DestinationLevel(Series series, boolean isNewSeries, Album destination, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination) {
+
+    public Level2_DestinationLevel(Series series, boolean isNewSeries, Album destination, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination, boolean isSend) {
         level3 = new HashMap<>();
         level3.put(destination, new Level3_SeriesLevel(series, isNewSeries, numberOfInstances, isInbox, isNewInDestination));
+        this.isSend = isSend;
     }
 
     public void addDestination(Series series, boolean isNewSeries, Album destination, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination) {
@@ -22,9 +25,11 @@ public class Level2_DestinationLevel {
         }
     }
 
+    public void setSend(boolean isSend) { this.isSend = isSend; }
 
     public Map<Album, Level3_SeriesLevel> getDestinations() { return level3; }
     public Level3_SeriesLevel getDestination(Album destination) { return level3.get(destination); }
+    public boolean isSend() { return isSend; }
 
     @Override
     public String toString() {

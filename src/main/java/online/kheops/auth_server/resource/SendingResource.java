@@ -62,6 +62,9 @@ public class SendingResource
     @HeaderParam(X_AUTHORIZATION_SOURCE)
     private String headerXAuthorizationSource;
 
+    @Context
+    private UriInfo uriInfo;
+
     @PUT
     @Secured
     @AlbumAccessSecured

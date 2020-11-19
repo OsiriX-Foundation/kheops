@@ -12,5 +12,5 @@ public interface FooHashMap {
                         Album destination, boolean isInbox,
                         boolean isNewStudy, boolean isNewSeries,
                         Integer numberOfInstances, Source source,
-                        boolean isNewInDestination);
+                        boolean isNewInDestination, boolean isSend);
 }

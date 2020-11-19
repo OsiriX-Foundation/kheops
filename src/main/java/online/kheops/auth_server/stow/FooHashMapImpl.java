@@ -33,16 +33,16 @@ public class FooHashMapImpl implements FooHashMap {
 
     public FooHashMapImpl() { /*empty*/ }
 
-    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, Source source, boolean isNewInDestination) {
-        scheduler.schedule(() -> addData(study, series, isNewStudy, isNewSeries, destination, isInbox, numberOfInstances, source, isNewInDestination), 0, TimeUnit.SECONDS);
+    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, Source source, boolean isNewInDestination, boolean isSend) {
+        scheduler.schedule(() -> addData(study, series, isNewStudy, isNewSeries, destination, isInbox, numberOfInstances, source, isNewInDestination, isSend), 0, TimeUnit.SECONDS);
     }
 
 
-    private void addData(Study study, Series series, boolean isNewStudy, boolean isNewSeries, Album destination, boolean isInbox, Integer numberOfInstances, Source source, boolean isNewInDestination) {
+    private void addData(Study study, Series series, boolean isNewStudy, boolean isNewSeries, Album destination, boolean isInbox, Integer numberOfInstances, Source source, boolean isNewInDestination, boolean isSend) {
         if (level0StudyLevel.containsStudy(study)) {
             level0StudyLevel.get(study).cancelScheduledFuture();
         }
-        level0StudyLevel.put(scheduler.schedule(() -> callWebhook(study), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination);
+        level0StudyLevel.put(scheduler.schedule(() -> callWebhook(study), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination, isSend);
     }
 
     private void callWebhook(Study studyIn) {
@@ -78,11 +78,15 @@ public class FooHashMapImpl implements FooHashMap {
 
                                 final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
                                         .setDestination(album.getId())
-                                        .isUpload()
                                         .isAutomatedTrigger()
                                         .setStudy(study)
                                         .setSource(source)
                                         .setKheopsInstance(kheopsInstance.get());
+                                if(level2DestinationLevel.isSend()) {
+                                    newSeriesWebhookBuilder.isSent();
+                                } else {
+                                    newSeriesWebhookBuilder.isUpload();
+                                }
 
                                 for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level3SeriesLevel.getSeries().entrySet()) {
                                     final Series series = em.merge(entry2.getKey());
@@ -116,10 +120,14 @@ public class FooHashMapImpl implements FooHashMap {
                         final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
                                 .setKheopsInstance(kheopsInstance.get())
                                 .setDestination(album.getId())
-                                .isUpload()
                                 .isAutomatedTrigger()
                                 .setStudy(study)
                                 .setSource(source);
+                        if(level2DestinationLevel.isSend()) {
+                            newSeriesWebhookBuilder.isSent();
+                        } else {
+                            newSeriesWebhookBuilder.isUpload();
+                        }
 
                         if (level2DestinationLevel.getDestinations().containsKey(album)) {
                             if (!level2DestinationLevel.getDestination(album).isInbox()) {
