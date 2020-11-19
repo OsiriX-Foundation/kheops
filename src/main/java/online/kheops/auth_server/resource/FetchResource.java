@@ -74,7 +74,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, UserNotMemberException {
 
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -124,15 +124,16 @@ public class FetchResource {
             }
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
-
+            final Source source = new Source(callingUser);
             final Album targetAlbum;
             if (albumId != null) {
                 targetAlbum = getAlbum(albumId, em);
+                source.setAlbumUser(getAlbumUser(targetAlbum, callingUser, em));
             } else {
                 targetAlbum = kheopsPrincipal.getUser().getInbox();
             }
 
-            final Source source = new Source(callingUser);
+
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Map.Entry<Series, Integer> seriesInstance : seriesNumberOfInstance.entrySet())  {

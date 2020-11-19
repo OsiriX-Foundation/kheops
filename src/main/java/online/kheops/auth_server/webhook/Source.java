@@ -1,5 +1,6 @@
 package online.kheops.auth_server.webhook;
 
+import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.entity.User;
@@ -10,6 +11,7 @@ import java.util.Optional;
 public class Source {
     private Optional<ReportProvider> reportProvider = Optional.empty();
     private Optional<Capability> capabilityToken = Optional.empty();
+    private Optional<AlbumUser> albumUser = Optional.empty();
     private User user;
 
     public Source(User user) {
@@ -20,6 +22,10 @@ public class Source {
         this.reportProvider = Optional.of(reportProvider);
     }
 
+    public void setAlbumUser(AlbumUser albumUser) {
+        this.albumUser = Optional.of(albumUser);
+    }
+
     public void setCapabilityToken(Capability capabilityToken) {
         this.capabilityToken = Optional.of(capabilityToken);
     }
@@ -27,10 +33,10 @@ public class Source {
     public Optional<ReportProvider> getReportProvider() {
         return reportProvider;
     }
-
     public Optional<Capability> getCapabilityToken() {
         return capabilityToken;
     }
+    public Optional<AlbumUser> getAlbumUser() { return albumUser; }
 
     public User getUser() {
         return user;

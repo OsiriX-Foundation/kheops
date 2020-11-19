@@ -62,8 +62,6 @@ public class SendingResource
     @HeaderParam(X_AUTHORIZATION_SOURCE)
     private String headerXAuthorizationSource;
 
-    @Context
-    private UriInfo uriInfo;
 
     @PUT
     @Secured
@@ -164,7 +162,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                       @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -264,7 +262,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateStudy(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @QueryParam(ALBUM) String albumId)
-            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -440,7 +438,7 @@ public class SendingResource
     public Response putSeriesInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -513,7 +511,7 @@ public class SendingResource
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox)
-            throws AlbumNotFoundException, StudyNotFoundException {
+            throws AlbumNotFoundException, StudyNotFoundException, UserNotMemberException {
 
 
         if (((fromAlbumId == null && fromInbox == null) ||

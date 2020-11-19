@@ -72,32 +72,18 @@ public class NewSeriesWebhook implements WebhookResult{
             if (source == null) {
                 throw new IllegalStateException("source is null");
             }
-            sourceUser = new UserResponse(source.getUser());
-            source.getCapabilityToken().ifPresent(capability -> sourceUser.setCapabilityToken(capability));
+            if(source.getAlbumUser().isPresent()) {
+                sourceUser = new UserResponse(source.getAlbumUser().get());
+            } else {
+                sourceUser = new UserResponse(source.getUser());
+            }
+            source.getCapabilityToken().ifPresent(sourceUser::setCapabilityToken);
             source.getReportProvider().ifPresent(reportProvider -> sourceUser.setReportProvider(reportProvider, WEBHOOK));
             return this;
         }
 
         public Builder setSource(AlbumUser sourceUser) {
             this.sourceUser = new UserResponse(sourceUser);
-            return this;
-        }
-
-        public Builder setCapabilityToken(Capability capability) {
-            if (sourceUser != null) {
-                sourceUser.setCapabilityToken(capability);
-            } else {
-                throw new IllegalStateException();
-            }
-            return this;
-        }
-
-        public Builder setReportProvider(ReportProvider reportProvider) {
-            if (sourceUser != null) {
-                sourceUser.setReportProvider(reportProvider, WEBHOOK);
-            } else {
-                throw new IllegalStateException();
-            }
             return this;
         }
 

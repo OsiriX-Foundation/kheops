@@ -257,7 +257,7 @@ public class Sending {
     }
 
     public static void putSeriesInAlbum(FooHashMap fooHashMap, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, ClientIdNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, ClientIdNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -267,6 +267,7 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
+            final AlbumUser albumUser = getAlbumUser(targetAlbum, callingUser, em);
 
             Series availableSeries = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
 
@@ -304,11 +305,12 @@ public class Sending {
 
 
             final Source source = new Source(kheopsPrincipal.getUser());
+            source.setAlbumUser(albumUser);
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             fooHashMap.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
                     !availableSeries.getStudy().isPopulated(), !availableSeries.isPopulated(), availableSeries.getNumberOfSeriesRelatedInstances(),
-                    source, true, true);//TODO isSend a changer en fonction de la source (dicomWebProxy ou pas)
+                    source, true, true);
 
             tx.commit();
         } finally {
@@ -320,7 +322,7 @@ public class Sending {
     }
 
     public static void putStudyInAlbum(FooHashMap fooHashMap, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
-            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -329,6 +331,7 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
+            final AlbumUser albumUser = getAlbumUser(targetAlbum, callingUser, em);
             final Study study = getStudy(studyInstanceUID, em);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);
@@ -386,6 +389,7 @@ public class Sending {
 
 
             final Source source = new Source(kheopsPrincipal.getUser());
+            source.setAlbumUser(albumUser);
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesListWebhook) {
