@@ -23,8 +23,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,9 +53,11 @@ public abstract class Fetcher {
         seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
-    public static void fetchStudy(String studyInstanceUID) {
+    public static HashMap<Series, Integer> fetchStudy(String studyInstanceUID) {
         final URI studyUri = studyUriBuilder.build(studyInstanceUID);
 
+
+        final HashMap<Series, Integer> result = new HashMap<>();
         final Attributes attributes;
         try {
             String authToken = PepAccessTokenBuilder.newBuilder(new TokenProvenance() {})
@@ -68,10 +70,10 @@ public abstract class Fetcher {
             attributes = studyList.get(0);
         } catch (ResponseProcessingException e) {
             logResponseProcessingException(e, studyInstanceUID);
-            return;
+            return result;
         } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
-            return;
+            return result;
         }
 
         final List<String> seriesUIDList;
@@ -94,19 +96,22 @@ public abstract class Fetcher {
 
             tx.commit();
 
-            seriesUIDList.forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID, em));
+            seriesUIDList.forEach(seriesUID -> result.putAll(fetchSeries(studyInstanceUID, seriesUID, em)));
+
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
+            return result;
         }
     }
 
-    private static void fetchSeries(String studyUID, String seriesUID, EntityManager em) {
+    private static HashMap<Series, Integer> fetchSeries(String studyUID, String seriesUID, EntityManager em) {
         final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
+        final HashMap<Series, Integer> result = new HashMap<>();
         try {
             String authToken = PepAccessTokenBuilder.newBuilder(new TokenProvenance() {})
                     .withStudyUID(studyUID)
@@ -121,10 +126,10 @@ public abstract class Fetcher {
             attributes = seriesList.get(0);
         } catch (ResponseProcessingException e) {
             logResponseProcessingException(e, studyUID, seriesUID);
-            return;
+            return result;
         } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID, e);
-            return;
+            return result;
         }
 
         final EntityTransaction tx = em.getTransaction();
@@ -132,6 +137,7 @@ public abstract class Fetcher {
             tx.begin();
 
             final Series series = findSeriesBySeriesUID(seriesUID, em);
+            result.put(series, series.getNumberOfSeriesRelatedInstances());
             series.mergeAttributes(attributes);
             series.setPopulated(true);
 
@@ -142,6 +148,7 @@ public abstract class Fetcher {
             if (tx.isActive()) {
                 tx.rollback();
             }
+            return result;
         }
     }
 

@@ -85,9 +85,7 @@ public class FooHashMapImpl implements FooHashMap {
                                         .setKheopsInstance(kheopsInstance.get());
 
                                 for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level3SeriesLevel.getSeries().entrySet()) {
-                                    em.refresh(em.merge(entry2.getKey()));
-                                    Series series = entry2.getKey();
-                                    series = em.merge(series);
+                                    final Series series = em.merge(entry2.getKey());
                                     em.refresh(series);
                                     final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
                                     newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - level4InstancesLevel.getNumberOfInstances());
@@ -128,6 +126,7 @@ public class FooHashMapImpl implements FooHashMap {
                                 List<Series> newSeriesInDestinationLst = new ArrayList<>();
                                 for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level2DestinationLevel.getDestination(album).getSeries().entrySet()) {
                                     final Series series = em.merge(entry2.getKey());
+                                    em.refresh(series);
                                     final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
                                     seriesLstForWebhookTrigger.add(series);
                                     newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - level4InstancesLevel.getNumberOfInstances());

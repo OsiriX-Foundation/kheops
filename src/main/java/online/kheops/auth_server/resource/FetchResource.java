@@ -29,7 +29,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
@@ -73,14 +75,6 @@ public class FetchResource {
                                @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
             throws AlbumNotFoundException, SeriesNotFoundException {
-        Fetcher.fetchStudy(studyInstanceUID);
-        for (String seriesInstanceUID: seriesInstanceUIDList) {
-            ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                    .study(studyInstanceUID)
-                    .series(seriesInstanceUID)
-                    .action(ActionType.FETCH)
-                    .log();
-        }
 
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -88,6 +82,15 @@ public class FetchResource {
                     .detail("'" + SeriesInstanceUID + "' formparam is empty")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
+        }
+
+        final HashMap<Series, Integer> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
+        for (String seriesInstanceUID: seriesInstanceUIDList) {
+            ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                    .study(studyInstanceUID)
+                    .series(seriesInstanceUID)
+                    .action(ActionType.FETCH)
+                    .log();
         }
 
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
@@ -129,19 +132,14 @@ public class FetchResource {
                 targetAlbum = kheopsPrincipal.getUser().getInbox();
             }
 
-            final List<Series> seriesList = new ArrayList<>();
-            for (String seriesInstanceUID : seriesInstanceUIDList) {
-                seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
-            }
-
             final Source source = new Source(callingUser);
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
-            for(Series s : seriesList) {
-                fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
-                        !s.getStudy().isPopulated(), !s.isPopulated(), s.getNumberOfSeriesRelatedInstances(), source, true);
+            for(Map.Entry<Series, Integer> seriesInstance : seriesNumberOfInstance.entrySet())  {
+                final Series series = em.merge(seriesInstance.getKey());
+                fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, false,
+                        !series.getStudy().isPopulated(), !series.isPopulated(), seriesInstance.getValue(), source, true);
             }
-
 
             tx.commit();
         } finally {
