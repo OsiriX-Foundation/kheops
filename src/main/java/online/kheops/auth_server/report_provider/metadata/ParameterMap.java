@@ -5,7 +5,7 @@ import java.util.Map;
 public interface ParameterMap extends OidcMetadata {
   Map<Parameter<?>, Object> getMap();
 
-  <T> void put(Parameter<? extends T> parameter, T value);
+  <T> void put(Parameter<? super T> parameter, T value);
 
   void putAll(ParameterMap parameterMap);
 
@@ -23,7 +23,7 @@ public interface ParameterMap extends OidcMetadata {
 
   int hashCode();
 
-  default <T, S extends T> T getOrDefault(Parameter<? extends T> parameter, S defaultValue) {
+  default <T, S extends T, U extends S> T getOrDefault(Parameter<S> parameter, U defaultValue) {
     T v;
     return (v = this.get(parameter)) == null && !this.containsKey(parameter) ? defaultValue : v;
   }

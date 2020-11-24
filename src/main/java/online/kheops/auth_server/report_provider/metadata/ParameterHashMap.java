@@ -14,7 +14,7 @@ public class ParameterHashMap implements ParameterMap {
   }
 
   @Override
-  public <T> void put(Parameter<? extends T> parameter, T value) {
+  public <T> void put(Parameter<? super T> parameter, T value) {
     // cast to make sure that a ClassCastException is thrown
     // if the value is of the wrong type.
     map.put(parameter, parameter.cast(value));
