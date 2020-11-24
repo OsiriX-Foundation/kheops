@@ -2,7 +2,6 @@ package online.kheops.auth_server.accesstoken;
 
 import online.kheops.auth_server.token.TokenAuthenticationContext;
 
-import javax.servlet.ServletContext;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,8 +21,13 @@ public abstract class AccessTokenVerifier {
     private AccessTokenVerifier() {}
 
     public static AccessToken authenticateAccessToken(TokenAuthenticationContext tokenAuthenticationContext, String accessToken)
-            throws AccessTokenVerificationException {
-        return authenticateAccessTokens(accessTokenBuilderClasses, tokenAuthenticationContext, accessToken);
+        throws AccessTokenVerificationException {
+        return authenticateAccessTokens(accessTokenBuilderClasses, tokenAuthenticationContext, accessToken, true);
+    }
+
+    public static AccessToken authenticateAccessToken(TokenAuthenticationContext tokenAuthenticationContext, String accessToken, boolean verifySignature)
+        throws AccessTokenVerificationException {
+        return authenticateAccessTokens(accessTokenBuilderClasses, tokenAuthenticationContext, accessToken, verifySignature);
     }
 
     public static AccessToken authenticateIntrospectableAccessToken(TokenAuthenticationContext tokenAuthenticationContext, String accessToken)
@@ -32,10 +36,10 @@ public abstract class AccessTokenVerifier {
         List<Class<?>> introspectableAccessTokenBuilderClasses = new ArrayList<>(accessTokenBuilderClasses);
         introspectableAccessTokenBuilderClasses.add(pepAccessTokenClass);
 
-        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, tokenAuthenticationContext, accessToken);
+        return authenticateAccessTokens(introspectableAccessTokenBuilderClasses, tokenAuthenticationContext, accessToken, true);
     }
 
-    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, TokenAuthenticationContext tokenAuthenticationContext, String accessToken)
+    private static AccessToken authenticateAccessTokens(List<Class<?>> accessTokenBuilderClasses, TokenAuthenticationContext tokenAuthenticationContext, String accessToken, boolean verifySignature)
             throws AccessTokenVerificationException {
 
         List<AccessTokenVerificationException> exceptionList = new ArrayList<>(6);
@@ -60,7 +64,7 @@ public abstract class AccessTokenVerifier {
             }
 
             try {
-                return accessTokenBuilder.build(accessToken);
+                return accessTokenBuilder.build(accessToken, verifySignature);
             } catch (AccessTokenVerificationException e) {
                 exceptionList.add(e);
             }

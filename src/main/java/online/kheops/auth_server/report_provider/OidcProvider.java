@@ -9,7 +9,7 @@ public interface OidcProvider {
 
   OidcMetadata getOidcMetadata() throws OidcProviderException;
 
-  DecodedJWT validateAccessToken(String accessToken) throws OidcProviderException;
+  DecodedJWT validateAccessToken(String accessToken, boolean verifySignature) throws OidcProviderException;
 
   OidcMetadata getUserInfo(String token) throws OidcProviderException;
 }

@@ -5,12 +5,9 @@ import online.kheops.auth_server.user.UserResponse;
 import org.jooq.Record;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 public class AlbumResponseBuilder {
 
@@ -45,8 +42,8 @@ public class AlbumResponseBuilder {
         this.id = r.getValue("album_id").toString();
         this.name = r.getValue("album_name").toString();
         this.description = r.getValue("album_description").toString();
-        this.createdTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_created_time")).getTime()), TimeZone.getDefault().toZoneId());
-        this.lastEventTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(((Timestamp) r.getValue("album_last_event_time")).getTime()), TimeZone.getDefault().toZoneId());
+        this.createdTime = (LocalDateTime) r.getValue("album_created_time");
+        this.lastEventTime = (LocalDateTime) r.getValue("album_last_event_time");
         this.numberOfUsers = (Integer) r.getValue("number_of_users");
         this.numberOfStudies = (Integer) r.getValue("number_of_studies");
         this.numberOfSeries = (Integer) r.getValue("number_of_series");

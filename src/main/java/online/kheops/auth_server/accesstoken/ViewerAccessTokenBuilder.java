@@ -16,7 +16,7 @@ final class ViewerAccessTokenBuilder implements AccessTokenBuilder {
     }
 
     @Override
-    public AccessToken build(String assertionToken) throws AccessTokenVerificationException {
+    public AccessToken build(String assertionToken, boolean verifySignature) throws AccessTokenVerificationException {
 
         try {
             final JsonWebEncryption jwe = new JsonWebEncryption();

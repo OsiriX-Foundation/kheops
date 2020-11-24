@@ -216,7 +216,7 @@ public class Sending {
                 mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
             }
 
-            if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).size() == 0) {
+            if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).isEmpty()) {
                 removeSeriesWebhookBuilder.removeAllSeries(true);
             } else {
                 removeSeriesWebhookBuilder.removeAllSeries(false);

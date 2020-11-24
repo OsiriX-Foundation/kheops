@@ -27,10 +27,10 @@ public final class OidcAccessToken implements AccessToken {
             this.tokenAuthenticationContext = tokenAuthenticationContext;
         }
 
-        public OidcAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public OidcAccessToken build(String assertionToken, boolean verifySignature) throws AccessTokenVerificationException {
             final DecodedJWT jwt;
             try {
-                jwt = tokenAuthenticationContext.getOidcProvider().validateAccessToken(assertionToken);
+                jwt = tokenAuthenticationContext.getOidcProvider().validateAccessToken(assertionToken, verifySignature);
             } catch (OidcProviderException e) {
                 throw new AccessTokenVerificationException("Unable to validate the access token");
             }

@@ -157,6 +157,7 @@ public class TokenResource
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .link(false);
+            accessToken.getCapabilityTokenId().ifPresent(logBuilder::capabilityID);
             if (headerXForwardedFor != null) {
                 logBuilder.ip(headerXForwardedFor);
             }

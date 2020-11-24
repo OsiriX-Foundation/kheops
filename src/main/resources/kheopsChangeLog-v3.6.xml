@@ -10,8 +10,8 @@
 
 
 
-    <changeSet author="kheops" id="v3.6-3">
-       <tagDatabase tag="v3.4"/>
+    <changeSet author="kheops" id="v3.6-2">
+       <tagDatabase tag="v3.6"/>
     </changeSet>
 
 </databaseChangeLog>

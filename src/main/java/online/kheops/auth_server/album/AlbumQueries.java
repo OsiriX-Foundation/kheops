@@ -344,9 +344,9 @@ public class AlbumQueries {
             if (parameter.startsWith("*") && parameter.endsWith("*")) {
                 condition = column.containsIgnoreCase(parameterNoStar);
             } else if (parameter.startsWith("*")) {
-                condition = column.lower().endsWith(parameterNoStar.toLowerCase());
+                condition = column.endsWithIgnoreCase(parameterNoStar);
             } else if (parameter.endsWith("*")) {
-                condition = column.lower().startsWith(parameterNoStar.toLowerCase());
+                condition = column.startsWithIgnoreCase(parameterNoStar);
             } else {
                 condition = column.equalIgnoreCase(parameterNoStar);
             }

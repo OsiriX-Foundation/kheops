@@ -41,7 +41,7 @@ public final class ViewerAccessToken implements AccessToken {
             throws AccessTokenVerificationException {
 
         this.jwe = jwe;
-        this.accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, jwe.getString(Consts.JWE.TOKEN));
+        this.accessToken = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, jwe.getString(Consts.JWE.TOKEN), false);
         this.originalToken = originalToken;
     }
 

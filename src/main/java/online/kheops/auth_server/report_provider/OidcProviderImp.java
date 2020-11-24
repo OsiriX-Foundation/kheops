@@ -128,7 +128,7 @@ public class OidcProviderImp implements OidcProvider {
   }
 
   @Override
-  public DecodedJWT validateAccessToken(String accessToken) throws OidcProviderException {
+  public DecodedJWT validateAccessToken(String accessToken, boolean verifySignature) throws OidcProviderException {
     final URI jwksUri =
         getOidcMetadata()
             .getValue(JWKS_URI)
@@ -158,13 +158,20 @@ public class OidcProviderImp implements OidcProvider {
 
     final DecodedJWT jwt;
     try {
-      jwt =
-          JWT.require(Algorithm.RSA256(keyProvider))
-              .acceptLeeway(120)
-              .withIssuer(issuer.toString())
-              .acceptLeeway(60)
-              .build()
-              .verify(accessToken);
+      if (verifySignature) {
+        jwt = JWT.require(Algorithm.RSA256(keyProvider))
+            .acceptLeeway(120)
+            .withIssuer(issuer.toString())
+            .acceptLeeway(60)
+            .build()
+            .verify(accessToken);
+      } else {
+        if (accessToken.indexOf('.') == -1) {
+          jwt = JWT.decode("eyJhbGciOiJub25lIn0." + accessToken + ".");
+        } else {
+          jwt = JWT.decode(accessToken);
+        }
+      }
     } catch (JWTVerificationException e) {
       throw new OidcProviderException(
           "Verification of the token failed, configuration URL:" + getOIDCConfigurationUri(), e);

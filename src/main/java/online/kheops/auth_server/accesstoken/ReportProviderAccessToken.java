@@ -41,7 +41,7 @@ public class ReportProviderAccessToken implements AccessToken {
             this.tokenAuthenticationContext = Objects.requireNonNull(tokenAuthenticationContext);
         }
 
-        public ReportProviderAccessToken build(String assertionToken) throws AccessTokenVerificationException {
+        public ReportProviderAccessToken build(String assertionToken, boolean verifySignature) throws AccessTokenVerificationException {
             Objects.requireNonNull(assertionToken);
 
             final Algorithm algorithm;
