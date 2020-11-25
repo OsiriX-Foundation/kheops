@@ -134,6 +134,17 @@ public class Capability {
         updatedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Capability capability = (Capability) o;
+        return id.equals(capability.id);
+    }
+
+    @Override
+    public int hashCode() { return id.hashCode(); }
+
     public Capability() {}
 
     private Capability(CapabilityBuilder builder) throws BadQueryParametersException {
