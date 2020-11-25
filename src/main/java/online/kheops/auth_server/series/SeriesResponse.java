@@ -43,9 +43,9 @@ public class SeriesResponse {
         seriesNumber = Long.valueOf(series.getSeriesNumber());
         bodyPartExamined = series.getBodyPartExamined();
         retrieveUrl = kheopsInstance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
-        if(numberOfNewInstances != 0) {
+        //if(numberOfNewInstances != 0) {
             this.numberOfNewInstances = numberOfNewInstances;
-        }
+        //}
     }
 
 

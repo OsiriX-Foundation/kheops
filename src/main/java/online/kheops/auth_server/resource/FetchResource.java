@@ -74,7 +74,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
-            throws AlbumNotFoundException, UserNotMemberException {
+            throws AlbumNotFoundException, UserNotMemberException, SeriesNotFoundException {
 
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -136,10 +136,11 @@ public class FetchResource {
 
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
-            for(Map.Entry<Series, Integer> seriesInstance : seriesNumberOfInstance.entrySet())  {
-                final Series series = em.merge(seriesInstance.getKey());
+            for(String seriesUID : seriesInstanceUIDList) {
+
+                final Series series = getSeries(seriesUID, em);
                 fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, false,
-                        !series.getStudy().isPopulated(), !series.isPopulated(), seriesInstance.getValue(), source, true, false);
+                        !series.getStudy().isPopulated(), !series.isPopulated(), seriesNumberOfInstance.get(series), source, true, false);
             }
 
             tx.commit();

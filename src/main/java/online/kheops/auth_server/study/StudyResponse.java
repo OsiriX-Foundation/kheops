@@ -79,7 +79,7 @@ public class StudyResponse {
     }
 
     public void addSeries(Series series) {
-        this.addSeries(series, 0);
+        this.addSeries(series, null);
     }
 
 
