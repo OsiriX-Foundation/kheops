@@ -8,6 +8,7 @@ import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.fetch.FetchSeriesMetadata;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
@@ -84,7 +85,7 @@ public class FetchResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-        final HashMap<Series, Integer> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
+        final HashMap<Series, FetchSeriesMetadata> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
         for (String seriesInstanceUID: seriesInstanceUIDList) {
             ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                     .study(studyInstanceUID)
@@ -139,8 +140,9 @@ public class FetchResource {
             for(String seriesUID : seriesInstanceUIDList) {
 
                 final Series series = getSeries(seriesUID, em);
-                fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, false,
-                        !series.getStudy().isPopulated(), !series.isPopulated(), seriesNumberOfInstance.get(series), source, true, false);
+                fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, albumId==null,
+                        seriesNumberOfInstance.get(series).isNewStudy(), seriesNumberOfInstance.get(series).isNewSeries(),
+                        seriesNumberOfInstance.get(series).getOldNumberOfSeriesRelatedInstances(), source, true, false);
             }
 
             tx.commit();
