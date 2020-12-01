@@ -138,6 +138,7 @@ export default {
     sendingFiles() {
       if (!this.sendingFiles) {
         this.updateStudies(0, this.studiesParams.offset > 0 ? this.studiesParams.offset : this.studiesParams.limit);
+        this.updateAlbumInbox();
         this.$refs.infiniteLoading.stateChanger.reset();
       }
     },
@@ -237,6 +238,9 @@ export default {
     },
     reloadStudies() {
       this.searchStudies();
+      this.updateAlbumInbox();
+    },
+    updateAlbumInbox() {
       if (this.albumID !== undefined) {
         this.getAlbum().then(() => {
           this.setAlbumInbox();
