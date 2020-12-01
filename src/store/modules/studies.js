@@ -157,14 +157,11 @@ const actions = {
   },
   deleteStudy({ commit }, params) {
     const request = `/studies/${params.StudyInstanceUID}`;
-    return HTTP.delete(request).then(() => {
+    return HTTP.delete(request).then((res) => {
       commit('DELETE_STUDY', { StudyInstanceUID: params.StudyInstanceUID, source: params.source });
       commit('DELETE_SERIE_STUDY', { StudyInstanceUID: params.StudyInstanceUID });
-      return true;
-    }).catch((err) => {
-      console.log(err);
-      return false;
-    });
+      return res;
+    }).catch((err) => Promise.reject(err));
   },
   sendStudy(context, params) {
     let queries = '';

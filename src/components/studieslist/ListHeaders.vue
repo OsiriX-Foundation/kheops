@@ -363,12 +363,21 @@ export default {
       return undefined;
     },
     deleteStudies() {
-      this.deleteSelectedStudies();
-      this.deleteSelectedSeries();
+      this.manageDeleteStudiesSeries().then(() => {
+        this.updateModalities();
+      }).catch(() => {
+        this.$snotify.error(this.$t('sorryerror'));
+      });
       this.confirmDelete = false;
       this.deselectStudySeries();
     },
+    manageDeleteStudiesSeries() {
+      const promisesDeleteStudies = this.deleteSelectedStudies();
+      const promisesDeleteSeries = this.deleteSelectedSeries();
+      return Promise.all(promisesDeleteStudies.concat(promisesDeleteSeries));
+    },
     deleteSelectedStudies() {
+      const promises = [];
       this.selectedStudies.forEach((study) => {
         const source = this.albumId === undefined || this.albumId === '' ? 'inbox' : this.albumId;
         const params = {
@@ -376,14 +385,16 @@ export default {
           source,
         };
         if (this.albumId === '') {
-          this.$store.dispatch('deleteStudy', params);
+          promises.push(this.$store.dispatch('deleteStudy', params));
         } else {
           params.album_id = this.albumId;
-          this.$store.dispatch('removeStudyInAlbum', params);
+          promises.push(this.$store.dispatch('removeStudyInAlbum', params));
         }
       });
+      return promises;
     },
     deleteSelectedSeries() {
+      const promises = [];
       Object.keys(this.selectedSeries).forEach((studyUID) => {
         this.selectedSeries[studyUID].forEach((serie) => {
           const serieUID = serie.SeriesInstanceUID.Value[0];
@@ -392,13 +403,23 @@ export default {
             SeriesInstanceUID: serieUID,
           };
           if (this.albumId === '') {
-            this.$store.dispatch('deleteSerie', params);
+            promises.push(this.$store.dispatch('deleteSerie', params));
           } else {
             params.album_id = this.albumId;
-            this.$store.dispatch('removeSerieInAlbum', params);
+            promises.push(this.$store.dispatch('removeSerieInAlbum', params));
           }
         });
       });
+      return Promise.all(promises);
+    },
+    updateModalities() {
+      if (this.albumId !== '') {
+        this.$store.dispatch('getAlbum', { album_id: this.albumId }).then(() => {
+          this.$store.dispatch('setModalitiesAlbum');
+        });
+      } else {
+        this.$store.dispatch('getInboxInfo');
+      }
     },
     checkErrorStatus(status, message) {
       if (status === 403) {
