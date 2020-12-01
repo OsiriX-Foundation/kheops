@@ -188,7 +188,7 @@ export default {
         this.confirmQuit = true;
       } else {
         this.onloading = true;
-        this.$store.dispatch('removeAlbumUser', { album_id: this.album.album_id, user: this.currentuserSub }).then(() => {
+        this.$store.dispatch('quitAlbum', { album_id: this.album.album_id, user: this.currentuserSub }).then(() => {
           this.$router.push('/albums');
         }).catch(() => {
           this.onloading = false;

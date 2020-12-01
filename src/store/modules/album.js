@@ -109,6 +109,10 @@ const actions = {
       return res;
     }).catch((err) => Promise.reject(err));
   },
+  quitAlbum(context, params) {
+    const request = `albums/${params.album_id}/users/${params.user}`;
+    return HTTP.delete(request).then((res) => res).catch((err) => Promise.reject(err));
+  },
   removeAlbumUser({ dispatch }, params) {
     const request = `albums/${params.album_id}/users/${params.user}`;
     return HTTP.delete(request).then((res) => {
