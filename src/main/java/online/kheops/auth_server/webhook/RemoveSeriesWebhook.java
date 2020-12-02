@@ -47,6 +47,7 @@ public class RemoveSeriesWebhook implements WebhookResult{
         private Study study;
         private List<Series> seriesList;
         private Source source;
+        private Boolean isAdmin;
 
         public Builder() {
             seriesList = new ArrayList<>();
@@ -69,6 +70,11 @@ public class RemoveSeriesWebhook implements WebhookResult{
 
         public Builder source(Source source) {
             this.source = source;
+            return this;
+        }
+
+        public Builder isAdmin(boolean isAdmin) {
+            this.isAdmin = isAdmin;
             return this;
         }
 
@@ -106,11 +112,11 @@ public class RemoveSeriesWebhook implements WebhookResult{
                 removeSeriesWebhook.removedStudy.addSeries(series);
             }
 
-            if(source.getAlbumUser().isPresent()) {
-                sourceUser = new UserResponse(source.getAlbumUser().get());
-            } else {
-                sourceUser = new UserResponse(source.getUser());
+            sourceUser = new UserResponse(source.getUser());
+            if (isAdmin != null) {
+                sourceUser.setIsAdmin(isAdmin);
             }
+
             source.getCapabilityToken().ifPresent(sourceUser::setCapabilityToken);
             source.getReportProvider().ifPresent(reportProvider -> sourceUser.setReportProvider(reportProvider, WEBHOOK));
 

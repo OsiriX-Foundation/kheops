@@ -18,7 +18,6 @@ import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.*;
 
-import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
@@ -135,7 +134,6 @@ public class Sending {
             }
 
             final Source source = new Source(callingUser);
-            source.setAlbumUser(callingAlbumUser);
             final RemoveSeriesWebhook.Builder removeSeriesWebhookBuilder = new RemoveSeriesWebhook.Builder()
                     .albumId(albumId)
                     .kheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER))
@@ -152,6 +150,7 @@ public class Sending {
                 mutation = Events.albumPostStudyMutation(callingUser, callingAlbum, MutationType.REMOVE_STUDY, study, availableSeries);
             }
             removeSeriesWebhookBuilder.source(source);
+            removeSeriesWebhookBuilder.isAdmin(callingAlbumUser.isAdmin());
 
             removeSeriesWebhookBuilder.study(study);
             for(Series series : availableSeries) {
@@ -206,7 +205,6 @@ public class Sending {
             final Series availableSeries = findSeriesByStudyUIDandSeriesUIDFromAlbum(callingAlbum, studyInstanceUID, seriesInstanceUID, em);
 
             final Source source = new Source(callingUser);
-            source.setAlbumUser(callingAlbumUser);
             final RemoveSeriesWebhook.Builder removeSeriesWebhookBuilder = new RemoveSeriesWebhook.Builder()
                     .albumId(albumId)
                     .kheopsInstance(context.getInitParameter(HOST_ROOT_PARAMETER))
@@ -224,6 +222,7 @@ public class Sending {
                 mutation = Events.albumPostSeriesMutation(callingUser, callingAlbum, MutationType.REMOVE_SERIES, availableSeries);
             }
             removeSeriesWebhookBuilder.source(source);
+            removeSeriesWebhookBuilder.isAdmin(callingAlbumUser.isAdmin());
 
             if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).isEmpty()) {
                 removeSeriesWebhookBuilder.removeAllSeries(true);
@@ -310,7 +309,6 @@ public class Sending {
 
 
             final Source source = new Source(kheopsPrincipal.getUser());
-            source.setAlbumUser(albumUser);
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             fooHashMap.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
@@ -394,7 +392,6 @@ public class Sending {
 
 
             final Source source = new Source(kheopsPrincipal.getUser());
-            source.setAlbumUser(albumUser);
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesListWebhook) {

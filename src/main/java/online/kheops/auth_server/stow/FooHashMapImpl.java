@@ -2,6 +2,7 @@ package online.kheops.auth_server.stow;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsInstance;
+import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.webhook.*;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumsWithEnabledNewSeriesWebhooks;
+import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.event.Events.albumPostStudyMutation;
 
 public class FooHashMapImpl implements FooHashMap {
@@ -30,6 +32,7 @@ public class FooHashMapImpl implements FooHashMap {
     private static final int TIME_TO_LIVE = 10;//seconds
 
     private static Level0_StudyLevel level0StudyLevel = new Level0_StudyLevel();
+    private static Level0 level0 = new Level0();
 
     public FooHashMapImpl() { /*empty*/ }
 
@@ -39,13 +42,103 @@ public class FooHashMapImpl implements FooHashMap {
 
 
     private void addData(Study study, Series series, boolean isNewStudy, boolean isNewSeries, Album destination, boolean isInbox, Integer numberOfInstances, Source source, boolean isNewInDestination, boolean isSend) {
-        if (level0StudyLevel.containsStudy(study)) {
-            level0StudyLevel.get(study).cancelScheduledFuture();
-        }
-        level0StudyLevel.put(scheduler.schedule(() -> callWebhook(study), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination, isSend);
+        level0.put(scheduler.schedule(() -> callWebhook(study, source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination, isSend);
     }
 
-    private void callWebhook(Study studyIn) {
+    private void callWebhook(Study studyIn, Source source) {
+
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+
+            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
+            Study study = em.merge(studyIn);
+            em.refresh(study);
+            final Level0Key level0Key = new Level0Key(study, source);
+            final Level0Value level0Value = level0.get(level0Key);
+            final Set<Level1Key> level1Keys = level0Value.getKeys();
+
+            for (Level1Key destination : level1Keys) {
+                final Album album = em.merge(destination.getAlbum());
+                final Level1Value level1Value = level0Value.get(destination);
+                Boolean isAdmin = null;
+                try {
+                    final AlbumUser albumUser = getAlbumUser(album, source.getUser(), em);
+                    isAdmin = albumUser.isAdmin();
+                } catch (UserNotMemberException e){ /*empty*/ }
+
+                final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
+                        .setKheopsInstance(kheopsInstance.get())
+                        .isAutomatedTrigger()
+                        .setSource(source)
+                        .isAdmin(isAdmin)
+                        .setStudy(study)
+                        .setDestination(album.getId());
+
+                for (Series s : level1Value.getSeries()) {
+                    Series series = em.merge(s);
+                    em.refresh(series);
+
+                    Integer minimalValue = Integer.MAX_VALUE;
+                    for (Level1Key destination2 : level1Keys) {
+                        if (level0Value.get(destination2).getSeries().contains(series)) {
+                            if(level0Value.get(destination2).get(series).getOldNumberOfSeriesRelatedInstance() < minimalValue) {
+                                minimalValue = level0Value.get(destination2).get(series).getOldNumberOfSeriesRelatedInstance();
+                            }
+                        }
+                    }
+                    if(level1Value.get(series).isSendUpload()) {
+                        newSeriesWebhookBuilder.isSent();
+                        newSeriesWebhookBuilder.addSeries(series);
+                    } else {
+                        newSeriesWebhookBuilder.isUpload();
+                        if (level1Value.get(series).isNewInDestination()) {
+                            newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances());
+                        } else {
+                            if (series.getNumberOfSeriesRelatedInstances() - minimalValue != 0) {
+                                newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - minimalValue);
+                            }
+                        }
+                    }
+                }
+
+                if (!newSeriesWebhookBuilder.getSeries().isEmpty()) {
+                    final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
+                    for (Webhook webhook : album.getWebhooksNewSeriesEnabled()) {
+                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
+                        newSeriesWebhookBuilder.getSeries().forEach(webhookTrigger::addSeries);
+                        em.persist(webhookTrigger);
+                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
+                    }
+                }
+            }
+
+
+
+
+            tx.commit();
+            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
+                webhookAsyncRequest.firstRequest();
+            }
+        } catch (Exception e) {
+            LOG.log(Level.WARNING,"", e);
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+            level0.remove(studyIn, source);
+        }
+
+
+
+
+    }
+
+    private void test(Study studyIn) {
         String log = "callWebhook:";
         log += level0StudyLevel.toString(studyIn);
         LOG.info(log);

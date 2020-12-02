@@ -57,6 +57,7 @@ public class NewSeriesWebhook implements WebhookResult{
         private StudyResponse updatedStudy;
         private String kheopInstance;
         private HashMap<Series, Integer> series = new HashMap<>();
+        private Boolean isAdmin;
 
         public Builder() { /*empty*/ }
 
@@ -72,11 +73,8 @@ public class NewSeriesWebhook implements WebhookResult{
             if (source == null) {
                 throw new IllegalStateException("source is null");
             }
-            if(source.getAlbumUser().isPresent()) {
-                sourceUser = new UserResponse(source.getAlbumUser().get());
-            } else {
-                sourceUser = new UserResponse(source.getUser());
-            }
+
+            sourceUser = new UserResponse(source.getUser());
             source.getCapabilityToken().ifPresent(sourceUser::setCapabilityToken);
             source.getReportProvider().ifPresent(reportProvider -> sourceUser.setReportProvider(reportProvider, WEBHOOK));
             return this;
@@ -84,6 +82,11 @@ public class NewSeriesWebhook implements WebhookResult{
 
         public Builder setSource(AlbumUser sourceUser) {
             this.sourceUser = new UserResponse(sourceUser);
+            return this;
+        }
+
+        public Builder isAdmin(Boolean isAdmin) {
+            this.isAdmin = isAdmin;
             return this;
         }
 
@@ -126,13 +129,16 @@ public class NewSeriesWebhook implements WebhookResult{
         }
 
         public Builder addSeries(Series series) {
-            this.series.put(series, series.getNumberOfSeriesRelatedInstances());
+            this.series.put(series, null);
             return this;
         }
 
         public Set<Series> getSeries() { return series.keySet(); }
 
         public NewSeriesWebhook build() {
+            if (isAdmin != null) {
+                sourceUser.setIsAdmin(isAdmin);
+            }
             series.forEach(updatedStudy::addSeries);
             return new NewSeriesWebhook(this);
         }

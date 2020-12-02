@@ -22,10 +22,6 @@ public class Source {
         this.reportProvider = Optional.of(reportProvider);
     }
 
-    public void setAlbumUser(AlbumUser albumUser) {
-        this.albumUser = Optional.of(albumUser);
-    }
-
     public void setCapabilityToken(Capability capabilityToken) {
         this.capabilityToken = Optional.of(capabilityToken);
     }
@@ -36,7 +32,6 @@ public class Source {
     public Optional<Capability> getCapabilityToken() {
         return capabilityToken;
     }
-    public Optional<AlbumUser> getAlbumUser() { return albumUser; }
 
     public User getUser() {
         return user;
