@@ -15,13 +15,13 @@ public class Level0 {
 
     Level0() { level0KeyLevel0ValueMap = new HashMap<>(); }
 
-    public void put (ScheduledFuture<?> scheduledFuture, Study study, Series series, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination, boolean isSend) {
+    public void put (ScheduledFuture<?> scheduledFuture, Study study, Series series, boolean isNewStudy, boolean isNewSeries, Integer numberOfNewInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination, boolean isSend) {
         final Level0Key level0Key = new Level0Key(study, source);
         if (level0KeyLevel0ValueMap.containsKey(level0Key)) {
             level0KeyLevel0ValueMap.get(level0Key).cancelScheduledFuture();
-            level0KeyLevel0ValueMap.get(level0Key).add(scheduledFuture, series, isNewStudy, isNewSeries, numberOfInstances, destination, isInbox, isNewInDestination, isSend);
+            level0KeyLevel0ValueMap.get(level0Key).add(scheduledFuture, series, isNewStudy, isNewSeries, numberOfNewInstances, destination, isInbox, isNewInDestination, isSend);
         } else {
-            final Level0Value level0Value = new Level0Value(scheduledFuture, series, isNewStudy, isNewSeries, numberOfInstances, destination, isInbox, isNewInDestination, isSend);
+            final Level0Value level0Value = new Level0Value(scheduledFuture, series, isNewStudy, isNewSeries, numberOfNewInstances, destination, isInbox, isNewInDestination, isSend);
             level0KeyLevel0ValueMap.put(level0Key, level0Value);
         }
     }

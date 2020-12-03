@@ -136,9 +136,12 @@ public abstract class Fetcher {
             tx.begin();
 
             final Series series = findSeriesBySeriesUID(seriesUID, em);
-            result.put(series, new FetchSeriesMetadata(!series.isPopulated(), wasNewStudy, series.getNumberOfSeriesRelatedInstances()));
+            final Integer oldValueNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
+            final boolean wasNewSeries = !series.isPopulated();
             series.mergeAttributes(attributes);
             series.setPopulated(true);
+
+            result.put(series, new FetchSeriesMetadata(wasNewSeries, wasNewStudy, series.getNumberOfSeriesRelatedInstances() - oldValueNumberOfSeriesRelatedInstances));
 
             tx.commit();
         } catch (Exception e) {

@@ -11,6 +11,6 @@ public interface FooHashMap {
     void addHashMapData(Study study, Series series,
                         Album destination, boolean isInbox,
                         boolean isNewStudy, boolean isNewSeries,
-                        Integer numberOfInstances, Source source,
+                        Integer numberOfNewInstances, Source source,
                         boolean isNewInDestination, boolean isSend);
 }

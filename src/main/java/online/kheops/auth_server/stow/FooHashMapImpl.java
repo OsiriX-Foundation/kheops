@@ -36,13 +36,13 @@ public class FooHashMapImpl implements FooHashMap {
 
     public FooHashMapImpl() { /*empty*/ }
 
-    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, Source source, boolean isNewInDestination, boolean isSend) {
-        scheduler.schedule(() -> addData(study, series, isNewStudy, isNewSeries, destination, isInbox, numberOfInstances, source, isNewInDestination, isSend), 0, TimeUnit.SECONDS);
+    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, boolean isNewStudy, boolean isNewSeries, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
+        scheduler.schedule(() -> addData(study, series, isNewStudy, isNewSeries, destination, isInbox, numberOfNewInstances, source, isNewInDestination, isSend), 0, TimeUnit.SECONDS);
     }
 
 
-    private void addData(Study study, Series series, boolean isNewStudy, boolean isNewSeries, Album destination, boolean isInbox, Integer numberOfInstances, Source source, boolean isNewInDestination, boolean isSend) {
-        level0.put(scheduler.schedule(() -> callWebhook(study, source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfInstances, source, destination, isInbox, isNewInDestination, isSend);
+    private void addData(Study study, Series series, boolean isNewStudy, boolean isNewSeries, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
+        level0.put(scheduler.schedule(() -> callWebhook(study, source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfNewInstances, source, destination, isInbox, isNewInDestination, isSend);
     }
 
     private void callWebhook(Study studyIn, Source source) {
@@ -83,12 +83,10 @@ public class FooHashMapImpl implements FooHashMap {
                     Series series = em.merge(s);
                     em.refresh(series);
 
-                    Integer minimalValue = Integer.MAX_VALUE;
+                    Integer nbNewInstances = 0;
                     for (Level1Key destination2 : level1Keys) {
                         if (level0Value.get(destination2).getSeries().contains(series)) {
-                            if(level0Value.get(destination2).get(series).getOldNumberOfSeriesRelatedInstance() < minimalValue) {
-                                minimalValue = level0Value.get(destination2).get(series).getOldNumberOfSeriesRelatedInstance();
-                            }
+                            nbNewInstances += level0Value.get(destination2).get(series).getNumberOfNewInstances();
                         }
                     }
                     //todo y'a-t-il des autres séries d'une autre destination
@@ -99,13 +97,13 @@ public class FooHashMapImpl implements FooHashMap {
                         newSeriesWebhookBuilder.isUpload();
                         if (level1Value.get(series).isNewInDestination()) {
                             newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances());
-                            if (series.getNumberOfSeriesRelatedInstances() - minimalValue != 0) {
-                                newUploadedSeries.putIfAbsent(series, series.getNumberOfSeriesRelatedInstances() - minimalValue);
+                            if (nbNewInstances != 0) {
+                                newUploadedSeries.putIfAbsent(series, nbNewInstances);
                             }
                         } else {
-                            if (series.getNumberOfSeriesRelatedInstances() - minimalValue != 0) {
-                                newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - minimalValue);
-                                newUploadedSeries.putIfAbsent(series, series.getNumberOfSeriesRelatedInstances() - minimalValue);
+                            if (nbNewInstances != 0) {
+                                newSeriesWebhookBuilder.addSeries(series, nbNewInstances);
+                                newUploadedSeries.putIfAbsent(series, nbNewInstances);
                             }
                         }
                     }
@@ -153,7 +151,7 @@ public class FooHashMapImpl implements FooHashMap {
 
 
 
-                tx.commit();
+            tx.commit();
             for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
                 webhookAsyncRequest.firstRequest();
             }

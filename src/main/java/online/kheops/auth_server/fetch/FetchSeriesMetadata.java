@@ -4,15 +4,15 @@ public class FetchSeriesMetadata {
 
     private boolean isNewSeries;
     private boolean isNewStudy;
-    private Integer oldNumberOfSeriesRelatedInstances;
+    private Integer numberOfNewInstances;
 
-    public FetchSeriesMetadata(boolean isNewSeries, boolean isNewStudy, Integer oldNumberOfSeriesRelatedInstances) {
+    public FetchSeriesMetadata(boolean isNewSeries, boolean isNewStudy, Integer numberOfNewInstances) {
         this.isNewSeries = isNewSeries;
         this.isNewStudy = isNewStudy;
-        this.oldNumberOfSeriesRelatedInstances = oldNumberOfSeriesRelatedInstances;
+        this.numberOfNewInstances = numberOfNewInstances;
     }
 
     public boolean isNewSeries() { return isNewSeries; }
     public boolean isNewStudy() { return isNewStudy; }
-    public Integer getOldNumberOfSeriesRelatedInstances() { return oldNumberOfSeriesRelatedInstances; }
+    public Integer getNumberOfNewInstances() { return numberOfNewInstances; }
 }

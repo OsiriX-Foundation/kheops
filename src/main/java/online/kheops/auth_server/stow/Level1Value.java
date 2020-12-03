@@ -11,19 +11,19 @@ public class Level1Value {
     private boolean inbox;
     private HashMap<Series, Level2Value> seriesLevel2ValueHashMap;
 
-    public Level1Value(Series series, boolean isNewStudy, boolean isNewSeries, Integer numberOfInstances, boolean isInbox, boolean isNewInDestination, boolean isSend) {
+    public Level1Value(Series series, boolean isNewStudy, boolean isNewSeries, Integer numberOfNewInstances, boolean isInbox, boolean isNewInDestination, boolean isSend) {
         this.newStudy = isNewStudy;
         this.inbox = isInbox;
         seriesLevel2ValueHashMap = new HashMap<>();
-        final Level2Value level2Value = new Level2Value(isNewSeries, numberOfInstances, isNewInDestination, isSend);
+        final Level2Value level2Value = new Level2Value(isNewSeries, numberOfNewInstances, isNewInDestination, isSend);
         seriesLevel2ValueHashMap.put(series, level2Value);
     }
 
-    public void add(Series series, boolean isNewSeries, Integer numberOfInstances, boolean isNewInDestination, boolean isSend) {
+    public void add(Series series, boolean isNewSeries, Integer numberOfNewInstances, boolean isNewInDestination, boolean isSend) {
         if (seriesLevel2ValueHashMap.containsKey(series)) {
-            seriesLevel2ValueHashMap.get(series).add(isNewSeries, numberOfInstances, isNewInDestination, isSend);
+            seriesLevel2ValueHashMap.get(series).add(isNewSeries, numberOfNewInstances, isNewInDestination, isSend);
         } else {
-            final Level2Value level2Value = new Level2Value(isNewSeries, numberOfInstances, isNewInDestination, isSend);
+            final Level2Value level2Value = new Level2Value(isNewSeries, numberOfNewInstances, isNewInDestination, isSend);
             seriesLevel2ValueHashMap.put(series, level2Value);
         }
     }

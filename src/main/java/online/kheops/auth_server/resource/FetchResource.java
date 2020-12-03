@@ -134,7 +134,7 @@ public class FetchResource {
                 final Series series = getSeries(seriesUID, em);
                 fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, albumId==null,
                         seriesNumberOfInstance.get(series).isNewStudy(), seriesNumberOfInstance.get(series).isNewSeries(),
-                        seriesNumberOfInstance.get(series).getOldNumberOfSeriesRelatedInstances(), source, false, false);
+                        seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
             }
 
             tx.commit();
