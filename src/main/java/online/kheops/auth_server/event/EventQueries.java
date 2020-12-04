@@ -5,12 +5,9 @@ import online.kheops.auth_server.entity.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import static online.kheops.auth_server.album.Albums.getAlbum;
 
 public class EventQueries {
 

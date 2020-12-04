@@ -3,7 +3,6 @@ package online.kheops.auth_server.webhook;
 import online.kheops.auth_server.entity.WebhookAttempt;
 
 import javax.xml.bind.annotation.XmlElement;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 

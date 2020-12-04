@@ -52,7 +52,7 @@ public abstract class Fetcher {
         seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
-    public static HashMap<Series, FetchSeriesMetadata> fetchStudy(String studyInstanceUID) {
+    public static Map<Series, FetchSeriesMetadata> fetchStudy(String studyInstanceUID) {
         final URI studyUri = studyUriBuilder.build(studyInstanceUID);
 
 
@@ -101,11 +101,11 @@ public abstract class Fetcher {
                 tx.rollback();
             }
             em.close();
-            return result;
         }
+        return result;
     }
 
-    private static HashMap<Series, FetchSeriesMetadata> fetchSeries(String studyUID, String seriesUID, EntityManager em) {
+    private static Map<Series, FetchSeriesMetadata> fetchSeries(String studyUID, String seriesUID, EntityManager em) {
         final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
@@ -135,7 +135,7 @@ public abstract class Fetcher {
             tx.begin();
 
             final Series series = findSeriesBySeriesUID(seriesUID, em);
-            final Integer oldValueNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
+            final int oldValueNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
             series.mergeAttributes(attributes);
             series.setPopulated(true);
 
@@ -148,8 +148,8 @@ public abstract class Fetcher {
             if (tx.isActive()) {
                 tx.rollback();
             }
-            return result;
         }
+        return result;
     }
 
     private static void logResponseProcessingException(ResponseProcessingException e, String studyUID) {

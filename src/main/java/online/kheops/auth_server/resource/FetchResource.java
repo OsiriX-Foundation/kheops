@@ -26,8 +26,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
@@ -78,7 +78,7 @@ public class FetchResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
 
-        final HashMap<Series, FetchSeriesMetadata> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
+        final Map<Series, FetchSeriesMetadata> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
         for (String seriesInstanceUID: seriesInstanceUIDList) {
             ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                     .study(studyInstanceUID)
