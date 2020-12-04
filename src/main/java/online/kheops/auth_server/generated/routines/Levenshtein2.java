@@ -10,6 +10,7 @@ import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
 import org.jooq.impl.Internal;
+import org.jooq.impl.SQLDataType;
 
 
 /**
@@ -18,43 +19,43 @@ import org.jooq.impl.Internal;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Levenshtein2 extends AbstractRoutine<Integer> {
 
-    private static final long serialVersionUID = -157896069;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The parameter <code>public.levenshtein.RETURN_VALUE</code>.
      */
-    public static final Parameter<Integer> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", org.jooq.impl.SQLDataType.INTEGER, false, false);
+    public static final Parameter<Integer> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.INTEGER, false, false);
 
     /**
      * The parameter <code>public.levenshtein._1</code>.
      */
-    public static final Parameter<String> _1 = Internal.createParameter("_1", org.jooq.impl.SQLDataType.CLOB, false, true);
+    public static final Parameter<String> _1 = Internal.createParameter("_1", SQLDataType.CLOB, false, true);
 
     /**
      * The parameter <code>public.levenshtein._2</code>.
      */
-    public static final Parameter<String> _2 = Internal.createParameter("_2", org.jooq.impl.SQLDataType.CLOB, false, true);
+    public static final Parameter<String> _2 = Internal.createParameter("_2", SQLDataType.CLOB, false, true);
 
     /**
      * The parameter <code>public.levenshtein._3</code>.
      */
-    public static final Parameter<Integer> _3 = Internal.createParameter("_3", org.jooq.impl.SQLDataType.INTEGER, false, true);
+    public static final Parameter<Integer> _3 = Internal.createParameter("_3", SQLDataType.INTEGER, false, true);
 
     /**
      * The parameter <code>public.levenshtein._4</code>.
      */
-    public static final Parameter<Integer> _4 = Internal.createParameter("_4", org.jooq.impl.SQLDataType.INTEGER, false, true);
+    public static final Parameter<Integer> _4 = Internal.createParameter("_4", SQLDataType.INTEGER, false, true);
 
     /**
      * The parameter <code>public.levenshtein._5</code>.
      */
-    public static final Parameter<Integer> _5 = Internal.createParameter("_5", org.jooq.impl.SQLDataType.INTEGER, false, true);
+    public static final Parameter<Integer> _5 = Internal.createParameter("_5", SQLDataType.INTEGER, false, true);
 
     /**
      * Create a new routine call instance
      */
     public Levenshtein2() {
-        super("levenshtein", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER);
+        super("levenshtein", Public.PUBLIC, SQLDataType.INTEGER);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

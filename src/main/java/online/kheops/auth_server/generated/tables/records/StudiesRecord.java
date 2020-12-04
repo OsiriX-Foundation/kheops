@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class StudiesRecord extends UpdatableRecordImpl<StudiesRecord> implements Record16<Long, LocalDateTime, LocalDateTime, String, String, String, String, String, String, String, String, String, String, String, String, Boolean> {
 
-    private static final long serialVersionUID = -1792916906;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.studies.pk</code>.
@@ -644,21 +644,21 @@ public class StudiesRecord extends UpdatableRecordImpl<StudiesRecord> implements
     public StudiesRecord(Long pk, LocalDateTime createdTime, LocalDateTime updatedTime, String studyUid, String studyDate, String studyTime, String studyDescription, String timezoneOffsetFromUtc, String accessionNumber, String referringPhysicianName, String patientName, String patientId, String patientBirthDate, String patientSex, String studyId, Boolean populated) {
         super(Studies.STUDIES);
 
-        set(0, pk);
-        set(1, createdTime);
-        set(2, updatedTime);
-        set(3, studyUid);
-        set(4, studyDate);
-        set(5, studyTime);
-        set(6, studyDescription);
-        set(7, timezoneOffsetFromUtc);
-        set(8, accessionNumber);
-        set(9, referringPhysicianName);
-        set(10, patientName);
-        set(11, patientId);
-        set(12, patientBirthDate);
-        set(13, patientSex);
-        set(14, studyId);
-        set(15, populated);
+        setPk(pk);
+        setCreatedTime(createdTime);
+        setUpdatedTime(updatedTime);
+        setStudyUid(studyUid);
+        setStudyDate(studyDate);
+        setStudyTime(studyTime);
+        setStudyDescription(studyDescription);
+        setTimezoneOffsetFromUtc(timezoneOffsetFromUtc);
+        setAccessionNumber(accessionNumber);
+        setReferringPhysicianName(referringPhysicianName);
+        setPatientName(patientName);
+        setPatientId(patientId);
+        setPatientBirthDate(patientBirthDate);
+        setPatientSex(patientSex);
+        setStudyId(studyId);
+        setPopulated(populated);
     }
 }

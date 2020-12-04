@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumUserRecord extends UpdatableRecordImpl<AlbumUserRecord> implements Record7<Long, Long, Long, Boolean, Boolean, Boolean, Boolean> {
 
-    private static final long serialVersionUID = 74608482;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.album_user.pk</code>.
@@ -318,12 +318,12 @@ public class AlbumUserRecord extends UpdatableRecordImpl<AlbumUserRecord> implem
     public AlbumUserRecord(Long pk, Long albumFk, Long userFk, Boolean admin, Boolean newSeriesNotifications, Boolean newCommentNotifications, Boolean favorite) {
         super(AlbumUser.ALBUM_USER);
 
-        set(0, pk);
-        set(1, albumFk);
-        set(2, userFk);
-        set(3, admin);
-        set(4, newSeriesNotifications);
-        set(5, newCommentNotifications);
-        set(6, favorite);
+        setPk(pk);
+        setAlbumFk(albumFk);
+        setUserFk(userFk);
+        setAdmin(admin);
+        setNewSeriesNotifications(newSeriesNotifications);
+        setNewCommentNotifications(newCommentNotifications);
+        setFavorite(favorite);
     }
 }

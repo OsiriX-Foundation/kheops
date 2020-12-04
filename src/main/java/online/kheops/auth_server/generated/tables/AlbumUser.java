@@ -25,6 +25,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -34,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumUser extends TableImpl<AlbumUserRecord> {
 
-    private static final long serialVersionUID = 1678704917;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.album_user</code>
@@ -52,43 +53,44 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
     /**
      * The column <code>public.album_user.pk</code>.
      */
-    public final TableField<AlbumUserRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<AlbumUserRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.album_user.album_fk</code>.
      */
-    public final TableField<AlbumUserRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.album_user.user_fk</code>.
      */
-    public final TableField<AlbumUserRecord, Long> USER_FK = createField(DSL.name("user_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Long> USER_FK = createField(DSL.name("user_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.album_user.admin</code>.
      */
-    public final TableField<AlbumUserRecord, Boolean> ADMIN = createField(DSL.name("admin"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> ADMIN = createField(DSL.name("admin"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.album_user.new_series_notifications</code>.
      */
-    public final TableField<AlbumUserRecord, Boolean> NEW_SERIES_NOTIFICATIONS = createField(DSL.name("new_series_notifications"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> NEW_SERIES_NOTIFICATIONS = createField(DSL.name("new_series_notifications"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.album_user.new_comment_notifications</code>.
      */
-    public final TableField<AlbumUserRecord, Boolean> NEW_COMMENT_NOTIFICATIONS = createField(DSL.name("new_comment_notifications"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> NEW_COMMENT_NOTIFICATIONS = createField(DSL.name("new_comment_notifications"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.album_user.favorite</code>.
      */
-    public final TableField<AlbumUserRecord, Boolean> FAVORITE = createField(DSL.name("favorite"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumUserRecord, Boolean> FAVORITE = createField(DSL.name("favorite"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
-    /**
-     * Create a <code>public.album_user</code> table reference
-     */
-    public AlbumUser() {
-        this(DSL.name("album_user"), null);
+    private AlbumUser(Name alias, Table<AlbumUserRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private AlbumUser(Name alias, Table<AlbumUserRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -105,12 +107,11 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
         this(alias, ALBUM_USER);
     }
 
-    private AlbumUser(Name alias, Table<AlbumUserRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private AlbumUser(Name alias, Table<AlbumUserRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.album_user</code> table reference
+     */
+    public AlbumUser() {
+        this(DSL.name("album_user"), null);
     }
 
     public <O extends Record> AlbumUser(Table<O> child, ForeignKey<O, AlbumUserRecord> key) {
@@ -129,7 +130,7 @@ public class AlbumUser extends TableImpl<AlbumUserRecord> {
 
     @Override
     public Identity<AlbumUserRecord, Long> getIdentity() {
-        return Keys.IDENTITY_ALBUM_USER;
+        return (Identity<AlbumUserRecord, Long>) super.getIdentity();
     }
 
     @Override

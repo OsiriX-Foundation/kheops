@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implements Record13<Long, String, String, String, Boolean, LocalDateTime, Long, String, Boolean, Boolean, Long, Boolean, Boolean> {
 
-    private static final long serialVersionUID = -331983080;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.webhooks.pk</code>.
@@ -536,18 +536,18 @@ public class WebhooksRecord extends UpdatableRecordImpl<WebhooksRecord> implemen
     public WebhooksRecord(Long pk, String id, String name, String url, Boolean enabled, LocalDateTime creationTime, Long userFk, String secret, Boolean newSeries, Boolean newUser, Long albumFk, Boolean removeSeries, Boolean deleteAlbum) {
         super(Webhooks.WEBHOOKS);
 
-        set(0, pk);
-        set(1, id);
-        set(2, name);
-        set(3, url);
-        set(4, enabled);
-        set(5, creationTime);
-        set(6, userFk);
-        set(7, secret);
-        set(8, newSeries);
-        set(9, newUser);
-        set(10, albumFk);
-        set(11, removeSeries);
-        set(12, deleteAlbum);
+        setPk(pk);
+        setId(id);
+        setName(name);
+        setUrl(url);
+        setEnabled(enabled);
+        setCreationTime(creationTime);
+        setUserFk(userFk);
+        setSecret(secret);
+        setNewSeries(newSeries);
+        setNewUser(newUser);
+        setAlbumFk(albumFk);
+        setRemoveSeries(removeSeries);
+        setDeleteAlbum(deleteAlbum);
     }
 }

@@ -25,6 +25,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -34,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
 
-    private static final long serialVersionUID = -1939058258;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.webhook_triggers</code>
@@ -52,48 +53,49 @@ public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
     /**
      * The column <code>public.webhook_triggers.pk</code>.
      */
-    public final TableField<WebhookTriggersRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<WebhookTriggersRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.webhook_triggers.id</code>.
      */
-    public final TableField<WebhookTriggersRecord, String> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.VARCHAR(30).nullable(false), this, "");
+    public final TableField<WebhookTriggersRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(30).nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_triggers.webhook_fk</code>.
      */
-    public final TableField<WebhookTriggersRecord, Long> WEBHOOK_FK = createField(DSL.name("webhook_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhookTriggersRecord, Long> WEBHOOK_FK = createField(DSL.name("webhook_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_triggers.is_manual_trigger</code>.
      */
-    public final TableField<WebhookTriggersRecord, Boolean> IS_MANUAL_TRIGGER = createField(DSL.name("is_manual_trigger"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<WebhookTriggersRecord, Boolean> IS_MANUAL_TRIGGER = createField(DSL.name("is_manual_trigger"), SQLDataType.BOOLEAN, this, "");
 
     /**
      * The column <code>public.webhook_triggers.new_series</code>.
      */
-    public final TableField<WebhookTriggersRecord, Boolean> NEW_SERIES = createField(DSL.name("new_series"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<WebhookTriggersRecord, Boolean> NEW_SERIES = createField(DSL.name("new_series"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_triggers.new_user</code>.
      */
-    public final TableField<WebhookTriggersRecord, Boolean> NEW_USER = createField(DSL.name("new_user"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<WebhookTriggersRecord, Boolean> NEW_USER = createField(DSL.name("new_user"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_triggers.user_fk</code>.
      */
-    public final TableField<WebhookTriggersRecord, Long> USER_FK = createField(DSL.name("user_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<WebhookTriggersRecord, Long> USER_FK = createField(DSL.name("user_fk"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.webhook_triggers.remove_series</code>.
      */
-    public final TableField<WebhookTriggersRecord, Boolean> REMOVE_SERIES = createField(DSL.name("remove_series"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("false", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+    public final TableField<WebhookTriggersRecord, Boolean> REMOVE_SERIES = createField(DSL.name("remove_series"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
 
-    /**
-     * Create a <code>public.webhook_triggers</code> table reference
-     */
-    public WebhookTriggers() {
-        this(DSL.name("webhook_triggers"), null);
+    private WebhookTriggers(Name alias, Table<WebhookTriggersRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private WebhookTriggers(Name alias, Table<WebhookTriggersRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -110,12 +112,11 @@ public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
         this(alias, WEBHOOK_TRIGGERS);
     }
 
-    private WebhookTriggers(Name alias, Table<WebhookTriggersRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private WebhookTriggers(Name alias, Table<WebhookTriggersRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.webhook_triggers</code> table reference
+     */
+    public WebhookTriggers() {
+        this(DSL.name("webhook_triggers"), null);
     }
 
     public <O extends Record> WebhookTriggers(Table<O> child, ForeignKey<O, WebhookTriggersRecord> key) {
@@ -134,7 +135,7 @@ public class WebhookTriggers extends TableImpl<WebhookTriggersRecord> {
 
     @Override
     public Identity<WebhookTriggersRecord, Long> getIdentity() {
-        return Keys.IDENTITY_WEBHOOK_TRIGGERS;
+        return (Identity<WebhookTriggersRecord, Long>) super.getIdentity();
     }
 
     @Override

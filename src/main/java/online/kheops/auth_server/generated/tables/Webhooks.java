@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Webhooks extends TableImpl<WebhooksRecord> {
 
-    private static final long serialVersionUID = 720562730;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.webhooks</code>
@@ -53,73 +54,74 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
     /**
      * The column <code>public.webhooks.pk</code>.
      */
-    public final TableField<WebhooksRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<WebhooksRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.webhooks.id</code>.
      */
-    public final TableField<WebhooksRecord, String> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.VARCHAR(30).nullable(false), this, "");
+    public final TableField<WebhooksRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(30).nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.name</code>.
      */
-    public final TableField<WebhooksRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<WebhooksRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.url</code>.
      */
-    public final TableField<WebhooksRecord, String> URL = createField(DSL.name("url"), org.jooq.impl.SQLDataType.VARCHAR(1024).nullable(false), this, "");
+    public final TableField<WebhooksRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(1024).nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.enabled</code>.
      */
-    public final TableField<WebhooksRecord, Boolean> ENABLED = createField(DSL.name("enabled"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<WebhooksRecord, Boolean> ENABLED = createField(DSL.name("enabled"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.creation_time</code>.
      */
-    public final TableField<WebhooksRecord, LocalDateTime> CREATION_TIME = createField(DSL.name("creation_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<WebhooksRecord, LocalDateTime> CREATION_TIME = createField(DSL.name("creation_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.user_fk</code>.
      */
-    public final TableField<WebhooksRecord, Long> USER_FK = createField(DSL.name("user_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhooksRecord, Long> USER_FK = createField(DSL.name("user_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.secret</code>.
      */
-    public final TableField<WebhooksRecord, String> SECRET = createField(DSL.name("secret"), org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
+    public final TableField<WebhooksRecord, String> SECRET = createField(DSL.name("secret"), SQLDataType.VARCHAR(1024), this, "");
 
     /**
      * The column <code>public.webhooks.new_series</code>.
      */
-    public final TableField<WebhooksRecord, Boolean> NEW_SERIES = createField(DSL.name("new_series"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<WebhooksRecord, Boolean> NEW_SERIES = createField(DSL.name("new_series"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.new_user</code>.
      */
-    public final TableField<WebhooksRecord, Boolean> NEW_USER = createField(DSL.name("new_user"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<WebhooksRecord, Boolean> NEW_USER = createField(DSL.name("new_user"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.album_fk</code>.
      */
-    public final TableField<WebhooksRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhooksRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.webhooks.remove_series</code>.
      */
-    public final TableField<WebhooksRecord, Boolean> REMOVE_SERIES = createField(DSL.name("remove_series"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("false", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+    public final TableField<WebhooksRecord, Boolean> REMOVE_SERIES = createField(DSL.name("remove_series"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
 
     /**
      * The column <code>public.webhooks.delete_album</code>.
      */
-    public final TableField<WebhooksRecord, Boolean> DELETE_ALBUM = createField(DSL.name("delete_album"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("false", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+    public final TableField<WebhooksRecord, Boolean> DELETE_ALBUM = createField(DSL.name("delete_album"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field("false", SQLDataType.BOOLEAN)), this, "");
 
-    /**
-     * Create a <code>public.webhooks</code> table reference
-     */
-    public Webhooks() {
-        this(DSL.name("webhooks"), null);
+    private Webhooks(Name alias, Table<WebhooksRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Webhooks(Name alias, Table<WebhooksRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -136,12 +138,11 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
         this(alias, WEBHOOKS);
     }
 
-    private Webhooks(Name alias, Table<WebhooksRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Webhooks(Name alias, Table<WebhooksRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.webhooks</code> table reference
+     */
+    public Webhooks() {
+        this(DSL.name("webhooks"), null);
     }
 
     public <O extends Record> Webhooks(Table<O> child, ForeignKey<O, WebhooksRecord> key) {
@@ -160,7 +161,7 @@ public class Webhooks extends TableImpl<WebhooksRecord> {
 
     @Override
     public Identity<WebhooksRecord, Long> getIdentity() {
-        return Keys.IDENTITY_WEBHOOKS;
+        return (Identity<WebhooksRecord, Long>) super.getIdentity();
     }
 
     @Override

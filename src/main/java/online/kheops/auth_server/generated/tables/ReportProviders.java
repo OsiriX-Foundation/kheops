@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReportProviders extends TableImpl<ReportProvidersRecord> {
 
-    private static final long serialVersionUID = 2023287857;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.report_providers</code>
@@ -53,43 +54,44 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
     /**
      * The column <code>public.report_providers.pk</code>.
      */
-    public final TableField<ReportProvidersRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<ReportProvidersRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.report_providers.album_fk</code>.
      */
-    public final TableField<ReportProvidersRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<ReportProvidersRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.creation_time</code>.
      */
-    public final TableField<ReportProvidersRecord, LocalDateTime> CREATION_TIME = createField(DSL.name("creation_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<ReportProvidersRecord, LocalDateTime> CREATION_TIME = createField(DSL.name("creation_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.name</code>.
      */
-    public final TableField<ReportProvidersRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(1024).nullable(false), this, "");
+    public final TableField<ReportProvidersRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(1024).nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.url</code>.
      */
-    public final TableField<ReportProvidersRecord, String> URL = createField(DSL.name("url"), org.jooq.impl.SQLDataType.VARCHAR(1024).nullable(false), this, "");
+    public final TableField<ReportProvidersRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(1024).nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.client_id</code>.
      */
-    public final TableField<ReportProvidersRecord, String> CLIENT_ID = createField(DSL.name("client_id"), org.jooq.impl.SQLDataType.VARCHAR(64).nullable(false), this, "");
+    public final TableField<ReportProvidersRecord, String> CLIENT_ID = createField(DSL.name("client_id"), SQLDataType.VARCHAR(64).nullable(false), this, "");
 
     /**
      * The column <code>public.report_providers.removed</code>.
      */
-    public final TableField<ReportProvidersRecord, Boolean> REMOVED = createField(DSL.name("removed"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<ReportProvidersRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
-    /**
-     * Create a <code>public.report_providers</code> table reference
-     */
-    public ReportProviders() {
-        this(DSL.name("report_providers"), null);
+    private ReportProviders(Name alias, Table<ReportProvidersRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private ReportProviders(Name alias, Table<ReportProvidersRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -106,12 +108,11 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
         this(alias, REPORT_PROVIDERS);
     }
 
-    private ReportProviders(Name alias, Table<ReportProvidersRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private ReportProviders(Name alias, Table<ReportProvidersRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.report_providers</code> table reference
+     */
+    public ReportProviders() {
+        this(DSL.name("report_providers"), null);
     }
 
     public <O extends Record> ReportProviders(Table<O> child, ForeignKey<O, ReportProvidersRecord> key) {
@@ -130,7 +131,7 @@ public class ReportProviders extends TableImpl<ReportProvidersRecord> {
 
     @Override
     public Identity<ReportProvidersRecord, Long> getIdentity() {
-        return Keys.IDENTITY_REPORT_PROVIDERS;
+        return (Identity<ReportProvidersRecord, Long>) super.getIdentity();
     }
 
     @Override

@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumsRecord extends UpdatableRecordImpl<AlbumsRecord> implements Record12<Long, String, String, String, LocalDateTime, LocalDateTime, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean> {
 
-    private static final long serialVersionUID = -634426587;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.albums.pk</code>.
@@ -500,17 +500,17 @@ public class AlbumsRecord extends UpdatableRecordImpl<AlbumsRecord> implements R
     public AlbumsRecord(Long pk, String id, String name, String description, LocalDateTime createdTime, LocalDateTime lastEventTime, Boolean addUserPermission, Boolean downloadSeriesPermission, Boolean sendSeriesPermission, Boolean deleteSeriesPermission, Boolean addSeriesPermission, Boolean writeCommentsPermission) {
         super(Albums.ALBUMS);
 
-        set(0, pk);
-        set(1, id);
-        set(2, name);
-        set(3, description);
-        set(4, createdTime);
-        set(5, lastEventTime);
-        set(6, addUserPermission);
-        set(7, downloadSeriesPermission);
-        set(8, sendSeriesPermission);
-        set(9, deleteSeriesPermission);
-        set(10, addSeriesPermission);
-        set(11, writeCommentsPermission);
+        setPk(pk);
+        setId(id);
+        setName(name);
+        setDescription(description);
+        setCreatedTime(createdTime);
+        setLastEventTime(lastEventTime);
+        setAddUserPermission(addUserPermission);
+        setDownloadSeriesPermission(downloadSeriesPermission);
+        setSendSeriesPermission(sendSeriesPermission);
+        setDeleteSeriesPermission(deleteSeriesPermission);
+        setAddSeriesPermission(addSeriesPermission);
+        setWriteCommentsPermission(writeCommentsPermission);
     }
 }

@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Albums extends TableImpl<AlbumsRecord> {
 
-    private static final long serialVersionUID = -652304788;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.albums</code>
@@ -53,68 +54,69 @@ public class Albums extends TableImpl<AlbumsRecord> {
     /**
      * The column <code>public.albums.pk</code>.
      */
-    public final TableField<AlbumsRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<AlbumsRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.albums.id</code>.
      */
-    public final TableField<AlbumsRecord, String> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<AlbumsRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.albums.name</code>.
      */
-    public final TableField<AlbumsRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<AlbumsRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.albums.description</code>.
      */
-    public final TableField<AlbumsRecord, String> DESCRIPTION = createField(DSL.name("description"), org.jooq.impl.SQLDataType.VARCHAR(2048), this, "");
+    public final TableField<AlbumsRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.VARCHAR(2048), this, "");
 
     /**
      * The column <code>public.albums.created_time</code>.
      */
-    public final TableField<AlbumsRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<AlbumsRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.albums.last_event_time</code>.
      */
-    public final TableField<AlbumsRecord, LocalDateTime> LAST_EVENT_TIME = createField(DSL.name("last_event_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<AlbumsRecord, LocalDateTime> LAST_EVENT_TIME = createField(DSL.name("last_event_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.albums.add_user_permission</code>.
      */
-    public final TableField<AlbumsRecord, Boolean> ADD_USER_PERMISSION = createField(DSL.name("add_user_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumsRecord, Boolean> ADD_USER_PERMISSION = createField(DSL.name("add_user_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.albums.download_series_permission</code>.
      */
-    public final TableField<AlbumsRecord, Boolean> DOWNLOAD_SERIES_PERMISSION = createField(DSL.name("download_series_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumsRecord, Boolean> DOWNLOAD_SERIES_PERMISSION = createField(DSL.name("download_series_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.albums.send_series_permission</code>.
      */
-    public final TableField<AlbumsRecord, Boolean> SEND_SERIES_PERMISSION = createField(DSL.name("send_series_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumsRecord, Boolean> SEND_SERIES_PERMISSION = createField(DSL.name("send_series_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.albums.delete_series_permission</code>.
      */
-    public final TableField<AlbumsRecord, Boolean> DELETE_SERIES_PERMISSION = createField(DSL.name("delete_series_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumsRecord, Boolean> DELETE_SERIES_PERMISSION = createField(DSL.name("delete_series_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.albums.add_series_permission</code>.
      */
-    public final TableField<AlbumsRecord, Boolean> ADD_SERIES_PERMISSION = createField(DSL.name("add_series_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumsRecord, Boolean> ADD_SERIES_PERMISSION = createField(DSL.name("add_series_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.albums.write_comments_permission</code>.
      */
-    public final TableField<AlbumsRecord, Boolean> WRITE_COMMENTS_PERMISSION = createField(DSL.name("write_comments_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumsRecord, Boolean> WRITE_COMMENTS_PERMISSION = createField(DSL.name("write_comments_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
-    /**
-     * Create a <code>public.albums</code> table reference
-     */
-    public Albums() {
-        this(DSL.name("albums"), null);
+    private Albums(Name alias, Table<AlbumsRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Albums(Name alias, Table<AlbumsRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -131,12 +133,11 @@ public class Albums extends TableImpl<AlbumsRecord> {
         this(alias, ALBUMS);
     }
 
-    private Albums(Name alias, Table<AlbumsRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Albums(Name alias, Table<AlbumsRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.albums</code> table reference
+     */
+    public Albums() {
+        this(DSL.name("albums"), null);
     }
 
     public <O extends Record> Albums(Table<O> child, ForeignKey<O, AlbumsRecord> key) {
@@ -155,7 +156,7 @@ public class Albums extends TableImpl<AlbumsRecord> {
 
     @Override
     public Identity<AlbumsRecord, Long> getIdentity() {
-        return Keys.IDENTITY_ALBUMS;
+        return (Identity<AlbumsRecord, Long>) super.getIdentity();
     }
 
     @Override

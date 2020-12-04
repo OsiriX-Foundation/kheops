@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Events extends TableImpl<EventsRecord> {
 
-    private static final long serialVersionUID = -1983157479;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.events</code>
@@ -53,68 +54,69 @@ public class Events extends TableImpl<EventsRecord> {
     /**
      * The column <code>public.events.pk</code>.
      */
-    public final TableField<EventsRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<EventsRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.events.event_type</code>.
      */
-    public final TableField<EventsRecord, String> EVENT_TYPE = createField(DSL.name("event_type"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<EventsRecord, String> EVENT_TYPE = createField(DSL.name("event_type"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.events.album_fk</code>.
      */
-    public final TableField<EventsRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<EventsRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.events.study_fk</code>.
      */
-    public final TableField<EventsRecord, Long> STUDY_FK = createField(DSL.name("study_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<EventsRecord, Long> STUDY_FK = createField(DSL.name("study_fk"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.events.event_time</code>.
      */
-    public final TableField<EventsRecord, LocalDateTime> EVENT_TIME = createField(DSL.name("event_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<EventsRecord, LocalDateTime> EVENT_TIME = createField(DSL.name("event_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.events.user_fk</code>.
      */
-    public final TableField<EventsRecord, Long> USER_FK = createField(DSL.name("user_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<EventsRecord, Long> USER_FK = createField(DSL.name("user_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.events.capability_fk</code>.
      */
-    public final TableField<EventsRecord, Long> CAPABILITY_FK = createField(DSL.name("capability_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<EventsRecord, Long> CAPABILITY_FK = createField(DSL.name("capability_fk"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.events.private_target_user_fk</code>.
      */
-    public final TableField<EventsRecord, Long> PRIVATE_TARGET_USER_FK = createField(DSL.name("private_target_user_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<EventsRecord, Long> PRIVATE_TARGET_USER_FK = createField(DSL.name("private_target_user_fk"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.events.comment</code>.
      */
-    public final TableField<EventsRecord, String> COMMENT = createField(DSL.name("comment"), org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
+    public final TableField<EventsRecord, String> COMMENT = createField(DSL.name("comment"), SQLDataType.VARCHAR(1024), this, "");
 
     /**
      * The column <code>public.events.mutation_type</code>.
      */
-    public final TableField<EventsRecord, String> MUTATION_TYPE = createField(DSL.name("mutation_type"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<EventsRecord, String> MUTATION_TYPE = createField(DSL.name("mutation_type"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.events.to_user_fk</code>.
      */
-    public final TableField<EventsRecord, Long> TO_USER_FK = createField(DSL.name("to_user_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<EventsRecord, Long> TO_USER_FK = createField(DSL.name("to_user_fk"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.events.report_provider_fk</code>.
      */
-    public final TableField<EventsRecord, Long> REPORT_PROVIDER_FK = createField(DSL.name("report_provider_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<EventsRecord, Long> REPORT_PROVIDER_FK = createField(DSL.name("report_provider_fk"), SQLDataType.BIGINT, this, "");
 
-    /**
-     * Create a <code>public.events</code> table reference
-     */
-    public Events() {
-        this(DSL.name("events"), null);
+    private Events(Name alias, Table<EventsRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Events(Name alias, Table<EventsRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -131,12 +133,11 @@ public class Events extends TableImpl<EventsRecord> {
         this(alias, EVENTS);
     }
 
-    private Events(Name alias, Table<EventsRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Events(Name alias, Table<EventsRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.events</code> table reference
+     */
+    public Events() {
+        this(DSL.name("events"), null);
     }
 
     public <O extends Record> Events(Table<O> child, ForeignKey<O, EventsRecord> key) {
@@ -155,7 +156,7 @@ public class Events extends TableImpl<EventsRecord> {
 
     @Override
     public Identity<EventsRecord, Long> getIdentity() {
-        return Keys.IDENTITY_EVENTS;
+        return (Identity<EventsRecord, Long>) super.getIdentity();
     }
 
     @Override

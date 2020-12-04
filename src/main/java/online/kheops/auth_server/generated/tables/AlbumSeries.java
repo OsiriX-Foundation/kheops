@@ -25,6 +25,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -34,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
-    private static final long serialVersionUID = -1469152187;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.album_series</code>
@@ -52,28 +53,29 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
     /**
      * The column <code>public.album_series.pk</code>.
      */
-    public final TableField<AlbumSeriesRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<AlbumSeriesRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.album_series.album_fk</code>.
      */
-    public final TableField<AlbumSeriesRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<AlbumSeriesRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.album_series.series_fk</code>.
      */
-    public final TableField<AlbumSeriesRecord, Long> SERIES_FK = createField(DSL.name("series_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<AlbumSeriesRecord, Long> SERIES_FK = createField(DSL.name("series_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.album_series.favorite</code>.
      */
-    public final TableField<AlbumSeriesRecord, Boolean> FAVORITE = createField(DSL.name("favorite"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<AlbumSeriesRecord, Boolean> FAVORITE = createField(DSL.name("favorite"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
-    /**
-     * Create a <code>public.album_series</code> table reference
-     */
-    public AlbumSeries() {
-        this(DSL.name("album_series"), null);
+    private AlbumSeries(Name alias, Table<AlbumSeriesRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private AlbumSeries(Name alias, Table<AlbumSeriesRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -90,12 +92,11 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
         this(alias, ALBUM_SERIES);
     }
 
-    private AlbumSeries(Name alias, Table<AlbumSeriesRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private AlbumSeries(Name alias, Table<AlbumSeriesRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.album_series</code> table reference
+     */
+    public AlbumSeries() {
+        this(DSL.name("album_series"), null);
     }
 
     public <O extends Record> AlbumSeries(Table<O> child, ForeignKey<O, AlbumSeriesRecord> key) {
@@ -114,7 +115,7 @@ public class AlbumSeries extends TableImpl<AlbumSeriesRecord> {
 
     @Override
     public Identity<AlbumSeriesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_ALBUM_SERIES;
+        return (Identity<AlbumSeriesRecord, Long>) super.getIdentity();
     }
 
     @Override

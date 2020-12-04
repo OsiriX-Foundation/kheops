@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookAttemptsRecord extends UpdatableRecordImpl<WebhookAttemptsRecord> implements Record5<Long, Long, LocalDateTime, Long, Long> {
 
-    private static final long serialVersionUID = -1826008728;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.webhook_attempts.pk</code>.
@@ -248,10 +248,10 @@ public class WebhookAttemptsRecord extends UpdatableRecordImpl<WebhookAttemptsRe
     public WebhookAttemptsRecord(Long pk, Long status, LocalDateTime time, Long webhookTriggerFk, Long attempt) {
         super(WebhookAttempts.WEBHOOK_ATTEMPTS);
 
-        set(0, pk);
-        set(1, status);
-        set(2, time);
-        set(3, webhookTriggerFk);
-        set(4, attempt);
+        setPk(pk);
+        setStatus(status);
+        setTime(time);
+        setWebhookTriggerFk(webhookTriggerFk);
+        setAttempt(attempt);
     }
 }

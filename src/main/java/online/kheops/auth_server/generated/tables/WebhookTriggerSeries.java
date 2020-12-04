@@ -25,6 +25,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -34,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookTriggerSeries extends TableImpl<WebhookTriggerSeriesRecord> {
 
-    private static final long serialVersionUID = -1825934220;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.webhook_trigger_series</code>
@@ -52,23 +53,24 @@ public class WebhookTriggerSeries extends TableImpl<WebhookTriggerSeriesRecord> 
     /**
      * The column <code>public.webhook_trigger_series.pk</code>.
      */
-    public final TableField<WebhookTriggerSeriesRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<WebhookTriggerSeriesRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.webhook_trigger_series.webhook_trigger_fk</code>.
      */
-    public final TableField<WebhookTriggerSeriesRecord, Long> WEBHOOK_TRIGGER_FK = createField(DSL.name("webhook_trigger_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhookTriggerSeriesRecord, Long> WEBHOOK_TRIGGER_FK = createField(DSL.name("webhook_trigger_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_trigger_series.series_fk</code>.
      */
-    public final TableField<WebhookTriggerSeriesRecord, Long> SERIES_FK = createField(DSL.name("series_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhookTriggerSeriesRecord, Long> SERIES_FK = createField(DSL.name("series_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
-    /**
-     * Create a <code>public.webhook_trigger_series</code> table reference
-     */
-    public WebhookTriggerSeries() {
-        this(DSL.name("webhook_trigger_series"), null);
+    private WebhookTriggerSeries(Name alias, Table<WebhookTriggerSeriesRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private WebhookTriggerSeries(Name alias, Table<WebhookTriggerSeriesRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -85,12 +87,11 @@ public class WebhookTriggerSeries extends TableImpl<WebhookTriggerSeriesRecord> 
         this(alias, WEBHOOK_TRIGGER_SERIES);
     }
 
-    private WebhookTriggerSeries(Name alias, Table<WebhookTriggerSeriesRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private WebhookTriggerSeries(Name alias, Table<WebhookTriggerSeriesRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.webhook_trigger_series</code> table reference
+     */
+    public WebhookTriggerSeries() {
+        this(DSL.name("webhook_trigger_series"), null);
     }
 
     public <O extends Record> WebhookTriggerSeries(Table<O> child, ForeignKey<O, WebhookTriggerSeriesRecord> key) {
@@ -109,7 +110,7 @@ public class WebhookTriggerSeries extends TableImpl<WebhookTriggerSeriesRecord> 
 
     @Override
     public Identity<WebhookTriggerSeriesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_WEBHOOK_TRIGGER_SERIES;
+        return (Identity<WebhookTriggerSeriesRecord, Long>) super.getIdentity();
     }
 
     @Override

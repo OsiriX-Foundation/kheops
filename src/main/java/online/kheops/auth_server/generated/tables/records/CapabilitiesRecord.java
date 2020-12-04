@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> implements Record17<Long, String, LocalDateTime, LocalDateTime, LocalDateTime, LocalDateTime, LocalDateTime, LocalDateTime, String, String, Boolean, Boolean, Boolean, Boolean, Long, String, Long> {
 
-    private static final long serialVersionUID = 518930570;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.capabilities.pk</code>.
@@ -680,22 +680,22 @@ public class CapabilitiesRecord extends UpdatableRecordImpl<CapabilitiesRecord> 
     public CapabilitiesRecord(Long pk, String id, LocalDateTime issuedAtTime, LocalDateTime updatedTime, LocalDateTime expirationTime, LocalDateTime notBeforeTime, LocalDateTime lastUsed, LocalDateTime revokedTime, String title, String secret, Boolean readPermission, Boolean appropriatePermission, Boolean downloadPermission, Boolean writePermission, Long userFk, String scopeType, Long albumFk) {
         super(Capabilities.CAPABILITIES);
 
-        set(0, pk);
-        set(1, id);
-        set(2, issuedAtTime);
-        set(3, updatedTime);
-        set(4, expirationTime);
-        set(5, notBeforeTime);
-        set(6, lastUsed);
-        set(7, revokedTime);
-        set(8, title);
-        set(9, secret);
-        set(10, readPermission);
-        set(11, appropriatePermission);
-        set(12, downloadPermission);
-        set(13, writePermission);
-        set(14, userFk);
-        set(15, scopeType);
-        set(16, albumFk);
+        setPk(pk);
+        setId(id);
+        setIssuedAtTime(issuedAtTime);
+        setUpdatedTime(updatedTime);
+        setExpirationTime(expirationTime);
+        setNotBeforeTime(notBeforeTime);
+        setLastUsed(lastUsed);
+        setRevokedTime(revokedTime);
+        setTitle(title);
+        setSecret(secret);
+        setReadPermission(readPermission);
+        setAppropriatePermission(appropriatePermission);
+        setDownloadPermission(downloadPermission);
+        setWritePermission(writePermission);
+        setUserFk(userFk);
+        setScopeType(scopeType);
+        setAlbumFk(albumFk);
     }
 }

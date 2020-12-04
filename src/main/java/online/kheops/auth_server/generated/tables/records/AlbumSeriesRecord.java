@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlbumSeriesRecord extends UpdatableRecordImpl<AlbumSeriesRecord> implements Record4<Long, Long, Long, Boolean> {
 
-    private static final long serialVersionUID = 22347716;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.album_series.pk</code>.
@@ -210,9 +210,9 @@ public class AlbumSeriesRecord extends UpdatableRecordImpl<AlbumSeriesRecord> im
     public AlbumSeriesRecord(Long pk, Long albumFk, Long seriesFk, Boolean favorite) {
         super(AlbumSeries.ALBUM_SERIES);
 
-        set(0, pk);
-        set(1, albumFk);
-        set(2, seriesFk);
-        set(3, favorite);
+        setPk(pk);
+        setAlbumFk(albumFk);
+        setSeriesFk(seriesFk);
+        setFavorite(favorite);
     }
 }
