@@ -4,7 +4,6 @@ import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.webhook.*;
 
 import javax.inject.Inject;
@@ -19,7 +18,6 @@ import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumsWithEnabledNewSeriesWebhooks;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
-import static online.kheops.auth_server.event.Events.albumPostStudyMutation;
 
 public class FooHashMapImpl implements FooHashMap {
 
@@ -31,7 +29,6 @@ public class FooHashMapImpl implements FooHashMap {
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private static final int TIME_TO_LIVE = 10;//seconds
 
-    private static Level0_StudyLevel level0StudyLevel = new Level0_StudyLevel();
     private static Level0 level0 = new Level0();
 
     public FooHashMapImpl() { /*empty*/ }
@@ -47,7 +44,6 @@ public class FooHashMapImpl implements FooHashMap {
 
     private void callWebhook(Study studyIn, Source source) {
 
-
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
@@ -61,6 +57,20 @@ public class FooHashMapImpl implements FooHashMap {
             final Level0Value level0Value = level0.get(level0Key);
             final Set<Level1Key> level1Keys = level0Value.getKeys();
             final HashMap<Series, Integer> newUploadedSeries = new HashMap<>();
+
+            for (Level1Key destination : level1Keys) {
+                final Level1Value level1Value = level0Value.get(destination);
+                for (Series unmergedSeries : level1Value.getSeries()) {
+                    Series series = em.merge(unmergedSeries);
+                    em.refresh(series);
+                    if(level0Value.get(destination).get(series).getNumberOfNewInstances() != 0) {
+                        newUploadedSeries.compute(series, (s, nb) -> (nb == null)
+                                ? level0Value.get(destination).get(series).getNumberOfNewInstances()
+                                : nb + level0Value.get(destination).get(series).getNumberOfNewInstances() );
+
+                    }
+                }
+            }
 
             for (Level1Key destination : level1Keys) {
                 final Album album = em.merge(destination.getAlbum());
@@ -79,16 +89,10 @@ public class FooHashMapImpl implements FooHashMap {
                         .setStudy(study)
                         .setDestination(album.getId());
 
-                for (Series s : level1Value.getSeries()) {
-                    Series series = em.merge(s);
+                for (Series unmergedSeries : level1Value.getSeries()) {
+                    Series series = em.merge(unmergedSeries);
                     em.refresh(series);
 
-                    Integer nbNewInstances = 0;
-                    for (Level1Key destination2 : level1Keys) {
-                        if (level0Value.get(destination2).getSeries().contains(series)) {
-                            nbNewInstances += level0Value.get(destination2).get(series).getNumberOfNewInstances();
-                        }
-                    }
                     //todo y'a-t-il des autres séries d'une autre destination
                     if(level1Value.get(series).isSendUpload()) {
                         newSeriesWebhookBuilder.isSent();
@@ -97,15 +101,18 @@ public class FooHashMapImpl implements FooHashMap {
                         newSeriesWebhookBuilder.isUpload();
                         if (level1Value.get(series).isNewInDestination()) {
                             newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances());
-                            if (nbNewInstances != 0) {
-                                newUploadedSeries.putIfAbsent(series, nbNewInstances);
-                            }
                         } else {
-                            if (nbNewInstances != 0) {
-                                newSeriesWebhookBuilder.addSeries(series, nbNewInstances);
-                                newUploadedSeries.putIfAbsent(series, nbNewInstances);
+                            if (newUploadedSeries.get(series) != 0) {
+                                newSeriesWebhookBuilder.addSeries(series, newUploadedSeries.get(series));
                             }
                         }
+                    }
+                }
+
+                for (Map.Entry<Series, Integer> s: newUploadedSeries.entrySet()) {
+                    // si la series dans l'album de destination && pas déjà ajoutée au webhook
+                    if (album.containsSeries(s.getKey(), em) && !newSeriesWebhookBuilder.getSeries().contains(s.getKey())) {
+                        newSeriesWebhookBuilder.addSeries(s.getKey(), s.getValue());
                     }
                 }
 
@@ -148,9 +155,6 @@ public class FooHashMapImpl implements FooHashMap {
                 }
             }
 
-
-
-
             tx.commit();
             for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
                 webhookAsyncRequest.firstRequest();
@@ -165,206 +169,4 @@ public class FooHashMapImpl implements FooHashMap {
             level0.remove(studyIn, source);
         }
     }
-
-
-
-
-
-
-
-    private void test(Study studyIn) {
-        String log = "callWebhook:";
-        log += level0StudyLevel.toString(studyIn);
-        LOG.info(log);
-
-        final Level1_SourceLevel level1SourceLevel = level0StudyLevel.get(studyIn);
-
-        final EntityManager em = EntityManagerListener.createEntityManager();
-        final EntityTransaction tx = em.getTransaction();
-
-        try {
-            tx.begin();
-
-            final Study study = em.merge(studyIn);
-
-            final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
-
-            for (Map.Entry<Source, Level2_DestinationLevel> entry : level1SourceLevel.getSources().entrySet()) {
-                final Source source = entry.getKey();
-                final Level2_DestinationLevel level2DestinationLevel = entry.getValue();
-
-                if (level1SourceLevel.isNewStudy()) {
-                    for (Map.Entry<Album, Level3_SeriesLevel> entry1 : level2DestinationLevel.getDestinations().entrySet()) {
-                        final Album album = em.merge(entry1.getKey());
-                        final Level3_SeriesLevel level3SeriesLevel = entry1.getValue();
-
-                        if (!level3SeriesLevel.isInbox()) {
-
-                            if (!album.getWebhooksNewSeriesEnabled().isEmpty()) {
-                                //if destination contain webhooks
-
-                                final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
-                                        .setDestination(album.getId())
-                                        .isAutomatedTrigger()
-                                        .setStudy(study)
-                                        .setSource(source)
-                                        .setKheopsInstance(kheopsInstance.get());
-                                if(level2DestinationLevel.isSend()) {
-                                    newSeriesWebhookBuilder.isSent();
-                                    for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level3SeriesLevel.getSeries().entrySet()) {
-                                        final Series series = em.merge(entry2.getKey());
-                                        em.refresh(series);
-                                        final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
-                                        newSeriesWebhookBuilder.addSeries(series, null);
-                                    }
-                                } else {
-                                    newSeriesWebhookBuilder.isUpload();
-                                    for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level3SeriesLevel.getSeries().entrySet()) {
-                                        final Series series = em.merge(entry2.getKey());
-                                        em.refresh(series);
-                                        final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
-                                        newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - level4InstancesLevel.getNumberOfInstances());
-                                    }
-                                }
-
-                                for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level3SeriesLevel.getSeries().entrySet()) {
-                                    final Series series = em.merge(entry2.getKey());
-                                    em.refresh(series);
-                                    final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
-                                    newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - level4InstancesLevel.getNumberOfInstances());
-                                }
-
-                                final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
-                                for (Webhook webhook : album.getWebhooksNewSeriesEnabled()) {
-                                    final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                                    newSeriesWebhookBuilder.getSeries().forEach(webhookTrigger::addSeries);
-                                    em.persist(webhookTrigger);
-                                    webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
-                                }
-                            }
-
-                            source.getCapabilityToken().ifPresentOrElse(
-                                    capability ->
-                                            em.persist(albumPostStudyMutation(em.merge(capability), album, MutationType.IMPORT_STUDY, study, new ArrayList<>(level3SeriesLevel.getSeries().keySet()))),
-                                    () ->
-                                            em.persist(albumPostStudyMutation(em.merge(source.getUser()), album, MutationType.IMPORT_STUDY, study, new ArrayList<>(level3SeriesLevel.getSeries().keySet())))
-                            );
-                        }
-                    }
-                } else { //ce n'est pas une nouvelle study
-                    if(level2DestinationLevel.isSend()) {   // c'est un send (on applique le webhook uniquement sur les destination)
-                        for (Map.Entry<Album, Level3_SeriesLevel> entry1 : level2DestinationLevel.getDestinations().entrySet()) {
-                            final Album album = em.merge(entry1.getKey());
-                            final Level3_SeriesLevel level3SeriesLevel = entry1.getValue();
-
-                            final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
-                                .setKheopsInstance(kheopsInstance.get())
-                                .setDestination(album.getId())
-                                .isAutomatedTrigger()
-                                .setStudy(study)
-                                .setSource(source)
-                                .isSent();
-
-                            for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level3SeriesLevel.getSeries().entrySet()) {
-                                final Series series = em.merge(entry2.getKey());
-                                em.refresh(series);
-                                final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
-                                newSeriesWebhookBuilder.addSeries(series, null);
-                            }
-
-                            if (!newSeriesWebhookBuilder.getSeries().isEmpty()) {
-                                source.getCapabilityToken().ifPresentOrElse(
-                                        capability ->
-                                                em.persist(albumPostStudyMutation(em.merge(capability), album, MutationType.IMPORT_STUDY, study, new ArrayList<>(newSeriesWebhookBuilder.getSeries()))),
-                                        () ->
-                                                em.persist(albumPostStudyMutation(em.merge(source.getUser()), album, MutationType.IMPORT_STUDY, study, new ArrayList<>(newSeriesWebhookBuilder.getSeries())))
-                                );
-                            }
-                            final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
-                            for (Webhook webhook : album.getWebhooksNewSeriesEnabled()) {
-                                final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                                newSeriesWebhookBuilder.getSeries().forEach(webhookTrigger::addSeries);
-                                em.persist(webhookTrigger);
-                                webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
-                            }
-                        }
-
-                    } else { // c'est un upload si'il y a des nouvelles images partout sinon uniquement destination
-                        for (Album album : findAlbumsWithEnabledNewSeriesWebhooks(study.getStudyInstanceUID(), em)) {
-
-                            final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
-                                    .setKheopsInstance(kheopsInstance.get())
-                                    .setDestination(album.getId())
-                                    .isAutomatedTrigger()
-                                    .setStudy(study)
-                                    .setSource(source)
-                                    .isUpload();
-
-                            if (level2DestinationLevel.getDestinations().containsKey(album)) {
-                                if (!level2DestinationLevel.getDestination(album).isInbox()) {
-                                    for (Map.Entry<Series, Level4_InstancesLevel> entry2 : level2DestinationLevel.getDestination(album).getSeries().entrySet()) {
-                                        final Series series = em.merge(entry2.getKey());
-                                        em.refresh(series);
-                                        final Level4_InstancesLevel level4InstancesLevel = entry2.getValue();
-
-                                        newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - level4InstancesLevel.getNumberOfInstances());
-
-                                    }
-                                    source.getCapabilityToken().ifPresentOrElse(
-                                            capability ->
-                                                    em.persist(albumPostStudyMutation(em.merge(capability), album, MutationType.IMPORT_STUDY, study, new ArrayList<>(newSeriesWebhookBuilder.getSeries()))),
-                                            () ->
-                                                    em.persist(albumPostStudyMutation(em.merge(source.getUser()), album, MutationType.IMPORT_STUDY, study, new ArrayList<>(newSeriesWebhookBuilder.getSeries())))
-                                    );
-                                }
-                            } else {
-                                //pour un album non destination
-                                //si la series à des nouvelles instance => webhook
-                                for (Map.Entry<Series, Integer> seriesUIDNumberOfStudy : level2DestinationLevel.getAllSeries().entrySet()) {
-                                    final Series series = em.merge(seriesUIDNumberOfStudy.getKey());
-                                    em.refresh(series);
-                                    if(series.getNumberOfSeriesRelatedInstances() - seriesUIDNumberOfStudy.getValue() > 0) {
-                                        if (album.containsSeries(series, em)) {
-                                            newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances() - seriesUIDNumberOfStudy.getValue());
-                                        }
-                                    }
-                                }
-                            }
-
-                            if(!newSeriesWebhookBuilder.getSeries().isEmpty()) {
-                                final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
-                                for (Webhook webhook : album.getWebhooksNewSeriesEnabled()) {
-                                    final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                                    newSeriesWebhookBuilder.getSeries().forEach(webhookTrigger::addSeries);
-                                    em.persist(webhookTrigger);
-                                    webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            /*
-            new study in destination (with list of series)=>si fooHashMap NE contient PAS la study
-            new series in destination =>si fooHashMap NE contient PAS la séries
-            ?? new instances ?? (update series) or (add instances in series)
-             */
-
-
-            tx.commit();
-            for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
-                webhookAsyncRequest.firstRequest();
-            }
-        } catch (Exception e) {
-            LOG.log(Level.WARNING,"", e);
-        } finally {
-            if (tx.isActive()) {
-                tx.rollback();
-            }
-            em.close();
-            level0StudyLevel.remove(studyIn);
-        }
-    }
-
 }
