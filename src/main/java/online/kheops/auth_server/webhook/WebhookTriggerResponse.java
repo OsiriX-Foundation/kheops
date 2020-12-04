@@ -54,7 +54,7 @@ public class WebhookTriggerResponse {
             event = WebhookType.REMOVE_SERIES.name().toLowerCase();
             for (Series series: webhookTrigger.getSeries()) {
                 if (studyResponse == null) {
-                    studyResponse = new StudyResponse(series.getStudy(), "toto",false); //TODO use instance not toto
+                    studyResponse = new StudyResponse(series.getStudy(), null,false); //TODO use instance not toto
                 }
                 studyResponse.addSeries(series);
             }
