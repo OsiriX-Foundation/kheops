@@ -312,8 +312,7 @@ public class Sending {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             fooHashMap.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
-                    !availableSeries.getStudy().isPopulated(), !availableSeries.isPopulated(), 0,
-                    source, true, true);
+                     0, source, true, true);
 
             tx.commit();
         } finally {
@@ -396,7 +395,7 @@ public class Sending {
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesListWebhook) {
                 fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
-                        !s.getStudy().isPopulated(), !s.isPopulated(), 0, source, true, true);
+                        0, source, true, true);
             }
             tx.commit();
         } finally {

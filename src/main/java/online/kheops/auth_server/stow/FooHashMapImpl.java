@@ -33,13 +33,12 @@ public class FooHashMapImpl implements FooHashMap {
 
     public FooHashMapImpl() { /*empty*/ }
 
-    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, boolean isNewStudy, boolean isNewSeries, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
-        scheduler.schedule(() -> addData(study, series, isNewStudy, isNewSeries, destination, isInbox, numberOfNewInstances, source, isNewInDestination, isSend), 0, TimeUnit.SECONDS);
+    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
+        scheduler.schedule(() -> addData(study, series, destination, isInbox, numberOfNewInstances, source, isNewInDestination, isSend), 0, TimeUnit.SECONDS);
     }
 
-
-    private void addData(Study study, Series series, boolean isNewStudy, boolean isNewSeries, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
-        level0.put(scheduler.schedule(() -> callWebhook(study, source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, isNewStudy, isNewSeries, numberOfNewInstances, source, destination, isInbox, isNewInDestination, isSend);
+    private void addData(Study study, Series series, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
+        level0.put(scheduler.schedule(() -> callWebhook(study, source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, numberOfNewInstances, source, destination, isInbox, isNewInDestination, isSend);
     }
 
     private void callWebhook(Study studyIn, Source source) {
@@ -56,8 +55,8 @@ public class FooHashMapImpl implements FooHashMap {
             final Level0Key level0Key = new Level0Key(study, source);
             final Level0Value level0Value = level0.get(level0Key);
             final Set<Level1Key> level1Keys = level0Value.getKeys();
-            final HashMap<Series, Integer> newUploadedSeries = new HashMap<>();
 
+            final HashMap<Series, Integer> newUploadedSeries = new HashMap<>();
             for (Level1Key destination : level1Keys) {
                 final Level1Value level1Value = level0Value.get(destination);
                 for (Series unmergedSeries : level1Value.getSeries()) {
@@ -93,7 +92,6 @@ public class FooHashMapImpl implements FooHashMap {
                     Series series = em.merge(unmergedSeries);
                     em.refresh(series);
 
-                    //todo y'a-t-il des autres séries d'une autre destination
                     if(level1Value.get(series).isSendUpload()) {
                         newSeriesWebhookBuilder.isSent();
                         newSeriesWebhookBuilder.addSeries(series);
@@ -110,7 +108,6 @@ public class FooHashMapImpl implements FooHashMap {
                 }
 
                 for (Map.Entry<Series, Integer> s: newUploadedSeries.entrySet()) {
-                    // si la series dans l'album de destination && pas déjà ajoutée au webhook
                     if (album.containsSeries(s.getKey(), em) && !newSeriesWebhookBuilder.getSeries().contains(s.getKey())) {
                         newSeriesWebhookBuilder.addSeries(s.getKey(), s.getValue());
                     }

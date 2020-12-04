@@ -85,7 +85,6 @@ public abstract class Fetcher {
             queryStudy.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             final Study study = queryStudy.getSingleResult();
-            final boolean wasNewStudy = !study.isPopulated();
             study.mergeAttributes(attributes);
             study.setPopulated(true);
 
@@ -95,7 +94,7 @@ public abstract class Fetcher {
 
             tx.commit();
 
-            seriesUIDList.forEach(seriesUID -> result.putAll(fetchSeries(studyInstanceUID, seriesUID, wasNewStudy, em)));
+            seriesUIDList.forEach(seriesUID -> result.putAll(fetchSeries(studyInstanceUID, seriesUID, em)));
 
         } finally {
             if (tx.isActive()) {
@@ -106,7 +105,7 @@ public abstract class Fetcher {
         }
     }
 
-    private static HashMap<Series, FetchSeriesMetadata> fetchSeries(String studyUID, String seriesUID, boolean wasNewStudy, EntityManager em) {
+    private static HashMap<Series, FetchSeriesMetadata> fetchSeries(String studyUID, String seriesUID, EntityManager em) {
         final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
@@ -137,11 +136,10 @@ public abstract class Fetcher {
 
             final Series series = findSeriesBySeriesUID(seriesUID, em);
             final Integer oldValueNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
-            final boolean wasNewSeries = !series.isPopulated();
             series.mergeAttributes(attributes);
             series.setPopulated(true);
 
-            result.put(series, new FetchSeriesMetadata(wasNewSeries, wasNewStudy, series.getNumberOfSeriesRelatedInstances() - oldValueNumberOfSeriesRelatedInstances));
+            result.put(series, new FetchSeriesMetadata(series.getNumberOfSeriesRelatedInstances() - oldValueNumberOfSeriesRelatedInstances));
 
             tx.commit();
         } catch (Exception e) {
