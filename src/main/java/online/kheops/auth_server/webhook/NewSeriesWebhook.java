@@ -55,6 +55,7 @@ public class NewSeriesWebhook implements WebhookResult{
         private boolean isManualTrigger;
         private String importSource;
         private StudyResponse updatedStudy;
+        private Study study;
         private String kheopInstance;
         private HashMap<Series, Integer> series = new HashMap<>();
         private Boolean isAdmin;
@@ -116,10 +117,7 @@ public class NewSeriesWebhook implements WebhookResult{
         }
 
         public Builder setStudy(Study study) {
-            if (updatedStudy != null) {
-                throw new IllegalStateException("updatedStudy is already set");
-            }
-            this.updatedStudy = new StudyResponse(study, kheopInstance, false);
+            this.study = study;
             return this;
         }
 
@@ -139,7 +137,14 @@ public class NewSeriesWebhook implements WebhookResult{
             if (isAdmin != null) {
                 sourceUser.setIsAdmin(isAdmin);
             }
-            series.forEach(updatedStudy::addSeries);
+            final StudyResponse.Builder studyResponseBuilder = new StudyResponse.Builder(study)
+                    .showRetrieveUrl()
+                    .kheopsInstance(kheopInstance)
+                    .uidOnly(false);
+
+            series.forEach(studyResponseBuilder::addSeries);
+            updatedStudy = studyResponseBuilder.build();
+
             return new NewSeriesWebhook(this);
         }
 

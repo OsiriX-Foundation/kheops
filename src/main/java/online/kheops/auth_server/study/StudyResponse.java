@@ -1,12 +1,12 @@
 package online.kheops.auth_server.study;
 
-import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.series.SeriesResponse;
 
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -43,58 +43,91 @@ public class StudyResponse {
     @XmlElement(name = "series")
     private List<SeriesResponse> series;
 
-    private String kheopsInstance = null;
-
     private StudyResponse() { /*empty*/ }
 
-    public StudyResponse(Study study, String kheopsInstance, boolean uidOnly) {
-        studyInstanceUID = study.getStudyInstanceUID();
-        if (uidOnly) { return; }
-        patientName = study.getPatientName();
-        studyDate = study.getStudyDate();
-        studyDescription = study.getStudyDescription();
-        patientID = study.getPatientID();
-        patientBirthDate = study.getPatientBirthDate();
-        patientSex = study.getPatientSex();
-        referringPhysicianName = study.getReferringPhysicianName();
-        accessionNumber = study.getAccessionNumber();
-        studyId = study.getStudyID();
-        timezoneOffsetFromUtc = study.getTimezoneOffsetFromUTC();
-        studyTime = study.getStudyTime();
-        if(kheopsInstance != null) {
-            retrieveUrl = kheopsInstance + "/api/studies/" + studyInstanceUID;
+    public static class Builder {
+
+        private Study study;
+        private boolean showRetrieveUrl;
+        private boolean uidOnly;
+        private String kheopsInstance;
+        private HashMap<Series, Integer> seriesLst;
+
+        public Builder(Study study) {
+            this.study = study;
+            this.seriesLst = new HashMap<>();
+            showRetrieveUrl = false;
+            uidOnly = false;
+        }
+
+        public Builder showRetrieveUrl() {
+            this.showRetrieveUrl = true;
+            return this;
+        }
+        public Builder showRetrieveUrl(boolean showRetrieveUrl) {
+            this.showRetrieveUrl = showRetrieveUrl;
+            return this;
+        }
+        public Builder hideRetrieveUrl() {
+            this.showRetrieveUrl = false;
+            return this;
+        }
+
+        public Builder uidOnly(boolean uidOnly) {
+            this.uidOnly = uidOnly;
+            return this;
+        }
+
+        public Builder kheopsInstance(String kheopsInstance) {
             this.kheopsInstance = kheopsInstance;
+            return this;
         }
-    }
 
-    public void addSeries(Series series, Integer numberOfNewInstances) {
-        if(this.series == null) {
-            this.series = new ArrayList<>();
+        public Builder addSeries(Series series) {
+            this.seriesLst.putIfAbsent(series, null);
+            return this;
         }
-        final SeriesResponse seriesResponse = new SeriesResponse(series, kheopsInstance, numberOfNewInstances, false);
-        if(retrieveUrl == null) {
-            seriesResponse.hideRetrieveUrl();
+
+        public Builder addSeries(Series series, Integer numberOfNewInstances) {
+            this.seriesLst.put(series, numberOfNewInstances);
+            return this;
         }
-        this.series.add(seriesResponse);
-    }
 
-    public void addSeries(Series series) {
-        this.addSeries(series, null);
-    }
+        public StudyResponse build () {
+            final StudyResponse studyResponse = new StudyResponse();
+            studyResponse.studyInstanceUID = study.getStudyInstanceUID();
+            if (!uidOnly) {
+                studyResponse.patientName = study.getPatientName();
+                studyResponse.studyDate = study.getStudyDate();
+                studyResponse.studyDescription = study.getStudyDescription();
+                studyResponse.patientID = study.getPatientID();
+                studyResponse.patientBirthDate = study.getPatientBirthDate();
+                studyResponse.patientSex = study.getPatientSex();
+                studyResponse.referringPhysicianName = study.getReferringPhysicianName();
+                studyResponse.accessionNumber = study.getAccessionNumber();
+                studyResponse.studyId = study.getStudyID();
+                studyResponse.timezoneOffsetFromUtc = study.getTimezoneOffsetFromUTC();
+                studyResponse.studyTime = study.getStudyTime();
+            }
+            if (kheopsInstance != null && showRetrieveUrl) {
+                studyResponse.retrieveUrl = kheopsInstance + "/api/studies/" + studyResponse.studyInstanceUID;
+            }
 
+            if (!seriesLst.isEmpty()) {
+                studyResponse.series = new ArrayList<>();
+                for (Series series : seriesLst.keySet()) {
+                    final SeriesResponse seriesResponse = new SeriesResponse.Builder(series)
+                            .kheopsInstance(kheopsInstance)
+                            .uidOnly(uidOnly)
+                            .numberOfNewInstances(seriesLst.get(series))
+                            .showRetrieveUrl(showRetrieveUrl)
+                            .build();
 
-    public boolean containSeries() {
-        if (series == null) {
-            return false;
-        } else {
-            return !series.isEmpty();
+                    studyResponse.series.add(seriesResponse);
+                }
+            }
+
+            return studyResponse;
         }
-    }
-
-    public void hideRetrieveUrl() {
-        if (series != null) {
-            series.forEach(seriesResponse -> hideRetrieveUrl());
-        }
-        retrieveUrl = null;
     }
 }

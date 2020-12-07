@@ -103,14 +103,17 @@ public class RemoveSeriesWebhook implements WebhookResult{
             removeSeriesWebhook.isManualTrigger = isManualTrigger;
             removeSeriesWebhook.eventTime = LocalDateTime.now();
 
-            removeSeriesWebhook.removedStudy = new StudyResponse(study, kheopsInstance, false);
+            final StudyResponse.Builder studyResponseBuilder = new StudyResponse.Builder(study)
+                    .uidOnly(false)
+                    .hideRetrieveUrl()
+                    .kheopsInstance(kheopsInstance);
             if (removeAllSeries) {
-                removeSeriesWebhook.removedStudy.hideRetrieveUrl();
                 removeSeriesWebhook.removeAllSeries = true;
             }
             for(Series series:seriesList) {
-                removeSeriesWebhook.removedStudy.addSeries(series);
+                studyResponseBuilder.addSeries(series);
             }
+            removeSeriesWebhook.removedStudy = studyResponseBuilder.build();
 
             sourceUser = new UserResponse(source.getUser());
             if (isAdmin != null) {

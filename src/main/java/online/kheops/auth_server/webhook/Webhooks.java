@@ -1,6 +1,7 @@
 package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
 import online.kheops.auth_server.album.UserNotMemberException;
@@ -183,7 +184,7 @@ public class Webhooks {
     }
 
 
-    public static WebhookResponse getWebhook(String webhookID, String albumId, Integer triggerLimit, Integer triggerOffset, KheopsLogBuilder kheopsLogBuilder)
+    public static WebhookResponse getWebhook(String webhookID, String albumId, Integer triggerLimit, Integer triggerOffset, KheopsInstance kheopsInstance, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -207,7 +208,7 @@ public class Webhooks {
                 if (triggerOffset > 0) {
                     triggerOffset--;
                 } else {
-                    webhookResponse.addFullTriggers(webhookTrigger);
+                    webhookResponse.addFullTriggers(webhookTrigger, kheopsInstance);
                     triggerLimit--;
                     if (triggerLimit == 0) {
                         break;

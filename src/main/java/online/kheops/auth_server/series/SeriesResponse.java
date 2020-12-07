@@ -1,12 +1,8 @@
 package online.kheops.auth_server.series;
 
-import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
 
-import javax.inject.Inject;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.HashSet;
-import java.util.Set;
 
 public class SeriesResponse {
 
@@ -33,21 +29,73 @@ public class SeriesResponse {
 
     private SeriesResponse() { /*empty*/ }
 
-    public SeriesResponse(Series series, String kheopsInstance, Integer numberOfNewInstances, boolean uidOnly) {
-        seriesUid = series.getSeriesInstanceUID();
-        if (uidOnly) { return; }
-        modality = series.getModality();
-        numberOfSeriesRelatedInstance = Long.valueOf(series.getNumberOfSeriesRelatedInstances());
-        seriesDescription = series.getSeriesDescription();
-        timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
-        seriesNumber = Long.valueOf(series.getSeriesNumber());
-        bodyPartExamined = series.getBodyPartExamined();
-        retrieveUrl = kheopsInstance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
-        this.numberOfNewInstances = numberOfNewInstances;
-    }
-
-
     public void hideRetrieveUrl() {
         retrieveUrl = null;
+    }
+
+    public static class Builder {
+
+        private Series series;
+        private boolean showRetrieveUrl;
+        private Integer numberOfNewInstances;
+        private boolean uidOnly;
+        private String kheopsInstance;
+
+        public Builder(Series series) {
+            this.series = series;
+            showRetrieveUrl = false;
+            uidOnly = false;
+        }
+
+        public Builder showRetrieveUrl() {
+            this.showRetrieveUrl = true;
+            return this;
+        }
+
+        public Builder showRetrieveUrl(boolean showRetrieveUrl) {
+            this.showRetrieveUrl = showRetrieveUrl;
+            return this;
+        }
+
+        public Builder hideRetrieveUrl() {
+            this.showRetrieveUrl = false;
+            return this;
+        }
+
+        public Builder kheopsInstance(String kheopsInstance) {
+            this.kheopsInstance = kheopsInstance;
+            return this;
+        }
+
+        public Builder uidOnly(boolean uidOnly) {
+            this.uidOnly = uidOnly;
+            return this;
+        }
+
+        public Builder numberOfNewInstances(Integer numberOfNewInstances) {
+            this.numberOfNewInstances = numberOfNewInstances;
+            return this;
+        }
+
+        public SeriesResponse build() {
+            final SeriesResponse seriesResponse = new SeriesResponse();
+            seriesResponse.seriesUid = series.getSeriesInstanceUID();
+            if (!uidOnly) {
+                seriesResponse.modality = series.getModality();
+                seriesResponse.numberOfSeriesRelatedInstance = Long.valueOf(series.getNumberOfSeriesRelatedInstances());
+                seriesResponse.seriesDescription = series.getSeriesDescription();
+                seriesResponse.timeZoneOffsetFromUTC = series.getTimezoneOffsetFromUTC();
+                seriesResponse.seriesNumber = Long.valueOf(series.getSeriesNumber());
+                seriesResponse.bodyPartExamined = series.getBodyPartExamined();
+                if (numberOfNewInstances != null) {
+                    seriesResponse.numberOfNewInstances = numberOfNewInstances;
+                }
+            }
+            if (kheopsInstance != null && showRetrieveUrl) {
+                seriesResponse.retrieveUrl = kheopsInstance + "/api/studies/" + series.getStudy().getStudyInstanceUID() + "/series/" + series.getSeriesInstanceUID();
+            }
+
+            return seriesResponse;
+        }
     }
 }

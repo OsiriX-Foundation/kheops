@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
@@ -15,6 +16,7 @@ import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.webhook.*;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -41,6 +43,9 @@ public class WebhookResource {
 
     @Context
     private ServletContext context;
+
+    @Inject
+    KheopsInstance kheopsInstance;
 
     @POST
     @Secured
@@ -126,7 +131,7 @@ public class WebhookResource {
 
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-        final WebhookResponse webhookResponse = Webhooks.getWebhook(webhookId, albumId, limit, offset, kheopsPrincipal.getKheopsLogBuilder());
+        final WebhookResponse webhookResponse = Webhooks.getWebhook(webhookId, albumId, limit, offset, kheopsInstance, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(webhookResponse).build();
     }
