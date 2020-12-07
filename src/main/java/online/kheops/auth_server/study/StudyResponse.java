@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class StudyResponse {
@@ -115,11 +116,13 @@ public class StudyResponse {
 
             if (!seriesLst.isEmpty()) {
                 studyResponse.series = new ArrayList<>();
-                for (Series series : seriesLst.keySet()) {
+                for (Map.Entry<Series, Integer> seriesLstEntry : seriesLst.entrySet()) {
+                    final Series series = seriesLstEntry.getKey();
+                    final Integer numberOfNewInstances = seriesLstEntry.getValue();
                     final SeriesResponse seriesResponse = new SeriesResponse.Builder(series)
                             .kheopsInstance(kheopsInstance)
                             .uidOnly(uidOnly)
-                            .numberOfNewInstances(seriesLst.get(series))
+                            .numberOfNewInstances(numberOfNewInstances)
                             .showRetrieveUrl(showRetrieveUrl)
                             .build();
 
