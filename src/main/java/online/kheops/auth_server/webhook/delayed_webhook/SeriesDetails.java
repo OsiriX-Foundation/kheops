@@ -1,4 +1,4 @@
-package online.kheops.auth_server.webhook.delayedWebhook;
+package online.kheops.auth_server.webhook.delayed_webhook;
 
 public class SeriesDetails {
 

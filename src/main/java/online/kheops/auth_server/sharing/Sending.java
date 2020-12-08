@@ -10,7 +10,7 @@ import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.webhook.delayedWebhook.DelayedWebhook;
+import online.kheops.auth_server.webhook.delayed_webhook.DelayedWebhook;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -311,7 +311,7 @@ public class Sending {
             final Source source = new Source(kheopsPrincipal.getUser());
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
-            delayedWebhook.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
+            delayedWebhook.addWebhookData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
                      0, source, true, true);
 
             tx.commit();
@@ -394,7 +394,7 @@ public class Sending {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesListWebhook) {
-                delayedWebhook.addHashMapData(s.getStudy(), s, targetAlbum, false,
+                delayedWebhook.addWebhookData(s.getStudy(), s, targetAlbum, false,
                         0, source, true, true);
             }
             tx.commit();

@@ -1,7 +1,7 @@
 package online.kheops.auth_server;
 
-import online.kheops.auth_server.webhook.delayedWebhook.DelayedWebhook;
-import online.kheops.auth_server.webhook.delayedWebhook.DelayedWebhookImpl;
+import online.kheops.auth_server.webhook.delayed_webhook.DelayedWebhook;
+import online.kheops.auth_server.webhook.delayed_webhook.DelayedWebhookImpl;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Singleton;

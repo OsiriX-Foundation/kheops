@@ -1,4 +1,4 @@
-package online.kheops.auth_server.webhook.delayedWebhook;
+package online.kheops.auth_server.webhook.delayed_webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsInstance;
@@ -33,7 +33,7 @@ public class DelayedWebhookImpl implements DelayedWebhook {
 
     public DelayedWebhookImpl() { /*empty*/ }
 
-    public void addHashMapData(Study study, Series series, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
+    public void addWebhookData(Study study, Series series, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
         scheduler.schedule(() -> addData(study, series, destination, isInbox, numberOfNewInstances, source, isNewInDestination, isSend), 0, TimeUnit.SECONDS);
     }
 
