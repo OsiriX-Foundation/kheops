@@ -56,20 +56,7 @@ public class FooHashMapImpl implements FooHashMap {
             final Level0Value level0Value = level0.get(level0Key);
             final Set<Level1Key> level1Keys = level0Value.getKeys();
 
-            final HashMap<Series, Integer> newUploadedSeries = new HashMap<>();
-            for (Level1Key destination : level1Keys) {
-                final Level1Value level1Value = level0Value.get(destination);
-                for (Series unmergedSeries : level1Value.getSeries()) {
-                    Series series = em.merge(unmergedSeries);
-                    em.refresh(series);
-                    if(level0Value.get(destination).get(series).getNumberOfNewInstances() != 0) {
-                        newUploadedSeries.compute(series, (s, nb) -> (nb == null)
-                                ? level0Value.get(destination).get(series).getNumberOfNewInstances()
-                                : nb + level0Value.get(destination).get(series).getNumberOfNewInstances() );
-
-                    }
-                }
-            }
+            final HashMap<Series, Integer> newUploadedSeries = getNewUploadedSeries(level0Value, level1Keys, em);
 
             for (Level1Key destination : level1Keys) {
                 final Album album = em.merge(destination.getAlbum());
@@ -124,30 +111,28 @@ public class FooHashMapImpl implements FooHashMap {
                 }
             }
 
-            //pour toutes les autres destinations
+            //for all others albums that contains the study
             for (Album album : findAlbumsWithEnabledNewSeriesWebhooks(study.getStudyInstanceUID(), em)) {
-                final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
+                if (!level1Keys.contains(new Level1Key(album))) {
+                    final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
                         .setKheopsInstance(kheopsInstance.get())
                         .isAutomatedTrigger()
                         .setSource(source)
                         .setStudy(study)
                         .setDestination(album.getId());
-                //la destination ne doit pas déjà être une destination
-                if (!level1Keys.contains(new Level1Key(album))) {
-                    for(Map.Entry<Series, Integer> s : newUploadedSeries.entrySet()) {
-                        //il faut envoyer uniquement les séries qui sont présente dans l'album.
+                    for (Map.Entry<Series, Integer> s : newUploadedSeries.entrySet()) {
                         if (album.containsSeries(s.getKey(), em)) {
                             newSeriesWebhookBuilder.addSeries(s.getKey(), s.getValue());
                         }
                     }
-                }
-                if (!newSeriesWebhookBuilder.getSeries().isEmpty()) {
-                    final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
-                    for (Webhook webhook : album.getWebhooksNewSeriesEnabled()) {
-                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                        newSeriesWebhookBuilder.getSeries().forEach(webhookTrigger::addSeries);
-                        em.persist(webhookTrigger);
-                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
+                    if (!newSeriesWebhookBuilder.getSeries().isEmpty()) {
+                        final NewSeriesWebhook newSeriesWebhook = newSeriesWebhookBuilder.build();
+                        for (Webhook webhook : album.getWebhooksNewSeriesEnabled()) {
+                            final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
+                            newSeriesWebhookBuilder.getSeries().forEach(webhookTrigger::addSeries);
+                            em.persist(webhookTrigger);
+                            webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
+                        }
                     }
                 }
             }
@@ -165,5 +150,23 @@ public class FooHashMapImpl implements FooHashMap {
             em.close();
             level0.remove(studyIn, source);
         }
+    }
+
+    private HashMap<Series, Integer> getNewUploadedSeries(Level0Value level0Value, Set<Level1Key> level1Keys, EntityManager em) {
+        final HashMap<Series, Integer> newUploadedSeries = new HashMap<>();
+        for (Level1Key destination : level1Keys) {
+            final Level1Value level1Value = level0Value.get(destination);
+            for (Series unmergedSeries : level1Value.getSeries()) {
+                Series series = em.merge(unmergedSeries);
+                em.refresh(series);
+                if(level0Value.get(destination).get(series).getNumberOfNewInstances() != 0) {
+                    newUploadedSeries.compute(series, (s, nb) -> (nb == null)
+                            ? level0Value.get(destination).get(series).getNumberOfNewInstances()
+                            : nb + level0Value.get(destination).get(series).getNumberOfNewInstances() );
+
+                }
+            }
+        }
+        return newUploadedSeries;
     }
 }
