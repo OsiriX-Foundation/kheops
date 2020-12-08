@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventSeriesRecord extends UpdatableRecordImpl<EventSeriesRecord> implements Record3<Long, Long, Long> {
 
-    private static final long serialVersionUID = -284850589;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.event_series.pk</code>.
@@ -174,8 +174,8 @@ public class EventSeriesRecord extends UpdatableRecordImpl<EventSeriesRecord> im
     public EventSeriesRecord(Long pk, Long eventFk, Long seriesFk) {
         super(EventSeries.EVENT_SERIES);
 
-        set(0, pk);
-        set(1, eventFk);
-        set(2, seriesFk);
+        setPk(pk);
+        setEventFk(eventFk);
+        setSeriesFk(seriesFk);
     }
 }

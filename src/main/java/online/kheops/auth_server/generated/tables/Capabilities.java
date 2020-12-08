@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
-    private static final long serialVersionUID = -1205383330;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.capabilities</code>
@@ -53,93 +54,94 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
     /**
      * The column <code>public.capabilities.pk</code>.
      */
-    public final TableField<CapabilitiesRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<CapabilitiesRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.capabilities.id</code>.
      */
-    public final TableField<CapabilitiesRecord, String> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.issued_at_time</code>.
      */
-    public final TableField<CapabilitiesRecord, LocalDateTime> ISSUED_AT_TIME = createField(DSL.name("issued_at_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, LocalDateTime> ISSUED_AT_TIME = createField(DSL.name("issued_at_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.updated_time</code>.
      */
-    public final TableField<CapabilitiesRecord, LocalDateTime> UPDATED_TIME = createField(DSL.name("updated_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, LocalDateTime> UPDATED_TIME = createField(DSL.name("updated_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.expiration_time</code>.
      */
-    public final TableField<CapabilitiesRecord, LocalDateTime> EXPIRATION_TIME = createField(DSL.name("expiration_time"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+    public final TableField<CapabilitiesRecord, LocalDateTime> EXPIRATION_TIME = createField(DSL.name("expiration_time"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
      * The column <code>public.capabilities.not_before_time</code>.
      */
-    public final TableField<CapabilitiesRecord, LocalDateTime> NOT_BEFORE_TIME = createField(DSL.name("not_before_time"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+    public final TableField<CapabilitiesRecord, LocalDateTime> NOT_BEFORE_TIME = createField(DSL.name("not_before_time"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
      * The column <code>public.capabilities.last_used</code>.
      */
-    public final TableField<CapabilitiesRecord, LocalDateTime> LAST_USED = createField(DSL.name("last_used"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+    public final TableField<CapabilitiesRecord, LocalDateTime> LAST_USED = createField(DSL.name("last_used"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
      * The column <code>public.capabilities.revoked_time</code>.
      */
-    public final TableField<CapabilitiesRecord, LocalDateTime> REVOKED_TIME = createField(DSL.name("revoked_time"), org.jooq.impl.SQLDataType.LOCALDATETIME, this, "");
+    public final TableField<CapabilitiesRecord, LocalDateTime> REVOKED_TIME = createField(DSL.name("revoked_time"), SQLDataType.LOCALDATETIME(6), this, "");
 
     /**
      * The column <code>public.capabilities.title</code>.
      */
-    public final TableField<CapabilitiesRecord, String> TITLE = createField(DSL.name("title"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<CapabilitiesRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.capabilities.secret</code>.
      */
-    public final TableField<CapabilitiesRecord, String> SECRET = createField(DSL.name("secret"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<CapabilitiesRecord, String> SECRET = createField(DSL.name("secret"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.capabilities.read_permission</code>.
      */
-    public final TableField<CapabilitiesRecord, Boolean> READ_PERMISSION = createField(DSL.name("read_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, Boolean> READ_PERMISSION = createField(DSL.name("read_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.appropriate_permission</code>.
      */
-    public final TableField<CapabilitiesRecord, Boolean> APPROPRIATE_PERMISSION = createField(DSL.name("appropriate_permission"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<CapabilitiesRecord, Boolean> APPROPRIATE_PERMISSION = createField(DSL.name("appropriate_permission"), SQLDataType.BOOLEAN, this, "");
 
     /**
      * The column <code>public.capabilities.download_permission</code>.
      */
-    public final TableField<CapabilitiesRecord, Boolean> DOWNLOAD_PERMISSION = createField(DSL.name("download_permission"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<CapabilitiesRecord, Boolean> DOWNLOAD_PERMISSION = createField(DSL.name("download_permission"), SQLDataType.BOOLEAN, this, "");
 
     /**
      * The column <code>public.capabilities.write_permission</code>.
      */
-    public final TableField<CapabilitiesRecord, Boolean> WRITE_PERMISSION = createField(DSL.name("write_permission"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, Boolean> WRITE_PERMISSION = createField(DSL.name("write_permission"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.user_fk</code>.
      */
-    public final TableField<CapabilitiesRecord, Long> USER_FK = createField(DSL.name("user_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<CapabilitiesRecord, Long> USER_FK = createField(DSL.name("user_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.capabilities.scope_type</code>.
      */
-    public final TableField<CapabilitiesRecord, String> SCOPE_TYPE = createField(DSL.name("scope_type"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<CapabilitiesRecord, String> SCOPE_TYPE = createField(DSL.name("scope_type"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.capabilities.album_fk</code>.
      */
-    public final TableField<CapabilitiesRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<CapabilitiesRecord, Long> ALBUM_FK = createField(DSL.name("album_fk"), SQLDataType.BIGINT, this, "");
 
-    /**
-     * Create a <code>public.capabilities</code> table reference
-     */
-    public Capabilities() {
-        this(DSL.name("capabilities"), null);
+    private Capabilities(Name alias, Table<CapabilitiesRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Capabilities(Name alias, Table<CapabilitiesRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -156,12 +158,11 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
         this(alias, CAPABILITIES);
     }
 
-    private Capabilities(Name alias, Table<CapabilitiesRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Capabilities(Name alias, Table<CapabilitiesRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.capabilities</code> table reference
+     */
+    public Capabilities() {
+        this(DSL.name("capabilities"), null);
     }
 
     public <O extends Record> Capabilities(Table<O> child, ForeignKey<O, CapabilitiesRecord> key) {
@@ -180,7 +181,7 @@ public class Capabilities extends TableImpl<CapabilitiesRecord> {
 
     @Override
     public Identity<CapabilitiesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_CAPABILITIES;
+        return (Identity<CapabilitiesRecord, Long>) super.getIdentity();
     }
 
     @Override

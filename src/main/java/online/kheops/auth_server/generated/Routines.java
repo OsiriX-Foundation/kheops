@@ -20,7 +20,7 @@ import org.jooq.Field;
 
 
 /**
- * Convenience access to all stored procedures and functions in public
+ * Convenience access to all stored procedures and functions in public.
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Routines {
@@ -28,7 +28,11 @@ public class Routines {
     /**
      * Call <code>public.difference</code>
      */
-    public static Integer difference(Configuration configuration, String __1, String __2) {
+    public static Integer difference(
+          Configuration configuration
+        , String __1
+        , String __2
+    ) {
         Difference f = new Difference();
         f.set__1(__1);
         f.set__2(__2);
@@ -40,7 +44,10 @@ public class Routines {
     /**
      * Get <code>public.difference</code> as a field.
      */
-    public static Field<Integer> difference(String __1, String __2) {
+    public static Field<Integer> difference(
+          String __1
+        , String __2
+    ) {
         Difference f = new Difference();
         f.set__1(__1);
         f.set__2(__2);
@@ -51,7 +58,10 @@ public class Routines {
     /**
      * Get <code>public.difference</code> as a field.
      */
-    public static Field<Integer> difference(Field<String> __1, Field<String> __2) {
+    public static Field<Integer> difference(
+          Field<String> __1
+        , Field<String> __2
+    ) {
         Difference f = new Difference();
         f.set__1(__1);
         f.set__2(__2);
@@ -62,7 +72,10 @@ public class Routines {
     /**
      * Call <code>public.dmetaphone</code>
      */
-    public static String dmetaphone(Configuration configuration, String __1) {
+    public static String dmetaphone(
+          Configuration configuration
+        , String __1
+    ) {
         Dmetaphone f = new Dmetaphone();
         f.set__1(__1);
 
@@ -73,7 +86,9 @@ public class Routines {
     /**
      * Get <code>public.dmetaphone</code> as a field.
      */
-    public static Field<String> dmetaphone(String __1) {
+    public static Field<String> dmetaphone(
+          String __1
+    ) {
         Dmetaphone f = new Dmetaphone();
         f.set__1(__1);
 
@@ -83,7 +98,9 @@ public class Routines {
     /**
      * Get <code>public.dmetaphone</code> as a field.
      */
-    public static Field<String> dmetaphone(Field<String> __1) {
+    public static Field<String> dmetaphone(
+          Field<String> __1
+    ) {
         Dmetaphone f = new Dmetaphone();
         f.set__1(__1);
 
@@ -93,7 +110,10 @@ public class Routines {
     /**
      * Call <code>public.dmetaphone_alt</code>
      */
-    public static String dmetaphoneAlt(Configuration configuration, String __1) {
+    public static String dmetaphoneAlt(
+          Configuration configuration
+        , String __1
+    ) {
         DmetaphoneAlt f = new DmetaphoneAlt();
         f.set__1(__1);
 
@@ -104,7 +124,9 @@ public class Routines {
     /**
      * Get <code>public.dmetaphone_alt</code> as a field.
      */
-    public static Field<String> dmetaphoneAlt(String __1) {
+    public static Field<String> dmetaphoneAlt(
+          String __1
+    ) {
         DmetaphoneAlt f = new DmetaphoneAlt();
         f.set__1(__1);
 
@@ -114,7 +136,9 @@ public class Routines {
     /**
      * Get <code>public.dmetaphone_alt</code> as a field.
      */
-    public static Field<String> dmetaphoneAlt(Field<String> __1) {
+    public static Field<String> dmetaphoneAlt(
+          Field<String> __1
+    ) {
         DmetaphoneAlt f = new DmetaphoneAlt();
         f.set__1(__1);
 
@@ -124,7 +148,11 @@ public class Routines {
     /**
      * Call <code>public.levenshtein</code>
      */
-    public static Integer levenshtein1(Configuration configuration, String __1, String __2) {
+    public static Integer levenshtein1(
+          Configuration configuration
+        , String __1
+        , String __2
+    ) {
         Levenshtein1 f = new Levenshtein1();
         f.set__1(__1);
         f.set__2(__2);
@@ -136,7 +164,10 @@ public class Routines {
     /**
      * Get <code>public.levenshtein</code> as a field.
      */
-    public static Field<Integer> levenshtein1(String __1, String __2) {
+    public static Field<Integer> levenshtein1(
+          String __1
+        , String __2
+    ) {
         Levenshtein1 f = new Levenshtein1();
         f.set__1(__1);
         f.set__2(__2);
@@ -147,7 +178,10 @@ public class Routines {
     /**
      * Get <code>public.levenshtein</code> as a field.
      */
-    public static Field<Integer> levenshtein1(Field<String> __1, Field<String> __2) {
+    public static Field<Integer> levenshtein1(
+          Field<String> __1
+        , Field<String> __2
+    ) {
         Levenshtein1 f = new Levenshtein1();
         f.set__1(__1);
         f.set__2(__2);
@@ -158,7 +192,14 @@ public class Routines {
     /**
      * Call <code>public.levenshtein</code>
      */
-    public static Integer levenshtein2(Configuration configuration, String __1, String __2, Integer __3, Integer __4, Integer __5) {
+    public static Integer levenshtein2(
+          Configuration configuration
+        , String __1
+        , String __2
+        , Integer __3
+        , Integer __4
+        , Integer __5
+    ) {
         Levenshtein2 f = new Levenshtein2();
         f.set__1(__1);
         f.set__2(__2);
@@ -173,7 +214,13 @@ public class Routines {
     /**
      * Get <code>public.levenshtein</code> as a field.
      */
-    public static Field<Integer> levenshtein2(String __1, String __2, Integer __3, Integer __4, Integer __5) {
+    public static Field<Integer> levenshtein2(
+          String __1
+        , String __2
+        , Integer __3
+        , Integer __4
+        , Integer __5
+    ) {
         Levenshtein2 f = new Levenshtein2();
         f.set__1(__1);
         f.set__2(__2);
@@ -187,7 +234,13 @@ public class Routines {
     /**
      * Get <code>public.levenshtein</code> as a field.
      */
-    public static Field<Integer> levenshtein2(Field<String> __1, Field<String> __2, Field<Integer> __3, Field<Integer> __4, Field<Integer> __5) {
+    public static Field<Integer> levenshtein2(
+          Field<String> __1
+        , Field<String> __2
+        , Field<Integer> __3
+        , Field<Integer> __4
+        , Field<Integer> __5
+    ) {
         Levenshtein2 f = new Levenshtein2();
         f.set__1(__1);
         f.set__2(__2);
@@ -201,7 +254,12 @@ public class Routines {
     /**
      * Call <code>public.levenshtein_less_equal</code>
      */
-    public static Integer levenshteinLessEqual1(Configuration configuration, String __1, String __2, Integer __3) {
+    public static Integer levenshteinLessEqual1(
+          Configuration configuration
+        , String __1
+        , String __2
+        , Integer __3
+    ) {
         LevenshteinLessEqual1 f = new LevenshteinLessEqual1();
         f.set__1(__1);
         f.set__2(__2);
@@ -214,7 +272,11 @@ public class Routines {
     /**
      * Get <code>public.levenshtein_less_equal</code> as a field.
      */
-    public static Field<Integer> levenshteinLessEqual1(String __1, String __2, Integer __3) {
+    public static Field<Integer> levenshteinLessEqual1(
+          String __1
+        , String __2
+        , Integer __3
+    ) {
         LevenshteinLessEqual1 f = new LevenshteinLessEqual1();
         f.set__1(__1);
         f.set__2(__2);
@@ -226,7 +288,11 @@ public class Routines {
     /**
      * Get <code>public.levenshtein_less_equal</code> as a field.
      */
-    public static Field<Integer> levenshteinLessEqual1(Field<String> __1, Field<String> __2, Field<Integer> __3) {
+    public static Field<Integer> levenshteinLessEqual1(
+          Field<String> __1
+        , Field<String> __2
+        , Field<Integer> __3
+    ) {
         LevenshteinLessEqual1 f = new LevenshteinLessEqual1();
         f.set__1(__1);
         f.set__2(__2);
@@ -238,7 +304,15 @@ public class Routines {
     /**
      * Call <code>public.levenshtein_less_equal</code>
      */
-    public static Integer levenshteinLessEqual2(Configuration configuration, String __1, String __2, Integer __3, Integer __4, Integer __5, Integer __6) {
+    public static Integer levenshteinLessEqual2(
+          Configuration configuration
+        , String __1
+        , String __2
+        , Integer __3
+        , Integer __4
+        , Integer __5
+        , Integer __6
+    ) {
         LevenshteinLessEqual2 f = new LevenshteinLessEqual2();
         f.set__1(__1);
         f.set__2(__2);
@@ -254,7 +328,14 @@ public class Routines {
     /**
      * Get <code>public.levenshtein_less_equal</code> as a field.
      */
-    public static Field<Integer> levenshteinLessEqual2(String __1, String __2, Integer __3, Integer __4, Integer __5, Integer __6) {
+    public static Field<Integer> levenshteinLessEqual2(
+          String __1
+        , String __2
+        , Integer __3
+        , Integer __4
+        , Integer __5
+        , Integer __6
+    ) {
         LevenshteinLessEqual2 f = new LevenshteinLessEqual2();
         f.set__1(__1);
         f.set__2(__2);
@@ -269,7 +350,14 @@ public class Routines {
     /**
      * Get <code>public.levenshtein_less_equal</code> as a field.
      */
-    public static Field<Integer> levenshteinLessEqual2(Field<String> __1, Field<String> __2, Field<Integer> __3, Field<Integer> __4, Field<Integer> __5, Field<Integer> __6) {
+    public static Field<Integer> levenshteinLessEqual2(
+          Field<String> __1
+        , Field<String> __2
+        , Field<Integer> __3
+        , Field<Integer> __4
+        , Field<Integer> __5
+        , Field<Integer> __6
+    ) {
         LevenshteinLessEqual2 f = new LevenshteinLessEqual2();
         f.set__1(__1);
         f.set__2(__2);
@@ -284,7 +372,11 @@ public class Routines {
     /**
      * Call <code>public.metaphone</code>
      */
-    public static String metaphone(Configuration configuration, String __1, Integer __2) {
+    public static String metaphone(
+          Configuration configuration
+        , String __1
+        , Integer __2
+    ) {
         Metaphone f = new Metaphone();
         f.set__1(__1);
         f.set__2(__2);
@@ -296,7 +388,10 @@ public class Routines {
     /**
      * Get <code>public.metaphone</code> as a field.
      */
-    public static Field<String> metaphone(String __1, Integer __2) {
+    public static Field<String> metaphone(
+          String __1
+        , Integer __2
+    ) {
         Metaphone f = new Metaphone();
         f.set__1(__1);
         f.set__2(__2);
@@ -307,7 +402,10 @@ public class Routines {
     /**
      * Get <code>public.metaphone</code> as a field.
      */
-    public static Field<String> metaphone(Field<String> __1, Field<Integer> __2) {
+    public static Field<String> metaphone(
+          Field<String> __1
+        , Field<Integer> __2
+    ) {
         Metaphone f = new Metaphone();
         f.set__1(__1);
         f.set__2(__2);
@@ -318,7 +416,10 @@ public class Routines {
     /**
      * Call <code>public.soundex</code>
      */
-    public static String soundex(Configuration configuration, String __1) {
+    public static String soundex(
+          Configuration configuration
+        , String __1
+    ) {
         Soundex f = new Soundex();
         f.set__1(__1);
 
@@ -329,7 +430,9 @@ public class Routines {
     /**
      * Get <code>public.soundex</code> as a field.
      */
-    public static Field<String> soundex(String __1) {
+    public static Field<String> soundex(
+          String __1
+    ) {
         Soundex f = new Soundex();
         f.set__1(__1);
 
@@ -339,7 +442,9 @@ public class Routines {
     /**
      * Get <code>public.soundex</code> as a field.
      */
-    public static Field<String> soundex(Field<String> __1) {
+    public static Field<String> soundex(
+          Field<String> __1
+    ) {
         Soundex f = new Soundex();
         f.set__1(__1);
 
@@ -349,7 +454,10 @@ public class Routines {
     /**
      * Call <code>public.text_soundex</code>
      */
-    public static String textSoundex(Configuration configuration, String __1) {
+    public static String textSoundex(
+          Configuration configuration
+        , String __1
+    ) {
         TextSoundex f = new TextSoundex();
         f.set__1(__1);
 
@@ -360,7 +468,9 @@ public class Routines {
     /**
      * Get <code>public.text_soundex</code> as a field.
      */
-    public static Field<String> textSoundex(String __1) {
+    public static Field<String> textSoundex(
+          String __1
+    ) {
         TextSoundex f = new TextSoundex();
         f.set__1(__1);
 
@@ -370,7 +480,9 @@ public class Routines {
     /**
      * Get <code>public.text_soundex</code> as a field.
      */
-    public static Field<String> textSoundex(Field<String> __1) {
+    public static Field<String> textSoundex(
+          Field<String> __1
+    ) {
         TextSoundex f = new TextSoundex();
         f.set__1(__1);
 

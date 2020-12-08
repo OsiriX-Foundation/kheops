@@ -1,5 +1,6 @@
 package online.kheops.auth_server.webhook;
 
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Webhook;
 import online.kheops.auth_server.entity.WebhookTrigger;
 
@@ -63,10 +64,10 @@ public class WebhookResponse {
 
     }
 
-    public void addFullTriggers(WebhookTrigger webhookTrigger) {
+    public void addFullTriggers(WebhookTrigger webhookTrigger, KheopsInstance kheopsInstance) {
         if (fullTriggers == null) {
             fullTriggers = new ArrayList<>();
         }
-        this.fullTriggers.add(new WebhookTriggerResponse(webhookTrigger));
+        this.fullTriggers.add(new WebhookTriggerResponse(webhookTrigger, kheopsInstance));
     }
 }

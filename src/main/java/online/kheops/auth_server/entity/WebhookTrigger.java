@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.webhook.WebhookRequestId;
 import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.*;

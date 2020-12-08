@@ -19,7 +19,6 @@ import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
@@ -100,7 +99,7 @@ public class ReportProviderResource {
     public Response newReport(@FormParam("access_token") @NotNull @NotEmpty final String tokenParam,
                               @FormParam("client_id") final String clientId,
                               @FormParam("studyUID") @NotNull @NotEmpty List<String> studyInstanceUIDs)
-            throws AlbumNotFoundException, UserNotFoundException {//Edit UidValidator for work with @FormParam
+            throws UserNotFoundException {//Edit UidValidator for work with @FormParam
 
         for (String uid : studyInstanceUIDs) {
             if (!checkValidUID(uid)) {

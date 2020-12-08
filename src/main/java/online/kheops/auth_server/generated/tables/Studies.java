@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Studies extends TableImpl<StudiesRecord> {
 
-    private static final long serialVersionUID = -1578694999;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.studies</code>
@@ -53,88 +54,89 @@ public class Studies extends TableImpl<StudiesRecord> {
     /**
      * The column <code>public.studies.pk</code>.
      */
-    public final TableField<StudiesRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<StudiesRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.studies.created_time</code>.
      */
-    public final TableField<StudiesRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<StudiesRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.studies.updated_time</code>.
      */
-    public final TableField<StudiesRecord, LocalDateTime> UPDATED_TIME = createField(DSL.name("updated_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<StudiesRecord, LocalDateTime> UPDATED_TIME = createField(DSL.name("updated_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.studies.study_uid</code>.
      */
-    public final TableField<StudiesRecord, String> STUDY_UID = createField(DSL.name("study_uid"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<StudiesRecord, String> STUDY_UID = createField(DSL.name("study_uid"), SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.studies.study_date</code>.
      */
-    public final TableField<StudiesRecord, String> STUDY_DATE = createField(DSL.name("study_date"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> STUDY_DATE = createField(DSL.name("study_date"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.study_time</code>.
      */
-    public final TableField<StudiesRecord, String> STUDY_TIME = createField(DSL.name("study_time"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> STUDY_TIME = createField(DSL.name("study_time"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.study_description</code>.
      */
-    public final TableField<StudiesRecord, String> STUDY_DESCRIPTION = createField(DSL.name("study_description"), org.jooq.impl.SQLDataType.VARCHAR(155), this, "");
+    public final TableField<StudiesRecord, String> STUDY_DESCRIPTION = createField(DSL.name("study_description"), SQLDataType.VARCHAR(155), this, "");
 
     /**
      * The column <code>public.studies.timezone_offset_from_utc</code>.
      */
-    public final TableField<StudiesRecord, String> TIMEZONE_OFFSET_FROM_UTC = createField(DSL.name("timezone_offset_from_utc"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> TIMEZONE_OFFSET_FROM_UTC = createField(DSL.name("timezone_offset_from_utc"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.accession_number</code>.
      */
-    public final TableField<StudiesRecord, String> ACCESSION_NUMBER = createField(DSL.name("accession_number"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> ACCESSION_NUMBER = createField(DSL.name("accession_number"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.referring_physician_name</code>.
      */
-    public final TableField<StudiesRecord, String> REFERRING_PHYSICIAN_NAME = createField(DSL.name("referring_physician_name"), org.jooq.impl.SQLDataType.VARCHAR(4095), this, "");
+    public final TableField<StudiesRecord, String> REFERRING_PHYSICIAN_NAME = createField(DSL.name("referring_physician_name"), SQLDataType.VARCHAR(4095), this, "");
 
     /**
      * The column <code>public.studies.patient_name</code>.
      */
-    public final TableField<StudiesRecord, String> PATIENT_NAME = createField(DSL.name("patient_name"), org.jooq.impl.SQLDataType.VARCHAR(4095), this, "");
+    public final TableField<StudiesRecord, String> PATIENT_NAME = createField(DSL.name("patient_name"), SQLDataType.VARCHAR(4095), this, "");
 
     /**
      * The column <code>public.studies.patient_id</code>.
      */
-    public final TableField<StudiesRecord, String> PATIENT_ID = createField(DSL.name("patient_id"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> PATIENT_ID = createField(DSL.name("patient_id"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.patient_birth_date</code>.
      */
-    public final TableField<StudiesRecord, String> PATIENT_BIRTH_DATE = createField(DSL.name("patient_birth_date"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> PATIENT_BIRTH_DATE = createField(DSL.name("patient_birth_date"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.patient_sex</code>.
      */
-    public final TableField<StudiesRecord, String> PATIENT_SEX = createField(DSL.name("patient_sex"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> PATIENT_SEX = createField(DSL.name("patient_sex"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.study_id</code>.
      */
-    public final TableField<StudiesRecord, String> STUDY_ID = createField(DSL.name("study_id"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
+    public final TableField<StudiesRecord, String> STUDY_ID = createField(DSL.name("study_id"), SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.studies.populated</code>.
      */
-    public final TableField<StudiesRecord, Boolean> POPULATED = createField(DSL.name("populated"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+    public final TableField<StudiesRecord, Boolean> POPULATED = createField(DSL.name("populated"), SQLDataType.BOOLEAN, this, "");
 
-    /**
-     * Create a <code>public.studies</code> table reference
-     */
-    public Studies() {
-        this(DSL.name("studies"), null);
+    private Studies(Name alias, Table<StudiesRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Studies(Name alias, Table<StudiesRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -151,12 +153,11 @@ public class Studies extends TableImpl<StudiesRecord> {
         this(alias, STUDIES);
     }
 
-    private Studies(Name alias, Table<StudiesRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Studies(Name alias, Table<StudiesRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.studies</code> table reference
+     */
+    public Studies() {
+        this(DSL.name("studies"), null);
     }
 
     public <O extends Record> Studies(Table<O> child, ForeignKey<O, StudiesRecord> key) {
@@ -175,7 +176,7 @@ public class Studies extends TableImpl<StudiesRecord> {
 
     @Override
     public Identity<StudiesRecord, Long> getIdentity() {
-        return Keys.IDENTITY_STUDIES;
+        return (Identity<StudiesRecord, Long>) super.getIdentity();
     }
 
     @Override

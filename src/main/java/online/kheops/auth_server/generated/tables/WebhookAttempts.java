@@ -26,6 +26,7 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
 
-    private static final long serialVersionUID = 1581176458;
+    private static final long serialVersionUID = 1L;
 
     /**
      * The reference instance of <code>public.webhook_attempts</code>
@@ -53,33 +54,34 @@ public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
     /**
      * The column <code>public.webhook_attempts.pk</code>.
      */
-    public final TableField<WebhookAttemptsRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<WebhookAttemptsRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.webhook_attempts.status</code>.
      */
-    public final TableField<WebhookAttemptsRecord, Long> STATUS = createField(DSL.name("status"), org.jooq.impl.SQLDataType.BIGINT, this, "");
+    public final TableField<WebhookAttemptsRecord, Long> STATUS = createField(DSL.name("status"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>public.webhook_attempts.time</code>.
      */
-    public final TableField<WebhookAttemptsRecord, LocalDateTime> TIME = createField(DSL.name("time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
+    public final TableField<WebhookAttemptsRecord, LocalDateTime> TIME = createField(DSL.name("time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_attempts.webhook_trigger_fk</code>.
      */
-    public final TableField<WebhookAttemptsRecord, Long> WEBHOOK_TRIGGER_FK = createField(DSL.name("webhook_trigger_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhookAttemptsRecord, Long> WEBHOOK_TRIGGER_FK = createField(DSL.name("webhook_trigger_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.webhook_attempts.attempt</code>.
      */
-    public final TableField<WebhookAttemptsRecord, Long> ATTEMPT = createField(DSL.name("attempt"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<WebhookAttemptsRecord, Long> ATTEMPT = createField(DSL.name("attempt"), SQLDataType.BIGINT.nullable(false), this, "");
 
-    /**
-     * Create a <code>public.webhook_attempts</code> table reference
-     */
-    public WebhookAttempts() {
-        this(DSL.name("webhook_attempts"), null);
+    private WebhookAttempts(Name alias, Table<WebhookAttemptsRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private WebhookAttempts(Name alias, Table<WebhookAttemptsRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     /**
@@ -96,12 +98,11 @@ public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
         this(alias, WEBHOOK_ATTEMPTS);
     }
 
-    private WebhookAttempts(Name alias, Table<WebhookAttemptsRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private WebhookAttempts(Name alias, Table<WebhookAttemptsRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.webhook_attempts</code> table reference
+     */
+    public WebhookAttempts() {
+        this(DSL.name("webhook_attempts"), null);
     }
 
     public <O extends Record> WebhookAttempts(Table<O> child, ForeignKey<O, WebhookAttemptsRecord> key) {
@@ -120,7 +121,7 @@ public class WebhookAttempts extends TableImpl<WebhookAttemptsRecord> {
 
     @Override
     public Identity<WebhookAttemptsRecord, Long> getIdentity() {
-        return Keys.IDENTITY_WEBHOOK_ATTEMPTS;
+        return (Identity<WebhookAttemptsRecord, Long>) super.getIdentity();
     }
 
     @Override

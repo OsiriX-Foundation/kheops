@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UsersRecord extends UpdatableRecordImpl<UsersRecord> implements Record5<Long, String, Long, String, String> {
 
-    private static final long serialVersionUID = 653284684;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.users.pk</code>.
@@ -246,10 +246,10 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> implements Rec
     public UsersRecord(Long pk, String sub, Long inboxFk, String email, String name) {
         super(Users.USERS);
 
-        set(0, pk);
-        set(1, sub);
-        set(2, inboxFk);
-        set(3, email);
-        set(4, name);
+        setPk(pk);
+        setSub(sub);
+        setInboxFk(inboxFk);
+        setEmail(email);
+        setName(name);
     }
 }

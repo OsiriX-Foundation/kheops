@@ -74,6 +74,10 @@ public class UserResponse  implements Comparable<UserResponse> {
         this.capability = new CapabilitiesResponse(capability);
     }
 
+    public void setIsAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
+
     public String getSub() { return sub; }
 
     @Override

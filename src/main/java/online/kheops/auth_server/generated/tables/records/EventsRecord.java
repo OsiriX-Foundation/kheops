@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventsRecord extends UpdatableRecordImpl<EventsRecord> implements Record12<Long, String, Long, Long, LocalDateTime, Long, Long, Long, String, String, Long, Long> {
 
-    private static final long serialVersionUID = -1133648092;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.events.pk</code>.
@@ -500,17 +500,17 @@ public class EventsRecord extends UpdatableRecordImpl<EventsRecord> implements R
     public EventsRecord(Long pk, String eventType, Long albumFk, Long studyFk, LocalDateTime eventTime, Long userFk, Long capabilityFk, Long privateTargetUserFk, String comment, String mutationType, Long toUserFk, Long reportProviderFk) {
         super(Events.EVENTS);
 
-        set(0, pk);
-        set(1, eventType);
-        set(2, albumFk);
-        set(3, studyFk);
-        set(4, eventTime);
-        set(5, userFk);
-        set(6, capabilityFk);
-        set(7, privateTargetUserFk);
-        set(8, comment);
-        set(9, mutationType);
-        set(10, toUserFk);
-        set(11, reportProviderFk);
+        setPk(pk);
+        setEventType(eventType);
+        setAlbumFk(albumFk);
+        setStudyFk(studyFk);
+        setEventTime(eventTime);
+        setUserFk(userFk);
+        setCapabilityFk(capabilityFk);
+        setPrivateTargetUserFk(privateTargetUserFk);
+        setComment(comment);
+        setMutationType(mutationType);
+        setToUserFk(toUserFk);
+        setReportProviderFk(reportProviderFk);
     }
 }

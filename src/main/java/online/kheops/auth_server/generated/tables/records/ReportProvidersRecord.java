@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ReportProvidersRecord extends UpdatableRecordImpl<ReportProvidersRecord> implements Record7<Long, Long, LocalDateTime, String, String, String, Boolean> {
 
-    private static final long serialVersionUID = -84514286;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.report_providers.pk</code>.
@@ -320,12 +320,12 @@ public class ReportProvidersRecord extends UpdatableRecordImpl<ReportProvidersRe
     public ReportProvidersRecord(Long pk, Long albumFk, LocalDateTime creationTime, String name, String url, String clientId, Boolean removed) {
         super(ReportProviders.REPORT_PROVIDERS);
 
-        set(0, pk);
-        set(1, albumFk);
-        set(2, creationTime);
-        set(3, name);
-        set(4, url);
-        set(5, clientId);
-        set(6, removed);
+        setPk(pk);
+        setAlbumFk(albumFk);
+        setCreationTime(creationTime);
+        setName(name);
+        setUrl(url);
+        setClientId(clientId);
+        setRemoved(removed);
     }
 }

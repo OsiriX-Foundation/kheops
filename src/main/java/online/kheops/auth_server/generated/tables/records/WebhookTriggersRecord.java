@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class WebhookTriggersRecord extends UpdatableRecordImpl<WebhookTriggersRecord> implements Record8<Long, String, Long, Boolean, Boolean, Boolean, Long, Boolean> {
 
-    private static final long serialVersionUID = 1067901923;
+    private static final long serialVersionUID = 1L;
 
     /**
      * Setter for <code>public.webhook_triggers.pk</code>.
@@ -354,13 +354,13 @@ public class WebhookTriggersRecord extends UpdatableRecordImpl<WebhookTriggersRe
     public WebhookTriggersRecord(Long pk, String id, Long webhookFk, Boolean isManualTrigger, Boolean newSeries, Boolean newUser, Long userFk, Boolean removeSeries) {
         super(WebhookTriggers.WEBHOOK_TRIGGERS);
 
-        set(0, pk);
-        set(1, id);
-        set(2, webhookFk);
-        set(3, isManualTrigger);
-        set(4, newSeries);
-        set(5, newUser);
-        set(6, userFk);
-        set(7, removeSeries);
+        setPk(pk);
+        setId(id);
+        setWebhookFk(webhookFk);
+        setIsManualTrigger(isManualTrigger);
+        setNewSeries(newSeries);
+        setNewUser(newUser);
+        setUserFk(userFk);
+        setRemoveSeries(removeSeries);
     }
 }
