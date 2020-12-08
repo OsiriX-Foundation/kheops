@@ -1,4 +1,4 @@
-package online.kheops.auth_server.stow;
+package online.kheops.auth_server.fooHashMap;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsInstance;

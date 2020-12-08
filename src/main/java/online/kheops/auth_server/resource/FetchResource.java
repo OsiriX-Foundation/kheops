@@ -11,7 +11,7 @@ import online.kheops.auth_server.fetch.FetchSeriesMetadata;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.stow.FooHashMap;
+import online.kheops.auth_server.fooHashMap.FooHashMap;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.*;

@@ -1,7 +1,7 @@
 package online.kheops.auth_server;
 
-import online.kheops.auth_server.stow.FooHashMap;
-import online.kheops.auth_server.stow.FooHashMapImpl;
+import online.kheops.auth_server.fooHashMap.FooHashMap;
+import online.kheops.auth_server.fooHashMap.FooHashMapImpl;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Singleton;

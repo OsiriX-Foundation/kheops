@@ -1,4 +1,4 @@
-package online.kheops.auth_server.stow;
+package online.kheops.auth_server.fooHashMap;
 
 public class Level2Value {
 
