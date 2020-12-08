@@ -50,6 +50,7 @@ public class StudyResponse {
 
         private Study study;
         private boolean showRetrieveUrl;
+        private boolean showRetrieveUrlStudyOnly;
         private boolean uidOnly;
         private String kheopsInstance;
         private HashMap<Series, Integer> seriesLst;
@@ -71,6 +72,11 @@ public class StudyResponse {
         }
         public Builder hideRetrieveUrl() {
             this.showRetrieveUrl = false;
+            return this;
+        }
+
+        public Builder hideRetrieveUrlSeriesOnly() {
+            this.showRetrieveUrlStudyOnly = true;
             return this;
         }
 
@@ -123,7 +129,7 @@ public class StudyResponse {
                             .kheopsInstance(kheopsInstance)
                             .uidOnly(uidOnly)
                             .numberOfNewInstances(numberOfNewInstances)
-                            .showRetrieveUrl(showRetrieveUrl)
+                            .showRetrieveUrl(showRetrieveUrl && !showRetrieveUrlStudyOnly)
                             .build();
 
                     studyResponse.series.add(seriesResponse);

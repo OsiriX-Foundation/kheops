@@ -105,10 +105,11 @@ public class RemoveSeriesWebhook implements WebhookResult{
 
             final StudyResponse.Builder studyResponseBuilder = new StudyResponse.Builder(study)
                     .uidOnly(false)
-                    .hideRetrieveUrl()
                     .kheopsInstance(kheopsInstance);
             if (removeAllSeries) {
                 removeSeriesWebhook.removeAllSeries = true;
+            } else {
+                studyResponseBuilder.showRetrieveUrl().hideRetrieveUrlSeriesOnly();
             }
             for(Series series:seriesList) {
                 studyResponseBuilder.addSeries(series);
