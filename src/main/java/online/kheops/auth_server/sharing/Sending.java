@@ -10,7 +10,7 @@ import online.kheops.auth_server.event.MutationType;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.fooHashMap.FooHashMap;
+import online.kheops.auth_server.webhook.delayedWebhook.DelayedWebhook;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -260,7 +260,7 @@ public class Sending {
         }
     }
 
-    public static void putSeriesInAlbum(FooHashMap fooHashMap, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+    public static void putSeriesInAlbum(DelayedWebhook delayedWebhook, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, ClientIdNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -311,7 +311,7 @@ public class Sending {
             final Source source = new Source(kheopsPrincipal.getUser());
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
-            fooHashMap.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
+            delayedWebhook.addHashMapData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
                      0, source, true, true);
 
             tx.commit();
@@ -323,7 +323,7 @@ public class Sending {
         }
     }
 
-    public static void putStudyInAlbum(FooHashMap fooHashMap, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
+    public static void putStudyInAlbum(DelayedWebhook delayedWebhook, KheopsPrincipal kheopsPrincipal, String albumId, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -394,7 +394,7 @@ public class Sending {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(Series s : seriesListWebhook) {
-                fooHashMap.addHashMapData(s.getStudy(), s, targetAlbum, false,
+                delayedWebhook.addHashMapData(s.getStudy(), s, targetAlbum, false,
                         0, source, true, true);
             }
             tx.commit();

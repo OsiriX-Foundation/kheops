@@ -16,7 +16,7 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
-import online.kheops.auth_server.fooHashMap.FooHashMap;
+import online.kheops.auth_server.webhook.delayedWebhook.DelayedWebhook;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -57,7 +57,7 @@ public class SendingResource
     private SecurityContext securityContext;
 
     @Inject
-    FooHashMap fooHashMap;
+    DelayedWebhook delayedWebhook;
 
     @HeaderParam(X_AUTHORIZATION_SOURCE)
     private String headerXAuthorizationSource;
@@ -208,7 +208,7 @@ public class SendingResource
                 if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                     final String albumID = kheopsPrincipal.getAlbumID();
                     if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                        Sending.putSeriesInAlbum(fooHashMap, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                        Sending.putSeriesInAlbum(delayedWebhook, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                         return Response.status(CREATED).build();
                     } else {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -238,7 +238,7 @@ public class SendingResource
             if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                    Sending.putSeriesInAlbum(fooHashMap, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                    Sending.putSeriesInAlbum(delayedWebhook, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(AUTHORIZATION_ERROR)
@@ -324,7 +324,7 @@ public class SendingResource
             if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                    Sending.putStudyInAlbum(fooHashMap, kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
+                    Sending.putStudyInAlbum(delayedWebhook, kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(AUTHORIZATION_ERROR)
@@ -492,7 +492,7 @@ public class SendingResource
         }
 
         try {
-            Sending.putSeriesInAlbum(fooHashMap, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+            Sending.putSeriesInAlbum(delayedWebhook, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
@@ -572,7 +572,7 @@ public class SendingResource
         }
 
         try {
-            Sending.putStudyInAlbum(fooHashMap, kheopsPrincipal, albumId, studyInstanceUID, fromAlbumId, fromInbox, kheopsPrincipal.getKheopsLogBuilder());
+            Sending.putStudyInAlbum(delayedWebhook, kheopsPrincipal, albumId, studyInstanceUID, fromAlbumId, fromInbox, kheopsPrincipal.getKheopsLogBuilder());
         } catch (SeriesNotFoundException e) {
             LOG.log(WARNING, "not found", e);
             return Response.status(NOT_FOUND).build();

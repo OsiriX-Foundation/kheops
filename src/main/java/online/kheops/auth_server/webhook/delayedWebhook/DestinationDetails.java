@@ -1,14 +1,14 @@
-package online.kheops.auth_server.fooHashMap;
+package online.kheops.auth_server.webhook.delayedWebhook;
 
 import online.kheops.auth_server.entity.Album;
 
 import java.util.Objects;
 
-public class Level1Key {
+public class DestinationDetails {
 
     private Album destination;
 
-    public Level1Key(Album destination) {
+    public DestinationDetails(Album destination) {
         this.destination = destination;
     }
 
@@ -18,8 +18,8 @@ public class Level1Key {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Level1Key level1Key = (Level1Key) o;
-        return level1Key.destination.equals(destination);
+        DestinationDetails destinationDetails = (DestinationDetails) o;
+        return destinationDetails.destination.equals(this.destination);
     }
 
     @Override

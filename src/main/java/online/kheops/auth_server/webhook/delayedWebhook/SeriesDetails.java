@@ -1,12 +1,12 @@
-package online.kheops.auth_server.fooHashMap;
+package online.kheops.auth_server.webhook.delayedWebhook;
 
-public class Level2Value {
+public class SeriesDetails {
 
     private boolean newInDestination;
     private Integer numberOfNewInstances;
     private boolean sendUpload;
 
-    public Level2Value(Integer numberOfNewInstances, boolean isNewInDestination, boolean isSend) {
+    public SeriesDetails(Integer numberOfNewInstances, boolean isNewInDestination, boolean isSend) {
         this.newInDestination = isNewInDestination;
         this.numberOfNewInstances = numberOfNewInstances;
         this.sendUpload = isSend;
