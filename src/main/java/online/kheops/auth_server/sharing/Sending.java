@@ -644,7 +644,7 @@ public class Sending {
             if (fromAlbumId != null) {
                 final Album album = getAlbum(fromAlbumId, em);
                 availableSeriesUIDs = findAllSeriesInstanceUIDbyStudyUIDfromAlbum(callingUser, album, studyInstanceUID, em);
-            } else if (fromInbox) {
+            } else if (Boolean.TRUE.equals(fromInbox)) {
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromInbox(callingUser, studyInstanceUID, em);
             } else {
                 availableSeriesUIDs = findAllSeriesInstanceUIDbySeriesIUIDfromAlbumandInbox(callingUser, studyInstanceUID, em);
@@ -662,9 +662,8 @@ public class Sending {
 
         if (fromAlbumId != null) {
             final Album callingAlbum = getAlbum(fromAlbumId, em);
-
             availableSeries = findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em);
-        } else if (fromInbox) {
+        } else if (Boolean.TRUE.equals(fromInbox)) {
             availableSeries = findSeriesListByStudyUIDFromInbox(callingUser, studyInstanceUID, em);
         } else {
             availableSeries = findSeriesListByStudyUIDFromAlbumAndInbox(callingUser, studyInstanceUID, em);

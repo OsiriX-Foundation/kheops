@@ -112,7 +112,7 @@ public class SendingResource
             fromInbox = false;
         }
 
-        if(fromInbox && !kheopsPrincipal.hasStudyShareAccess(studyInstanceUID)) {
+        if(Boolean.TRUE.equals(fromInbox) && !kheopsPrincipal.hasStudyShareAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the inbox")
