@@ -498,7 +498,8 @@ public class Sending {
         }
     }
 
-    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder) {
+    public static void appropriateSeries(User callingUser, String studyInstanceUID, String seriesInstanceUID, KheopsLogBuilder kheopsLogBuilder)
+            throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -512,45 +513,23 @@ public class Sending {
                     .series(seriesInstanceUID)
                     .action(ActionType.APPROPRIATE_SERIES);
 
-            try {
-                final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
-
-                if (isOrphan(storedSeries, em)) {
-                    //here the series exists but she is orphan
-                    final Album inbox = callingUser.getInbox();
-                    final AlbumSeries inboxSeries = new AlbumSeries(inbox, storedSeries);
-                    em.persist(inboxSeries);
-                    tx.commit();
-
-                    kheopsLogBuilder.log();
-                    return; //appropriate OK
-                } else if (isSeriesInInbox(callingUser, storedSeries, em)) {
-                    kheopsLogBuilder.log();
-                    return;
-                } else {
-                    final Series series = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, storedSeries, em);
-                    final Album inbox = callingUser.getInbox();
-                    final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-                    em.persist(inboxSeries);
-                    tx.commit();
-                    kheopsLogBuilder.log();
-                    return;
-                }
-
-            } catch (SeriesNotFoundException ignored) {/*empty*/}
-
-            // from here the series does not exists
-            // find if the study already exists
-            final Study study = getOrCreateStudy(studyInstanceUID, em);
-
-            final Series series = new Series(seriesInstanceUID);
-            study.addSeries(series);
-            final Album inbox = callingUser.getInbox();
-            final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
-            em.persist(series);
-            em.persist(inboxSeries);
-            tx.commit();
-            kheopsLogBuilder.log();
+            final Series series = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
+            if (isOrphan(series, em)) {
+                final Album inbox = callingUser.getInbox();
+                final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
+                em.persist(inboxSeries);
+                tx.commit();
+                kheopsLogBuilder.log();
+            } else if (isSeriesInInbox(callingUser, series, em)) {
+                kheopsLogBuilder.log();
+            } else {
+                final Series seriesWithPermission = findSeriesBySeriesAndAlbumWithSendPermission(callingUser, series, em);
+                final Album inbox = callingUser.getInbox();
+                final AlbumSeries inboxSeries = new AlbumSeries(inbox, seriesWithPermission);
+                em.persist(inboxSeries);
+                tx.commit();
+                kheopsLogBuilder.log();
+            }
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
