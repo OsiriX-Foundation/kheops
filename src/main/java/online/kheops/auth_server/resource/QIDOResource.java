@@ -213,7 +213,7 @@ public class QIDOResource {
         }
 
         //BEGIN kheopsPrincipal
-        if (fromInbox && !kheopsPrincipal.hasInboxAccess()) {
+        if (Boolean.TRUE.equals(fromInbox) && !kheopsPrincipal.hasInboxAccess()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
                     .detail("This authorization is not available for access to the inbox")
