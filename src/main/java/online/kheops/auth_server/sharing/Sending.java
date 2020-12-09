@@ -32,7 +32,6 @@ import static online.kheops.auth_server.report_provider.ReportProviderQueries.ge
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
 import static online.kheops.auth_server.series.SeriesQueries.*;
-import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
@@ -273,7 +272,7 @@ public class Sending {
             final Album targetAlbum = getAlbum(albumId, em);
             final AlbumUser albumUser = getAlbumUser(targetAlbum, callingUser, em);
 
-            Series availableSeries = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
+            final Series availableSeries = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
 
             if (targetAlbum.containsSeries(availableSeries, em)) {
                 kheopsLogBuilder.action(ActionType.SHARE_SERIES_WITH_ALBUM)
