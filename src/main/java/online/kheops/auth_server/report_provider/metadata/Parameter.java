@@ -16,10 +16,6 @@ public interface Parameter<T> {
     return false;
   }
 
-  static Parameter<?> valueOf(String value) {
-    return null;
-  }
-
   /**
    * @throws JsonException if a JSON object cannot be created
    * @throws IllegalArgumentException if the JSON object is not appropriate

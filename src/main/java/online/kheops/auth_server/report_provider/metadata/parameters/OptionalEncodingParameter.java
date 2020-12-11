@@ -1,6 +1,5 @@
 package online.kheops.auth_server.report_provider.metadata.parameters;
 
-import online.kheops.auth_server.report_provider.ApplicationType;
 import online.kheops.auth_server.report_provider.Encoding;
 import online.kheops.auth_server.report_provider.NoKeyException;
 
