@@ -87,7 +87,7 @@ public class DelayedWebhookImpl implements DelayedWebhook {
                         if (seriesData.get(series).isNewInDestination()) {
                             newSeriesWebhookBuilder.addSeries(series, series.getNumberOfSeriesRelatedInstances());
                         } else {
-                            if (newUploadedSeries.get(series) != 0) {
+                            if (newUploadedSeries.getOrDefault(series, 0) != 0) {
                                 newSeriesWebhookBuilder.addSeries(series, newUploadedSeries.get(series));
                             }
                         }
