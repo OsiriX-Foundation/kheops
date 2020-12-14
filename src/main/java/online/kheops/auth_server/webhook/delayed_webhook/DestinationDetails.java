@@ -8,9 +8,7 @@ public class DestinationDetails {
 
     private Album destination;
 
-    public DestinationDetails(Album destination) {
-        this.destination = destination;
-    }
+    public DestinationDetails(Album destination) { this.destination = destination; }
 
     public Album getAlbum() { return destination; }
 

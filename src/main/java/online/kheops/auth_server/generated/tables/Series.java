@@ -26,7 +26,6 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -36,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Series extends TableImpl<SeriesRecord> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2118567940;
 
     /**
      * The reference instance of <code>public.series</code>
@@ -54,69 +53,68 @@ public class Series extends TableImpl<SeriesRecord> {
     /**
      * The column <code>public.series.pk</code>.
      */
-    public final TableField<SeriesRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<SeriesRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.series.created_time</code>.
      */
-    public final TableField<SeriesRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
+    public final TableField<SeriesRecord, LocalDateTime> CREATED_TIME = createField(DSL.name("created_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
 
     /**
      * The column <code>public.series.updated_time</code>.
      */
-    public final TableField<SeriesRecord, LocalDateTime> UPDATED_TIME = createField(DSL.name("updated_time"), SQLDataType.LOCALDATETIME(6).nullable(false), this, "");
+    public final TableField<SeriesRecord, LocalDateTime> UPDATED_TIME = createField(DSL.name("updated_time"), org.jooq.impl.SQLDataType.LOCALDATETIME.nullable(false), this, "");
 
     /**
      * The column <code>public.series.modality</code>.
      */
-    public final TableField<SeriesRecord, String> MODALITY = createField(DSL.name("modality"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<SeriesRecord, String> MODALITY = createField(DSL.name("modality"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.series.timezone_offset_from_utc</code>.
      */
-    public final TableField<SeriesRecord, String> TIMEZONE_OFFSET_FROM_UTC = createField(DSL.name("timezone_offset_from_utc"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<SeriesRecord, String> TIMEZONE_OFFSET_FROM_UTC = createField(DSL.name("timezone_offset_from_utc"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.series.series_description</code>.
      */
-    public final TableField<SeriesRecord, String> SERIES_DESCRIPTION = createField(DSL.name("series_description"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<SeriesRecord, String> SERIES_DESCRIPTION = createField(DSL.name("series_description"), org.jooq.impl.SQLDataType.VARCHAR(255), this, "");
 
     /**
      * The column <code>public.series.series_uid</code>.
      */
-    public final TableField<SeriesRecord, String> SERIES_UID = createField(DSL.name("series_uid"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<SeriesRecord, String> SERIES_UID = createField(DSL.name("series_uid"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.series.series_number</code>.
      */
-    public final TableField<SeriesRecord, Integer> SERIES_NUMBER = createField(DSL.name("series_number"), SQLDataType.INTEGER, this, "");
+    public final TableField<SeriesRecord, Integer> SERIES_NUMBER = createField(DSL.name("series_number"), org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>public.series.body_part_examined</code>.
      */
-    public final TableField<SeriesRecord, String> BODY_PART_EXAMINED = createField(DSL.name("body_part_examined"), SQLDataType.VARCHAR(32), this, "");
+    public final TableField<SeriesRecord, String> BODY_PART_EXAMINED = createField(DSL.name("body_part_examined"), org.jooq.impl.SQLDataType.VARCHAR(32), this, "");
 
     /**
      * The column <code>public.series.number_of_series_related_instances</code>.
      */
-    public final TableField<SeriesRecord, Integer> NUMBER_OF_SERIES_RELATED_INSTANCES = createField(DSL.name("number_of_series_related_instances"), SQLDataType.INTEGER, this, "");
+    public final TableField<SeriesRecord, Integer> NUMBER_OF_SERIES_RELATED_INSTANCES = createField(DSL.name("number_of_series_related_instances"), org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * The column <code>public.series.study_fk</code>.
      */
-    public final TableField<SeriesRecord, Long> STUDY_FK = createField(DSL.name("study_fk"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<SeriesRecord, Long> STUDY_FK = createField(DSL.name("study_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.series.populated</code>.
      */
-    public final TableField<SeriesRecord, Boolean> POPULATED = createField(DSL.name("populated"), SQLDataType.BOOLEAN, this, "");
+    public final TableField<SeriesRecord, Boolean> POPULATED = createField(DSL.name("populated"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
-    private Series(Name alias, Table<SeriesRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Series(Name alias, Table<SeriesRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.series</code> table reference
+     */
+    public Series() {
+        this(DSL.name("series"), null);
     }
 
     /**
@@ -133,11 +131,12 @@ public class Series extends TableImpl<SeriesRecord> {
         this(alias, SERIES);
     }
 
-    /**
-     * Create a <code>public.series</code> table reference
-     */
-    public Series() {
-        this(DSL.name("series"), null);
+    private Series(Name alias, Table<SeriesRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Series(Name alias, Table<SeriesRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     public <O extends Record> Series(Table<O> child, ForeignKey<O, SeriesRecord> key) {
@@ -156,7 +155,7 @@ public class Series extends TableImpl<SeriesRecord> {
 
     @Override
     public Identity<SeriesRecord, Long> getIdentity() {
-        return (Identity<SeriesRecord, Long>) super.getIdentity();
+        return Keys.IDENTITY_SERIES;
     }
 
     @Override

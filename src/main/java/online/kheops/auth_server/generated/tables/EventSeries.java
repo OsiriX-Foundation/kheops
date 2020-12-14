@@ -25,7 +25,6 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class EventSeries extends TableImpl<EventSeriesRecord> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 134462258;
 
     /**
      * The reference instance of <code>public.event_series</code>
@@ -53,24 +52,23 @@ public class EventSeries extends TableImpl<EventSeriesRecord> {
     /**
      * The column <code>public.event_series.pk</code>.
      */
-    public final TableField<EventSeriesRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<EventSeriesRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.event_series.event_fk</code>.
      */
-    public final TableField<EventSeriesRecord, Long> EVENT_FK = createField(DSL.name("event_fk"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<EventSeriesRecord, Long> EVENT_FK = createField(DSL.name("event_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.event_series.series_fk</code>.
      */
-    public final TableField<EventSeriesRecord, Long> SERIES_FK = createField(DSL.name("series_fk"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<EventSeriesRecord, Long> SERIES_FK = createField(DSL.name("series_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
-    private EventSeries(Name alias, Table<EventSeriesRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private EventSeries(Name alias, Table<EventSeriesRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.event_series</code> table reference
+     */
+    public EventSeries() {
+        this(DSL.name("event_series"), null);
     }
 
     /**
@@ -87,11 +85,12 @@ public class EventSeries extends TableImpl<EventSeriesRecord> {
         this(alias, EVENT_SERIES);
     }
 
-    /**
-     * Create a <code>public.event_series</code> table reference
-     */
-    public EventSeries() {
-        this(DSL.name("event_series"), null);
+    private EventSeries(Name alias, Table<EventSeriesRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private EventSeries(Name alias, Table<EventSeriesRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     public <O extends Record> EventSeries(Table<O> child, ForeignKey<O, EventSeriesRecord> key) {
@@ -110,7 +109,7 @@ public class EventSeries extends TableImpl<EventSeriesRecord> {
 
     @Override
     public Identity<EventSeriesRecord, Long> getIdentity() {
-        return (Identity<EventSeriesRecord, Long>) super.getIdentity();
+        return Keys.IDENTITY_EVENT_SERIES;
     }
 
     @Override
