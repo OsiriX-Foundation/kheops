@@ -11,7 +11,8 @@ import online.kheops.auth_server.fetch.FetchSeriesMetadata;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
-import online.kheops.auth_server.stow.FooHashMap;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.webhook.delayed_webhook.DelayedWebhook;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 import online.kheops.auth_server.webhook.*;
@@ -47,7 +48,7 @@ public class FetchResource {
     private ServletContext context;
 
     @Inject
-    FooHashMap fooHashMap;
+    DelayedWebhook delayedWebhook;
 
     @POST
     @Secured
@@ -79,13 +80,11 @@ public class FetchResource {
         }
 
         final Map<Series, FetchSeriesMetadata> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
-        for (String seriesInstanceUID: seriesInstanceUIDList) {
-            ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                    .study(studyInstanceUID)
-                    .series(seriesInstanceUID)
-                    .action(ActionType.FETCH)
-                    .log();
-        }
+        final KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                .study(studyInstanceUID)
+                .action(ActionType.FETCH);
+        seriesInstanceUIDList.forEach(kheopsLogBuilder::series);
+        kheopsLogBuilder.log();
 
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
@@ -132,7 +131,7 @@ public class FetchResource {
             for(String seriesUID : seriesInstanceUIDList) {
 
                 final Series series = getSeries(seriesUID, em);
-                fooHashMap.addHashMapData(series.getStudy(), series, targetAlbum, albumId==null,
+                delayedWebhook.addWebhookData(series.getStudy(), series, targetAlbum, albumId==null,
                         seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
             }
 

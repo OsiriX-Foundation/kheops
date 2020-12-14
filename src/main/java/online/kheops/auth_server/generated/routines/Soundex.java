@@ -10,7 +10,6 @@ import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
 import org.jooq.impl.Internal;
-import org.jooq.impl.SQLDataType;
 
 
 /**
@@ -19,23 +18,23 @@ import org.jooq.impl.SQLDataType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Soundex extends AbstractRoutine<String> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -933826722;
 
     /**
      * The parameter <code>public.soundex.RETURN_VALUE</code>.
      */
-    public static final Parameter<String> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.CLOB, false, false);
+    public static final Parameter<String> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", org.jooq.impl.SQLDataType.CLOB, false, false);
 
     /**
      * The parameter <code>public.soundex._1</code>.
      */
-    public static final Parameter<String> _1 = Internal.createParameter("_1", SQLDataType.CLOB, false, true);
+    public static final Parameter<String> _1 = Internal.createParameter("_1", org.jooq.impl.SQLDataType.CLOB, false, true);
 
     /**
      * Create a new routine call instance
      */
     public Soundex() {
-        super("soundex", Public.PUBLIC, SQLDataType.CLOB);
+        super("soundex", Public.PUBLIC, org.jooq.impl.SQLDataType.CLOB);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

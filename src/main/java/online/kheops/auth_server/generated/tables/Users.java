@@ -25,7 +25,6 @@ import org.jooq.TableField;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
-import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
 
@@ -35,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Users extends TableImpl<UsersRecord> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 251648197;
 
     /**
      * The reference instance of <code>public.users</code>
@@ -53,34 +52,33 @@ public class Users extends TableImpl<UsersRecord> {
     /**
      * The column <code>public.users.pk</code>.
      */
-    public final TableField<UsersRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+    public final TableField<UsersRecord, Long> PK = createField(DSL.name("pk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
     /**
      * The column <code>public.users.sub</code>.
      */
-    public final TableField<UsersRecord, String> SUB = createField(DSL.name("sub"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+    public final TableField<UsersRecord, String> SUB = createField(DSL.name("sub"), org.jooq.impl.SQLDataType.VARCHAR(255).nullable(false), this, "");
 
     /**
      * The column <code>public.users.inbox_fk</code>.
      */
-    public final TableField<UsersRecord, Long> INBOX_FK = createField(DSL.name("inbox_fk"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<UsersRecord, Long> INBOX_FK = createField(DSL.name("inbox_fk"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * The column <code>public.users.email</code>.
      */
-    public final TableField<UsersRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(1024), this, "");
+    public final TableField<UsersRecord, String> EMAIL = createField(DSL.name("email"), org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
 
     /**
      * The column <code>public.users.name</code>.
      */
-    public final TableField<UsersRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(1024), this, "");
+    public final TableField<UsersRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(1024), this, "");
 
-    private Users(Name alias, Table<UsersRecord> aliased) {
-        this(alias, aliased, null);
-    }
-
-    private Users(Name alias, Table<UsersRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    /**
+     * Create a <code>public.users</code> table reference
+     */
+    public Users() {
+        this(DSL.name("users"), null);
     }
 
     /**
@@ -97,11 +95,12 @@ public class Users extends TableImpl<UsersRecord> {
         this(alias, USERS);
     }
 
-    /**
-     * Create a <code>public.users</code> table reference
-     */
-    public Users() {
-        this(DSL.name("users"), null);
+    private Users(Name alias, Table<UsersRecord> aliased) {
+        this(alias, aliased, null);
+    }
+
+    private Users(Name alias, Table<UsersRecord> aliased, Field<?>[] parameters) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
     }
 
     public <O extends Record> Users(Table<O> child, ForeignKey<O, UsersRecord> key) {
@@ -120,7 +119,7 @@ public class Users extends TableImpl<UsersRecord> {
 
     @Override
     public Identity<UsersRecord, Long> getIdentity() {
-        return (Identity<UsersRecord, Long>) super.getIdentity();
+        return Keys.IDENTITY_USERS;
     }
 
     @Override

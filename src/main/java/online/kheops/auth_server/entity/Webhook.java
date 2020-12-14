@@ -55,23 +55,23 @@ public class Webhook {
 
     @Basic(optional = false)
     @Column(name = "new_series")
-    private Boolean newSeries;
+    private boolean newSeries;
 
     @Basic(optional = false)
     @Column(name = "remove_series")
-    private Boolean removeSeries;
+    private boolean removeSeries;
 
     @Basic(optional = false)
     @Column(name = "delete_album")
-    private Boolean deleteAlbum;
+    private boolean deleteAlbum;
 
     @Basic(optional = false)
     @Column(name = "new_user")
-    private Boolean newUser;
+    private boolean newUser;
 
     @Basic(optional = false)
     @Column(name = "enabled")
-    private Boolean enabled;
+    private boolean enabled;
 
     @ManyToOne
     @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
@@ -132,7 +132,7 @@ public class Webhook {
 
     public boolean getNewSeries() { return newSeries; }
 
-    public Boolean getRemoveSeries() { return removeSeries; }
+    public boolean getRemoveSeries() { return removeSeries; }
 
     public boolean getNewUser() {
         return newUser;
@@ -140,7 +140,7 @@ public class Webhook {
 
     public boolean getDeleteAlbum() { return deleteAlbum; }
 
-    public Boolean isEnabled() { return enabled; }
+    public boolean isEnabled() { return enabled; }
 
     public Album getAlbum() {
         return album;
@@ -172,19 +172,19 @@ public class Webhook {
         this.url = url;
     }
 
-    public void setNewSeries(Boolean newSeries) {
+    public void setNewSeries(boolean newSeries) {
         this.newSeries = newSeries;
     }
 
-    public void setRemoveSeries(Boolean removeSeries) { this.removeSeries = removeSeries; }
+    public void setRemoveSeries(boolean removeSeries) { this.removeSeries = removeSeries; }
 
-    public void setNewUser(Boolean newUser) {
+    public void setNewUser(boolean newUser) {
         this.newUser = newUser;
     }
 
-    public void setDeleteAlbum(Boolean deleteAlbum) { this.deleteAlbum = deleteAlbum; }
+    public void setDeleteAlbum(boolean deleteAlbum) { this.deleteAlbum = deleteAlbum; }
 
-    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
     public long getPk() { return pk; }
 }

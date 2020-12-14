@@ -10,7 +10,6 @@ import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
 import org.jooq.impl.Internal;
-import org.jooq.impl.SQLDataType;
 
 
 /**
@@ -19,28 +18,28 @@ import org.jooq.impl.SQLDataType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Metaphone extends AbstractRoutine<String> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -615549845;
 
     /**
      * The parameter <code>public.metaphone.RETURN_VALUE</code>.
      */
-    public static final Parameter<String> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.CLOB, false, false);
+    public static final Parameter<String> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", org.jooq.impl.SQLDataType.CLOB, false, false);
 
     /**
      * The parameter <code>public.metaphone._1</code>.
      */
-    public static final Parameter<String> _1 = Internal.createParameter("_1", SQLDataType.CLOB, false, true);
+    public static final Parameter<String> _1 = Internal.createParameter("_1", org.jooq.impl.SQLDataType.CLOB, false, true);
 
     /**
      * The parameter <code>public.metaphone._2</code>.
      */
-    public static final Parameter<Integer> _2 = Internal.createParameter("_2", SQLDataType.INTEGER, false, true);
+    public static final Parameter<Integer> _2 = Internal.createParameter("_2", org.jooq.impl.SQLDataType.INTEGER, false, true);
 
     /**
      * Create a new routine call instance
      */
     public Metaphone() {
-        super("metaphone", Public.PUBLIC, SQLDataType.CLOB);
+        super("metaphone", Public.PUBLIC, org.jooq.impl.SQLDataType.CLOB);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

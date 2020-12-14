@@ -10,7 +10,6 @@ import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
 import org.jooq.impl.Internal;
-import org.jooq.impl.SQLDataType;
 
 
 /**
@@ -19,23 +18,23 @@ import org.jooq.impl.SQLDataType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Dmetaphone extends AbstractRoutine<String> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1370814639;
 
     /**
      * The parameter <code>public.dmetaphone.RETURN_VALUE</code>.
      */
-    public static final Parameter<String> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.CLOB, false, false);
+    public static final Parameter<String> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", org.jooq.impl.SQLDataType.CLOB, false, false);
 
     /**
      * The parameter <code>public.dmetaphone._1</code>.
      */
-    public static final Parameter<String> _1 = Internal.createParameter("_1", SQLDataType.CLOB, false, true);
+    public static final Parameter<String> _1 = Internal.createParameter("_1", org.jooq.impl.SQLDataType.CLOB, false, true);
 
     /**
      * Create a new routine call instance
      */
     public Dmetaphone() {
-        super("dmetaphone", Public.PUBLIC, SQLDataType.CLOB);
+        super("dmetaphone", Public.PUBLIC, org.jooq.impl.SQLDataType.CLOB);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

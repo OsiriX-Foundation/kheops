@@ -21,7 +21,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements Record12<Long, LocalDateTime, LocalDateTime, String, String, String, String, Integer, String, Integer, Long, Boolean> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -2081436327;
 
     /**
      * Setter for <code>public.series.pk</code>.
@@ -500,17 +500,17 @@ public class SeriesRecord extends UpdatableRecordImpl<SeriesRecord> implements R
     public SeriesRecord(Long pk, LocalDateTime createdTime, LocalDateTime updatedTime, String modality, String timezoneOffsetFromUtc, String seriesDescription, String seriesUid, Integer seriesNumber, String bodyPartExamined, Integer numberOfSeriesRelatedInstances, Long studyFk, Boolean populated) {
         super(Series.SERIES);
 
-        setPk(pk);
-        setCreatedTime(createdTime);
-        setUpdatedTime(updatedTime);
-        setModality(modality);
-        setTimezoneOffsetFromUtc(timezoneOffsetFromUtc);
-        setSeriesDescription(seriesDescription);
-        setSeriesUid(seriesUid);
-        setSeriesNumber(seriesNumber);
-        setBodyPartExamined(bodyPartExamined);
-        setNumberOfSeriesRelatedInstances(numberOfSeriesRelatedInstances);
-        setStudyFk(studyFk);
-        setPopulated(populated);
+        set(0, pk);
+        set(1, createdTime);
+        set(2, updatedTime);
+        set(3, modality);
+        set(4, timezoneOffsetFromUtc);
+        set(5, seriesDescription);
+        set(6, seriesUid);
+        set(7, seriesNumber);
+        set(8, bodyPartExamined);
+        set(9, numberOfSeriesRelatedInstances);
+        set(10, studyFk);
+        set(11, populated);
     }
 }
