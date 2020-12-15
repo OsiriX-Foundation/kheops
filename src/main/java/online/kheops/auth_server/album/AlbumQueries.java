@@ -28,6 +28,7 @@ import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
+import static online.kheops.auth_server.util.JooqConstances.*;
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
@@ -93,28 +94,28 @@ public class AlbumQueries {
                     .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
-            query.addSelect(ALBUMS.PK.as("album_pk"),
-                    ALBUMS.ID.as("album_id"),
-                    ALBUMS.NAME.as("album_name"),
-                    isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    ALBUMS.CREATED_TIME.as("album_created_time"),
-                    ALBUMS.LAST_EVENT_TIME.as("album_last_event_time"),
-                    nbUsers.as("number_of_users"),
-                    countDistinct(EVENTS.PK).as("number_of_comments"),
-                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as("number_of_series"),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as("number_of_instances"),
-                    ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
-                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
-                    ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
-                    ALBUMS.DELETE_SERIES_PERMISSION.as("delete_series_permision"),
-                    ALBUMS.ADD_SERIES_PERMISSION.as("add_series_permission"),
-                    ALBUMS.WRITE_COMMENTS_PERMISSION.as("write_comment_permission"),
-                    ALBUM_USER.FAVORITE.as("favorite"),
-                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as("new_comment_notifications"),
-                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
-                    ALBUM_USER.ADMIN.as("admin"),
-                    groupConcatDistinct(SERIES.MODALITY).as("modalities"));
+            query.addSelect(ALBUMS.PK.as(ALBUM_PK),
+                    ALBUMS.ID.as(ALBUM_ID),
+                    ALBUMS.NAME.as(ALBUM_NAME),
+                    isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
+                    ALBUMS.CREATED_TIME.as(ALBUM_CREATED_TIME),
+                    ALBUMS.LAST_EVENT_TIME.as(ALBUM_LAST_EVENT_TIME),
+                    nbUsers.as(NUMBER_OF_USERS),
+                    countDistinct(EVENTS.PK).as(NUMBER_OF_COMMENTS),
+                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as(NUMBER_OF_SERIES),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as(NUMBER_OF_INSTANCES),
+                    ALBUMS.ADD_USER_PERMISSION.as(ADD_USER_PERMISSION),
+                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as(DOWNLOAD_USER_PERMISSION),
+                    ALBUMS.SEND_SERIES_PERMISSION.as(SEND_SERIES_PERMISSION),
+                    ALBUMS.DELETE_SERIES_PERMISSION.as(DELETE_SERIES_PERMISION),
+                    ALBUMS.ADD_SERIES_PERMISSION.as(ADD_SERIES_PERMISSION),
+                    ALBUMS.WRITE_COMMENTS_PERMISSION.as(WRITE_COMMENT_PERMISSION),
+                    ALBUM_USER.FAVORITE.as(FAVORITE),
+                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as(NEW_COMMENT_NOTIFICATIONS),
+                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as(NEW_SERIES_NOTIFICATIONS),
+                    ALBUM_USER.ADMIN.as(ADMIN),
+                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
 
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
@@ -124,7 +125,7 @@ public class AlbumQueries {
             query.addJoin(USERS, ALBUM_USER.USER_FK.eq(USERS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
-                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
+                    .and(EVENTS.EVENT_TYPE.eq(COMMENT_EVENT_TYPE))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
                             .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getUser().getPk()))
                             .or(EVENTS.USER_FK.eq(albumQueryParams.getUser().getPk()))));
@@ -170,7 +171,7 @@ public class AlbumQueries {
 
             if(modalityFilter != null) {
                 final Table<Record> t = query.asTable();
-                final Field<String> f = (Field<String>) t.field("modalities");
+                final Field<String> f = (Field<String>) t.field(MODALITIES);
 
                 final SelectQuery<Record> q = create.selectQuery();
                 q.addFrom(t);
@@ -208,28 +209,28 @@ public class AlbumQueries {
                     .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
                     .asField();
 
-            query.addSelect(ALBUMS.PK.as("album_pk"),
-                    ALBUMS.ID.as("album_id"),
-                    ALBUMS.NAME.as("album_name"),
-                    isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    ALBUMS.CREATED_TIME.as("album_created_time"),
-                    ALBUMS.LAST_EVENT_TIME.as("album_last_event_time"),
-                    nbUsers.as("number_of_users"),
-                    countDistinct(EVENTS.PK).as("number_of_comments"),
-                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as("number_of_series"),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as("number_of_instances"),
-                    ALBUMS.ADD_USER_PERMISSION.as("add_user_permission"),
-                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as("download_user_permission"),
-                    ALBUMS.SEND_SERIES_PERMISSION.as("send_series_permission"),
-                    ALBUMS.DELETE_SERIES_PERMISSION.as("delete_series_permision"),
-                    ALBUMS.ADD_SERIES_PERMISSION.as("add_series_permission"),
-                    ALBUMS.WRITE_COMMENTS_PERMISSION.as("write_comment_permission"),
-                    ALBUM_USER.FAVORITE.as("favorite"),
-                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as("new_comment_notifications"),
-                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as("new_series_notifications"),
-                    ALBUM_USER.ADMIN.as("admin"),
-                    groupConcatDistinct(SERIES.MODALITY).as("modalities"));
+            query.addSelect(ALBUMS.PK.as(ALBUM_PK),
+                    ALBUMS.ID.as(ALBUM_ID),
+                    ALBUMS.NAME.as(ALBUM_NAME),
+                    isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
+                    ALBUMS.CREATED_TIME.as(ALBUM_CREATED_TIME),
+                    ALBUMS.LAST_EVENT_TIME.as(ALBUM_LAST_EVENT_TIME),
+                    nbUsers.as(NUMBER_OF_USERS),
+                    countDistinct(EVENTS.PK).as(NUMBER_OF_COMMENTS),
+                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as(NUMBER_OF_SERIES),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as(NUMBER_OF_INSTANCES),
+                    ALBUMS.ADD_USER_PERMISSION.as(ADD_USER_PERMISSION),
+                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as(DOWNLOAD_USER_PERMISSION),
+                    ALBUMS.SEND_SERIES_PERMISSION.as(SEND_SERIES_PERMISSION),
+                    ALBUMS.DELETE_SERIES_PERMISSION.as(DELETE_SERIES_PERMISION),
+                    ALBUMS.ADD_SERIES_PERMISSION.as(ADD_SERIES_PERMISSION),
+                    ALBUMS.WRITE_COMMENTS_PERMISSION.as(WRITE_COMMENT_PERMISSION),
+                    ALBUM_USER.FAVORITE.as(FAVORITE),
+                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as(NEW_COMMENT_NOTIFICATIONS),
+                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as(NEW_SERIES_NOTIFICATIONS),
+                    ALBUM_USER.ADMIN.as(ADMIN),
+                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
 
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
@@ -238,7 +239,7 @@ public class AlbumQueries {
             query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
 
             query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
-                    .and(EVENTS.EVENT_TYPE.eq("Comment"))
+                    .and(EVENTS.EVENT_TYPE.eq(COMMENT_EVENT_TYPE))
                     .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
                             .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(userPK))
                             .or(EVENTS.USER_FK.eq(userPK))));
@@ -264,14 +265,14 @@ public class AlbumQueries {
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
 
-            query.addSelect(ALBUMS.PK.as("album_pk"),
-                    ALBUMS.ID.as("album_id"),
-                    ALBUMS.NAME.as("album_name"),
-                    isnull(ALBUMS.DESCRIPTION,"NULL").as("album_description"),
-                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as("number_of_studies"),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as("number_of_series"),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as("number_of_instances"),
-                    groupConcatDistinct(SERIES.MODALITY).as("modalities"));
+            query.addSelect(ALBUMS.PK.as(ALBUM_PK),
+                    ALBUMS.ID.as(ALBUM_ID),
+                    ALBUMS.NAME.as(ALBUM_NAME),
+                    isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
+                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
+                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as(NUMBER_OF_SERIES),
+                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as(NUMBER_OF_INSTANCES),
+                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
 
             query.addFrom(ALBUMS);
             query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
@@ -314,14 +315,14 @@ public class AlbumQueries {
             if (orderByParameter.equals("created_time")) ord = ALBUMS.CREATED_TIME;
             else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
             else if (orderByParameter.equals("name")) ord = ALBUMS.NAME;
-            else if (orderByParameter.equals("number_of_users")) {
-                ord = field("number_of_users");
+            else if (orderByParameter.equals(NUMBER_OF_USERS)) {
+                ord = field(NUMBER_OF_USERS);
             }
-            else if (orderByParameter.equals("number_of_studies")) {
-                ord = field("number_of_studies");
+            else if (orderByParameter.equals(NUMBER_OF_STUDIES)) {
+                ord = field(NUMBER_OF_STUDIES);
             }
-            else if (orderByParameter.equals("number_of_comments")) {
-                ord = field("number_of_comments");
+            else if (orderByParameter.equals(NUMBER_OF_COMMENTS)) {
+                ord = field(NUMBER_OF_COMMENTS);
             }
             else {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
