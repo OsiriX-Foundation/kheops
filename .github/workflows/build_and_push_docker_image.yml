@@ -43,6 +43,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
