@@ -57,7 +57,7 @@ jobs:
           tags: sonarqube
           
       - name: Docker run
-        run: docker run --rm sonarqube gradle sonarqube -Dsonar.organization=osirix-foundation "-Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }}" -Dsonar.projectKey=KheopsAuthorization -Dsonar.host.url=https://sonarcloud.io "-Dsonar.login=${{ secrets.SONAR_TOKEN }}" --no-daemon
+        run: docker run --rm sonarqube gradle sonarqube -Dsonar.organization=osirix-foundation -Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }} -Dsonar.projectKey=KheopsAuthorization -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-daemon
 
         
 
