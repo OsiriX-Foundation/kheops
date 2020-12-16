@@ -2,7 +2,6 @@ package online.kheops.auth_server.webhook;
 
 import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
-import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
 import online.kheops.auth_server.study.StudyResponse;
 import online.kheops.auth_server.user.UserResponse;
@@ -73,9 +72,8 @@ public class WebhookTriggerResponse {
 
         if(!webhookTrigger.getWebhookAttempts().isEmpty()) {
             webhookAttemptResponseList = new ArrayList<>();
-            for (WebhookAttempt webhookAttempt : webhookTrigger.getWebhookAttempts()) {
-                webhookAttemptResponseList.add(new WebhookAttemptResponse(webhookAttempt));
-            }
+            webhookTrigger.getWebhookAttempts().forEach(
+                    webhookAttempt -> webhookAttemptResponseList.add(new WebhookAttemptResponse(webhookAttempt)));
         }
     }
 }
