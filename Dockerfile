@@ -12,7 +12,6 @@ ENV REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
 
 COPY --from=build /home/gradle/zipper/build/libs/zipper.war /usr/local/tomcat/webapps/zipper.war
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
-COPY kheops-entrypoint.sh kheops-entrypoint.sh
 COPY context.xml /usr/local/tomcat/conf/context.xml
 COPY replaceSecretsAndRun.sh replaceSecretsAndRun.sh
 
