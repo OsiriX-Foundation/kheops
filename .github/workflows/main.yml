@@ -3,7 +3,7 @@ name: Docker Image CI
 on: [push]
 
 jobs:
-  build ci_test:
+  build_ci-test:
     runs-on: ubuntu-latest
     steps:
 
@@ -34,7 +34,7 @@ jobs:
           tags: osirixfoundation/kheops-reverse-proxy:ci-test-${{ steps.extract_branch.outputs.branch }}
           
           
-  build secure:
+  build_secure:
     runs-on: ubuntu-latest
     steps:
 
@@ -65,7 +65,7 @@ jobs:
           tags: osirixfoundation/kheops-reverse-proxy:secure-${{ steps.extract_branch.outputs.branch }}
         
         
-  build letsencrypt:
+  build_letsencrypt:
     runs-on: ubuntu-latest
     steps:
 
