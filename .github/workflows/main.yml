@@ -23,8 +23,9 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
-      
-      
+              
       - name: build with script
         shell: bash
         run: ./build
+        env:
+          BRANCH: ${{ steps.extract_branch.outputs.branch }}
