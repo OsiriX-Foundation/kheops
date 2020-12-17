@@ -15,23 +15,23 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.27'
-    compile group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
-    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.27'
+    api group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.27'
+    api group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.27'
+    api group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.27'
 
-    compile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
+    api group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
 
-    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.15.0') {
+    api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.15.0') {
         exclude module: 'slf4j-log4j12'
     }
-    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.15.0') {
+    api (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.15.0') {
         exclude module: 'slf4j-log4j12'
     }
+    api group: 'javax.xml.bind', name: 'jaxb-api', version: '2.2.4'
+
 }
 
 gretty {
-
-
     httpPort = 7199
     contextPath = ''
     servletContainer = 'tomcat9'
