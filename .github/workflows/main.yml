@@ -24,15 +24,18 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
               
-      - name: build with script
-        shell: bash
-        run: ./build
-        env:
-          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+      #- name: build with script
+       # shell: bash
+       # run: ./build
+        #env:
+         # BRANCH: ${{ steps.extract_branch.outputs.branch }}
           
           
       - name: Push
         uses: docker/build-push-action@v2.2.1
         with:
+          context: hosts/proxy
+          file: hosts/proxy/Dockerfile
+          platforms: linux/amd64
           push: true
           tags: osirixfoundation/pacs-authorization-proxy:${{ steps.extract_branch.outputs.branch }}
