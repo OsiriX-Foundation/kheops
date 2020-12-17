@@ -23,12 +23,8 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
-        
-      - name: Build and push
-        uses: docker/build-push-action@v2.2.1
-        with:
-          context: .
-          file: Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: osirixfoundation/pacs-authorization-proxy:${{ steps.extract_branch.outputs.branch }}
+      
+      
+      - name: build with script
+        shell: bash
+        run: ./build
