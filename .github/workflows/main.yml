@@ -3,7 +3,7 @@ name: Docker Image CI
 on: [push]
 
 jobs:
-  build ci-test:
+  build ci_test:
     runs-on: ubuntu-latest
     steps:
 
