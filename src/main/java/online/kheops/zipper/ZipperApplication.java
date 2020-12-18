@@ -1,15 +1,9 @@
 package online.kheops.zipper;
 
 import javax.ws.rs.ApplicationPath;
-import org.glassfish.jersey.server.ResourceConfig;
-
+import javax.ws.rs.core.Application;
 
 @ApplicationPath("/*")
-public final class ZipperApplication extends ResourceConfig {
-
-    public ZipperApplication() {
-        property("jersey.config.server.provider.classnames", "org.glassfish.jersey.media.multipart.MultiPartFeature,online.kheops.zipper.filter.CacheFilterFactory");
-        packages(true, "online.kheops.zipper");
-    }
+public final class ZipperApplication extends Application {
 
 }
