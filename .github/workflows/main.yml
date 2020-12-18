@@ -35,7 +35,7 @@ jobs:
         uses: docker/build-push-action@v2.2.1
         with:
           context: hosts/proxy
-          file: hosts/proxy/Dockerfile
+          file: Dockerfile
           platforms: linux/amd64
           push: true
           tags: osirixfoundation/pacs-authorization-proxy:${{ steps.extract_branch.outputs.branch }}
