@@ -312,7 +312,7 @@ public class AlbumQueries {
 
     private static SortField getOrderBy(String orderByParameter, boolean descending) throws  BadQueryParametersException{
 
-            Field ord;
+            final Field ord;
 
             if (orderByParameter.equals("created_time")) ord = ALBUMS.CREATED_TIME;
             else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
