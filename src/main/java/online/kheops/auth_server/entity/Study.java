@@ -19,7 +19,7 @@ import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
         @NamedQuery(name = "Study.findByUID",
         query = "SELECT s FROM Study s WHERE s.studyInstanceUID = :"+STUDY_UID),
         @NamedQuery(name = "Study.findByUIDAndUser",
-        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:"+USER+" AND st = :"+STUDY_UID),
+        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:"+USER+" AND st = :"+STUDY),
         @NamedQuery(name = "Study.findByStudyAndAlbum",
         query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:"+ALBUM+" AND st = :"+STUDY),
         @NamedQuery(name = "Study.findByUIDAndAlbum",

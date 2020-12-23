@@ -26,7 +26,7 @@ public class SeriesQueries {
     public static List<Series> findSeriesListByStudyUIDFromInbox(User callingUser, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInbox", Series.class);
         query.setParameter(StudyInstanceUID, studyInstanceUID);
-        query.setParameter(USER_ID, callingUser);
+        query.setParameter(USER, callingUser);
         return query.getResultList();
     }
 
