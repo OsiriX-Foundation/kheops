@@ -25,21 +25,21 @@ public class SeriesQueries {
 
     public static List<Series> findSeriesListByStudyUIDFromInbox(User callingUser, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInbox", Series.class);
-        query.setParameter(StudyInstanceUID, studyInstanceUID);
+        query.setParameter(STUDY_UID, studyInstanceUID);
         query.setParameter(USER, callingUser);
         return query.getResultList();
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbum(Album album, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class);
-        query.setParameter(StudyInstanceUID,studyInstanceUID);
+        query.setParameter(STUDY_UID,studyInstanceUID);
         query.setParameter(ALBUM,album);
         return query.getResultList();
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbumAndInbox(User callingUser, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInboxAndAlbum", Series.class);
-        query.setParameter(StudyInstanceUID,studyInstanceUID);
+        query.setParameter(STUDY_UID,studyInstanceUID);
         query.setParameter(USER,callingUser);
         return query.getResultList();
     }
@@ -49,8 +49,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findByStudyUIDFromInbox", Series.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
             query.setParameter(USER, callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -68,8 +68,8 @@ public class SeriesQueries {
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findByStudyUIDFromAlbum", Series.class);
             query.setParameter(ALBUM, album);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -84,8 +84,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUIDAndStudyUIDAndUser", Series.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
             query.setParameter(USER, callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
@@ -102,8 +102,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> seriesQuery = em.createNamedQuery("Series.findBySeriesUIDAndStudyUIDAndUserWithSharePermission", Series.class);
-            seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
-            seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+            seriesQuery.setParameter(STUDY_UID, studyInstanceUID);
+            seriesQuery.setParameter(SERIES_UID, seriesInstanceUID);
             seriesQuery.setParameter(USER, callingUser);
             return seriesQuery.getSingleResult();
         } catch (NoResultException e) {
@@ -120,8 +120,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUIDAndStudyUID", Series.class);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -137,7 +137,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUID", Series.class);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -220,7 +220,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromInbox", SeriesUIDFavoritePair.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             query.setParameter(USER, callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
             final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
@@ -242,7 +242,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromInboxAndAlbum", SeriesUIDFavoritePair.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             query.setParameter(USER, callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
             final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();

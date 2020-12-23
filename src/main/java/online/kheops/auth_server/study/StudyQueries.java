@@ -24,7 +24,7 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createNamedQuery("Study.findByUID", Study.class);
-            query.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
