@@ -28,6 +28,8 @@ import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
 import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.ALBUM_ID;
 import static online.kheops.auth_server.util.JooqConstances.*;
 import static org.jooq.impl.DSL.*;
 
@@ -42,7 +44,7 @@ public class AlbumQueries {
 
         try {
             return em.createNamedQuery("Albums.findById", Album.class)
-                    .setParameter("albumId", albumId)
+                    .setParameter(ALBUM_ID, albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new AlbumNotFoundException();
@@ -54,8 +56,8 @@ public class AlbumQueries {
 
         try {
             return em.createNamedQuery("AlbumUser.findByAlbumIdAndUser", AlbumUser.class)
-                    .setParameter("targetUser", user)
-                    .setParameter("targetAlbum", album)
+                    .setParameter(USER, user)
+                    .setParameter(ALBUM, album)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new UserNotMemberException();
@@ -64,7 +66,7 @@ public class AlbumQueries {
 
     public static List<Album> findAlbumsWithEnabledNewSeriesWebhooks(String studyInstanceUID, EntityManager em ) {
         return em.createNamedQuery("Albums.findWithEnabledNewSeriesWebhooks", Album.class)
-                .setParameter("studyInstanceUID", studyInstanceUID)
+                .setParameter(STUDY_UID, studyInstanceUID)
                 .getResultList();
     }
 

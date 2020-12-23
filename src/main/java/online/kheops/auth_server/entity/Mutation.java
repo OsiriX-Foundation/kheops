@@ -6,11 +6,13 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.ALBUM;
+
 @NamedQueries({
         @NamedQuery(name = "Mutation.findAllByAlbum",
-                query = "SELECT m FROM Mutation m WHERE :album = m.album ORDER BY m.eventTime desc"),
+                query = "SELECT m FROM Mutation m WHERE :"+ALBUM+" = m.album ORDER BY m.eventTime desc"),
         @NamedQuery(name = "Mutation.countAllByAlbum",
-                query = "SELECT count(m) FROM Mutation m WHERE :album = m.album")
+                query = "SELECT count(m) FROM Mutation m WHERE :"+ALBUM+" = m.album")
 })
 
 @Entity(name = "Mutation")

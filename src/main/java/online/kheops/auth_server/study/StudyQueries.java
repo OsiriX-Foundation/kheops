@@ -11,6 +11,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 
 import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 public class StudyQueries {
 
@@ -39,8 +40,8 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createNamedQuery("Study.findByUIDAndUser", Study.class);
-            query.setParameter("study", study);
-            query.setParameter("user", user);
+            query.setParameter(STUDY, study);
+            query.setParameter(USER, user);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -56,8 +57,8 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createNamedQuery("Study.findByStudyAndAlbum", Study.class);
-            query.setParameter("study", study);
-            query.setParameter("album", album);
+            query.setParameter(STUDY, study);
+            query.setParameter(ALBUM, album);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -73,8 +74,8 @@ public class StudyQueries {
 
         try {
             TypedQuery<Study> query = em.createNamedQuery("Study.findByUIDAndAlbum", Study.class);
-            query.setParameter("studyUID", studyUID);
-            query.setParameter("album", album);
+            query.setParameter(STUDY_UID, studyUID);
+            query.setParameter(ALBUM, album);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()

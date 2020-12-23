@@ -3,11 +3,13 @@ package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 @NamedQueries({
 
         @NamedQuery(name = "AlbumSeries.findByAlbumAndSeries",
-                query = "SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album")
+                query = "SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album")
 })
 
 @Entity

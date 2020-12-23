@@ -9,13 +9,15 @@ import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 
 @NamedQueries({
         @NamedQuery(name = "Albums.findById",
-        query = "SELECT a FROM Album a WHERE :albumId = a.id"),
+        query = "SELECT a FROM Album a WHERE :"+ALBUM_ID+" = a.id"),
         @NamedQuery(name = "Albums.findWithEnabledNewSeriesWebhooks",
-        query = "SELECT distinct a FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st JOIN a.webhooks w WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :studyInstanceUID"),
+        query = "SELECT distinct a FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st JOIN a.webhooks w WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :"+STUDY_UID),
 
 })
 
@@ -120,8 +122,8 @@ public class Album {
     public boolean containsSeries(Series series, EntityManager em) {
         try {
             em.createNamedQuery("AlbumSeries.findByAlbumAndSeries", AlbumSeries.class)
-                    .setParameter("series", series)
-                    .setParameter("album", this)
+                    .setParameter(SERIES, series)
+                    .setParameter(ALBUM, this)
                     .getSingleResult();
         } catch (NoResultException e) {
             return false;
@@ -132,9 +134,9 @@ public class Album {
     public void addSeries(AlbumSeries albumSeries) { this.albumSeries.add(albumSeries); }
 
     public void removeSeries(Series series, EntityManager em) {
-        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
-                .setParameter("series", series)
-                .setParameter("album", this)
+        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album", AlbumSeries.class)
+                .setParameter(SERIES, series)
+                .setParameter(ALBUM, this)
                 .getSingleResult();
         series.removeAlbumSeries(localAlbumSeries);
         this.albumSeries.remove(localAlbumSeries);
