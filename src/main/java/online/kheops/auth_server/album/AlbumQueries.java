@@ -5,6 +5,8 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.ErrorResponse;
+import online.kheops.auth_server.util.JPANamedQueryConstants;
+import online.kheops.auth_server.util.JooqConstances;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import org.jooq.*;
 import org.jooq.JoinType;
@@ -29,8 +31,8 @@ import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
-import static online.kheops.auth_server.util.JPANamedQueryConstants.ALBUM_ID;
 import static online.kheops.auth_server.util.JooqConstances.*;
+
 import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
@@ -44,7 +46,7 @@ public class AlbumQueries {
 
         try {
             return em.createNamedQuery("Albums.findById", Album.class)
-                    .setParameter(ALBUM_ID, albumId)
+                    .setParameter(JPANamedQueryConstants.ALBUM_ID, albumId)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new AlbumNotFoundException();
@@ -97,7 +99,7 @@ public class AlbumQueries {
                     .asField();
 
             query.addSelect(ALBUMS.PK.as(ALBUM_PK),
-                    ALBUMS.ID.as(ALBUM_ID),
+                    ALBUMS.ID.as(JooqConstances.ALBUM_ID),
                     ALBUMS.NAME.as(ALBUM_NAME),
                     isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
                     ALBUMS.CREATED_TIME.as(ALBUM_CREATED_TIME),
@@ -212,7 +214,7 @@ public class AlbumQueries {
                     .asField();
 
             query.addSelect(ALBUMS.PK.as(ALBUM_PK),
-                    ALBUMS.ID.as(ALBUM_ID),
+                    ALBUMS.ID.as(JooqConstances.ALBUM_ID),
                     ALBUMS.NAME.as(ALBUM_NAME),
                     isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
                     ALBUMS.CREATED_TIME.as(ALBUM_CREATED_TIME),
@@ -268,7 +270,7 @@ public class AlbumQueries {
             final SelectQuery<Record> query = create.selectQuery();
 
             query.addSelect(ALBUMS.PK.as(ALBUM_PK),
-                    ALBUMS.ID.as(ALBUM_ID),
+                    ALBUMS.ID.as(JooqConstances.ALBUM_ID),
                     ALBUMS.NAME.as(ALBUM_NAME),
                     isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
                     countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
