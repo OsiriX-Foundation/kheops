@@ -83,7 +83,7 @@ public class Mutation extends Event{
     public Mutation(User callingUser, Album album, MutationType mutationType, Study study, List<Series> seriesList) {
         super(callingUser, album, study);
         this.mutationType = mutationType;
-        for (Series series :seriesList) {
+        for (Series series : seriesList) {
             this.addSeries(series);
         }
     }
@@ -95,7 +95,7 @@ public class Mutation extends Event{
 
         capability.addMutation(this);
 
-        for (Series series :seriesList) {
+        for (Series series : seriesList) {
             this.addSeries(series);
         }
     }

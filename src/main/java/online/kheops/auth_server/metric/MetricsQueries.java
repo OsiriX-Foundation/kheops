@@ -93,14 +93,14 @@ class MetricsQueries {
     }
 
     static Long getNumberOfActiveToken(ScopeType scopeType, EntityManager em) {
-        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE+" AND c.revokedTime = NULL AND c.expirationTime > :now AND c.notBeforeTime < :"+DATE_TIME_NOW, Long.class)
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE+" AND c.revokedTime = NULL AND c.expirationTime > :"+DATE_TIME_NOW+" AND c.notBeforeTime < :"+DATE_TIME_NOW, Long.class)
                 .setParameter(DATE_TIME_NOW, LocalDateTime.now(ZoneOffset.UTC))
                 .setParameter(CAPABILITY_SCOPE_TYPE, scopeType)
                 .getSingleResult();
     }
 
     static Long getNumberOfUnactiveToken(ScopeType scopeType, EntityManager em) {
-        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE+" AND (c.revokedTime <> NULL OR c.expirationTime < :now OR c.notBeforeTime > :"+DATE_TIME_NOW+")", Long.class)
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE+" AND (c.revokedTime <> NULL OR c.expirationTime < :"+DATE_TIME_NOW+" OR c.notBeforeTime > :"+DATE_TIME_NOW+")", Long.class)
                 .setParameter(DATE_TIME_NOW, LocalDateTime.now(ZoneOffset.UTC))
                 .setParameter(CAPABILITY_SCOPE_TYPE, scopeType)
                 .getSingleResult();
