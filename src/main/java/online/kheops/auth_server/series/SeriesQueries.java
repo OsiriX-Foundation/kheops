@@ -4,7 +4,6 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
@@ -12,7 +11,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.*;
 
-import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;

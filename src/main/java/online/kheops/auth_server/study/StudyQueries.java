@@ -3,7 +3,6 @@ package online.kheops.auth_server.study;
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
