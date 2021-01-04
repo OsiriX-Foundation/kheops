@@ -6,7 +6,7 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 @NamedQueries({
         @NamedQuery(name = "Comment.findAllByAlbum",
-                query = "SELECT c FROM Comment c WHERE :"+ALBUM+" = c.album AND (c.privateTargetUser = null OR c.privateTargetUser = :user OR c.user = :"+USER+") ORDER BY c.eventTime desc"),
+                query = "SELECT c FROM Comment c WHERE :"+ALBUM+" = c.album AND (c.privateTargetUser = null OR c.privateTargetUser = :"+USER+" OR c.user = :"+USER+") ORDER BY c.eventTime desc"),
         @NamedQuery(name = "Comment.countAllByAlbumAndUser",
                 query = "SELECT count(c) FROM Comment c WHERE :"+ALBUM+" = c.album AND (c.privateTargetUser = null OR c.user = :"+USER+" OR c.privateTargetUser = :"+USER+")"),
         @NamedQuery(name = "Comment.findAllByStudyUIDAndUser",
