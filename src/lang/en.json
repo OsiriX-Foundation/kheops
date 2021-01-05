@@ -303,8 +303,7 @@
 		"titleBoxSending": "Sending files",
 		"transfersyntaxnotsupported": "Referenced Transfer Syntax not supported",
 		"unknownError": "{count} unknown file produced this error : | {count} unknown files produced this error :",
-		"unknownerror": "Unknown Error",
-		"upload": "Drop your files / directories !"
+		"unknownerror": "Unknown Error"
 	},
 	"urlnotvalid": "This url is not valid",
 	"user": {

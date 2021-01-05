@@ -282,8 +282,7 @@
 		"titleBoxSending": "*UPLOAD.TITLEBOXSENDING*",
 		"transfersyntaxnotsupported": "*UPLOAD.TRANSFERSYNTAXNOTSUPPORTED*",
 		"unknownError": "{count} *UPLOAD.UNKNOWNERROR* | {count} *UPLOAD.UNKNOWNERROR*",
-		"unknownerror": "*UPLOAD.UNKNOWNERROR*",
-		"upload": "*UPLOAD.UPLOAD*"
+		"unknownerror": "*UPLOAD.UNKNOWNERROR*"
 	},
 	"urlnotvalid": "*URLNOTVALID*",
 	"user": {

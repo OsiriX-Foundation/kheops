@@ -32,11 +32,6 @@
               {{ $t("upload.cantUpload") }}
             </span>
           </p>
-          <p
-            v-else
-          >
-            {{ $t("upload.upload") }}
-          </p>
         </div>
         <div
           v-if="loading"

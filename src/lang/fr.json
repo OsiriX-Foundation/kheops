@@ -287,8 +287,7 @@
 		"titleBoxSending": "Fichiers en cours d'envois",
 		"transfersyntaxnotsupported": "Syntaxe de transfert référencée non prise en charge",
 		"unknownError": "{count} fichier inconnu a produit cette erreur : | {count} fichiers inconnus ont produit cette erreur :",
-		"unknownerror": "Erreur inconnue",
-		"upload": "Lâcher vos fichiers / dossiers !"
+		"unknownerror": "Erreur inconnue"
 	},
 	"urlnotvalid": "Cette url n'est pas valide",
 	"user": {
