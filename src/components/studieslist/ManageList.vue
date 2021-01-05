@@ -43,7 +43,17 @@
         {{ $t('study.nomorestudies') }}
       </div>
       <div slot="no-results">
-        {{ $t('study.noresults') }}
+        <div
+          v-if="mobiledetect"
+        >
+          {{ $t('study.noresults') }}
+        </div>
+        <drag-and-drop-icon
+          v-else
+          height="400px"
+          width="400px"
+          :text="$t('study.dragDrop')"
+        />
       </div>
       <div slot="error">
         <span
@@ -77,11 +87,13 @@ import ListHeaders from '@/components/studieslist/ListHeaders';
 import StudyInputFile from '@/components/study/StudyInputFile';
 import StudyInputDirectory from '@/components/study/StudyInputDirectory';
 import { CurrentUser } from '@/mixins/currentuser.js';
+import DragAndDropIcon from '@/components/kheopsSVG/DragAndDropIcon.vue';
+import mobiledetect from '@/mixins/mobiledetect.js';
 
 export default {
   name: 'ManageList',
   components: {
-    ListHeaders, InfiniteLoading, Loading, StudiesList, StudyInputFile, StudyInputDirectory,
+    ListHeaders, InfiniteLoading, Loading, StudiesList, StudyInputFile, StudyInputDirectory, DragAndDropIcon,
   },
   mixins: [CurrentUser],
   props: {
@@ -132,6 +144,9 @@ export default {
         canUpload = !process.env.VUE_APP_DISABLE_UPLOAD.includes('true');
       }
       return canUpload;
+    },
+    mobiledetect() {
+      return mobiledetect.mobileAndTabletcheck();
     },
   },
   watch: {
@@ -300,9 +315,7 @@ export default {
         if (Object.keys(this.tmpFilters).length !== Object.keys(this.filters).length) {
           return false;
         }
-        const difference = Object.keys(this.filters).every((key) => {
-          return (this.tmpFilters[key] === this.filters[key]);
-        });
+        const difference = Object.keys(this.filters).every((key) => this.tmpFilters[key] === this.filters[key]);
         return difference;
       }
       return true;
