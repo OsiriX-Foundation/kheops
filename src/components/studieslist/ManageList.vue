@@ -44,7 +44,7 @@
       </div>
       <div slot="no-results">
         <div
-          v-if="mobiledetect"
+          v-if="mobiledetect || !canUpload || !permissions.add_series"
         >
           {{ $t('study.noresults') }}
         </div>
