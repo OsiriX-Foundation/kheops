@@ -1,19 +1,17 @@
 <template>
-  <div>
-    <component-import-study
-      v-if="active === true"
-      :permissions="permissions"
-      :album-i-d="albumID"
-    />
-    <div
-      v-if="active === false"
-    >
-      <b-card class="text-center">
-        <div class="bg-secondary font-large">
-          {{ $t('sharinglink.invalidtoken') }}
-        </div>
-      </b-card>
-    </div>
+  <component-import-study
+    v-if="active === true"
+    :permissions="permissions"
+    :album-i-d="albumID"
+  />
+  <div
+    v-else
+  >
+    <b-card class="text-center">
+      <div class="bg-secondary font-large">
+        {{ $t('sharinglink.invalidtoken') }}
+      </div>
+    </b-card>
   </div>
 </template>
 

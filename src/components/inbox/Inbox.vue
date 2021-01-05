@@ -1,19 +1,17 @@
 <template>
-  <div>
-    <component-import-study
-      :permissions="permissions"
-    />
-    <!--
-      <template
-        slot="dropzone-content"
-      >
-        <manage-list
-          :permissions="permissions"
-        />
-      </template>
-    </component-import-study>
-    -->
-  </div>
+  <component-import-study
+    :permissions="permissions"
+  />
+  <!--
+    <template
+      slot="dropzone-content"
+    >
+      <manage-list
+        :permissions="permissions"
+      />
+    </template>
+  </component-import-study>
+  -->
 </template>
 
 <script>

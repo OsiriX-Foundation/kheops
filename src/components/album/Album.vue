@@ -30,22 +30,20 @@
         </div>
       </div>
     </div>
-    <span v-if="currentView === 'studies' || currentView === undefined && loading === false">
-      <div class="container">
-        <div
-          v-if="album.description !== undefined && album.description.length > 0"
-          class="card"
-        >
-          <album-description
-            :description="album.description"
-          />
-        </div>
+    <div v-if="currentView === 'studies' || currentView === undefined && loading === false">
+      <div
+        v-if="album.description !== undefined && album.description.length > 0"
+        class="container card"
+      >
+        <album-description
+          :description="album.description"
+        />
       </div>
       <component-import-study
         :album-i-d="albumID"
         :permissions="permissions"
       />
-    </span>
+    </div>
     <album-comments
       v-if="currentView=='comments' && loading === false"
       :id="album.album_id"

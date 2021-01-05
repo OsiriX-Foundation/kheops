@@ -1,73 +1,58 @@
 <template>
-  <div
-    id="file-drag-drop"
-    ref="filedragdrop"
+  <!--
+    https://stackoverflow.com/questions/34817656/add-class-in-drop-area-file-input-when-dragging-an-external-image-over-dragen
+  -->
+  <form
+    id="fileform"
+    ref="fileform"
+    :class="['fileform', hover ? 'dragenterFormClass' : '']"
   >
-    <!--
-      https://stackoverflow.com/questions/34817656/add-class-in-drop-area-file-input-when-dragging-an-external-image-over-dragen
-    -->
-    <form
-      id="fileform"
-      ref="fileform"
-      :class="['fileform', hover ? 'dragenterFormClass' : '']"
+    <div
+      id="dragingcomponent"
+      class="dragingcomponent"
     >
       <div
-        id="dragingcomponenet"
-        ref="dragingcomponenet"
-        class="dragingcomponenet"
+        v-if="hover"
+        class="outPopUp"
       >
-        <div
-          v-if="hover"
-          class="outPopUp"
+        <p
+          v-if="!canUpload"
         >
-          <p
-            v-if="!canUpload"
-          >
-            {{ $t("upload.cantUploadPermission") }}
-          </p>
-          <p
-            v-else-if="sending && files.length > 0"
-          >
-            <span>
-              {{ $t("upload.cantUpload") }}
-            </span>
-          </p>
-        </div>
-        <div
-          v-if="loading"
-          class="outPopUp"
+          {{ $t("upload.cantUploadPermission") }}
+        </p>
+        <p
+          v-else-if="sending && files.length > 0"
         >
-          <kheops-clip-loader
-            :loading="loading"
-            :size="'60px'"
-            :color="'white'"
-          />
-        </div>
-        <div
-          :class="['dropzone-area', classDragIn]"
-        >
-          <slot name="dropzone-content">
-            <!--
-            <list
-              ref="list"
-              :permissions="permissions"
-              :album-i-d="albumID"
-              @loadfiles="inputLoadFiles"
-              @loaddirectories="inputLoadFiles"
-            />
-            -->
-            <manage-list
-              ref="list"
-              :permissions="permissions"
-              :album-i-d="albumID"
-              @loadfiles="inputLoadFiles"
-              @loaddirectories="inputLoadFiles"
-            />
-          </slot>
-        </div>
+          <span>
+            {{ $t("upload.cantUpload") }}
+          </span>
+        </p>
       </div>
-    </form>
-  </div>
+      <div
+        v-if="loading"
+        class="outPopUp"
+      >
+        <kheops-clip-loader
+          :loading="loading"
+          :size="'60px'"
+          :color="'white'"
+        />
+      </div>
+      <div
+        :class="['dropzone-area', classDragIn]"
+      >
+        <slot name="dropzone-content">
+          <manage-list
+            ref="list"
+            :permissions="permissions"
+            :album-i-d="albumID"
+            @loadfiles="inputLoadFiles"
+            @loaddirectories="inputLoadFiles"
+          />
+        </slot>
+      </div>
+    </div>
+  </form>
 </template>
 
 <script>
@@ -157,7 +142,6 @@ export default {
 
       /*
       https://stackoverflow.com/questions/7110353/html5-dragleave-fired-when-hovering-a-child-element
-      //$refs.dragingcomponenet
       */
       this.$refs.fileform.addEventListener('dragenter', () => {
         this.counterDraging += 1;
