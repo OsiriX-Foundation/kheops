@@ -288,6 +288,9 @@ export default {
           this.statusList = res.status;
         }
         if (this.studies.length === parseInt(res.headers['x-total-count'], 10)) {
+          if (this.studies.length > 0) {
+            $state.loaded();
+          }
           $state.complete();
         }
         if (res.status === 200 && res.data.length > 0) {
@@ -301,7 +304,6 @@ export default {
         }
         this.firstLoading = false;
       }).catch((err) => {
-        console.log(err);
         if (err.response !== undefined && err.response.status !== undefined) {
           this.statusList = err.response.status;
         }
