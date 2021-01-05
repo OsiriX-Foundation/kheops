@@ -1,286 +1,284 @@
 <template>
-  <div>
+  <div
+    v-if="UI.show"
+    class="chat-popup container-fluid p-0"
+  >
     <div
-      v-if="UI.show"
-      class="chat-popup container-fluid p-0"
+      class="closeBtn d-flex"
     >
       <div
-        class="closeBtn d-flex"
+        v-if="sending === true && UI.getInfo === false"
+        class="p-2"
       >
-        <div
+        <kheops-clip-loader
+          :loading="sending"
+          :size="'20px'"
+          :color="'white'"
+        />
+      </div>
+      <div
+        v-else-if="sending === false && UI.getInfo === false"
+        class="p-2"
+      >
+        <done-icon
+          v-if="error.length === 0 && totalUnknownFilesError === 0"
+          :height="'20'"
+          :width="'20'"
+        />
+        <v-icon
+          v-if="(error.length > 0 || totalUnknownFilesError > 0) && (error.length + totalUnknownFilesError) < totalSize"
+          name="warning"
+          :height="'20'"
+          :width="'20'"
+          color="red"
+        />
+        <error-icon
+          v-if="(error.length === totalSize || totalUnknownFilesError === totalSize) && totalSize !== 0"
+          :height="'20'"
+          :width="'20'"
+          color="red"
+        />
+      </div>
+      <div
+        v-else-if="UI.getInfo === true"
+        class="p-2 text-danger"
+      >
+        <v-icon
+          class="align-middle"
+          name="warning"
+          :height="'20'"
+          :width="'20'"
+        />
+      </div>
+      <div
+        class="p-2"
+      >
+        <span
           v-if="sending === true && UI.getInfo === false"
-          class="p-2"
         >
-          <kheops-clip-loader
-            :loading="sending"
-            :size="'20px'"
-            :color="'white'"
-          />
-        </div>
-        <div
+          {{ $t("upload.titleBoxSending") }}
+        </span>
+        <span
           v-else-if="sending === false && UI.getInfo === false"
-          class="p-2"
         >
-          <done-icon
-            v-if="error.length === 0 && totalUnknownFilesError === 0"
-            :height="'20'"
-            :width="'20'"
-          />
-          <v-icon
-            v-if="(error.length > 0 || totalUnknownFilesError > 0) && (error.length + totalUnknownFilesError) < totalSize"
-            name="warning"
-            :height="'20'"
-            :width="'20'"
-            color="red"
-          />
-          <error-icon
-            v-if="(error.length === totalSize || totalUnknownFilesError === totalSize) && totalSize !== 0"
-            :height="'20'"
-            :width="'20'"
-            color="red"
-          />
-        </div>
-        <div
+          {{ $t("upload.titleBoxSended") }}
+        </span>
+        <span
           v-else-if="UI.getInfo === true"
-          class="p-2 text-danger"
         >
-          <v-icon
-            class="align-middle"
-            name="warning"
-            :height="'20'"
-            :width="'20'"
-          />
-        </div>
-        <div
-          class="p-2"
+          {{ $t("upload.titleBoxDicomize") }}
+        </span>
+      </div>
+      <!--
+      <div
+        class="ml-auto p-1"
+      >
+          Reduce / Show icon
+        <button
+          type="button"
+          class="btn btn-link btn-sm"
+          @click="UI.hide=!UI.hide"
         >
           <span
-            v-if="sending === true && UI.getInfo === false"
+            v-if="UI.hide===false"
           >
-            {{ $t("upload.titleBoxSending") }}
-          </span>
-          <span
-            v-else-if="sending === false && UI.getInfo === false"
-          >
-            {{ $t("upload.titleBoxSended") }}
-          </span>
-          <span
-            v-else-if="UI.getInfo === true"
-          >
-            {{ $t("upload.titleBoxDicomize") }}
-          </span>
-        </div>
-        <!--
-        <div
-          class="ml-auto p-1"
-        >
-            Reduce / Show icon
-          <button
-            type="button"
-            class="btn btn-link btn-sm"
-            @click="UI.hide=!UI.hide"
-          >
-            <span
-              v-if="UI.hide===false"
-            >
-              <remove-icon
-                :height="UI.SVGHeaderHeight"
-                :width="UI.SVGHeaderWidth"
-              />
-            </span>
-            <span
-              v-if="UI.hide===true"
-            >
-              <add-icon
-                :height="UI.SVGHeaderHeight"
-                :width="UI.SVGHeaderWidth"
-              />
-            </span>
-          </button>
-        </div>
-        -->
-        <!--
-            Close icon
-          -->
-        <div
-          class="ml-auto p-1"
-        >
-          <button
-            type="button"
-            class="btn btn-link btn-sm"
-            @click="closeWindow()"
-          >
-            <close-icon
+            <remove-icon
               :height="UI.SVGHeaderHeight"
               :width="UI.SVGHeaderWidth"
             />
-          </button>
-        </div>
+          </span>
+          <span
+            v-if="UI.hide===true"
+          >
+            <add-icon
+              :height="UI.SVGHeaderHeight"
+              :width="UI.SVGHeaderWidth"
+            />
+          </span>
+        </button>
       </div>
+      -->
+      <!--
+          Close icon
+        -->
       <div
-        v-if="UI.hide === false"
-        class="p-2"
+        class="ml-auto p-1"
+      >
+        <button
+          type="button"
+          class="btn btn-link btn-sm"
+          @click="closeWindow()"
+        >
+          <close-icon
+            :height="UI.SVGHeaderHeight"
+            :width="UI.SVGHeaderWidth"
+          />
+        </button>
+      </div>
+    </div>
+    <div
+      v-if="UI.hide === false"
+      class="p-2"
+    >
+      <div
+        v-if="UI.getInfo"
+        class="mb-2"
+      >
+        <input-dicomize
+          :files-to-dicomize="filesToDicomize"
+          :create-study="studyUIDToSend === '' ? true : false"
+          @valid-dicom-value="validDicomValue"
+        />
+      </div>
+      <!--
+        When sending
+      -->
+      <div
+        v-if="files.length > 0 && sending === true"
       >
         <div
-          v-if="UI.getInfo"
-          class="mb-2"
+          v-if="UI.cancel === false"
         >
-          <input-dicomize
-            :files-to-dicomize="filesToDicomize"
-            :create-study="studyUIDToSend === '' ? true : false"
-            @valid-dicom-value="validDicomValue"
+          <b-progress-bar
+            :value="progress"
+            :max="totalSize"
+            show-progress
+            animated
+            class="text-center"
+          >
+            {{ countSentFiles }} / {{ totalSize }}
+          </b-progress-bar>
+          <div
+            class="d-flex justify-content-center mt-1 mb-1"
+          >
+            <button
+              type="button"
+              class="btn btn-link btn-sm text-center text-warning"
+              @click="setCancel()"
+            >
+              <span>
+                {{ $t("cancel") }}
+              </span>
+              <block-icon
+                :height="UI.SVGheight"
+                :width="UI.SVGwidth"
+                color="red"
+              />
+            </button>
+          </div>
+        </div>
+        <div
+          v-else
+        >
+          <kheops-clip-loader
+            :loading="UI.cancel"
+            :size="UI.SpinnerCancelSize"
+            :color="'red'"
           />
         </div>
-        <!--
-          When sending
-        -->
+      </div>
+      <!--
+        When sending finish
+      -->
+      <div
+        v-else-if="(UI.show === true) && (countSentFiles === totalSize || sending === false)"
+        class="row"
+      >
         <div
-          v-if="files.length > 0 && sending === true"
+          class="col-11 mt-2 mb-2 ml-3"
         >
-          <div
-            v-if="UI.cancel === false"
+          {{ $tc("upload.filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
+          {{ $tc("upload.locationSend", sourceIsAlbum ? 0 : 1) }}
+          <span
+            v-if="sourceIsAlbum"
           >
-            <b-progress-bar
-              :value="progress"
-              :max="totalSize"
-              show-progress
-              animated
-              class="text-center"
+            <router-link
+              :to="{ name: 'album', params: { album_id: sourceSending.value }}"
             >
-              {{ countSentFiles }} / {{ totalSize }}
-            </b-progress-bar>
+              {{ $t("upload.album") }}
+            </router-link>
+          </span>
+
+          <span
+            v-if="studyUIDToSend!== ''"
+          >
+            <!--
+              {{ studyUIDToSend }}
+            -->
+          </span>
+          <div
+            v-if="Object.keys(listErrorUnknownFiles).length > 0"
+          >
             <div
-              class="d-flex justify-content-center mt-1 mb-1"
+              v-for="(item, key) in listErrorUnknownFiles"
+              :key="item.key"
             >
-              <button
-                type="button"
-                class="btn btn-link btn-sm text-center text-warning"
-                @click="setCancel()"
+              {{ $tc("upload.unknownError", item, {count: item }) }} <br>
+              <span
+                class="text-warning"
               >
-                <span>
-                  {{ $t("cancel") }}
-                </span>
-                <block-icon
-                  :height="UI.SVGheight"
-                  :width="UI.SVGwidth"
-                  color="red"
-                />
-              </button>
+                {{ generateTextError(key) }}
+              </span>
             </div>
           </div>
-          <div
-            v-else
-          >
-            <kheops-clip-loader
-              :loading="UI.cancel"
-              :size="UI.SpinnerCancelSize"
-              :color="'red'"
-            />
-          </div>
-        </div>
-        <!--
-          When sending finish
-        -->
-        <div
-          v-else-if="(UI.show === true) && (countSentFiles === totalSize || sending === false)"
-          class="row"
-        >
-          <div
-            class="col-11 mt-2 mb-2 ml-3"
-          >
-            {{ $tc("upload.filesSend", countSentFiles - error.length - totalUnknownFilesError, {count: (countSentFiles - error.length - totalUnknownFilesError)}) }}
-            {{ $tc("upload.locationSend", sourceIsAlbum ? 0 : 1) }}
-            <span
-              v-if="sourceIsAlbum"
-            >
-              <router-link
-                :to="{ name: 'album', params: { album_id: sourceSending.value }}"
-              >
-                {{ $t("upload.album") }}
-              </router-link>
-            </span>
 
-            <span
-              v-if="studyUIDToSend!== ''"
-            >
-              <!--
-                {{ studyUIDToSend }}
-              -->
-            </span>
+          <div
+            v-if="error.length > 0"
+          >
             <div
-              v-if="Object.keys(listErrorUnknownFiles).length > 0"
+              class="mb-1"
             >
-              <div
-                v-for="(item, key) in listErrorUnknownFiles"
-                :key="item.key"
-              >
-                {{ $tc("upload.unknownError", item, {count: item }) }} <br>
-                <span
-                  class="text-warning"
-                >
-                  {{ generateTextError(key) }}
-                </span>
-              </div>
+              <span>
+                {{ $tc("upload.filesErrors", error.length, {count: error.length}) }}
+              </span>
             </div>
-
             <div
-              v-if="error.length > 0"
+              class="mb-1"
             >
-              <div
-                class="mb-1"
-              >
-                <span>
-                  {{ $tc("upload.filesErrors", error.length, {count: error.length}) }}
-                </span>
-              </div>
-              <div
-                class="mb-1"
-              >
-                <a
-                  class="text-center text-neutral"
-                  @click="retry"
-                >
-                  {{ $t('upload.reload') }}
-                </a>
-              </div>
               <a
-                class="text-center text-warning"
-                @click="UI.showErrors=!UI.showErrors"
+                class="text-center text-neutral"
+                @click="retry"
               >
-                <span v-if="!UI.showErrors">
-                  {{ $t("upload.showError") }}
-                </span>
-                <span v-else>
-                  {{ $t("upload.hideError") }}
-                </span>
-                <error-icon
-                  :height="UI.SVGheight"
-                  :width="UI.SVGwidth"
-                  color="red"
-                />
+                {{ $t('upload.reload') }}
               </a>
             </div>
+            <a
+              class="text-center text-warning"
+              @click="UI.showErrors=!UI.showErrors"
+            >
+              <span v-if="!UI.showErrors">
+                {{ $t("upload.showError") }}
+              </span>
+              <span v-else>
+                {{ $t("upload.hideError") }}
+              </span>
+              <error-icon
+                :height="UI.SVGheight"
+                :width="UI.SVGwidth"
+                color="red"
+              />
+            </a>
           </div>
         </div>
-        <!--
-          Unknow files error
-        -->
+      </div>
+      <!--
+        Unknow files error
+      -->
 
-        <!--
-          Show the errors
-        -->
+      <!--
+        Show the errors
+      -->
+      <div
+        v-if="error.length > 0 && UI.showErrors"
+        class="row"
+      >
         <div
-          v-if="error.length > 0 && UI.showErrors"
-          class="row"
+          class="col-12 mt-2 mb-2"
         >
-          <div
-            class="col-12 mt-2 mb-2"
-          >
-            <list-error-files
-              :error-files="error"
-              @show-errors="setShowErrors"
-            />
-          </div>
+          <list-error-files
+            :error-files="error"
+            @show-errors="setShowErrors"
+          />
         </div>
       </div>
     </div>
