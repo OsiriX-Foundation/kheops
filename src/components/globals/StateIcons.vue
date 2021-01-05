@@ -25,7 +25,7 @@ import ErrorIcon from '@/components/kheopsSVG/ErrorIcon.vue';
 import DoneIcon from '@/components/kheopsSVG/DoneIcon';
 
 export default {
-  name: 'SendStudies',
+  name: 'StateIcons',
   components: {
     ErrorIcon, DoneIcon,
   },
