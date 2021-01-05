@@ -43,13 +43,16 @@
         {{ $t('study.nomorestudies') }}
       </div>
       <div slot="no-results">
-        <div>
+        <div
+          v-if="mobiledetect"
+        >
           {{ $t('study.noresults') }}
         </div>
         <drag-and-drop-icon
-          v-if="!mobiledetect"
+          v-else
           height="400px"
           width="400px"
+          :text="$t('study.dragDrop')"
         />
       </div>
       <div slot="error">

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg width="157.69mm" height="157.69mm" version="1.1" viewBox="0 0 157.69 157.69" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
  <metadata>
   <rdf:RDF>
@@ -16,7 +15,7 @@
   <ellipse cx="82.319" cy="90.668" rx="44.367" ry="34.21" opacity="0"/>
  </g>
  <circle cx="78.844" cy="78.844" r="78.844" fill="#1c2434" fill-opacity=".94118" fill-rule="evenodd" stroke-width=".47719"/>
- <g transform="matrix(.10253 0 0 .10253 27.581 27.583)" fill="#fff">
+ <g transform="matrix(.10253 0 0 .10253 27.581 18.058)" fill="#fff">
   <g transform="matrix(.074589 0 0 -.074589 127.06 508.94)" fill="#fff" stroke="#000">
    <path d="m886.3 4990.3c-126.3-30.6-191.3-95.6-191.3-193.2 0-168.3 101.4-237.2 296.5-202.8 65 13.4 181.7 23 256.4 23 128.2 0 143.5 3.8 195.1 55.5 95.7 97.6 68.9 262.1-53.6 325.2-55.4 28.7-373 23-503.1-7.7z"/>
    <path d="m2039.9 4999.9c-24.9-9.6-61.2-45.9-82.3-80.4-53.6-86.1-40.2-179.8 38.3-248.7 57.4-53.6 59.3-53.6 340.5-53.6 237.2 0 287 5.7 321.4 34.4 105.2 84.2 112.9 208.5 19.1 302.3l-65 65-264-1.9c-147.3 0.1-285-7.5-308-17.1z"/>

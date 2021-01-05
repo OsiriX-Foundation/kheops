@@ -54,7 +54,7 @@
       stroke-width=".47719"
     />
     <g
-      transform="matrix(.10253 0 0 .10253 27.581 27.583)"
+      transform="matrix(.10253 0 0 .10253 27.581 18.058)"
       fill="#fff"
     >
       <g
@@ -103,6 +103,16 @@
         />
       </g>
     </g>
+    <text
+      x="50%"
+      y="80%"
+      dominant-baseline="middle"
+      text-anchor="middle"
+      fill="#fff"
+      font-size="8"
+    >
+      {{ text }}
+    </text>
   </svg>
 </template>
 
@@ -110,6 +120,11 @@
 export default {
   name: 'DragAndDropIcon',
   props: {
+    text: {
+      type: String,
+      required: true,
+      default: '',
+    },
     width: {
       type: String,
       required: true,

@@ -221,7 +221,8 @@
 		"series": "Séries",
 		"studiessharedsuccess": "études ont été envoyées avec succès",
 		"studyinfo": "Information de l'étude",
-		"toDate": "A"
+		"toDate": "A",
+		"dragDrop": "Déposer vos études ici"
 	},
 	"texterror": {
 		"notfound": "Pas trouvé",
