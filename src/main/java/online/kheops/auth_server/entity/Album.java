@@ -18,6 +18,8 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         query = "SELECT a FROM Album a WHERE :"+ALBUM_ID+" = a.id"),
         @NamedQuery(name = "Albums.findWithEnabledNewSeriesWebhooks",
         query = "SELECT distinct a FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st JOIN a.webhooks w WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :"+STUDY_UID),
+        @NamedQuery(name = "Albums.getInboxInfoByUserPk",
+        query = "SELECT NEW online.kheops.auth_server.inbox.InboxInfoResponse(COUNT(DISTINCT st.pk), COUNT(DISTINCT s.pk), SUM(s.numberOfSeriesRelatedInstances), FUNCTION('array_agg', s.modality) ) FROM User u JOIN u.inbox i LEFT OUTER JOIN i.albumSeries alS LEFT OUTER JOIN alS.series s LEFT OUTER JOIN s.study st WHERE u.pk = :userPk AND s.populated = true AND st.populated = true"),
 
 })
 
