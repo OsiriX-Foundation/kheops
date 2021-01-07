@@ -52,14 +52,13 @@ public class Albums {
             em.persist(newAlbumMutation);
 
             tx.commit();
-
+            return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
     }
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
@@ -112,14 +111,13 @@ public class Albums {
             }
 
             tx.commit();
-
+            return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
     }
 
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
@@ -196,9 +194,10 @@ public class Albums {
 
     public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
            throws JOOQException, AlbumNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
         AlbumResponse albumResponse;
         if (withUserAccess) {
-            albumResponse = findAlbumByUserAndAlbumId(albumId, user);
+            albumResponse = findAlbumByUserAndAlbumId(albumId, user, em);
             if(withUsersList) {
                 albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
             }

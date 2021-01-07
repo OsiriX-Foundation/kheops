@@ -14,6 +14,7 @@ import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -197,6 +198,16 @@ public class AlbumQueries {
         } catch (SQLException e) {
             throw new JOOQException("Error during request", e);
         }
+    }
+
+    public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user, EntityManager em) {
+
+        TypedQuery<AlbumResponseBuilder> query = em.createNamedQuery("Albums.getAlbumInfoByAlbumIdAndUser", AlbumResponseBuilder.class);
+        query.setParameter(USER, user);
+        query.setParameter(JPANamedQueryConstants.ALBUM_ID, albumId);
+        AlbumResponseBuilder x = query.getSingleResult();
+
+        return x.build();
     }
 
     public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user)

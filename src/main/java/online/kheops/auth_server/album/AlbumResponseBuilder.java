@@ -1,13 +1,13 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
 import online.kheops.auth_server.user.UserResponse;
 import org.jooq.Record;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static online.kheops.auth_server.util.JooqConstances.*;
 
@@ -16,7 +16,7 @@ public class AlbumResponseBuilder {
     private String id;
     private String name;
     private String description;
-    private String[] modalities;
+    private SortedSet<String> modalities;
     private LocalDateTime createdTime;
     private LocalDateTime lastEventTime;
     private Integer numberOfUsers;
@@ -38,6 +38,36 @@ public class AlbumResponseBuilder {
 
     public AlbumResponseBuilder() {
         users = new ArrayList<>();
+    }
+
+    public AlbumResponseBuilder(Album album, AlbumUser albumUser, long nbStudy, long nbSeries, long nbInstance, long nbUsers, int e, String modalitiesLst) {
+        users = new ArrayList<>();
+        this.id = album.getId();
+        this.name = album.getName();
+        this.description = album.getDescription();
+        this.createdTime = album.getCreatedTime();
+        this.lastEventTime = album.getLastEventTime();
+        this.numberOfUsers = ((Long)nbUsers).intValue();
+        this.numberOfStudies = ((Long) nbStudy).intValue();
+        this.numberOfSeries = ((Long)nbSeries).intValue();
+        this.numberOfInstances = ((Long) nbInstance).intValue();
+        this.addSeries = album.getUserPermission().isAddSeries();
+        this.addUser = album.getUserPermission().isAddUser();
+        this.deleteSeries = album.getUserPermission().isDeleteSeries();
+        this.downloadSeries = album.getUserPermission().isDownloadSeries();
+        this.sendSeries = album.getUserPermission().isSendSeries();
+        this.writeComments = album.getUserPermission().isWriteComments();
+        this.numberOfComments = 12;
+        this.isFavorite = albumUser.isFavorite();
+        this.notificationNewComment = albumUser.isNewCommentNotifications();
+        this.notificationNewSeries = albumUser.isNewSeriesNotifications();
+        this.isAdmin = albumUser.isAdmin();
+
+        this.modalities = new TreeSet<>();
+        if(!modalitiesLst.equals("{NULL}")) {
+            this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
+        }
+
     }
 
     public AlbumResponseBuilder setAlbumFromUser(Record r) {
@@ -66,10 +96,9 @@ public class AlbumResponseBuilder {
         this.notificationNewComment = (boolean) r.getValue(NEW_COMMENT_NOTIFICATIONS);
         this.notificationNewSeries = (boolean) r.getValue(NEW_SERIES_NOTIFICATIONS);
         this.isAdmin = ((boolean) r.getValue(ADMIN));
+        this.modalities = new TreeSet<>();
         if(r.getValue(MODALITIES) != null) {
-            this.modalities = r.getValue(MODALITIES).toString().split(",");
-        } else {
-            this.modalities = new String[0];
+            this.modalities.addAll(Arrays.asList(r.getValue(MODALITIES).toString().split(",")));
         }
         return this;
     }
@@ -85,10 +114,9 @@ public class AlbumResponseBuilder {
         } catch(NullPointerException e) {
             this.numberOfInstances = 0;
         }
+        this.modalities = new TreeSet<>();
         if(r.getValue(MODALITIES) != null) {
-            this.modalities = r.getValue(MODALITIES).toString().split(",");
-        } else {
-            this.modalities = new String[0];
+            this.modalities.addAll(Arrays.asList(r.getValue(MODALITIES).toString().split(",")));
         }
         try {
             this.numberOfInstances = ((BigDecimal) r.getValue(NUMBER_OF_INSTANCES)).intValue();
@@ -118,7 +146,7 @@ public class AlbumResponseBuilder {
         return description;
     }
 
-    public String[] getModalities() {
+    public SortedSet<String> getModalities() {
         return modalities;
     }
 

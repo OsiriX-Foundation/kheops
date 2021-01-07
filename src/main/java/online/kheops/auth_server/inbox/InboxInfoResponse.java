@@ -18,12 +18,12 @@ public class InboxInfoResponse {
 
     private InboxInfoResponse() { /*empty*/ }
 
-    public InboxInfoResponse(long a, long b, long c, String s) {
-        this.numberOfStudies = ((Long) a).intValue();
-        this.numberOfSeries = ((Long) b).intValue();
-        this.numberOfInstances = ((Long) c).intValue();
+    public InboxInfoResponse(long nbStudies, long nbSeries, long nbInstances, String modalitiesLst) {
+        this.numberOfStudies = ((Long) nbStudies).intValue();
+        this.numberOfSeries = ((Long) nbSeries).intValue();
+        this.numberOfInstances = ((Long) nbInstances).intValue();
         this.modalities = new TreeSet<>();
-        this.modalities.addAll(Arrays.asList(s.substring(1, s.length()-1).split(",")));
+        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length()-1).split(",")));
     }
 
 }

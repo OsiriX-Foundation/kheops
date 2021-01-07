@@ -10,6 +10,7 @@ public class JPANamedQueryConstants {
     public static final String ALBUM = "album";
 
     public static final String USER_ID = "userId";
+    public static final String USER_PK = "userPk";
     public static final String USER = "user";
     public static final String USER_EMAIL = "userEmail";
     public static final String SEARCH_NAME = "searchName";
