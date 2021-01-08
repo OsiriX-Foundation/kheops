@@ -193,17 +193,21 @@ public class Albums {
     }
 
     public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
-           throws JOOQException, AlbumNotFoundException {
+           throws AlbumNotFoundException {
         final EntityManager em = EntityManagerListener.createEntityManager();
-        AlbumResponse albumResponse;
-        if (withUserAccess) {
-            albumResponse = findAlbumByUserAndAlbumId(albumId, user, em);
-            if(withUsersList) {
-                albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
+        try {
+            AlbumResponse albumResponse;
+            if (withUserAccess) {
+                albumResponse = findAlbumByUserAndAlbumId(albumId, user, em);
+                if (withUsersList) {
+                    albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
+                }
+                return albumResponse;
+            } else {
+                return findAlbumByAlbumId(albumId, em);
             }
-            return albumResponse;
-        } else {
-            return findAlbumByAlbumId(albumId);
+        } finally {
+            em.close();
         }
     }
 

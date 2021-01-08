@@ -205,107 +205,18 @@ public class AlbumQueries {
         TypedQuery<AlbumResponseBuilder> query = em.createNamedQuery("Albums.getAlbumInfoByAlbumIdAndUser", AlbumResponseBuilder.class);
         query.setParameter(USER, user);
         query.setParameter(JPANamedQueryConstants.ALBUM_ID, albumId);
-        AlbumResponseBuilder x = query.getSingleResult();
+        AlbumResponseBuilder albumResponseBuilder = query.getSingleResult();
 
-        return x.build();
+        return albumResponseBuilder.build();
     }
 
-    public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user)
-            throws JOOQException {
-        try (Connection connection = EntityManagerListener.getConnection()) {
+    public static AlbumResponse findAlbumByAlbumId(String albumId, EntityManager em) {
+        TypedQuery<AlbumResponseBuilder> query = em.createNamedQuery("Albums.getAlbumInfoByAlbumId", AlbumResponseBuilder.class);
+        query.setParameter(JPANamedQueryConstants.ALBUM_ID, albumId);
+        AlbumResponseBuilder albumResponseBuilder = query.getSingleResult();
 
-            final long userPK = user.getPk();
-
-            final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-            final SelectQuery<Record> query = create.selectQuery();
-
-            Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
-                    .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
-                    .asField();
-
-            query.addSelect(ALBUMS.PK.as(ALBUM_PK),
-                    ALBUMS.ID.as(JooqConstances.ALBUM_ID),
-                    ALBUMS.NAME.as(ALBUM_NAME),
-                    isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
-                    ALBUMS.CREATED_TIME.as(ALBUM_CREATED_TIME),
-                    ALBUMS.LAST_EVENT_TIME.as(ALBUM_LAST_EVENT_TIME),
-                    nbUsers.as(NUMBER_OF_USERS),
-                    countDistinct(EVENTS.PK).as(NUMBER_OF_COMMENTS),
-                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as(NUMBER_OF_SERIES),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as(NUMBER_OF_INSTANCES),
-                    ALBUMS.ADD_USER_PERMISSION.as(ADD_USER_PERMISSION),
-                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as(DOWNLOAD_USER_PERMISSION),
-                    ALBUMS.SEND_SERIES_PERMISSION.as(SEND_SERIES_PERMISSION),
-                    ALBUMS.DELETE_SERIES_PERMISSION.as(DELETE_SERIES_PERMISION),
-                    ALBUMS.ADD_SERIES_PERMISSION.as(ADD_SERIES_PERMISSION),
-                    ALBUMS.WRITE_COMMENTS_PERMISSION.as(WRITE_COMMENT_PERMISSION),
-                    ALBUM_USER.FAVORITE.as(FAVORITE),
-                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as(NEW_COMMENT_NOTIFICATIONS),
-                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as(NEW_SERIES_NOTIFICATIONS),
-                    ALBUM_USER.ADMIN.as(ADMIN),
-                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
-
-            query.addFrom(ALBUMS);
-            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
-            query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
-
-            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
-                    .and(EVENTS.EVENT_TYPE.eq(COMMENT_EVENT_TYPE))
-                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(userPK))
-                            .or(EVENTS.USER_FK.eq(userPK))));
-
-            query.addConditions(ALBUMS.ID.eq(albumId));
-            query.addConditions(ALBUM_USER.FAVORITE.isNotNull());
-            query.addConditions(ALBUM_USER.USER_FK.eq(userPK));
-
-            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
-
-            Record result = query.fetchOne();
-
-            return new AlbumResponseBuilder().setAlbumFromUser(result).build();
-        } catch (SQLException e) {
-            throw new JOOQException("Error during request", e);
-        }
+        return albumResponseBuilder.build();
     }
-
-    public static AlbumResponse findAlbumByAlbumId(String albumId)
-            throws JOOQException {
-        try (Connection connection = EntityManagerListener.getConnection()) {
-
-            final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-            final SelectQuery<Record> query = create.selectQuery();
-
-            query.addSelect(ALBUMS.PK.as(ALBUM_PK),
-                    ALBUMS.ID.as(JooqConstances.ALBUM_ID),
-                    ALBUMS.NAME.as(ALBUM_NAME),
-                    isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
-                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as(NUMBER_OF_SERIES),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as(NUMBER_OF_INSTANCES),
-                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
-
-            query.addFrom(ALBUMS);
-            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
-            query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
-
-            query.addConditions(ALBUMS.ID.eq(albumId));
-
-            query.addGroupBy(ALBUMS.PK);
-
-            Record result = query.fetchOne();
-
-            return new AlbumResponseBuilder().setAlbumFromCapabilityToken(result).build();
-        } catch (Exception e) {
-            throw new JOOQException("Error during request");
-        }
-    }
-
 
     private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
         final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);

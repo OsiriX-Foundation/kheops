@@ -40,7 +40,7 @@ public class AlbumResponseBuilder {
         users = new ArrayList<>();
     }
 
-    public AlbumResponseBuilder(Album album, AlbumUser albumUser, long nbStudy, long nbSeries, long nbInstance, long nbUsers, int e, String modalitiesLst) {
+    public AlbumResponseBuilder(Album album, AlbumUser albumUser, long nbStudy, long nbSeries, long nbInstance, long nbUsers, long nbComment, String modalitiesLst) {
         users = new ArrayList<>();
         this.id = album.getId();
         this.name = album.getName();
@@ -57,7 +57,7 @@ public class AlbumResponseBuilder {
         this.downloadSeries = album.getUserPermission().isDownloadSeries();
         this.sendSeries = album.getUserPermission().isSendSeries();
         this.writeComments = album.getUserPermission().isWriteComments();
-        this.numberOfComments = 12;
+        this.numberOfComments = ((Long)nbComment).intValue();
         this.isFavorite = albumUser.isFavorite();
         this.notificationNewComment = albumUser.isNewCommentNotifications();
         this.notificationNewSeries = albumUser.isNewSeriesNotifications();
@@ -67,7 +67,21 @@ public class AlbumResponseBuilder {
         if(!modalitiesLst.equals("{NULL}")) {
             this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
         }
+    }
 
+    public AlbumResponseBuilder(Album album, long nbStudy, long nbSeries, long nbInstance, String modalitiesLst) {
+        users = new ArrayList<>();
+        this.id = album.getId();
+        this.name = album.getName();
+        this.description = album.getDescription();
+        this.numberOfStudies = ((Long) nbStudy).intValue();
+        this.numberOfSeries = ((Long)nbSeries).intValue();
+        this.numberOfInstances = ((Long) nbInstance).intValue();
+
+        this.modalities = new TreeSet<>();
+        if(!modalitiesLst.equals("{NULL}")) {
+            this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
+        }
     }
 
     public AlbumResponseBuilder setAlbumFromUser(Record r) {
@@ -99,29 +113,6 @@ public class AlbumResponseBuilder {
         this.modalities = new TreeSet<>();
         if(r.getValue(MODALITIES) != null) {
             this.modalities.addAll(Arrays.asList(r.getValue(MODALITIES).toString().split(",")));
-        }
-        return this;
-    }
-
-    public AlbumResponseBuilder setAlbumFromCapabilityToken(Record r) {
-        this.id = r.getValue(ALBUM_ID).toString();
-        this.name = r.getValue(ALBUM_NAME).toString();
-        this.description = r.getValue(ALBUM_DESCRIPTION).toString();
-        this.numberOfStudies = (Integer) r.getValue(NUMBER_OF_STUDIES);
-        this.numberOfSeries = (Integer) r.getValue(NUMBER_OF_SERIES);
-        try {
-            this.numberOfInstances = ((BigDecimal) r.getValue(NUMBER_OF_INSTANCES)).intValue();
-        } catch(NullPointerException e) {
-            this.numberOfInstances = 0;
-        }
-        this.modalities = new TreeSet<>();
-        if(r.getValue(MODALITIES) != null) {
-            this.modalities.addAll(Arrays.asList(r.getValue(MODALITIES).toString().split(",")));
-        }
-        try {
-            this.numberOfInstances = ((BigDecimal) r.getValue(NUMBER_OF_INSTANCES)).intValue();
-        } catch(NullPointerException e) {
-            this.numberOfInstances = 0;
         }
         return this;
     }

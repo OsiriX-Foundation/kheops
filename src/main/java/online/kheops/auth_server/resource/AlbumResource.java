@@ -153,12 +153,7 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        try {
-            albumResponse = Albums.getAlbum(kheopsPrincipal.getUser(), albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        albumResponse = Albums.getAlbum(kheopsPrincipal.getUser(), albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
 
         final KheopsLogBuilder kheopsLog = kheopsPrincipal.getKheopsLogBuilder();
         if (includeUsers) {
