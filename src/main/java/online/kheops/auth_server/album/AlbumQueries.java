@@ -1,8 +1,8 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.entity.Comment;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.JPANamedQueryConstants;
@@ -15,6 +15,7 @@ import org.jooq.impl.DSL;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -85,6 +86,42 @@ public class AlbumQueries {
         }
     }
 
+    public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams, EntityManager em) {
+
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<AlbumResponseBuilder> c = cb.createQuery(AlbumResponseBuilder.class);
+        Root<Album> al = c.from(Album.class);
+
+        Join<Album, AlbumSeries> alS = al.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
+        Join<AlbumSeries, Series> se = alS.join("series", javax.persistence.criteria.JoinType.LEFT);
+        Join<Series, Study> st = se.join("study", javax.persistence.criteria.JoinType.LEFT);
+        Join<Album, AlbumUser> alU = al.join("albumUser");
+        Join<Album, Comment> com = al.join("events", javax.persistence.criteria.JoinType.LEFT);
+
+
+        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get("pk")), cb.countDistinct(se.get("pk")), cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))), cb.countDistinct(alU.get("pk")), cb.countDistinct(com.get("pk")), al.get("name")));
+
+        List<Predicate> criteria = new ArrayList<>();
+        albumQueryParams.getName().ifPresent(name -> criteria.add(cb.like(cb.lower(al.get("name")), name.toLowerCase().replace("*", "%"))));
+
+        criteria.add(cb.equal(alU.get("user"), cb.parameter(User.class, "sub")));
+        if (criteria.size() == 0) {
+
+        } else if (criteria.size() == 1) {
+            c.where(cb.and(criteria.get(0)));
+        } else {
+            c.where(cb.and(criteria.toArray(new Predicate[0])));
+        }
+        c.groupBy(al, alU);
+
+        TypedQuery<AlbumResponseBuilder> q = em.createQuery(c);
+        q.setParameter("sub", albumQueryParams.getUser());
+        List<AlbumResponseBuilder> res = q.getResultList();
+
+
+
+        return null;
+    }
     public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
         try (Connection connection = EntityManagerListener.getConnection()) {

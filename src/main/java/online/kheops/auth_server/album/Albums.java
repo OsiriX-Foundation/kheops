@@ -123,6 +123,7 @@ public class Albums {
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
             throws JOOQException, BadQueryParametersException {
 
+        findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
         return findAlbumsByUserPk(albumQueryParams);
     }
 
