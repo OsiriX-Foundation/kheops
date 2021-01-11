@@ -1,41 +1,27 @@
 package online.kheops.auth_server.album;
 
-import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.entity.Comment;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.JPANamedQueryConstants;
-import online.kheops.auth_server.util.JooqConstances;
 import online.kheops.auth_server.util.PairListXTotalCount;
-import org.jooq.*;
-import org.jooq.JoinType;
-import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIES;
-import static online.kheops.auth_server.generated.tables.AlbumUser.ALBUM_USER;
-import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
-import static online.kheops.auth_server.generated.tables.Events.EVENTS;
-import static online.kheops.auth_server.generated.tables.Series.SERIES;
-import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
-import static online.kheops.auth_server.generated.tables.Users.USERS;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
-import static online.kheops.auth_server.util.JOOQTools.createDateCondition;
+import static online.kheops.auth_server.util.JOOQTools.checkDate;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 import static online.kheops.auth_server.util.JooqConstances.*;
-
-import static org.jooq.impl.DSL.*;
 
 public class AlbumQueries {
 
@@ -86,25 +72,55 @@ public class AlbumQueries {
         }
     }
 
-    public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams, EntityManager em) {
+    public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams, EntityManager em)
+            throws BadQueryParametersException {
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<AlbumResponseBuilder> c = cb.createQuery(AlbumResponseBuilder.class);
-        Root<Album> al = c.from(Album.class);
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<AlbumResponseBuilder> c = cb.createQuery(AlbumResponseBuilder.class);
+        final Root<Album> al = c.from(Album.class);
 
-        Join<Album, AlbumSeries> alS = al.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        Join<AlbumSeries, Series> se = alS.join("series", javax.persistence.criteria.JoinType.LEFT);
-        Join<Series, Study> st = se.join("study", javax.persistence.criteria.JoinType.LEFT);
-        Join<Album, AlbumUser> alU = al.join("albumUser");
-        Join<Album, Comment> com = al.join("events", javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, AlbumSeries> alS = al.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
+        final Join<AlbumSeries, Series> se = alS.join("series", javax.persistence.criteria.JoinType.LEFT);
+        se.on(cb.isTrue(se.get("populated")));
+        final Join<Series, Study> st = se.join("study", javax.persistence.criteria.JoinType.LEFT);
+        st.on(cb.isTrue(st.get("populated")));
+        final Join<Album, AlbumUser> alU = al.join("albumUser");
+        final Join<AlbumUser, User> u = alU.join("user", javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, Event> com = al.join("events", javax.persistence.criteria.JoinType.LEFT);
 
+        final Predicate privateMessage = cb.or(com.get("privateTargetUser").isNull(), cb.equal(com.get("privateTargetUser"), albumQueryParams.getUser()));
+        final Predicate author = cb.equal(com.get("user"), albumQueryParams.getUser());
+        com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
 
-        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get("pk")), cb.countDistinct(se.get("pk")), cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))), cb.countDistinct(alU.get("pk")), cb.countDistinct(com.get("pk")), al.get("name")));
+        final Subquery<Long> subqueryNbUser = c.subquery(Long.class);
+        final Root <AlbumUser> subqueryRoot = subqueryNbUser.from(AlbumUser.class);
+        subqueryNbUser.where(cb.equal(al, subqueryRoot.get("album")));
+        subqueryNbUser.select(cb.countDistinct(subqueryRoot.get("pk")));
 
-        List<Predicate> criteria = new ArrayList<>();
-        albumQueryParams.getName().ifPresent(name -> criteria.add(cb.like(cb.lower(al.get("name")), name.toLowerCase().replace("*", "%"))));
+        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get("pk")), cb.countDistinct(se.get("pk")),
+                cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))),
+                subqueryNbUser.getSelection(), cb.countDistinct(com.get("pk")), cb.function("array_agg", String.class ,se.get("modality"))));
 
-        criteria.add(cb.equal(alU.get("user"), cb.parameter(User.class, "sub")));
+        final List<Predicate> criteria = new ArrayList<>();
+        albumQueryParams.getName().ifPresent(name -> createConditon(name, criteria, al, cb, albumQueryParams.isFuzzyMatching()));
+        applyIfPresent(albumQueryParams::getCreatedTime, time -> createDateConditon(time, criteria, al.get("createdTime"), cb));
+        applyIfPresent(albumQueryParams::getLastEventTime, time -> createDateConditon(time, criteria, al.get("lastEventTime"), cb));
+
+        criteria.add(cb.equal(alU.get("user"), albumQueryParams.getUser()));
+        criteria.add(cb.notEqual(u.get("inbox"), al));
+        if (albumQueryParams.canAddSeries()) {
+            criteria.add(cb.or(cb.isTrue(alU.get("admin")), cb.isTrue(al.get("userPermission").get("addSeries"))));
+        }
+
+        if (albumQueryParams.canCreateCapabilityToken()) {
+            criteria.add(cb.isTrue(alU.get("admin")));
+        }
+
+        if (albumQueryParams.isFavorite()) {
+            criteria.add(cb.isTrue(alU.get("favorite")));
+
+        }
+
         if (criteria.size() == 0) {
 
         } else if (criteria.size() == 1) {
@@ -113,129 +129,24 @@ public class AlbumQueries {
             c.where(cb.and(criteria.toArray(new Predicate[0])));
         }
         c.groupBy(al, alU);
+        setOrderBy(cb, c, albumQueryParams.getOrderBy(), al, albumQueryParams.isDescending());
 
-        TypedQuery<AlbumResponseBuilder> q = em.createQuery(c);
-        q.setParameter("sub", albumQueryParams.getUser());
-        List<AlbumResponseBuilder> res = q.getResultList();
+        final TypedQuery<AlbumResponseBuilder> q = em.createQuery(c);
+        albumQueryParams.getOffset().ifPresent(q::setFirstResult);
+        albumQueryParams.getLimit().ifPresent(q::setMaxResults);
 
-
-
-        return null;
-    }
-    public static PairListXTotalCount<AlbumResponse> findAlbumsByUserPk(AlbumQueryParams albumQueryParams)
-            throws JOOQException, BadQueryParametersException {
-        try (Connection connection = EntityManagerListener.getConnection()) {
-
-            DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-            SelectQuery<Record> query = create.selectQuery();
-
-            ArrayList<Condition> conditionArrayList = new ArrayList<>();
-
-            Field<Object> nbUsers = create.select(countDistinct(ALBUM_USER.PK))
-                    .from(ALBUM_USER)
-                    .where(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK))
-                    .asField();
-
-            query.addSelect(ALBUMS.PK.as(ALBUM_PK),
-                    ALBUMS.ID.as(JooqConstances.ALBUM_ID),
-                    ALBUMS.NAME.as(ALBUM_NAME),
-                    isnull(ALBUMS.DESCRIPTION,"").as(ALBUM_DESCRIPTION),
-                    ALBUMS.CREATED_TIME.as(ALBUM_CREATED_TIME),
-                    ALBUMS.LAST_EVENT_TIME.as(ALBUM_LAST_EVENT_TIME),
-                    nbUsers.as(NUMBER_OF_USERS),
-                    countDistinct(EVENTS.PK).as(NUMBER_OF_COMMENTS),
-                    countDistinct(STUDIES.PK).filterWhere(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull())).as(NUMBER_OF_STUDIES),
-                    countDistinct(SERIES.PK).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))).as(NUMBER_OF_SERIES),
-                    isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).filterWhere((SERIES.POPULATED.isTrue().or(SERIES.POPULATED.isNull())).and(STUDIES.POPULATED.isTrue().or(STUDIES.POPULATED.isNull()))), 0).as(NUMBER_OF_INSTANCES),
-                    ALBUMS.ADD_USER_PERMISSION.as(ADD_USER_PERMISSION),
-                    ALBUMS.DOWNLOAD_SERIES_PERMISSION.as(DOWNLOAD_USER_PERMISSION),
-                    ALBUMS.SEND_SERIES_PERMISSION.as(SEND_SERIES_PERMISSION),
-                    ALBUMS.DELETE_SERIES_PERMISSION.as(DELETE_SERIES_PERMISION),
-                    ALBUMS.ADD_SERIES_PERMISSION.as(ADD_SERIES_PERMISSION),
-                    ALBUMS.WRITE_COMMENTS_PERMISSION.as(WRITE_COMMENT_PERMISSION),
-                    ALBUM_USER.FAVORITE.as(FAVORITE),
-                    ALBUM_USER.NEW_COMMENT_NOTIFICATIONS.as(NEW_COMMENT_NOTIFICATIONS),
-                    ALBUM_USER.NEW_SERIES_NOTIFICATIONS.as(NEW_SERIES_NOTIFICATIONS),
-                    ALBUM_USER.ADMIN.as(ADMIN),
-                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
-
-            query.addFrom(ALBUMS);
-            query.addJoin(ALBUM_SERIES,JoinType.LEFT_OUTER_JOIN, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
-            query.addJoin(SERIES,JoinType.LEFT_OUTER_JOIN, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
-            query.addJoin(STUDIES,JoinType.LEFT_OUTER_JOIN, STUDIES.PK.eq(SERIES.STUDY_FK));
-            query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK));
-            query.addJoin(USERS, ALBUM_USER.USER_FK.eq(USERS.PK));
-
-            query.addJoin(EVENTS, JoinType.LEFT_OUTER_JOIN, EVENTS.ALBUM_FK.eq(ALBUMS.PK)
-                    .and(EVENTS.EVENT_TYPE.eq(COMMENT_EVENT_TYPE))
-                    .and(EVENTS.PRIVATE_TARGET_USER_FK.isNull()
-                            .or(EVENTS.PRIVATE_TARGET_USER_FK.eq(albumQueryParams.getUser().getPk()))
-                            .or(EVENTS.USER_FK.eq(albumQueryParams.getUser().getPk()))));
-
-            conditionArrayList.add(ALBUM_USER.FAVORITE.isNotNull());
-
-            applyIfPresent(albumQueryParams::getName, filter -> conditionArrayList.add(createConditon(filter, ALBUMS.NAME, albumQueryParams.isFuzzyMatching())));
-            applyIfPresent(albumQueryParams::getCreatedTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.CREATED_TIME)));
-            applyIfPresent(albumQueryParams::getLastEventTime, filter -> conditionArrayList.add(createDateCondition(filter, ALBUMS.LAST_EVENT_TIME)));
-
-            if(albumQueryParams.canAddSeries()) {
-                conditionArrayList.add(ALBUM_USER.ADMIN.isTrue().or(ALBUMS.ADD_SERIES_PERMISSION.isTrue()));
-            }
-
-            if(albumQueryParams.canCreateCapabilityToken()) {
-                conditionArrayList.add(ALBUM_USER.ADMIN.isTrue());
-            }
-
-            if (albumQueryParams.isFavorite()) {
-                conditionArrayList.add(ALBUM_USER.FAVORITE.isTrue());
-            }
-
-            conditionArrayList.add(ALBUMS.PK.notEqual(USERS.INBOX_FK));
-            query.addConditions(ALBUM_USER.USER_FK.eq(albumQueryParams.getUser().getPk()).and(ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK)));
-
-            for (Condition c : conditionArrayList) {
-                if (c != null) {
-                    query.addConditions(c);
-                }
-            }
-
-            albumQueryParams.getLimit().ifPresent(query::addLimit);
-            albumQueryParams.getOffset().ifPresent(query::addOffset);
-
-            query.addOrderBy(getOrderBy(albumQueryParams.getOrderBy(), albumQueryParams.isDescending()));
-
-
-            query.addGroupBy(ALBUMS.PK, ALBUM_USER.PK);
-
-            final Result<? extends Record> result;
-
-            final String modalityFilter = albumQueryParams.getModality().orElse(null);
-
-            if(modalityFilter != null) {
-                final Table<Record> t = query.asTable();
-                final Field<String> f = (Field<String>) t.field(MODALITIES);
-
-                final SelectQuery<Record> q = create.selectQuery();
-                q.addFrom(t);
-                q.addConditions(f.containsIgnoreCase(modalityFilter));
-                result = q.fetch();
-            } else {
-                result = query.fetch();
-            }
-
-            final List<AlbumResponse> albumResponses = new ArrayList<>();
-
-            for(Record r : result) {
-                albumResponses.add(new AlbumResponseBuilder().setAlbumFromUser(r).build());
-            }
-
-            final int albumTotalCount = getAlbumTotalCount(albumQueryParams.getUser().getPk(), conditionArrayList, connection);
-
-            return new PairListXTotalCount<>(albumTotalCount, albumResponses);
-        } catch (SQLException e) {
-            throw new JOOQException("Error during request", e);
+        final List<AlbumResponseBuilder> res = q.getResultList();
+        final List<AlbumResponse> albumResponses = new ArrayList<>();
+        for (AlbumResponseBuilder albumResponseBuilder : res) {
+            albumResponses.add(albumResponseBuilder.build());
         }
+
+
+        final int albumTotalCount = getAlbumTotalCount(albumQueryParams, em);
+
+        return new PairListXTotalCount<>(albumTotalCount, albumResponses);
     }
+
 
     public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user, EntityManager em) {
 
@@ -255,77 +166,145 @@ public class AlbumQueries {
         return albumResponseBuilder.build();
     }
 
-    private static int getAlbumTotalCount(long userPk, ArrayList<Condition> conditionArrayList, Connection connection) {
-        final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
-        final SelectQuery<Record> query = create.selectQuery();
-        query.addSelect(countDistinct(ALBUMS.PK));
-        query.addFrom(ALBUMS);
-        query.addJoin(ALBUM_USER, ALBUM_USER.ALBUM_FK.eq(ALBUMS.PK).and(ALBUM_USER.USER_FK.eq(userPk)));
-        query.addJoin(USERS, USERS.PK.eq(ALBUM_USER.USER_FK));
-        for (Condition c : conditionArrayList) {
-            if (c != null) {
-                query.addConditions(c);
+    private static int getAlbumTotalCount(AlbumQueryParams albumQueryParams, EntityManager em)
+            throws BadQueryParametersException {
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Long> c = cb.createQuery(Long.class);
+        final Root<Album> al = c.from(Album.class);
+
+        final Join<Album, AlbumUser> alU = al.join("albumUser");
+        final Join<AlbumUser, User> u = alU.join("user", javax.persistence.criteria.JoinType.LEFT);
+
+        c.select(cb.countDistinct(al.get("pk")));
+
+        final List<Predicate> criteria = new ArrayList<>();
+        albumQueryParams.getName().ifPresent(name -> createConditon(name, criteria, al, cb, albumQueryParams.isFuzzyMatching()));
+        applyIfPresent(albumQueryParams::getCreatedTime, time -> createDateConditon(time, criteria, al.get("createdTime"), cb));
+        applyIfPresent(albumQueryParams::getLastEventTime, time -> createDateConditon(time, criteria, al.get("lastEventTime"), cb));
+
+        criteria.add(cb.equal(alU.get("user"), albumQueryParams.getUser()));
+        criteria.add(cb.notEqual(u.get("inbox"), al));
+        if (albumQueryParams.canAddSeries()) {
+            criteria.add(cb.or(cb.isTrue(alU.get("admin")), cb.isTrue(al.get("userPermission").get("addSeries"))));
+        }
+
+        if (albumQueryParams.canCreateCapabilityToken()) {
+            criteria.add(cb.isTrue(alU.get("admin")));
+        }
+
+        if (albumQueryParams.isFavorite()) {
+            criteria.add(cb.isTrue(alU.get("favorite")));
+        }
+
+        if (criteria.size() == 0) {
+
+        } else if (criteria.size() == 1) {
+            c.where(cb.and(criteria.get(0)));
+        } else {
+            c.where(cb.and(criteria.toArray(new Predicate[0])));
+        }
+
+        final TypedQuery<Long> q = em.createQuery(c);
+        final  Long res = q.getSingleResult();
+        return res.intValue();
+    }
+
+    private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery c, String orderByParameter, Path al, boolean descending)
+            throws  BadQueryParametersException{
+
+        Expression orderByColumn = null;
+        if (orderByParameter.equals("created_time")) {
+            orderByColumn = al.get("createdTime");
+        }
+        else if (orderByParameter.equals("last_event_time")) {
+            orderByColumn = al.get("lastEventTime");
+        }
+        else if (orderByParameter.equals("name")) {
+            orderByColumn = al.get("name");
+        }
+        else if (orderByParameter.equals(NUMBER_OF_USERS)) {
+            orderByColumn = cb.literal(6);
+        }
+        else if (orderByParameter.equals(NUMBER_OF_STUDIES)) {
+            orderByColumn = cb.literal(3);
+        }
+        else if (orderByParameter.equals(NUMBER_OF_COMMENTS)) {
+            orderByColumn = cb.literal(7);
+        }
+        else {
+            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                    .message(BAD_QUERY_PARAMETER)
+                    .detail("'sort' query parameter is bad")
+                    .build();
+            throw new BadQueryParametersException(errorResponse);
+        }
+
+        if (orderByColumn != null) {
+            if (descending) {
+                c.orderBy(cb.desc(orderByColumn), cb.desc(al.get("lastEventTime")));
+            } else {
+                c.orderBy(cb.asc(orderByColumn), cb.desc(al.get("lastEventTime")));
             }
         }
 
-        return (int) query.fetchOne().getValue(0);
     }
 
-    private static SortField getOrderBy(String orderByParameter, boolean descending) throws  BadQueryParametersException{
+    private static void createConditon(String name, List<Predicate> criteria, Path al, CriteriaBuilder cb,  boolean fuzzyMatching) {
 
-            final Field ord;
+        final Predicate p1 = cb.like(cb.lower(al.get("name")), name.toLowerCase().replace("*", "%"));
 
-            if (orderByParameter.equals("created_time")) ord = ALBUMS.CREATED_TIME;
-            else if (orderByParameter.equals("last_event_time")) ord = ALBUMS.LAST_EVENT_TIME;
-            else if (orderByParameter.equals("name")) ord = ALBUMS.NAME;
-            else if (orderByParameter.equals(NUMBER_OF_USERS)) {
-                ord = field(NUMBER_OF_USERS);
-            }
-            else if (orderByParameter.equals(NUMBER_OF_STUDIES)) {
-                ord = field(NUMBER_OF_STUDIES);
-            }
-            else if (orderByParameter.equals(NUMBER_OF_COMMENTS)) {
-                ord = field(NUMBER_OF_COMMENTS);
-            }
-            else {
-                final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                        .message(BAD_QUERY_PARAMETER)
-                        .detail("'sort' query parameter is bad")
-                        .build();
+        if (fuzzyMatching) {
+            Predicate p2 = cb.equal(cb.function("SOUNDEX", Long.class, cb.literal(name.replace("*", ""))), cb.function("SOUNDEX", Long.class, al.get("name")));
+            //Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getTable()+"."+column.getName()+")");
+            criteria.add(cb.or(p1, p2));
+            //criteria.add(p1);
+        } else {
+            criteria.add(p1);
+        }
+    }
+
+    private static void createDateConditon(String parameter, List<Predicate> criteria, Expression expression, CriteriaBuilder cb)
+            throws BadQueryParametersException {
+
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
+                .message(BAD_QUERY_PARAMETER)
+                .detail("Bad date format : yyyyMMdd")
+                .build();
+
+        if (parameter.contains("-")) {
+            String[] parameters = parameter.split("-");
+            if (parameters.length == 2) { //case yyyyMMdd-yyyyMMdd
+                if(parameters[0].length() == 0) {//case -yyyyMMdd = all before yyyyMMdd
+                    parameters[0] = "00010101";
+                }
+                checkDate(parameters[0]);
+                checkDate(parameters[1]);
+
+                final String strDateBegin = parameters[0]+"000000";
+                final LocalDateTime begin = LocalDateTime.parse(strDateBegin, formatter);
+                final String strDateEnd = parameters[1] + "235959";
+                final LocalDateTime end = LocalDateTime.parse(strDateEnd, formatter);
+                criteria.add(cb.between(expression, begin, end));
+            } else if(parameters.length == 1) { //case yyyyMMdd- = all after yyyyMMdd
+                checkDate(parameters[0]);
+
+                final String strDateBegin = parameters[0]+"000000";
+                final LocalDateTime begin = LocalDateTime.parse(strDateBegin, formatter);
+                final String strDateEnd = "99991231235959";
+                final LocalDateTime end = LocalDateTime.parse(strDateEnd, formatter);
+                criteria.add(cb.between(expression, begin, end));
+            } else {
                 throw new BadQueryParametersException(errorResponse);
             }
+        } else {  //case only at this date yyyyMMdd
+            checkDate(parameter);
+            final String strDateBegin = parameter+"000000";
+            final LocalDateTime begin = LocalDateTime.parse(strDateBegin, formatter);
+            final String strDateEnd = parameter+"235959";
+            final LocalDateTime end = LocalDateTime.parse(strDateEnd, formatter);
+            criteria.add(cb.between(expression, begin, end));
 
-            return descending ? ord.desc() : ord.asc();
-
-    }
-
-
-    private static Condition createConditon(String parameter, TableField<? extends Record, String> column, boolean fuzzyMatching) {
-
-        String parameterNoStar = parameter.replace("*", "");
-
-        if (parameterNoStar.length() == 0) {
-            return null;
-        }
-        if ("null".equalsIgnoreCase(parameterNoStar)) {
-            return column.isNull();
-        } else {
-            Condition condition;
-            if (parameter.startsWith("*") && parameter.endsWith("*")) {
-                condition = column.containsIgnoreCase(parameterNoStar);
-            } else if (parameter.startsWith("*")) {
-                condition = column.endsWithIgnoreCase(parameterNoStar);
-            } else if (parameter.endsWith("*")) {
-                condition = column.startsWithIgnoreCase(parameterNoStar);
-            } else {
-                condition = column.equalIgnoreCase(parameterNoStar);
-            }
-
-            if (fuzzyMatching) {
-                Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getTable()+"."+column.getName()+")");
-                return condition.or(fuzzyCondition);
-            }
-            return condition;
         }
     }
 }

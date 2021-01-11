@@ -121,10 +121,9 @@ public class Albums {
     }
 
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
-            throws JOOQException, BadQueryParametersException {
+            throws BadQueryParametersException {
 
-        findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
-        return findAlbumsByUserPk(albumQueryParams);
+        return findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
     }
 
     public static void deleteAlbum(ServletContext context, User callingUser, String albumId)

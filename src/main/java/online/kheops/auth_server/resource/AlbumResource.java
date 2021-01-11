@@ -115,13 +115,8 @@ public class AlbumResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
 
-        try {
-            final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
-            pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
+        pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
 
         final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder()

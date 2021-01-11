@@ -64,9 +64,8 @@ public class AlbumResponseBuilder {
         this.isAdmin = albumUser.isAdmin();
 
         this.modalities = new TreeSet<>();
-        if(!modalitiesLst.equals("{NULL}")) {
-            this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
-        }
+        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
+        this.modalities.remove("NULL");
     }
 
     public AlbumResponseBuilder(Album album, long nbStudy, long nbSeries, long nbInstance, String modalitiesLst) {
@@ -79,9 +78,8 @@ public class AlbumResponseBuilder {
         this.numberOfInstances = ((Long) nbInstance).intValue();
 
         this.modalities = new TreeSet<>();
-        if(!modalitiesLst.equals("{NULL}")) {
-            this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
-        }
+        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
+        this.modalities.remove("NULL");
     }
 
     public AlbumResponseBuilder setAlbumFromUser(Record r) {
@@ -111,9 +109,8 @@ public class AlbumResponseBuilder {
         this.notificationNewSeries = (boolean) r.getValue(NEW_SERIES_NOTIFICATIONS);
         this.isAdmin = ((boolean) r.getValue(ADMIN));
         this.modalities = new TreeSet<>();
-        if(r.getValue(MODALITIES) != null) {
-            this.modalities.addAll(Arrays.asList(r.getValue(MODALITIES).toString().split(",")));
-        }
+        this.modalities.addAll(Arrays.asList(r.getValue(MODALITIES).toString().split(",")));
+        this.modalities.remove("NULL");
         return this;
     }
 

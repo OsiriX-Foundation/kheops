@@ -9,5 +9,6 @@ public class extendPostgreSQLDialect extends PostgreSQLDialect {
     public extendPostgreSQLDialect() {
         super();
         registerFunction("array_agg", new StandardSQLFunction("array_agg", StandardBasicTypes.STRING));
+        registerFunction("SOUNDEX", new StandardSQLFunction("SOUNDEX", StandardBasicTypes.LONG));
     }
 }
