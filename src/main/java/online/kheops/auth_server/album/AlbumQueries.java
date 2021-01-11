@@ -118,7 +118,6 @@ public class AlbumQueries {
 
         if (albumQueryParams.isFavorite()) {
             criteria.add(cb.isTrue(alU.get("favorite")));
-
         }
 
         if (criteria.size() == 0) {
@@ -140,7 +139,6 @@ public class AlbumQueries {
         for (AlbumResponseBuilder albumResponseBuilder : res) {
             albumResponses.add(albumResponseBuilder.build());
         }
-
 
         final int albumTotalCount = getAlbumTotalCount(albumQueryParams, em);
 
