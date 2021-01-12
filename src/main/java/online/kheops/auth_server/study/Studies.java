@@ -2,7 +2,9 @@ package online.kheops.auth_server.study;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
+import online.kheops.auth_server.album.AlbumResponseBuilder;
 import online.kheops.auth_server.album.BadQueryParametersException;
+import online.kheops.auth_server.entity.Comment;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.event.Events;
@@ -17,11 +19,14 @@ import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
 import org.jooq.*;
+import org.jooq.JoinType;
 import org.jooq.impl.DSL;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.*;
 import javax.ws.rs.BadRequestException;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -250,6 +255,312 @@ public class Studies {
         return new PairListXTotalCount<>(studiesTotalCount, attributesList);
     }
 
+    private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery c, Path study, int orderBy, boolean isDescending) {
+
+        Expression orderByColumn = null;
+
+        if (orderBy == Tag.StudyDate)
+            orderByColumn = study.get("studyDate");
+        else if (orderBy == Tag.StudyTime)
+            orderByColumn = study.get("studyTime");
+        else if (orderBy == Tag.AccessionNumber)
+            orderByColumn = study.get("accessionNumber");
+        else if (orderBy == Tag.ReferringPhysicianName)
+            orderByColumn = study.get("referringPhysicianName");
+        else if (orderBy == Tag.PatientName)
+            orderByColumn = study.get("patientName");
+        else if (orderBy == Tag.PatientID)
+            orderByColumn = study.get("patientID");
+        else if (orderBy == Tag.StudyInstanceUID)
+            orderByColumn = study.get("studyInstanceUID");
+        else if (orderBy == Tag.StudyID)
+            orderByColumn = study.get("studyID");
+        else
+            orderByColumn = study.get("studyDate");
+
+        if (isDescending) {
+            if (orderBy == Tag.StudyDate) {
+                c.orderBy(cb.desc(cb.coalesce(orderByColumn, "00010101")), cb.desc(study.get("studyInstanceUID")));
+            } else {
+                c.orderBy(cb.desc(orderByColumn), cb.desc(study.get("studyInstanceUID")));
+            }
+        } else {
+            if (orderBy == Tag.StudyDate) {
+                c.orderBy(cb.asc(cb.coalesce(orderByColumn, "99993112")), cb.asc(study.get("studyInstanceUID")));
+            } else {
+                c.orderBy(cb.asc(orderByColumn), cb.asc(study.get("studyInstanceUID")));
+            }
+        }
+    }
+
+    public static PairListXTotalCount<Attributes> findAttributesByUserPKJPA(long callingUserPK, StudyQIDOParams qidoParams)
+            throws BadQueryParametersException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final List<Predicate> criteria = new ArrayList<>();
+
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<StudyResponseDICOM> c = cb.createQuery(StudyResponseDICOM.class);
+        final Root<User> u = c.from(User.class);
+
+        final Join<User, AlbumUser> alU = u.join("albumUser");
+        final Join<AlbumUser, Album> a = alU.join("album");
+        final Join<Album, AlbumSeries> alS = a.join("albumSeries");
+        final Join<AlbumSeries, Series> se = alS.join("series");
+        se.on(cb.isTrue(se.get("populated")));
+        final Join<Series, Study> st = se.join("study");
+        st.on(cb.isTrue(st.get("populated")));
+
+        final Join<Studies, Event> com = st.join("events", javax.persistence.criteria.JoinType.LEFT);
+        final Predicate privateMessage = cb.or(com.get("privateTargetUser").isNull(), cb.equal(com.get("privateTargetUser").get("pk"), callingUserPK));
+        final Predicate author = cb.equal(com.get("user").get("pk"), callingUserPK);
+        com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
+
+        c.select(cb.construct(StudyResponseDICOM.class, st, cb.countDistinct(se.get("pk")),
+                cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))),
+                cb.function("array_agg", String.class ,se.get("modality")),
+                cb.sum(cb.<Long>selectCase().when(cb.isTrue(alS.get("favorite")), 1L).otherwise(0L)),
+                cb.countDistinct(com.get("pk"))));
+
+        //filtre
+        //applyIfPresent(qidoParams::getStudyDateFilter, filter -> conditionArrayList.add(createConditionStudyDate(filter)));
+        //applyIfPresent(qidoParams::getStudyTimeFilter, filter -> conditionArrayList.add(createConditionStudyTime(filter)));
+        applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDateJPA(filter, criteria, cb));
+
+        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> createConditionJPA(filter, criteria, cb, st.get("acessionNumber"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> createConditionJPA(filter, criteria, cb, st.get("referringPhysicianName"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientNameFilter, filter -> createConditionJPA(filter, criteria, cb, st.get("patientName"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientIDFilter, filter -> createConditionJPA(filter, criteria, cb, st.get("patientID"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyIDFilter, filter -> createConditionJPA(filter, criteria, cb, st.get("studyID"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> createConditionJPA(filter, criteria, cb, st.get("studyDescription"), qidoParams.isFuzzyMatching()));
+
+        applyIfPresent(qidoParams::getFavoriteFilter, filter -> criteria.add(cb.equal(alS.get("favorite"), filter)));
+
+        if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
+            Predicate p = cb.or();//always false
+            for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
+                if (p!= null) {
+                    p = cb.or(p, cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                } else {
+                    p = cb.or(cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                }
+            }
+            criteria.add(p);
+        }
+
+
+        if (criteria.size() == 0) {
+
+        } else if (criteria.size() == 1) {
+            c.where(cb.and(criteria.get(0)));
+        } else {
+            c.where(cb.and(criteria.toArray(new Predicate[0])));
+        }
+
+        //order by
+        setOrderBy(cb, c, st, qidoParams.getOrderByTag(), qidoParams.isDescending());
+
+        //modalities (si filter) regarder group by =>  having
+        final Subquery<Study> subqueryModality = c.subquery(Study.class);
+        final Root<Series> subqueryRoot = subqueryModality.from(Series.class);
+        final Join<Series, Study> stsub = subqueryRoot.join("study");
+        subqueryModality.where(cb.and(cb.equal(stsub, st), cb.equal(subqueryRoot.get("modality"), qidoParams.getModalityFilter().get())));
+        subqueryModality.select(stsub);
+
+
+        qidoParams.getModalityFilter().ifPresent(filter -> c.having(cb.equal(st, cb.any(subqueryModality))));
+
+        //x-total-count
+
+        c.groupBy(st);
+
+        final TypedQuery<StudyResponseDICOM> q = em.createQuery(c);
+        qidoParams.getOffset().ifPresent(q::setFirstResult);
+        qidoParams.getLimit().ifPresent(q::setMaxResults);
+
+        final List<StudyResponseDICOM> res = q.getResultList();
+
+        return null;
+
+        /*ArrayList<Condition> conditionArrayList = new ArrayList<>();
+
+        if (qidoParams.isFromInbox()) {
+            conditionArrayList.add(ALBUMS.PK.eq(USERS.INBOX_FK));
+        }
+        qidoParams.getAlbumID().ifPresent(albu mId -> conditionArrayList.add(ALBUMS.ID.eq(albumId)));
+
+        final Condition fromCondition;
+        if (conditionArrayList.isEmpty()) {
+            fromCondition = trueCondition();
+        } else {
+            fromCondition = conditionArrayList.get(0);
+        }*/
+
+        /*DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
+
+        applyIfPresent(qidoParams::getStudyDateFilter, filter -> conditionArrayList.add(createConditionStudyDate(filter)));
+        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> conditionArrayList.add(createConditionStudyTime(filter)));
+        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.ACCESSION_NUMBER, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.REFERRING_PHYSICIAN_NAME, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getPatientNameFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_NAME, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getPatientIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.PATIENT_ID, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getStudyIDFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_ID, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> conditionArrayList.add(createCondition(filter, STUDIES.STUDY_DESCRIPTION, qidoParams.isFuzzyMatching())));
+        applyIfPresent(qidoParams::getFavoriteFilter, filter -> conditionArrayList.add(ALBUM_SERIES.FAVORITE.eq(filter)));
+
+        if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
+            Condition condition = trueCondition();
+            boolean conditionIsInitialised = false;
+            for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
+                if(!conditionIsInitialised) {
+                    condition = STUDIES.STUDY_UID.eq(studyInstanceUID);
+                    conditionIsInitialised = true;
+                } else {
+                    condition = condition.or(STUDIES.STUDY_UID.eq(studyInstanceUID));
+                }
+            }
+            conditionArrayList.add(condition);
+        }
+
+        qidoParams.getModalityFilter().ifPresent(filter -> conditionArrayList.add(createConditionModality(filter)));
+
+        final SelectQuery<Record> countQuery = create.selectQuery();
+        countQuery.addSelect(countDistinct(STUDIES.PK));
+        countQuery.addFrom(USERS);
+        countQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
+        countQuery.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        countQuery.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
+        countQuery.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+        countQuery.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+
+
+        conditionArrayList.add(USERS.PK.eq(callingUserPK));
+        conditionArrayList.add(SERIES.POPULATED.isTrue());
+        conditionArrayList.add(STUDIES.POPULATED.isTrue());
+
+        for (Condition c : conditionArrayList) {
+            if (c != null) {
+                countQuery.addConditions(c);
+            }
+        }
+
+        Integer studiesTotalCount = (Integer) countQuery.fetch().getValues("count").get(0);*/
+
+        /*final SelectQuery<? extends Record> selectQuery = create.selectQuery();
+        selectQuery.addSelect(STUDIES.STUDY_UID.as(STUDIES.STUDY_UID.getName()),
+                isnull(STUDIES.STUDY_DATE, "").as(STUDIES.STUDY_DATE.getName()),
+                isnull(STUDIES.STUDY_TIME, "").as(STUDIES.STUDY_TIME.getName()),
+                STUDIES.TIMEZONE_OFFSET_FROM_UTC.as(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()),
+                isnull(STUDIES.ACCESSION_NUMBER, "").as(STUDIES.ACCESSION_NUMBER.getName()),
+                isnull(STUDIES.REFERRING_PHYSICIAN_NAME,"").as(STUDIES.REFERRING_PHYSICIAN_NAME.getName()),
+                isnull(STUDIES.PATIENT_NAME, "").as(STUDIES.PATIENT_NAME.getName()),
+                isnull(STUDIES.PATIENT_ID, "").as(STUDIES.PATIENT_ID.getName()),
+                isnull(STUDIES.PATIENT_BIRTH_DATE, "").as(STUDIES.PATIENT_BIRTH_DATE.getName()),
+                isnull(STUDIES.PATIENT_SEX, "").as(STUDIES.PATIENT_SEX.getName()),
+                isnull(STUDIES.STUDY_ID, "").as(STUDIES.STUDY_ID.getName()),
+                countDistinct(SERIES.PK).as("count:" + SERIES.PK.getName()),
+                isnull(sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES),0).as("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName()),
+                isnull(groupConcatDistinct(SERIES.MODALITY), "NULL").as("modalities"),
+                countDistinct(when(ALBUM_SERIES.FAVORITE.eq(true), ALBUM_SERIES.PK)).as("sum_fav"),
+                countDistinct(EVENTS).as("sum_comments"));
+
+        if(qidoParams.includeStudyDescriptionField()) {
+            selectQuery.addSelect(STUDIES.STUDY_DESCRIPTION.as(STUDIES.STUDY_DESCRIPTION.getName()));
+        }
+
+        selectQuery.addFrom(USERS);
+        selectQuery.addJoin(ALBUM_USER, ALBUM_USER.USER_FK.eq(USERS.PK));
+        selectQuery.addJoin(ALBUMS, ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK));
+        selectQuery.addJoin(ALBUM_SERIES, ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK));
+        selectQuery.addJoin(SERIES, SERIES.PK.eq(ALBUM_SERIES.SERIES_FK));
+        selectQuery.addJoin(STUDIES, STUDIES.PK.eq(SERIES.STUDY_FK));
+        selectQuery.addJoin(EVENTS,JoinType.LEFT_OUTER_JOIN, EVENTS.EVENT_TYPE.eq("Comment").and(EVENTS.STUDY_FK.eq(STUDIES.PK)).and(EVENTS.PRIVATE_TARGET_USER_FK.isNull().or(EVENTS.USER_FK.eq(USERS.PK)).or(EVENTS.PRIVATE_TARGET_USER_FK.eq(USERS.PK))));
+
+        for (Condition c : conditionArrayList) {
+            if (c != null) {
+                selectQuery.addConditions(c);
+            }
+        }
+
+        selectQuery.addGroupBy(STUDIES.STUDY_UID, STUDIES.PK);
+
+        selectQuery.addOrderBy(orderBy(qidoParams.getOrderByTag(), qidoParams.isDescending()), STUDIES.PK);
+
+
+        qidoParams.getLimit().ifPresent(selectQuery::addLimit);
+        qidoParams.getOffset().ifPresent(selectQuery::addOffset);
+
+        Result<? extends Record> result = selectQuery.fetch();
+
+        List<Attributes> attributesList;
+        attributesList = new ArrayList<>();
+
+        for (Record r : result) {
+
+            Attributes attributes = new Attributes();
+
+            qidoParams.getModalityFilter().ifPresent(filter -> {
+                //get all the modalities for the STUDY_UID
+                String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
+                        .from(USERS)
+                        .join(ALBUM_USER).on(ALBUM_USER.USER_FK.eq(USERS.PK))
+                        .join(ALBUMS).on(ALBUMS.PK.eq(ALBUM_USER.ALBUM_FK))
+                        .join(ALBUM_SERIES).on(ALBUM_SERIES.ALBUM_FK.eq(ALBUMS.PK))
+                        .join(SERIES).on(SERIES.PK.eq(ALBUM_SERIES.SERIES_FK))
+                        .join(STUDIES).on(STUDIES.PK.eq(SERIES.STUDY_FK))
+                        .where(USERS.PK.eq(callingUserPK))
+                        .and(SERIES.POPULATED.isTrue())
+                        .and(STUDIES.POPULATED.isTrue())
+                        .and(STUDIES.STUDY_UID.eq(r.getValue(0).toString()))
+                        .and(fromCondition)
+                        .groupBy(STUDIES.STUDY_UID)
+                        .fetch().get(0).getValue(0).toString();
+
+                attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.split(","));
+            });
+            if (!qidoParams.getModalityFilter().isPresent()) {
+                attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString().split(","));
+            }
+
+            //Tag Type (1) Required
+            safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());
+
+            //Tag Type (2) Required, Empty if Unknown
+            safeAttributeSetString(attributes, Tag.StudyDate, VR.DA, r.getValue(STUDIES.STUDY_DATE.getName()).toString());
+            safeAttributeSetString(attributes, Tag.StudyTime, VR.TM, r.getValue(STUDIES.STUDY_TIME.getName()).toString());
+            safeAttributeSetString(attributes, Tag.AccessionNumber, VR.SH, r.getValue(STUDIES.ACCESSION_NUMBER.getName()).toString());
+            safeAttributeSetString(attributes, Tag.ReferringPhysicianName, VR.PN, r.getValue(STUDIES.REFERRING_PHYSICIAN_NAME.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientName, VR.PN, r.getValue(STUDIES.PATIENT_NAME.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientID, VR.LO, r.getValue(STUDIES.PATIENT_ID.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientBirthDate, VR.DA, r.getValue(STUDIES.PATIENT_BIRTH_DATE.getName()).toString());
+            safeAttributeSetString(attributes, Tag.PatientSex, VR.CS, r.getValue(STUDIES.PATIENT_SEX.getName()).toString());
+            safeAttributeSetString(attributes, Tag.StudyID, VR.SH, r.getValue(STUDIES.STUDY_ID.getName()).toString());
+            attributes.setInt(Tag.NumberOfStudyRelatedSeries, VR.IS, ((Integer) r.getValue("count:" + SERIES.PK.getName())));
+            attributes.setInt(Tag.NumberOfStudyRelatedInstances, VR.IS, ((BigDecimal) r.getValue("sum:" + SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES.getName())).intValue());
+
+            //Tag Type (3) Optional
+            if(qidoParams.includeStudyDescriptionField() && r.getValue(STUDIES.STUDY_DESCRIPTION.getName()) != null) {
+                safeAttributeSetString(attributes, Tag.StudyDescription, VR.CS, r.getValue(STUDIES.STUDY_DESCRIPTION.getName()).toString());
+            }
+            if(r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()) != null) {
+                safeAttributeSetString(attributes, Tag.TimezoneOffsetFromUTC, VR.SH, r.getValue(STUDIES.TIMEZONE_OFFSET_FROM_UTC.getName()).toString());
+            }
+            //Tag Custom
+            if(qidoParams.includeFavoriteField()) {
+                attributes.setInt(CUSTOM_DICOM_TAG_FAVORITE, VR.IS, ((Integer)r.getValue("sum_fav")));
+            }
+            if(qidoParams.includeCommentField()) {
+                attributes.setInt(CUSTOM_DICOM_TAG_COMMENTS, VR.IS, ((Integer)r.getValue("sum_comments")));
+            }
+
+            //Others
+            safeAttributeSetString(attributes, Tag.InstanceAvailability, VR.CS, "ONLINE");
+
+            attributesList.add(attributes);
+        }
+        return new PairListXTotalCount<>(studiesTotalCount, attributesList);*/
+    }
+
     private static SortField orderBy(int orderBy, boolean descending) {
         final TableField ord;
 
@@ -290,6 +601,11 @@ public class Studies {
     private static Condition createConditionStudyDate(String filter)
             throws BadQueryParametersException {
         return createIntervalCondition(filter, new CheckDate());
+    }
+
+    private static void createConditionStudyDateJPA(String filter, List<Predicate> criteria, CriteriaBuilder cb)
+            throws BadQueryParametersException {
+        createIntervalCondition(filter, new CheckDate());
     }
 
     private static Condition createConditionStudyTime(String filter)
@@ -402,6 +718,17 @@ public class Studies {
                 return condition.or(fuzzyCondition);
             }
             return condition;
+        }
+    }
+
+    private static void createConditionJPA(String filter, List<Predicate> criteria, CriteriaBuilder cb, Expression field, boolean isFuzzyMatching) {
+        final Predicate p1 = cb.like(cb.lower(field), filter.toLowerCase().replace("*", "%"));
+
+        if (isFuzzyMatching) {
+            Predicate p2 = cb.equal(cb.function("SOUNDEX", Long.class, cb.literal(filter.replace("*", ""))), cb.function("SOUNDEX", Long.class, field));
+            criteria.add(cb.or(p1, p2));
+        } else {
+            criteria.add(p1);
         }
     }
 

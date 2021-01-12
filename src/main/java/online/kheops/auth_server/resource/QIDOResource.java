@@ -44,6 +44,7 @@ import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUE
 import static online.kheops.auth_server.filter.SecuredFilter.LINK_AUTH;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
+import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJPA;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.USER_IN_ROLE.VIEWER_TOKEN;
@@ -99,6 +100,7 @@ public class QIDOResource {
         try (Connection connection = EntityManagerListener.getConnection()) {
             qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
+            findAttributesByUserPKJPA(callingUserPk, qidoParams);
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
