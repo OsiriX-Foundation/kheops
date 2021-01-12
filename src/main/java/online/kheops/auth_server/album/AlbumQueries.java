@@ -148,11 +148,37 @@ public class AlbumQueries {
 
     public static AlbumResponse findAlbumByUserAndAlbumId(String albumId, User user, EntityManager em) {
 
-        TypedQuery<AlbumResponseBuilder> query = em.createNamedQuery("Albums.getAlbumInfoByAlbumIdAndUser", AlbumResponseBuilder.class);
-        query.setParameter(USER, user);
-        query.setParameter(JPANamedQueryConstants.ALBUM_ID, albumId);
-        AlbumResponseBuilder albumResponseBuilder = query.getSingleResult();
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<AlbumResponseBuilder> c = cb.createQuery(AlbumResponseBuilder.class);
+        final Root<Album> al = c.from(Album.class);
 
+        final Join<Album, AlbumSeries> alS = al.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
+        final Join<AlbumSeries, Series> se = alS.join("series", javax.persistence.criteria.JoinType.LEFT);
+        se.on(cb.isTrue(se.get("populated")));
+        final Join<Series, Study> st = se.join("study", javax.persistence.criteria.JoinType.LEFT);
+        st.on(cb.isTrue(st.get("populated")));
+        final Join<Album, AlbumUser> alU = al.join("albumUser");
+        final Join<AlbumUser, User> u = alU.join("user", javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, Event> com = al.join("events", javax.persistence.criteria.JoinType.LEFT);
+
+        final Predicate privateMessage = cb.or(com.get("privateTargetUser").isNull(), cb.equal(com.get("privateTargetUser"), user));
+        final Predicate author = cb.equal(com.get("user"), user);
+        com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
+
+        final Subquery<Long> subqueryNbUser = c.subquery(Long.class);
+        final Root <AlbumUser> subqueryRoot = subqueryNbUser.from(AlbumUser.class);
+        subqueryNbUser.where(cb.equal(al, subqueryRoot.get("album")));
+        subqueryNbUser.select(cb.countDistinct(subqueryRoot.get("pk")));
+
+        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get("pk")), cb.countDistinct(se.get("pk")),
+                cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))),
+                subqueryNbUser.getSelection(), cb.countDistinct(com.get("pk")), cb.function("array_agg", String.class ,se.get("modality"))));
+
+        c.where(cb.and(cb.equal(u, user), cb.equal(al.get("id"), albumId)));
+        c.groupBy(al, alU);
+
+        final TypedQuery<AlbumResponseBuilder> q = em.createQuery(c);
+        final AlbumResponseBuilder albumResponseBuilder = q.getSingleResult();
         return albumResponseBuilder.build();
     }
 
