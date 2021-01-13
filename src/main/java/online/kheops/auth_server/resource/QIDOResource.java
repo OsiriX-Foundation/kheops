@@ -32,8 +32,6 @@ import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
