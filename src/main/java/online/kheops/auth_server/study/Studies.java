@@ -177,8 +177,6 @@ public class Studies {
             qidoParams.getModalityFilter().ifPresent(filter -> c.having(cb.equal(st, cb.any(subqueryModality))));
         }
 
-        //x-total-count
-
         c.groupBy(st);
 
         final TypedQuery<StudyResponseDICOM> q = em.createQuery(c);
@@ -187,11 +185,81 @@ public class Studies {
 
         final List<StudyResponseDICOM> res = q.getResultList();
 
-        List<Attributes> attributesList;
+        final List<Attributes> attributesList;
         attributesList = new ArrayList<>();
+
         res.forEach(re -> attributesList.add(re.getAttribute(qidoParams)));
 
-        return new PairListXTotalCount<>(123, attributesList);
+        return new PairListXTotalCount<>(getTotalCount(qidoParams, em), attributesList);
+    }
+
+    private static int getTotalCount(StudyQIDOParams qidoParams, EntityManager em)
+            throws BadQueryParametersException {
+
+        final List<Predicate> criteria = new ArrayList<>();
+
+        final CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Long> c = cb.createQuery(Long.class);
+        final Root<User> u = c.from(User.class);
+
+        final Join<User, AlbumUser> alU = u.join("albumUser");
+        final Join<AlbumUser, Album> a = alU.join("album");
+        final Join<Album, AlbumSeries> alS = a.join("albumSeries");
+        final Join<AlbumSeries, Series> se = alS.join("series");
+        se.on(cb.isTrue(se.get("populated")));
+        final Join<Series, Study> st = se.join("study");
+        st.on(cb.isTrue(st.get("populated")));
+
+        c.select(cb.countDistinct(st.get("pk")));
+
+        //filtre
+        applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDate(filter, criteria, cb, st.get("studyDate")));
+        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> createConditionStudyTime(filter, criteria, cb, st.get("studyTime")));
+
+        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> createCondition(filter, criteria, cb, st.get("acessionNumber"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> createCondition(filter, criteria, cb, st.get("referringPhysicianName"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientNameFilter, filter -> createCondition(filter, criteria, cb, st.get("patientName"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientIDFilter, filter -> createCondition(filter, criteria, cb, st.get("patientID"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyIDFilter, filter -> createCondition(filter, criteria, cb, st.get("studyID"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> createCondition(filter, criteria, cb, st.get("studyDescription"), qidoParams.isFuzzyMatching()));
+
+        applyIfPresent(qidoParams::getFavoriteFilter, filter -> criteria.add(cb.equal(alS.get("favorite"), filter)));
+
+        if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
+            Predicate p = cb.or();//always false
+            for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
+                if (p!= null) {
+                    p = cb.or(p, cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                } else {
+                    p = cb.or(cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                }
+            }
+            criteria.add(p);
+        }
+
+        if (qidoParams.isFromInbox()) {
+            criteria.add(cb.equal(a, u.get("inbox")));
+        }
+
+        qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get("id"), albumId)));
+
+        //modalities (si filter) regarder group by =>  having
+        if (qidoParams.getModalityFilter().isPresent()) {
+            criteria.add(cb.equal(cb.lower(se.get("modality")), qidoParams.getModalityFilter().get().toLowerCase()));
+        }
+        if (criteria.size() == 0) {
+
+        } else if (criteria.size() == 1) {
+            c.where(cb.and(criteria.get(0)));
+        } else {
+            c.where(cb.and(criteria.toArray(new Predicate[0])));
+        }
+
+
+
+        final TypedQuery<Long> q = em.createQuery(c);
+        int res = q.getSingleResult().intValue();
+        return res;
     }
 
     private static void createConditionStudyDate(String parameter, List<Predicate> criteria, CriteriaBuilder cb, Path study)
