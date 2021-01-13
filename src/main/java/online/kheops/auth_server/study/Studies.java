@@ -164,16 +164,16 @@ public class Studies {
         //order by
         setOrderBy(cb, c, st, qidoParams.getOrderByTag(), qidoParams.isDescending());
 
-        //modalities (si filter) regarder group by =>  having
-        if (qidoParams.getModalityFilter().isPresent()) {
+        //modalities subqueries
+        qidoParams.getModalityFilter().ifPresent(filter -> {
             final Subquery<Study> subqueryModality = c.subquery(Study.class);
             final Root<Series> subqueryRoot = subqueryModality.from(Series.class);
             final Join<Series, Study> stsub = subqueryRoot.join("study");
             subqueryModality.where(cb.and(cb.equal(stsub, st), cb.equal(cb.lower(subqueryRoot.get("modality")), qidoParams.getModalityFilter().get().toLowerCase())));
             subqueryModality.select(stsub);
 
-            qidoParams.getModalityFilter().ifPresent(filter -> c.having(cb.equal(st, cb.any(subqueryModality))));
-        }
+            c.having(cb.equal(st, cb.any(subqueryModality)));
+        });
 
         c.groupBy(st);
 
