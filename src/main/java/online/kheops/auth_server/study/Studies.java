@@ -155,11 +155,9 @@ public class Studies {
 
         qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get("id"), albumId)));
 
-        if (criteria.size() == 0) {
-
-        } else if (criteria.size() == 1) {
+        if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
-        } else {
+        } else if (criteria.size() > 1) {
             c.where(cb.and(criteria.toArray(new Predicate[0])));
         }
 
@@ -242,24 +240,16 @@ public class Studies {
         }
 
         qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get("id"), albumId)));
+        qidoParams.getModalityFilter().ifPresent(filter -> criteria.add(cb.equal(cb.lower(se.get("modality")), filter.toLowerCase())));
 
-        //modalities (si filter) regarder group by =>  having
-        if (qidoParams.getModalityFilter().isPresent()) {
-            criteria.add(cb.equal(cb.lower(se.get("modality")), qidoParams.getModalityFilter().get().toLowerCase()));
-        }
-        if (criteria.size() == 0) {
-
-        } else if (criteria.size() == 1) {
+        if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
-        } else {
+        } else if (criteria.size() > 1) {
             c.where(cb.and(criteria.toArray(new Predicate[0])));
         }
 
-
-
         final TypedQuery<Long> q = em.createQuery(c);
-        int res = q.getSingleResult().intValue();
-        return res;
+        return q.getSingleResult().intValue();
     }
 
     private static void createConditionStudyDate(String parameter, List<Predicate> criteria, CriteriaBuilder cb, Path study)

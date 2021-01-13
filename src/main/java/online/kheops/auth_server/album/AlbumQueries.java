@@ -119,11 +119,9 @@ public class AlbumQueries {
             criteria.add(cb.isTrue(alU.get("favorite")));
         }
 
-        if (criteria.size() == 0) {
-
-        } else if (criteria.size() == 1) {
+        if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
-        } else {
+        } else if (criteria.size() > 1) {
             c.where(cb.and(criteria.toArray(new Predicate[0])));
         }
         c.groupBy(al, alU);
@@ -219,11 +217,9 @@ public class AlbumQueries {
             criteria.add(cb.isTrue(alU.get("favorite")));
         }
 
-        if (criteria.size() == 0) {
-
-        } else if (criteria.size() == 1) {
+        if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
-        } else {
+        } else if (criteria.size() > 1) {
             c.where(cb.and(criteria.toArray(new Predicate[0])));
         }
 
