@@ -275,7 +275,8 @@ public class AlbumQueries {
 
     private static void createConditon(String name, List<Predicate> criteria, Path al, CriteriaBuilder cb,  boolean fuzzyMatching) {
 
-        final Predicate p1 = cb.like(cb.lower(al.get("name")), name.toLowerCase().replace("*", "%"));
+        final String name2 = name.toLowerCase().replace("_", "\\_").replace("%", "\\%").replace("*", "%");
+        final Predicate p1 = cb.like(cb.lower(al.get("name")), name2, '\\');
 
         if (fuzzyMatching) {
             Predicate p2 = cb.equal(cb.function("SOUNDEX", Long.class, cb.literal(name.replace("*", ""))), cb.function("SOUNDEX", Long.class, al.get("name")));
