@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.JOOQTools.checkDate;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
-import static online.kheops.auth_server.util.JooqConstances.*;
 
 public class AlbumQueries {
 
@@ -246,13 +245,13 @@ public class AlbumQueries {
         else if (orderByParameter.equals("name")) {
             orderByColumn = al.get("name");
         }
-        else if (orderByParameter.equals(NUMBER_OF_USERS)) {
+        else if (orderByParameter.equals("number_of_users")) {
             orderByColumn = cb.literal(6);
         }
-        else if (orderByParameter.equals(NUMBER_OF_STUDIES)) {
+        else if (orderByParameter.equals("number_of_studies")) {
             orderByColumn = cb.literal(3);
         }
-        else if (orderByParameter.equals(NUMBER_OF_COMMENTS)) {
+        else if (orderByParameter.equals("number_of_comments")) {
             orderByColumn = cb.literal(7);
         }
         else {
@@ -280,9 +279,7 @@ public class AlbumQueries {
 
         if (fuzzyMatching) {
             Predicate p2 = cb.equal(cb.function("SOUNDEX", Long.class, cb.literal(name.replace("*", ""))), cb.function("SOUNDEX", Long.class, al.get("name")));
-            //Condition fuzzyCondition = condition("SOUNDEX('"+parameterNoStar+"') = SOUNDEX("+column.getTable()+"."+column.getName()+")");
             criteria.add(cb.or(p1, p2));
-            //criteria.add(p1);
         } else {
             criteria.add(p1);
         }

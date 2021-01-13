@@ -1,7 +1,6 @@
 package online.kheops.auth_server.inbox;
 
 import online.kheops.auth_server.EntityManagerListener;
-import online.kheops.auth_server.album.JOOQException;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
