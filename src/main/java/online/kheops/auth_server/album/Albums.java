@@ -31,8 +31,7 @@ public class Albums {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
-            throws JOOQException {
+    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -63,7 +62,7 @@ public class Albums {
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
-            throws AlbumNotFoundException, AlbumForbiddenException, JOOQException, UserNotMemberException {
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();

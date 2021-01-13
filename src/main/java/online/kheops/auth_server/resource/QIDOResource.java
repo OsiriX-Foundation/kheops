@@ -96,7 +96,7 @@ public class QIDOResource {
 
         final PairListXTotalCount<Attributes> pair;
         final StudyQIDOParams qidoParams;
-        try (Connection connection = EntityManagerListener.getConnection()) {
+        try {
             qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
             pair = findAttributesByUserPKJPA(callingUserPk, qidoParams);
         } catch (BadRequestException e) {
@@ -108,13 +108,6 @@ public class QIDOResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         } catch (NoResultException e) {
             return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
-        } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "Error while connecting to the database", e);
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Database error")
-                    .detail("Database Connection Error")
-                    .build();
-            return Response.status(INTERNAL_SERVER_ERROR).entity(errorResponse).build();
         }
         if(pair.getAttributesList().isEmpty()) {
             return Response.status(NO_CONTENT)

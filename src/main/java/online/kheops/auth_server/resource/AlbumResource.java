@@ -88,14 +88,7 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
-        final AlbumResponse albumResponse;
-
-        try {
-            albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        final AlbumResponse albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumResponse.getId())
                 .action(ActionType.NEW_ALBUM)
@@ -228,9 +221,6 @@ public class AlbumResource {
             albumResponse = Albums.editAlbum(kheopsPrincipal.getUser(), albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
         } catch (UserNotMemberException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
         }
 
         kheopsPrincipal.getKheopsLogBuilder()
