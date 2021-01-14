@@ -136,8 +136,8 @@ public class Users {
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
                 kheopsLogBuilder.user(user.getSub());
                 return user;
-            } catch (UserNotFoundException unused) {
-                throw new IllegalStateException();
+            } catch (UserNotFoundException notFoundException) {
+                throw new IllegalStateException(notFoundException);
             }
         } finally {
             if (tx.isActive()) {
