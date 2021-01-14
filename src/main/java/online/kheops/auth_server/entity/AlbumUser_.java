@@ -1,8 +1,4 @@
-package online.kheops.auth_server.generated;
-
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.AlbumUser;
-import online.kheops.auth_server.entity.User;
+package online.kheops.auth_server.entity;
 
 import javax.annotation.Generated;
 import javax.persistence.metamodel.SingularAttribute;

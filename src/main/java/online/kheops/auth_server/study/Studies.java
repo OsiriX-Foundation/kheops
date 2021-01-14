@@ -62,35 +62,35 @@ public class Studies {
         Expression orderByColumn = null;
 
         if (orderBy == Tag.StudyDate)
-            orderByColumn = study.get("studyDate");
+            orderByColumn = study.get(Study_.studyDate);
         else if (orderBy == Tag.StudyTime)
-            orderByColumn = study.get("studyTime");
+            orderByColumn = study.get(Study_.studyTime);
         else if (orderBy == Tag.AccessionNumber)
-            orderByColumn = study.get("accessionNumber");
+            orderByColumn = study.get(Study_.accessionNumber);
         else if (orderBy == Tag.ReferringPhysicianName)
-            orderByColumn = study.get("referringPhysicianName");
+            orderByColumn = study.get(Study_.referringPhysicianName);
         else if (orderBy == Tag.PatientName)
-            orderByColumn = study.get("patientName");
+            orderByColumn = study.get(Study_.patientName);
         else if (orderBy == Tag.PatientID)
-            orderByColumn = study.get("patientID");
+            orderByColumn = study.get(Study_.patientID);
         else if (orderBy == Tag.StudyInstanceUID)
-            orderByColumn = study.get("studyInstanceUID");
+            orderByColumn = study.get(Study_.studyInstanceUID);
         else if (orderBy == Tag.StudyID)
-            orderByColumn = study.get("studyID");
+            orderByColumn = study.get(Study_.studyID);
         else
-            orderByColumn = study.get("studyDate");
+            orderByColumn = study.get(Study_.studyDate);
 
         if (isDescending) {
             if (orderBy == Tag.StudyDate) {
-                c.orderBy(cb.desc(cb.coalesce(orderByColumn, "00010101")), cb.desc(study.get("studyInstanceUID")));
+                c.orderBy(cb.desc(cb.coalesce(orderByColumn, "00010101")), cb.desc(study.get(Study_.studyInstanceUID)));
             } else {
-                c.orderBy(cb.desc(orderByColumn), cb.desc(study.get("studyInstanceUID")));
+                c.orderBy(cb.desc(orderByColumn), cb.desc(study.get(Study_.studyInstanceUID)));
             }
         } else {
             if (orderBy == Tag.StudyDate) {
-                c.orderBy(cb.asc(cb.coalesce(orderByColumn, "99993112")), cb.asc(study.get("studyInstanceUID")));
+                c.orderBy(cb.asc(cb.coalesce(orderByColumn, "99993112")), cb.asc(study.get(Study_.studyInstanceUID)));
             } else {
-                c.orderBy(cb.asc(orderByColumn), cb.asc(study.get("studyInstanceUID")));
+                c.orderBy(cb.asc(orderByColumn), cb.asc(study.get(Study_.studyInstanceUID)));
             }
         }
     }
@@ -105,55 +105,55 @@ public class Studies {
         final CriteriaQuery<StudyResponseDICOM> c = cb.createQuery(StudyResponseDICOM.class);
         final Root<User> u = c.from(User.class);
 
-        final Join<User, AlbumUser> alU = u.join("albumUser");
-        final Join<AlbumUser, Album> a = alU.join("album");
-        final Join<Album, AlbumSeries> alS = a.join("albumSeries");
-        final Join<AlbumSeries, Series> se = alS.join("series");
-        se.on(cb.isTrue(se.get("populated")));
-        final Join<Series, Study> st = se.join("study");
-        st.on(cb.isTrue(st.get("populated")));
+        final Join<User, AlbumUser> alU = u.join(User_.albumUser);
+        final Join<AlbumUser, Album> a = alU.join(AlbumUser_.album);
+        final Join<Album, AlbumSeries> alS = a.join(Album_.albumSeries);
+        final Join<AlbumSeries, Series> se = alS.join(AlbumSeries_.series);
+        se.on(cb.isTrue(se.get(Series_.populated)));
+        final Join<Series, Study> st = se.join(Series_.study);
+        st.on(cb.isTrue(st.get(Study_.populated)));
 
-        final Join<Studies, Event> com = st.join("events", javax.persistence.criteria.JoinType.LEFT);
-        final Predicate privateMessage = cb.or(com.get("privateTargetUser").isNull(), cb.equal(com.get("privateTargetUser").get("pk"), callingUserPK));
-        final Predicate author = cb.equal(com.get("user").get("pk"), callingUserPK);
+        final Join<Study, Event> com = st.join(Study_.events, javax.persistence.criteria.JoinType.LEFT);
+        final Predicate privateMessage = cb.or(com.get(Comment_.privateTargetUser).isNull(), cb.equal(com.get(Comment_.privateTargetUser).get(User_.pk), callingUserPK));
+        final Predicate author = cb.equal(com.get(Comment_.user).get(User_.pk), callingUserPK);
         com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
 
-        c.select(cb.construct(StudyResponseDICOM.class, st, cb.countDistinct(se.get("pk")),
-                cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))),
-                cb.function("array_agg", String.class ,se.get("modality")),
-                cb.sum(cb.<Long>selectCase().when(cb.isTrue(alS.get("favorite")), 1L).otherwise(0L)),
-                cb.countDistinct(com.get("pk"))));
+        c.select(cb.construct(StudyResponseDICOM.class, st, cb.countDistinct(se.get(Series_.pk)),
+                cb.sum(cb.<Long>selectCase().when(se.get(Series_.numberOfSeriesRelatedInstances).isNull(), 0L).otherwise(se.get(Series_.NUMBER_OF_SERIES_RELATED_INSTANCES))),
+                cb.function("array_agg", String.class ,se.get(Series_.modality)),
+                cb.sum(cb.<Long>selectCase().when(cb.isTrue(alS.get(AlbumSeries_.favorite)), 1L).otherwise(0L)),
+                cb.countDistinct(com.get(Comment_.pk))));
 
         //filtre
-        applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDate(filter, criteria, cb, st.get("studyDate")));
-        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> createConditionStudyTime(filter, criteria, cb, st.get("studyTime")));
+        applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDate(filter, criteria, cb, st.get(Study_.studyDate)));
+        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> createConditionStudyTime(filter, criteria, cb, st.get(Study_.studyTime)));
 
-        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> createCondition(filter, criteria, cb, st.get("acessionNumber"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> createCondition(filter, criteria, cb, st.get("referringPhysicianName"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getPatientNameFilter, filter -> createCondition(filter, criteria, cb, st.get("patientName"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getPatientIDFilter, filter -> createCondition(filter, criteria, cb, st.get("patientID"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getStudyIDFilter, filter -> createCondition(filter, criteria, cb, st.get("studyID"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> createCondition(filter, criteria, cb, st.get("studyDescription"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.accessionNumber), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.referringPhysicianName), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientNameFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.patientName), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientIDFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.patientID), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyIDFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.studyID), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.studyDescription), qidoParams.isFuzzyMatching()));
 
-        applyIfPresent(qidoParams::getFavoriteFilter, filter -> criteria.add(cb.equal(alS.get("favorite"), filter)));
+        applyIfPresent(qidoParams::getFavoriteFilter, filter -> criteria.add(cb.equal(alS.get(AlbumSeries_.favorite), filter)));
 
         if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
             Predicate p = cb.or();//always false
             for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
                 if (p!= null) {
-                    p = cb.or(p, cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                    p = cb.or(p, cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
                 } else {
-                    p = cb.or(cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                    p = cb.or(cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
                 }
             }
             criteria.add(p);
         }
 
         if (qidoParams.isFromInbox()) {
-            criteria.add(cb.equal(a, u.get("inbox")));
+            criteria.add(cb.equal(a, u.get(User_.inbox)));
         }
 
-        qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get("id"), albumId)));
+        qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get(Album_.id), albumId)));
 
         if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
@@ -168,8 +168,8 @@ public class Studies {
         qidoParams.getModalityFilter().ifPresent(filter -> {
             final Subquery<Study> subqueryModality = c.subquery(Study.class);
             final Root<Series> subqueryRoot = subqueryModality.from(Series.class);
-            final Join<Series, Study> stsub = subqueryRoot.join("study");
-            subqueryModality.where(cb.and(cb.equal(stsub, st), cb.equal(cb.lower(subqueryRoot.get("modality")), qidoParams.getModalityFilter().get().toLowerCase())));
+            final Join<Series, Study> stsub = subqueryRoot.join(Series_.study);
+            subqueryModality.where(cb.and(cb.equal(stsub, st), cb.equal(cb.lower(subqueryRoot.get(Series_.modality)), qidoParams.getModalityFilter().get().toLowerCase())));
             subqueryModality.select(stsub);
 
             c.having(cb.equal(st, cb.any(subqueryModality)));
@@ -200,47 +200,47 @@ public class Studies {
         final CriteriaQuery<Long> c = cb.createQuery(Long.class);
         final Root<User> u = c.from(User.class);
 
-        final Join<User, AlbumUser> alU = u.join("albumUser");
-        final Join<AlbumUser, Album> a = alU.join("album");
-        final Join<Album, AlbumSeries> alS = a.join("albumSeries");
-        final Join<AlbumSeries, Series> se = alS.join("series");
-        se.on(cb.isTrue(se.get("populated")));
-        final Join<Series, Study> st = se.join("study");
-        st.on(cb.isTrue(st.get("populated")));
+        final Join<User, AlbumUser> alU = u.join(User_.albumUser);
+        final Join<AlbumUser, Album> a = alU.join(AlbumUser_.album);
+        final Join<Album, AlbumSeries> alS = a.join(Album_.albumSeries);
+        final Join<AlbumSeries, Series> se = alS.join(AlbumSeries_.series);
+        se.on(cb.isTrue(se.get(Series_.populated)));
+        final Join<Series, Study> st = se.join(Series_.study);
+        st.on(cb.isTrue(st.get(Study_.populated)));
 
-        c.select(cb.countDistinct(st.get("pk")));
+        c.select(cb.countDistinct(st.get(Study_.pk)));
 
         //filtre
-        applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDate(filter, criteria, cb, st.get("studyDate")));
-        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> createConditionStudyTime(filter, criteria, cb, st.get("studyTime")));
+        applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDate(filter, criteria, cb, st.get(Study_.studyDate)));
+        applyIfPresent(qidoParams::getStudyTimeFilter, filter -> createConditionStudyTime(filter, criteria, cb, st.get(Study_.studyTime)));
 
-        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> createCondition(filter, criteria, cb, st.get("acessionNumber"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> createCondition(filter, criteria, cb, st.get("referringPhysicianName"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getPatientNameFilter, filter -> createCondition(filter, criteria, cb, st.get("patientName"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getPatientIDFilter, filter -> createCondition(filter, criteria, cb, st.get("patientID"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getStudyIDFilter, filter -> createCondition(filter, criteria, cb, st.get("studyID"), qidoParams.isFuzzyMatching()));
-        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> createCondition(filter, criteria, cb, st.get("studyDescription"), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getAccessionNumberFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.accessionNumber), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getReferringPhysicianNameFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.referringPhysicianName), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientNameFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.patientName), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getPatientIDFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.patientID), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyIDFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.studyID), qidoParams.isFuzzyMatching()));
+        applyIfPresent(qidoParams::getStudyDescriptionFilter, filter -> createCondition(filter, criteria, cb, st.get(Study_.studyDescription), qidoParams.isFuzzyMatching()));
 
-        applyIfPresent(qidoParams::getFavoriteFilter, filter -> criteria.add(cb.equal(alS.get("favorite"), filter)));
+        applyIfPresent(qidoParams::getFavoriteFilter, filter -> criteria.add(cb.equal(alS.get(AlbumSeries_.favorite), filter)));
 
         if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
             Predicate p = cb.or();//always false
             for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
                 if (p!= null) {
-                    p = cb.or(p, cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                    p = cb.or(p, cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
                 } else {
-                    p = cb.or(cb.equal(st.get("studyInstanceUID"), studyInstanceUID));
+                    p = cb.or(cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
                 }
             }
             criteria.add(p);
         }
 
         if (qidoParams.isFromInbox()) {
-            criteria.add(cb.equal(a, u.get("inbox")));
+            criteria.add(cb.equal(a, u.get(User_.inbox)));
         }
 
-        qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get("id"), albumId)));
-        qidoParams.getModalityFilter().ifPresent(filter -> criteria.add(cb.equal(cb.lower(se.get("modality")), filter.toLowerCase())));
+        qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get(Album_.id), albumId)));
+        qidoParams.getModalityFilter().ifPresent(filter -> criteria.add(cb.equal(cb.lower(se.get(Series_.modality)), filter.toLowerCase())));
 
         if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));

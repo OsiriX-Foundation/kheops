@@ -78,45 +78,45 @@ public class AlbumQueries {
         final CriteriaQuery<AlbumResponseBuilder> c = cb.createQuery(AlbumResponseBuilder.class);
         final Root<Album> al = c.from(Album.class);
 
-        final Join<Album, AlbumSeries> alS = al.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        final Join<AlbumSeries, Series> se = alS.join("series", javax.persistence.criteria.JoinType.LEFT);
-        se.on(cb.isTrue(se.get("populated")));
-        final Join<Series, Study> st = se.join("study", javax.persistence.criteria.JoinType.LEFT);
-        st.on(cb.isTrue(st.get("populated")));
-        final Join<Album, AlbumUser> alU = al.join("albumUser");
-        final Join<AlbumUser, User> u = alU.join("user", javax.persistence.criteria.JoinType.LEFT);
-        final Join<Album, Event> com = al.join("events", javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, AlbumSeries> alS = al.join(Album_.albumSeries, javax.persistence.criteria.JoinType.LEFT);
+        final Join<AlbumSeries, Series> se = alS.join(AlbumSeries_.series, javax.persistence.criteria.JoinType.LEFT);
+        se.on(cb.isTrue(se.get(Series_.populated)));
+        final Join<Series, Study> st = se.join(Series_.study, javax.persistence.criteria.JoinType.LEFT);
+        st.on(cb.isTrue(st.get(Study_.populated)));
+        final Join<Album, AlbumUser> alU = al.join(Album_.albumUser);
+        final Join<AlbumUser, User> u = alU.join(AlbumUser_.user, javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, Event> com = al.join(Album_.events, javax.persistence.criteria.JoinType.LEFT);
 
-        final Predicate privateMessage = cb.or(com.get("privateTargetUser").isNull(), cb.equal(com.get("privateTargetUser"), albumQueryParams.getUser()));
-        final Predicate author = cb.equal(com.get("user"), albumQueryParams.getUser());
+        final Predicate privateMessage = cb.or(com.get(Comment_.privateTargetUser).isNull(), cb.equal(com.get(Comment_.privateTargetUser), albumQueryParams.getUser()));
+        final Predicate author = cb.equal(com.get(Comment_.user), albumQueryParams.getUser());
         com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
 
         final Subquery<Long> subqueryNbUser = c.subquery(Long.class);
         final Root <AlbumUser> subqueryRoot = subqueryNbUser.from(AlbumUser.class);
-        subqueryNbUser.where(cb.equal(al, subqueryRoot.get("album")));
-        subqueryNbUser.select(cb.countDistinct(subqueryRoot.get("pk")));
+        subqueryNbUser.where(cb.equal(al, subqueryRoot.get(AlbumUser_.album)));
+        subqueryNbUser.select(cb.countDistinct(subqueryRoot.get(AlbumUser_.pk)));
 
-        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get("pk")), cb.countDistinct(se.get("pk")),
-                cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))),
-                subqueryNbUser.getSelection(), cb.countDistinct(com.get("pk")), cb.function("array_agg", String.class ,se.get("modality"))));
+        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get(Study_.pk)), cb.countDistinct(se.get(Series_.pk)),
+                cb.sum(cb.<Long>selectCase().when(se.get(Series_.numberOfSeriesRelatedInstances).isNull(), 0L).otherwise(se.get(Series_.NUMBER_OF_SERIES_RELATED_INSTANCES))),
+                subqueryNbUser.getSelection(), cb.countDistinct(com.get(Comment_.pk)), cb.function("array_agg", String.class ,se.get(Series_.modality))));
 
         final List<Predicate> criteria = new ArrayList<>();
         albumQueryParams.getName().ifPresent(name -> createConditon(name, criteria, al, cb, albumQueryParams.isFuzzyMatching()));
-        applyIfPresent(albumQueryParams::getCreatedTime, time -> createDateConditon(time, criteria, al.get("createdTime"), cb));
-        applyIfPresent(albumQueryParams::getLastEventTime, time -> createDateConditon(time, criteria, al.get("lastEventTime"), cb));
+        applyIfPresent(albumQueryParams::getCreatedTime, time -> createDateConditon(time, criteria, al.get(Album_.createdTime), cb));
+        applyIfPresent(albumQueryParams::getLastEventTime, time -> createDateConditon(time, criteria, al.get(Album_.lastEventTime), cb));
 
-        criteria.add(cb.equal(alU.get("user"), albumQueryParams.getUser()));
-        criteria.add(cb.notEqual(u.get("inbox"), al));
+        criteria.add(cb.equal(alU.get(AlbumUser_.user), albumQueryParams.getUser()));
+        criteria.add(cb.notEqual(u.get(User_.inbox), al));
         if (albumQueryParams.canAddSeries()) {
-            criteria.add(cb.or(cb.isTrue(alU.get("admin")), cb.isTrue(al.get("userPermission").get("addSeries"))));
+            criteria.add(cb.or(cb.isTrue(alU.get(AlbumUser_.admin)), cb.isTrue(al.get(Album_.userPermission).get(UserPermission_.addSeries))));
         }
 
         if (albumQueryParams.canCreateCapabilityToken()) {
-            criteria.add(cb.isTrue(alU.get("admin")));
+            criteria.add(cb.isTrue(alU.get(AlbumUser_.admin)));
         }
 
         if (albumQueryParams.isFavorite()) {
-            criteria.add(cb.isTrue(alU.get("favorite")));
+            criteria.add(cb.isTrue(alU.get(AlbumUser_.favorite)));
         }
 
         if (criteria.size() == 1) {
@@ -149,29 +149,29 @@ public class AlbumQueries {
         final CriteriaQuery<AlbumResponseBuilder> c = cb.createQuery(AlbumResponseBuilder.class);
         final Root<Album> al = c.from(Album.class);
 
-        final Join<Album, AlbumSeries> alS = al.join("albumSeries", javax.persistence.criteria.JoinType.LEFT);
-        final Join<AlbumSeries, Series> se = alS.join("series", javax.persistence.criteria.JoinType.LEFT);
-        se.on(cb.isTrue(se.get("populated")));
-        final Join<Series, Study> st = se.join("study", javax.persistence.criteria.JoinType.LEFT);
-        st.on(cb.isTrue(st.get("populated")));
-        final Join<Album, AlbumUser> alU = al.join("albumUser");
-        final Join<AlbumUser, User> u = alU.join("user", javax.persistence.criteria.JoinType.LEFT);
-        final Join<Album, Event> com = al.join("events", javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, AlbumSeries> alS = al.join(Album_.albumSeries, javax.persistence.criteria.JoinType.LEFT);
+        final Join<AlbumSeries, Series> se = alS.join(AlbumSeries_.series, javax.persistence.criteria.JoinType.LEFT);
+        se.on(cb.isTrue(se.get(Series_.populated)));
+        final Join<Series, Study> st = se.join(Series_.study, javax.persistence.criteria.JoinType.LEFT);
+        st.on(cb.isTrue(st.get(Study_.populated)));
+        final Join<Album, AlbumUser> alU = al.join(Album_.albumUser);
+        final Join<AlbumUser, User> u = alU.join(AlbumUser_.user, javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, Event> com = al.join(Album_.events, javax.persistence.criteria.JoinType.LEFT);
 
-        final Predicate privateMessage = cb.or(com.get("privateTargetUser").isNull(), cb.equal(com.get("privateTargetUser"), user));
-        final Predicate author = cb.equal(com.get("user"), user);
+        final Predicate privateMessage = cb.or(com.get(Comment_.privateTargetUser).isNull(), cb.equal(com.get(Comment_.privateTargetUser), user));
+        final Predicate author = cb.equal(com.get(Comment_.user), user);
         com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
 
         final Subquery<Long> subqueryNbUser = c.subquery(Long.class);
         final Root <AlbumUser> subqueryRoot = subqueryNbUser.from(AlbumUser.class);
-        subqueryNbUser.where(cb.equal(al, subqueryRoot.get("album")));
-        subqueryNbUser.select(cb.countDistinct(subqueryRoot.get("pk")));
+        subqueryNbUser.where(cb.equal(al, subqueryRoot.get(AlbumUser_.album)));
+        subqueryNbUser.select(cb.countDistinct(subqueryRoot.get(AlbumUser_.pk)));
 
-        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get("pk")), cb.countDistinct(se.get("pk")),
-                cb.sum(cb.<Long>selectCase().when(se.get("numberOfSeriesRelatedInstances").isNull(), 0L).otherwise(se.get("numberOfSeriesRelatedInstances"))),
-                subqueryNbUser.getSelection(), cb.countDistinct(com.get("pk")), cb.function("array_agg", String.class ,se.get("modality"))));
+        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get(Study_.pk)), cb.countDistinct(se.get(Series_.pk)),
+                cb.sum(cb.<Long>selectCase().when(se.get(Series_.numberOfSeriesRelatedInstances).isNull(), 0L).otherwise(se.get(Series_.NUMBER_OF_SERIES_RELATED_INSTANCES))),
+                subqueryNbUser.getSelection(), cb.countDistinct(com.get(Comment_.pk)), cb.function("array_agg", String.class ,se.get(Series_.modality))));
 
-        c.where(cb.and(cb.equal(u, user), cb.equal(al.get("id"), albumId)));
+        c.where(cb.and(cb.equal(u, user), cb.equal(al.get(Album_.id), albumId)));
         c.groupBy(al, alU);
 
         final TypedQuery<AlbumResponseBuilder> q = em.createQuery(c);
@@ -193,28 +193,28 @@ public class AlbumQueries {
         CriteriaQuery<Long> c = cb.createQuery(Long.class);
         final Root<Album> al = c.from(Album.class);
 
-        final Join<Album, AlbumUser> alU = al.join("albumUser");
-        final Join<AlbumUser, User> u = alU.join("user", javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, AlbumUser> alU = al.join(Album_.albumUser);
+        final Join<AlbumUser, User> u = alU.join(AlbumUser_.user, javax.persistence.criteria.JoinType.LEFT);
 
-        c.select(cb.countDistinct(al.get("pk")));
+        c.select(cb.countDistinct(al.get(Album_.pk)));
 
         final List<Predicate> criteria = new ArrayList<>();
         albumQueryParams.getName().ifPresent(name -> createConditon(name, criteria, al, cb, albumQueryParams.isFuzzyMatching()));
-        applyIfPresent(albumQueryParams::getCreatedTime, time -> createDateConditon(time, criteria, al.get("createdTime"), cb));
-        applyIfPresent(albumQueryParams::getLastEventTime, time -> createDateConditon(time, criteria, al.get("lastEventTime"), cb));
+        applyIfPresent(albumQueryParams::getCreatedTime, time -> createDateConditon(time, criteria, al.get(Album_.createdTime), cb));
+        applyIfPresent(albumQueryParams::getLastEventTime, time -> createDateConditon(time, criteria, al.get(Album_.lastEventTime), cb));
 
-        criteria.add(cb.equal(alU.get("user"), albumQueryParams.getUser()));
-        criteria.add(cb.notEqual(u.get("inbox"), al));
+        criteria.add(cb.equal(alU.get(AlbumUser_.user), albumQueryParams.getUser()));
+        criteria.add(cb.notEqual(u.get(User_.inbox), al));
         if (albumQueryParams.canAddSeries()) {
-            criteria.add(cb.or(cb.isTrue(alU.get("admin")), cb.isTrue(al.get("userPermission").get("addSeries"))));
+            criteria.add(cb.or(cb.isTrue(alU.get(AlbumUser_.admin)), cb.isTrue(al.get(Album_.userPermission).get(UserPermission_.addSeries))));
         }
 
         if (albumQueryParams.canCreateCapabilityToken()) {
-            criteria.add(cb.isTrue(alU.get("admin")));
+            criteria.add(cb.isTrue(alU.get(AlbumUser_.admin)));
         }
 
         if (albumQueryParams.isFavorite()) {
-            criteria.add(cb.isTrue(alU.get("favorite")));
+            criteria.add(cb.isTrue(alU.get(AlbumUser_.favorite)));
         }
 
         if (criteria.size() == 1) {
@@ -233,13 +233,13 @@ public class AlbumQueries {
 
         Expression orderByColumn = null;
         if (orderByParameter.equals("created_time")) {
-            orderByColumn = al.get("createdTime");
+            orderByColumn = al.get(Album_.createdTime);
         }
         else if (orderByParameter.equals("last_event_time")) {
-            orderByColumn = al.get("lastEventTime");
+            orderByColumn = al.get(Album_.lastEventTime);
         }
         else if (orderByParameter.equals("name")) {
-            orderByColumn = al.get("name");
+            orderByColumn = al.get(Album_.name);
         }
         else if (orderByParameter.equals("number_of_users")) {
             orderByColumn = cb.literal(6);
@@ -260,9 +260,9 @@ public class AlbumQueries {
 
         if (orderByColumn != null) {
             if (descending) {
-                c.orderBy(cb.desc(orderByColumn), cb.desc(al.get("lastEventTime")));
+                c.orderBy(cb.desc(orderByColumn), cb.desc(al.get(Album_.lastEventTime)));
             } else {
-                c.orderBy(cb.asc(orderByColumn), cb.desc(al.get("lastEventTime")));
+                c.orderBy(cb.asc(orderByColumn), cb.desc(al.get(Album_.lastEventTime)));
             }
         }
 
@@ -271,10 +271,10 @@ public class AlbumQueries {
     private static void createConditon(String name, List<Predicate> criteria, Path al, CriteriaBuilder cb,  boolean fuzzyMatching) {
 
         final String name2 = name.toLowerCase().replace("_", "\\_").replace("%", "\\%").replace("*", "%");
-        final Predicate p1 = cb.like(cb.lower(al.get("name")), name2, '\\');
+        final Predicate p1 = cb.like(cb.lower(al.get(Album_.name)), name2, '\\');
 
         if (fuzzyMatching) {
-            Predicate p2 = cb.equal(cb.function("SOUNDEX", Long.class, cb.literal(name.replace("*", ""))), cb.function("SOUNDEX", Long.class, al.get("name")));
+            Predicate p2 = cb.equal(cb.function("SOUNDEX", Long.class, cb.literal(name.replace("*", ""))), cb.function("SOUNDEX", Long.class, al.get(Album_.name)));
             criteria.add(cb.or(p1, p2));
         } else {
             criteria.add(p1);

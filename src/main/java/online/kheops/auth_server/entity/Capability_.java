@@ -1,4 +1,4 @@
-package online.kheops.auth_server.generated;
+package online.kheops.auth_server.entity;
 
 import java.time.LocalDateTime;
 import javax.annotation.Generated;
@@ -6,10 +6,6 @@ import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 import online.kheops.auth_server.capability.ScopeType;
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.Capability;
-import online.kheops.auth_server.entity.Mutation;
-import online.kheops.auth_server.entity.User;
 
 @Generated(value = "org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor")
 @StaticMetamodel(Capability.class)

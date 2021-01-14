@@ -1,6 +1,4 @@
-package online.kheops.auth_server.generated;
-
-import online.kheops.auth_server.entity.*;
+package online.kheops.auth_server.entity;
 
 import javax.annotation.Generated;
 import javax.persistence.metamodel.SetAttribute;

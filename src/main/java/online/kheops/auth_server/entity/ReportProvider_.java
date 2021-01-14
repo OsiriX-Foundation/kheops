@@ -1,8 +1,4 @@
-package online.kheops.auth_server.generated;
-
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.Mutation;
-import online.kheops.auth_server.entity.ReportProvider;
+package online.kheops.auth_server.entity;
 
 import java.time.LocalDateTime;
 import javax.annotation.Generated;
