@@ -137,7 +137,9 @@ public class Users {
                 kheopsLogBuilder.user(user.getSub());
                 return user;
             } catch (UserNotFoundException notFoundException) {
-                throw new IllegalStateException(notFoundException);
+                IllegalStateException illegalStateException = new IllegalStateException(notFoundException);
+                illegalStateException.addSuppressed(e);
+                throw illegalStateException;
             }
         } finally {
             if (tx.isActive()) {
