@@ -95,7 +95,7 @@ public class Studies {
         }
     }
 
-    public static PairListXTotalCount<Attributes> findAttributesByUserPKJPA(long callingUserPK, StudyQIDOParams qidoParams)
+    public static PairListXTotalCount<Attributes> findAttributesByUserPK(long callingUserPK, StudyQIDOParams qidoParams)
             throws BadQueryParametersException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -155,6 +155,8 @@ public class Studies {
 
         qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get(Album_.id), albumId)));
 
+        criteria.add(cb.equal(u.get(User_.pk), callingUserPK));
+
         if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
         } else if (criteria.size() > 1) {
@@ -188,10 +190,10 @@ public class Studies {
 
         res.forEach(re -> attributesList.add(re.getAttribute(qidoParams)));
 
-        return new PairListXTotalCount<>(getTotalCount(qidoParams, em), attributesList);
+        return new PairListXTotalCount<>(getTotalCount(callingUserPK, qidoParams, em), attributesList);
     }
 
-    private static int getTotalCount(StudyQIDOParams qidoParams, EntityManager em)
+    private static int getTotalCount(long callingUserPK, StudyQIDOParams qidoParams, EntityManager em)
             throws BadQueryParametersException {
 
         final List<Predicate> criteria = new ArrayList<>();
@@ -238,6 +240,8 @@ public class Studies {
         if (qidoParams.isFromInbox()) {
             criteria.add(cb.equal(a, u.get(User_.inbox)));
         }
+
+        criteria.add(cb.equal(u.get(User_.pk), callingUserPK));
 
         qidoParams.getAlbumID().ifPresent(albumId -> criteria.add(cb.equal(a.get(Album_.id), albumId)));
         qidoParams.getModalityFilter().ifPresent(filter -> criteria.add(cb.equal(cb.lower(se.get(Series_.modality)), filter.toLowerCase())));

@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
@@ -41,7 +40,7 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.filter.SecuredFilter.LINK_AUTH;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
-import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJPA;
+import static online.kheops.auth_server.study.Studies.findAttributesByUserPK;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.Consts.USER_IN_ROLE.VIEWER_TOKEN;
@@ -96,7 +95,7 @@ public class QIDOResource {
         final StudyQIDOParams qidoParams;
         try {
             qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
-            pair = findAttributesByUserPKJPA(callingUserPk, qidoParams);
+            pair = findAttributesByUserPK(callingUserPk, qidoParams);
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
