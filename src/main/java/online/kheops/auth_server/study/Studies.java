@@ -57,7 +57,7 @@ public class Studies {
         }
     }
 
-    private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery c, Path study, int orderBy, boolean isDescending) {
+    private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery<StudyResponseDICOM> c, Path<Study> study, int orderBy, boolean isDescending) {
 
         Expression orderByColumn = null;
 
@@ -256,12 +256,12 @@ public class Studies {
         return q.getSingleResult().intValue();
     }
 
-    private static void createConditionStudyDate(String parameter, List<Predicate> criteria, CriteriaBuilder cb, Path study)
+    private static void createConditionStudyDate(String parameter, List<Predicate> criteria, CriteriaBuilder cb, Path<Study> study)
             throws BadQueryParametersException {
         createIntervalCondition(parameter, criteria, cb, new CheckDate(study));
     }
 
-    private static void createConditionStudyTime(String parameter, List<Predicate> criteria, CriteriaBuilder cb, Path study)
+    private static void createConditionStudyTime(String parameter, List<Predicate> criteria, CriteriaBuilder cb, Path<Study> study)
             throws BadQueryParametersException {
             createIntervalCondition(parameter, criteria, cb, new CheckTime(study));
     }
@@ -302,15 +302,15 @@ public class Studies {
         String intervalEnd();
         ErrorResponse getErrorResponse();
         void check(String s) throws BadQueryParametersException;
-        Path getPath();
+        Path<Study> getPath();
     }
 
     private static class CheckTime implements CheckMethod {
         public String intervalBegin() {return "000000.000000";}
         public String intervalEnd() {return "235959.999999";}
-        private Path study;
+        private Path<Study> study;
 
-        public CheckTime(Path study) {
+        public CheckTime(Path<Study> study) {
             this.study = study;
         }
 
@@ -321,7 +321,7 @@ public class Studies {
                     .build();
         }
 
-        public Path getPath() {
+        public Path<Study> getPath() {
             return study;
         }
 
@@ -339,9 +339,9 @@ public class Studies {
     private static class CheckDate implements CheckMethod {
         public String intervalBegin() {return "00010101";}
         public String intervalEnd() {return "99991231";}
-        private Path study;
+        private Path<Study> study;
 
-        public CheckDate(Path study) {
+        public CheckDate(Path<Study> study) {
             this.study = study;
         }
 
@@ -352,7 +352,7 @@ public class Studies {
                     .build();
         }
 
-        public Path getPath() {
+        public Path<Study> getPath() {
             return study;
         }
         public void check(String date) throws BadQueryParametersException {

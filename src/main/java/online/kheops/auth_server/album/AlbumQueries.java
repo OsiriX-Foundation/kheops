@@ -247,7 +247,7 @@ public class AlbumQueries {
         return res.intValue();
     }
 
-    private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery c, String orderByParameter, Path al, boolean descending)
+    private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery<AlbumResponseBuilder> c, String orderByParameter, Path<Album> al, boolean descending)
             throws  BadQueryParametersException{
 
         Expression orderByColumn = null;
@@ -287,7 +287,7 @@ public class AlbumQueries {
 
     }
 
-    private static void createConditon(String name, List<Predicate> criteria, Path al, CriteriaBuilder cb,  boolean fuzzyMatching) {
+    private static void createConditon(String name, List<Predicate> criteria, Path<Album> al, CriteriaBuilder cb,  boolean fuzzyMatching) {
 
         final String name2 = name.toLowerCase().replace("_", "\\_").replace("%", "\\%").replace("*", "%");
         final Predicate p1 = cb.like(cb.lower(al.get(Album_.name)), name2, '\\');
