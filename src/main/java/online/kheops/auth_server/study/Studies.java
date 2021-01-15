@@ -171,7 +171,7 @@ public class Studies {
             final Subquery<Study> subqueryModality = c.subquery(Study.class);
             final Root<Series> subqueryRoot = subqueryModality.from(Series.class);
             final Join<Series, Study> stsub = subqueryRoot.join(Series_.study);
-            subqueryModality.where(cb.and(cb.equal(stsub, st), cb.equal(cb.lower(subqueryRoot.get(Series_.modality)), qidoParams.getModalityFilter().get().toLowerCase())));
+            subqueryModality.where(cb.and(cb.equal(stsub, st), cb.equal(cb.lower(subqueryRoot.get(Series_.modality)), filter.toLowerCase())));
             subqueryModality.select(stsub);
 
             c.having(cb.equal(st, cb.any(subqueryModality)));

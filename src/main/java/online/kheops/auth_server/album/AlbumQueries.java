@@ -119,6 +119,18 @@ public class AlbumQueries {
             criteria.add(cb.isTrue(alU.get(AlbumUser_.favorite)));
         }
 
+        albumQueryParams.getModality().ifPresent(filter -> {
+            final Subquery<Album> subqueryModality = c.subquery(Album.class);
+            final Root<Series> subqueryRoot2 = subqueryModality.from(Series.class);
+            final Join<Series, AlbumSeries> alSSub = subqueryRoot2.join(Series_.albumsSeries);
+            final Join<AlbumSeries, Album> alSub = alSSub.join(AlbumSeries_.album);
+            subqueryModality.where(cb.and(cb.and(cb.equal(alSub, al), cb.isTrue(subqueryRoot2.get(Series_.populated))), cb.equal(cb.lower(subqueryRoot2.get(Series_.modality)), filter.toLowerCase())));
+            subqueryModality.groupBy(alSub);
+            subqueryModality.select(alSub);
+
+            c.having(cb.equal(al, cb.any(subqueryModality)));
+        });
+
         if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
         } else if (criteria.size() > 1) {
@@ -195,6 +207,11 @@ public class AlbumQueries {
 
         final Join<Album, AlbumUser> alU = al.join(Album_.albumUser);
         final Join<AlbumUser, User> u = alU.join(AlbumUser_.user, javax.persistence.criteria.JoinType.LEFT);
+        final Join<Album, AlbumSeries> alS = al.join(Album_.albumSeries, javax.persistence.criteria.JoinType.LEFT);
+        final Join<AlbumSeries, Series> se = alS.join(AlbumSeries_.series, javax.persistence.criteria.JoinType.LEFT);
+        se.on(cb.isTrue(se.get(Series_.populated)));
+        final Join<Series, Study> st = se.join(Series_.study, javax.persistence.criteria.JoinType.LEFT);
+        st.on(cb.isTrue(st.get(Study_.populated)));
 
         c.select(cb.countDistinct(al.get(Album_.pk)));
 
@@ -216,6 +233,8 @@ public class AlbumQueries {
         if (albumQueryParams.isFavorite()) {
             criteria.add(cb.isTrue(alU.get(AlbumUser_.favorite)));
         }
+
+        albumQueryParams.getModality().ifPresent(filter -> criteria.add(cb.isTrue(cb.equal(cb.lower(se.get(Series_.modality)), filter.toLowerCase()))));
 
         if (criteria.size() == 1) {
             c.where(cb.and(criteria.get(0)));
