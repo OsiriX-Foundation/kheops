@@ -377,7 +377,7 @@ public class Studies {
         }
     }
 
-    private static void createCondition(String filter, List<Predicate> criteria, CriteriaBuilder cb, Expression field, boolean isFuzzyMatching) {
+    private static void createCondition(String filter, List<Predicate> criteria, CriteriaBuilder cb, Path<String> field, boolean isFuzzyMatching) {
 
         final String filter2 = filter.toLowerCase().replace("_", "\\_").replace("%", "\\%").replace("*", "%");
         final Predicate p1 = cb.like(cb.lower(field), filter2, '\\');

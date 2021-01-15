@@ -300,7 +300,7 @@ public class AlbumQueries {
         }
     }
 
-    private static void createDateConditon(String parameter, List<Predicate> criteria, Expression expression, CriteriaBuilder cb)
+    private static void createDateConditon(String parameter, List<Predicate> criteria, Path<LocalDateTime> expression, CriteriaBuilder cb)
             throws BadQueryParametersException {
 
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
