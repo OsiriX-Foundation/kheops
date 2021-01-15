@@ -123,8 +123,20 @@ public class AlbumQueries {
             final Subquery<Album> subqueryModality = c.subquery(Album.class);
             final Root<Series> subqueryRoot2 = subqueryModality.from(Series.class);
             final Join<Series, AlbumSeries> alSSub = subqueryRoot2.join(Series_.albumsSeries);
+            final Join<Series, Study> stSub = subqueryRoot2.join(Series_.study);
             final Join<AlbumSeries, Album> alSub = alSSub.join(AlbumSeries_.album);
-            subqueryModality.where(cb.and(cb.and(cb.equal(alSub, al), cb.isTrue(subqueryRoot2.get(Series_.populated))), cb.equal(cb.lower(subqueryRoot2.get(Series_.modality)), filter.toLowerCase())));
+
+            final List<Predicate> criteriaSub = new ArrayList<>();
+            criteriaSub.add(cb.equal(alSub, al));
+            criteriaSub.add(cb.isTrue(subqueryRoot2.get(Series_.populated)));
+            criteriaSub.add(cb.isTrue(stSub.get(Study_.populated)));
+            criteriaSub.add(cb.equal(cb.lower(subqueryRoot2.get(Series_.modality)), filter.toLowerCase()));
+
+            if (criteriaSub.size() == 1) {
+                subqueryModality.where(cb.and(criteriaSub.get(0)));
+            } else if (criteriaSub.size() > 1) {
+                subqueryModality.where(cb.and(criteriaSub.toArray(new Predicate[0])));
+            }
             subqueryModality.groupBy(alSub);
             subqueryModality.select(alSub);
 
