@@ -140,11 +140,7 @@ public class Studies {
         if (!qidoParams.getStudyInstanceUIDFilter().isEmpty()) {
             Predicate p = cb.or();//always false
             for (String studyInstanceUID: qidoParams.getStudyInstanceUIDFilter()) {
-                if (p!= null) {
-                    p = cb.or(p, cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
-                } else {
-                    p = cb.or(cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
-                }
+                p = cb.or(p, cb.equal(st.get(Study_.studyInstanceUID), studyInstanceUID));
             }
             criteria.add(p);
         }

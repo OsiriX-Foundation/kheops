@@ -51,7 +51,7 @@ public final class StudyQIDOParams {
     private final boolean studyDescriptionField;
 
     public StudyQIDOParams(KheopsPrincipal kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException , NoResultException {
+            throws BadQueryParametersException, AlbumForbiddenException , NoResultException {
 
         String albumIDLocal = null;
         boolean fromInboxLocal = false;
