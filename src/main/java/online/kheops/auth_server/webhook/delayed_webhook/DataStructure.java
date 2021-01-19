@@ -16,7 +16,7 @@ public class DataStructure {
     DataStructure() { studySourceKeyDestinationSeriesMap = new HashMap<>(); }
 
     public void put (ScheduledFuture<?> scheduledFuture, Study study, Series series, Integer numberOfNewInstances, Source source, Album destination, boolean isInbox, boolean isNewInDestination, boolean isSend) {
-        final StudySourceKey studySourceKey = new StudySourceKey(study, source);
+        final StudySourceKey studySourceKey = new StudySourceKey(study.getPk(), source);
         if (studySourceKeyDestinationSeriesMap.containsKey(studySourceKey)) {
             studySourceKeyDestinationSeriesMap.get(studySourceKey).cancelScheduledFuture();
             studySourceKeyDestinationSeriesMap.get(studySourceKey).add(scheduledFuture, series, numberOfNewInstances, destination, isInbox, isNewInDestination, isSend);
@@ -30,7 +30,7 @@ public class DataStructure {
         return studySourceKeyDestinationSeriesMap.get(studySourceKey);
     }
 
-    public void remove(Study study, Source source) {
-        studySourceKeyDestinationSeriesMap.remove(new StudySourceKey(study, source));
+    public void remove(long studyPk, Source source) {
+        studySourceKeyDestinationSeriesMap.remove(new StudySourceKey(studyPk, source));
     }
 }

@@ -435,6 +435,16 @@ public class Albums {
         return findAlbumById(albumId, em);
     }
 
+    public static Album getAlbum(long albumPk, EntityManager em)
+            throws AlbumNotFoundException {
+        final Album album = em.find(Album.class, albumPk);
+        if (album != null) {
+            return album;
+        } else {
+            throw new AlbumNotFoundException();
+        }
+    }
+
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)
             throws UserNotMemberException {
 
