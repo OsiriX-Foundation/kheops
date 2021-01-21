@@ -1,8 +1,6 @@
 FROM alpine:3.13.0
 
-COPY --from=build /home/gradle/authorization/build/libs/authorization.war /usr/local/tomcat/webapps/authorization.war
 COPY entrypoint.sh /entrypoint.sh
-
 
 #METRICBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/deb/metricbeat-amd64.deb .
