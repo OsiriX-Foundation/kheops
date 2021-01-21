@@ -4,7 +4,7 @@ COPY entrypoint.sh /entrypoint.sh
 
 #METRICBEAT
 COPY --from=osirixfoundation/kheops-beat:latest /install/rpm/metricbeat-x86_64.rpm .
-RUN apk add npm
+RUN apk add rpm
 RUN rpm -vi metricbeat-x86_64.rpm && \
  rm metricbeat-x86_64.rpm && \
  rm /etc/metricbeat/metricbeat.reference.yml && \
