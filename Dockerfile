@@ -3,8 +3,8 @@ FROM alpine:3.13.0
 COPY entrypoint.sh /entrypoint.sh
 
 #METRICBEAT
-COPY --from=osirixfoundation/kheops-beat:latest /install/deb/metricbeat-amd64.deb .
-RUN dpkg -i metricbeat-amd64.deb && \
+COPY --from=osirixfoundation/kheops-beat:latest /install/rpm/metricbeat-amd64.deb .
+RUN rpm -vi metricbeat-amd64.deb && \
  rm metricbeat-amd64.deb && \
  rm /etc/metricbeat/metricbeat.reference.yml && \
  rm /etc/metricbeat/modules.d/*
