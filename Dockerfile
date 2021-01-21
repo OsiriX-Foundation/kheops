@@ -27,17 +27,5 @@ RUN dpkg -i filebeat-amd64.deb && \
 COPY filebeat/filebeat.yml /etc/filebeat/filebeat.yml
 RUN chmod go-w /etc/filebeat/filebeat.yml
 
-#METRICBEAT
-COPY --from=osirixfoundation/kheops-beat:latest /install/deb/metricbeat-amd64.deb .
-RUN dpkg -i metricbeat-amd64.deb && \
- rm metricbeat-amd64.deb && \
- rm /etc/metricbeat/metricbeat.reference.yml && \
- rm /etc/metricbeat/modules.d/*
-
-COPY metricbeat/metricbeat.yml /etc/metricbeat/metricbeat.yml
-COPY metricbeat/http.yml /etc/metricbeat/modules.d/http.yml
-RUN chmod go-w /etc/metricbeat/metricbeat.yml
-RUN chmod go-w /etc/metricbeat/modules.d/http.yml
-
 CMD ["catalina.sh", "run"]
 ENTRYPOINT ["/kheops-entrypoint.sh"]
