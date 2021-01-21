@@ -2,6 +2,6 @@
     metricsets:
       - json
     period: 10s
-    hosts: ["http://localhost:8080"]
+    hosts: ["${kheops_authorization_url}"]
     namespace: "kheopsmetrics"
     path: "/authorization/metrics"
