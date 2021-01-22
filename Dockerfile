@@ -11,5 +11,6 @@ RUN chmod 770 /usr/share/metricbeat
 RUN chmod -R 777 /xxx 
 
 USER metricbeat
+RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
