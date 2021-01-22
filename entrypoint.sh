@@ -48,7 +48,7 @@ fi
 
 sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT$KHEOPS_AUTHORIZATION_PATH|g" /xxx/http.yml
 sed -i "s|\${instance}|http://$KHEOPS_INSTANCES|g" /xxx/metricbeat.yml
-sed -i "s|\${logstash_url}|http://$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /xxx/metricbeat.yml
+sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /xxx/metricbeat.yml
 
 echo "Ending setup env var"
 
