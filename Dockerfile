@@ -9,8 +9,9 @@ USER root
 
 RUN chmod 770 /usr/share/metricbeat
 RUN chmod -R 777 /xxx 
+RUN chmod +x /entrypoint.sh
 
 USER metricbeat
-RUN chmod +x /entrypoint.sh
+
 
 ENTRYPOINT ["/entrypoint.sh"]
