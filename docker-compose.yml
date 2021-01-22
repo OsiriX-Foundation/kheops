@@ -1,0 +1,12 @@
+---
+  version: "3.1"
+  services:
+  
+    test:
+      image: test:test
+      container_name: test
+      environment: 
+        KHEOPS_AUTHORIZATION_HOST: authorization
+        KHEOPS_AUTHORIZATION_PORT: 80
+        KHEOPS_INSTANCES: test
+        KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL: 10.5.5.7

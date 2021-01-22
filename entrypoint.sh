@@ -24,10 +24,10 @@ else
 fi
 
 if [[ -z $KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL ]]; then
-  echo "Missing KHEOPS_AUTHORIZATION_LOGSTASH_URL environment variable"
+  echo "Missing KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL environment variable"
   missing_env_var_secret=true
 else
-   echo -e "environment variable KHEOPS_AUTHORIZATION_LOGSTASH_URL \e[92mOK\e[0m"
+   echo -e "environment variable KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL \e[92mOK\e[0m"
 fi
 
 #if missing env var or secret => exit
@@ -37,8 +37,17 @@ else
    echo -e "all env var \e[92mOK\e[0m"
 fi
 
-sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|g" /etc/metricbeat/modules.d/http.yml
-sed -i "s|\${instance}|http://$KHEOPS_INSTANCES|g" /etc/metricbeat/metricbeat.yml
-sed -i "s|\${logstash_url}|http://$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /etc/metricbeat/metricbeat.yml
 
-echo "Ending setup NGINX secrets and env var"
+
+sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|g" /xxx/http.yml
+sed -i "s|\${instance}|http://$KHEOPS_INSTANCES|g" /xxx/metricbeat.yml
+sed -i "s|\${logstash_url}|http://$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /xxx/metricbeat.yml
+
+echo "Ending setup env var"
+
+mv /xxx/metricbeat.yml /usr/share/metricbeat/metricbeat.yml
+mv /xxx/http.yml /usr/share/metricbeat/modules.d/http.yml
+chmod 640 /usr/share/metricbeat/metricbeat.yml
+chmod 640 /usr/share/metricbeat/modules.d/http.yml
+metricbeat modules disable system
+./metricbeat $@

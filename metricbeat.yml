@@ -18,9 +18,6 @@ metricbeat.config.modules:
 # all the transactions sent by a single shipper in the web interface.
 name: "kheops_metrics"
 
-# The tags of the shipper are included in their own field with each
-# transaction published.
-#tags: [${elastic_tags}]
 
 # Optional fields that you can specify to add additional information to the
 # output.
