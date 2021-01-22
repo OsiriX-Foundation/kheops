@@ -50,4 +50,4 @@ mv /xxx/http.yml /usr/share/metricbeat/modules.d/http.yml
 chmod 640 /usr/share/metricbeat/metricbeat.yml
 chmod 640 /usr/share/metricbeat/modules.d/http.yml
 metricbeat modules disable system
-./metricbeat $@
+./usr/local/bin/docker-entrypoint.sh $@
