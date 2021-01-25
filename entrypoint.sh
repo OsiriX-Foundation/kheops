@@ -39,14 +39,14 @@ fi
 
 
 
-sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|g" /xxx/http.yml
-sed -i "s|\${instance}|$KHEOPS_INSTANCES|g" /xxx/metricbeat.yml
-sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /xxx/metricbeat.yml
+sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|g" /metricbeattmp/http.yml
+sed -i "s|\${instance}|$KHEOPS_INSTANCES|g" /metricbeattmp/metricbeat.yml
+sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /metricbeattmp/metricbeat.yml
 
 echo "Ending setup env var"
 
-mv /xxx/metricbeat.yml /usr/share/metricbeat/metricbeat.yml
-mv /xxx/http.yml /usr/share/metricbeat/modules.d/http.yml
+mv /metricbeattmp/metricbeat.yml /usr/share/metricbeat/metricbeat.yml
+mv /metricbeattmp/http.yml /usr/share/metricbeat/modules.d/http.yml
 chmod 640 /usr/share/metricbeat/metricbeat.yml
 chmod 640 /usr/share/metricbeat/modules.d/http.yml
 metricbeat modules disable system
