@@ -105,4 +105,6 @@ sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_use_kheops_scope}|$use_scope|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_welcomebot_webhook}|$KHEOPS_WELCOMEBOT_WEBHOOK|" ${REPLACE_FILE_PATH}
 
+export UMASK=022
+
 echo "Ending setup secrets and env var"
