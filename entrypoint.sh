@@ -35,6 +35,4 @@ chmod 640 /usr/share/filebeat/filebeat.yml
 
 filebeat modules disable system
 
-cat /usr/share/filebeat/filebeat.yml
-
 exec /usr/local/bin/docker-entrypoint -e
