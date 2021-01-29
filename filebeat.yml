@@ -5,7 +5,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /usr/local/tomcat/logs/catalina.*.log
+      - /kheops/authorization/logs/catalina.*.log
 
     fields:
       docker_type: tomcat
@@ -27,7 +27,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /usr/local/tomcat/logs/localhost_access_log.*.txt
+      - /kheops/authorization/logs/localhost_access_log.*.txt
 
     exclude_lines: ['.*/authorization/metrics.*']
 
@@ -42,7 +42,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /usr/local/tomcat/logs/manager.*.txt
+      - /kheops/authorization/logs/manager.*.txt
 
     fields:
       docker_type: tomcat
@@ -55,7 +55,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /usr/local/tomcat/logs/host-manager.*.txt
+      - /kheops/authorization/logs/host-manager.*.txt
 
     fields:
       docker_type: tomcat
@@ -68,7 +68,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /usr/local/tomcat/logs/localhost.*.txt
+      - /kheops/authorization/logs/localhost.*.txt
 
     fields:
       docker_type: tomcat
