@@ -15,6 +15,7 @@ ENV SECRET_FILE_PATH=/run/secrets \
 COPY --from=build /home/gradle/authorization/build/libs/authorization.war /usr/local/tomcat/webapps/authorization.war
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
 COPY kheops-entrypoint.sh /kheops-entrypoint.sh
+COPY logging.properties /usr/local/tomcat/conf/logging.properties
 COPY context.xml /usr/local/tomcat/conf/context.xml
 
 CMD ["catalina.sh", "run"]
