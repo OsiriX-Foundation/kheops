@@ -2,7 +2,7 @@
 
 remplace_in_file() {
   chmod a+w $1
-  sed -i "s|\${root_url}|$proto$host|" $1
+  sed -i "s|\${root_url}|$KHEOPS_ROOT_URL|" $1
 
   sed -i "s|\${DICOMWebProxy_url}|$KHEOPS_DICOMWEB_PROXY_HOST:$KHEOPS_DICOMWEB_PROXY_PORT|" $1
   sed -i "s|\${kheopsAuthorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|" $1
@@ -110,9 +110,9 @@ fi
 
 
 # extract the protocol
-proto="$(echo $KHEOPS_ROOT_URL | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+proto="$(echo $KHEOPS_OIDC_PROVIDER | grep :// | sed -e's,^\(.*://\).*,\1,g')"
 # remove the protocol
-url="$(echo ${KHEOPS_ROOT_URL/$proto/})"
+url="$(echo ${KHEOPS_OIDC_PROVIDER/$proto/})"
 # extract the user (if any)
 user="$(echo $url | grep @ | cut -d@ -f1)"
 # extract the host and port
