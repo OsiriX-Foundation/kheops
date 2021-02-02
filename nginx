@@ -1,0 +1,13 @@
+/var/log/nginx/*.log {
+    hourly
+    rotate 4
+    missingok
+    notifempty
+    create 640 nginx adm
+    sharedscripts
+    postrotate
+        if [  -f /var/run/nginx.pid]; then
+            kill -USR1 `cat /var/run/nginx.pid`
+        fi
+    endscript
+}
