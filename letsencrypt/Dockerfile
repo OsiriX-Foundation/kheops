@@ -12,7 +12,7 @@ COPY nginx /etc/logrotate.d/nginx
 
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
-RUN apt-get install logrotate
+RUN apt-get install -y logrotate
 RUN mv /etc/cron.daily/logrotate /etc/cron.hourly/logrotate
 
 CMD ["nginx", "-g", "daemon off;"]
