@@ -1,5 +1,6 @@
 /var/log/nginx/*.log {
     hourly
+    size 10M
     rotate 4
     missingok
     notifempty
