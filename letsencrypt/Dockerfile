@@ -14,6 +14,7 @@ COPY crontabfile /etc/crontabfile
 COPY logcrontab /logcrontab
 
 RUN chmod +x /docker-entrypoint.d/72-add_crontab.sh
+RUN chmod +x /logcrontab
 
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
