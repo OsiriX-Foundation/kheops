@@ -1,4 +1,5 @@
 /var/log/nginx/*.log {
+    rotate 7
     size 10k 
     missingok
     notifempty
