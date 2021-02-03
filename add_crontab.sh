@@ -1,3 +1,3 @@
 #!/bin/bash
 
-$(while :; do /logcrontab; sleep "1m"; done;) &
+$(while :; do /logcrontab.sh; sleep "1m"; done;) &
