@@ -8,7 +8,7 @@ if [ ! -x /usr/sbin/logrotate ]; then
     exit 0
 fi 
 
-/usr/sbin/logrotate -f /etc/logrotate.conf
+/usr/sbin/logrotate /etc/logrotate.conf
 EXITVALUE=$?
 if [ $EXITVALUE != 0 ]; then
     /usr/bin/logger -t logrotate "ALERT exited abnormally with [$EXITVALUE]"
