@@ -30,7 +30,6 @@ jobs:
         run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV        
           
       - name: Push
-        if: startsWith(github.ref , 'refs/heads/')
         with:
           context: hosts/proxy
           file: Dockerfile
