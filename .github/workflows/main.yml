@@ -29,7 +29,8 @@ jobs:
         shell: bash
         run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV        
           
-      - name: Push
+      - name: Build and Push
+        uses: docker/build-push-action@v2.2.1
         with:
           context: hosts/proxy
           file: Dockerfile
