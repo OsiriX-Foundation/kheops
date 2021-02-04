@@ -22,31 +22,18 @@ jobs:
       - name: Extract branch name
         if: startsWith(github.ref , 'refs/heads/')
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch 
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
                
       - name: Extract tag name
         if: startsWith(github.ref , 'refs/tags/')
         shell: bash
-        run: echo "##[set-output name=tag;]$(echo ${GITHUB_REF#refs/tags/})"
-        id: extract_tag         
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV        
           
-      - name: Push by branch name
-        uses: docker/build-push-action@v2.2.1
+      - name: Push
         if: startsWith(github.ref , 'refs/heads/')
         with:
           context: hosts/proxy
           file: Dockerfile
           platforms: linux/amd64
           push: true
-          tags: osirixfoundation/pacs-authorization-proxy:${{ steps.extract_branch.outputs.branch }}    
-  
-      - name: Push by tag
-        uses: docker/build-push-action@v2.2.1
-        if: startsWith(github.ref , 'refs/tags/')
-        with:
-          context: hosts/proxy
-          file: Dockerfile
-          platforms: linux/amd64
-          push: true
-          tags: osirixfoundation/pacs-authorization-proxy:${{ steps.extract_tag.outputs.tag }}
+          tags: osirixfoundation/pacs-authorization-proxy:${{ env.docker_tag }}    
