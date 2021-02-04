@@ -1,5 +1,5 @@
 /var/log/nginx/*.log {
-    hourly
+    daily
     rotate 7
     missingok
     notifempty
