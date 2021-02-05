@@ -15,10 +15,6 @@ COPY logcrontab.sh /logcrontab.sh
 COPY nginxday /etc/logrotate.d/nginxday
 COPY nginxsize /etc/logrotate.d/nginxsize
 
-
-RUN chmod +x /docker-entrypoint.d/72-add_crontab.sh
-RUN chmod +x /logcrontab.sh
-
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
 RUN apt-get install -y logrotate
