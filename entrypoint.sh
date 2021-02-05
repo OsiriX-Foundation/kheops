@@ -23,11 +23,11 @@ else
    echo -e "environment variable KHEOPS_INSTANCES \e[92mOK\e[0m"
 fi
 
-if [[ -z $KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL ]]; then
-  echo "Missing KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL environment variable"
+if [[ -z $KHEOPS_LOGSTASH_URL ]]; then
+  echo "Missing KHEOPS_LOGSTASH_URL environment variable"
   missing_env_var_secret=true
 else
-   echo -e "environment variable KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL \e[92mOK\e[0m"
+   echo -e "environment variable KHEOPS_LOGSTASH_URL \e[92mOK\e[0m"
 fi
 
 #if missing env var or secret => exit
@@ -41,7 +41,7 @@ fi
 
 sed -i "s|\${kheops_authorization_url}|http://$KHEOPS_AUTHORIZATION_HOST:$KHEOPS_AUTHORIZATION_PORT|g" /metricbeattmp/http.yml
 sed -i "s|\${instance}|$KHEOPS_INSTANCES|g" /metricbeattmp/metricbeat.yml
-sed -i "s|\${logstash_url}|$KHEOPS_AUTHORIZATION_METRICBEAT_LOGSTASH_URL|g" /metricbeattmp/metricbeat.yml
+sed -i "s|\${logstash_url}|$KHEOPS_LOGSTASH_URL|g" /metricbeattmp/metricbeat.yml
 
 echo "Ending setup env var"
 
