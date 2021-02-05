@@ -23,8 +23,7 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,9 +52,11 @@ public abstract class Fetcher {
         seriesUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(dicomWebURI)).path("studies/{StudyInstanceUID}/series").queryParam("SeriesInstanceUID", "{SeriesInstanceUID}").queryParam("includefield", String.format("%08X", Tag.BodyPartExamined));
     }
 
-    public static void fetchStudy(String studyInstanceUID) {
+    public static Map<Series, FetchSeriesMetadata> fetchStudy(String studyInstanceUID) {
         final URI studyUri = studyUriBuilder.build(studyInstanceUID);
 
+
+        final HashMap<Series, FetchSeriesMetadata> result = new HashMap<>();
         final Attributes attributes;
         try {
             String authToken = PepAccessTokenBuilder.newBuilder(new TokenProvenance() {})
@@ -68,10 +69,10 @@ public abstract class Fetcher {
             attributes = studyList.get(0);
         } catch (ResponseProcessingException e) {
             logResponseProcessingException(e, studyInstanceUID);
-            return;
+            return result;
         } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
-            return;
+            return result;
         }
 
         final List<String> seriesUIDList;
@@ -84,7 +85,6 @@ public abstract class Fetcher {
             queryStudy.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             final Study study = queryStudy.getSingleResult();
-
             study.mergeAttributes(attributes);
             study.setPopulated(true);
 
@@ -94,19 +94,22 @@ public abstract class Fetcher {
 
             tx.commit();
 
-            seriesUIDList.forEach(seriesUID -> fetchSeries(studyInstanceUID, seriesUID, em));
+            seriesUIDList.forEach(seriesUID -> result.putAll(fetchSeries(studyInstanceUID, seriesUID, em)));
+
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
+        return result;
     }
 
-    private static void fetchSeries(String studyUID, String seriesUID, EntityManager em) {
+    private static Map<Series, FetchSeriesMetadata> fetchSeries(String studyUID, String seriesUID, EntityManager em) {
         final URI uri = seriesUriBuilder.build(studyUID, seriesUID);
 
         final Attributes attributes;
+        final HashMap<Series, FetchSeriesMetadata> result = new HashMap<>();
         try {
             String authToken = PepAccessTokenBuilder.newBuilder(new TokenProvenance() {})
                     .withStudyUID(studyUID)
@@ -121,10 +124,10 @@ public abstract class Fetcher {
             attributes = seriesList.get(0);
         } catch (ResponseProcessingException e) {
             logResponseProcessingException(e, studyUID, seriesUID);
-            return;
+            return result;
         } catch (ProcessingException | WebApplicationException e) {
             LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID, e);
-            return;
+            return result;
         }
 
         final EntityTransaction tx = em.getTransaction();
@@ -132,8 +135,11 @@ public abstract class Fetcher {
             tx.begin();
 
             final Series series = findSeriesBySeriesUID(seriesUID, em);
+            final int oldValueNumberOfSeriesRelatedInstances = series.getNumberOfSeriesRelatedInstances();
             series.mergeAttributes(attributes);
             series.setPopulated(true);
+
+            result.put(series, new FetchSeriesMetadata(series.getNumberOfSeriesRelatedInstances() - oldValueNumberOfSeriesRelatedInstances));
 
             tx.commit();
         } catch (Exception e) {
@@ -143,6 +149,7 @@ public abstract class Fetcher {
                 tx.rollback();
             }
         }
+        return result;
     }
 
     private static void logResponseProcessingException(ResponseProcessingException e, String studyUID) {

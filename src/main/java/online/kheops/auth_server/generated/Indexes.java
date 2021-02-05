@@ -34,6 +34,7 @@ public class Indexes {
     // INDEX definitions
     // -------------------------------------------------------------------------
 
+    public static final Index ACCESSION_NUMBER_INDEX = Indexes0.ACCESSION_NUMBER_INDEX;
     public static final Index ALBUM_SERIES_ALBUM_FK_INDEX = Indexes0.ALBUM_SERIES_ALBUM_FK_INDEX;
     public static final Index ALBUM_SERIES_SERIES_FK_INDEX = Indexes0.ALBUM_SERIES_SERIES_FK_INDEX;
     public static final Index ALBUM_USER_ALBUM_FK_INDEX = Indexes0.ALBUM_USER_ALBUM_FK_INDEX;
@@ -43,16 +44,15 @@ public class Indexes {
     public static final Index CAPABILITIES_USER_FK_INDEX = Indexes0.CAPABILITIES_USER_FK_INDEX;
     public static final Index EVENT_SERIES_EVENT_FK_INDEX = Indexes0.EVENT_SERIES_EVENT_FK_INDEX;
     public static final Index EVENTS_USER_FK_INDEX = Indexes0.EVENTS_USER_FK_INDEX;
+    public static final Index PATIENT_ID_INDEX = Indexes0.PATIENT_ID_INDEX;
+    public static final Index POPULATED_INDEX = Indexes0.POPULATED_INDEX;
     public static final Index REPORT_PROVIDERS_ALBUM_FK_INDEX = Indexes0.REPORT_PROVIDERS_ALBUM_FK_INDEX;
     public static final Index REPORT_PROVIDERS_CLIENT_ID_INDEX = Indexes0.REPORT_PROVIDERS_CLIENT_ID_INDEX;
     public static final Index REPORT_PROVIDERS_CREATION_TIME_ALBUM_FK_INDEX = Indexes0.REPORT_PROVIDERS_CREATION_TIME_ALBUM_FK_INDEX;
     public static final Index SERIES_MODALITY_INDEX = Indexes0.SERIES_MODALITY_INDEX;
     public static final Index SERIES_POPULATED_INDEX = Indexes0.SERIES_POPULATED_INDEX;
-    public static final Index STUDY_FK_INDEX = Indexes0.STUDY_FK_INDEX;
-    public static final Index ACCESSION_NUMBER_INDEX = Indexes0.ACCESSION_NUMBER_INDEX;
-    public static final Index PATIENT_ID_INDEX = Indexes0.PATIENT_ID_INDEX;
-    public static final Index POPULATED_INDEX = Indexes0.POPULATED_INDEX;
     public static final Index STUDY_DATE_INDEX = Indexes0.STUDY_DATE_INDEX;
+    public static final Index STUDY_FK_INDEX = Indexes0.STUDY_FK_INDEX;
     public static final Index STUDY_ID_INDEX = Indexes0.STUDY_ID_INDEX;
     public static final Index STUDY_TIME_INDEX = Indexes0.STUDY_TIME_INDEX;
     public static final Index USERS_EMAIL_INDEX = Indexes0.USERS_EMAIL_INDEX;
@@ -69,6 +69,7 @@ public class Indexes {
     // -------------------------------------------------------------------------
 
     private static class Indexes0 {
+        public static Index ACCESSION_NUMBER_INDEX = Internal.createIndex("accession_number_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.ACCESSION_NUMBER }, false);
         public static Index ALBUM_SERIES_ALBUM_FK_INDEX = Internal.createIndex("album_series_album_fk_index", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.ALBUM_FK }, false);
         public static Index ALBUM_SERIES_SERIES_FK_INDEX = Internal.createIndex("album_series_series_fk_index", AlbumSeries.ALBUM_SERIES, new OrderField[] { AlbumSeries.ALBUM_SERIES.SERIES_FK }, false);
         public static Index ALBUM_USER_ALBUM_FK_INDEX = Internal.createIndex("album_user_album_fk_index", AlbumUser.ALBUM_USER, new OrderField[] { AlbumUser.ALBUM_USER.ALBUM_FK }, false);
@@ -78,16 +79,15 @@ public class Indexes {
         public static Index CAPABILITIES_USER_FK_INDEX = Internal.createIndex("capabilities_user_fk_index", Capabilities.CAPABILITIES, new OrderField[] { Capabilities.CAPABILITIES.USER_FK }, false);
         public static Index EVENT_SERIES_EVENT_FK_INDEX = Internal.createIndex("event_series_event_fk_index", EventSeries.EVENT_SERIES, new OrderField[] { EventSeries.EVENT_SERIES.EVENT_FK }, false);
         public static Index EVENTS_USER_FK_INDEX = Internal.createIndex("events_user_fk_index", Events.EVENTS, new OrderField[] { Events.EVENTS.USER_FK }, false);
+        public static Index PATIENT_ID_INDEX = Internal.createIndex("patient_id_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.PATIENT_ID }, false);
+        public static Index POPULATED_INDEX = Internal.createIndex("populated_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.POPULATED }, false);
         public static Index REPORT_PROVIDERS_ALBUM_FK_INDEX = Internal.createIndex("report_providers_album_fk_index", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.ALBUM_FK }, false);
         public static Index REPORT_PROVIDERS_CLIENT_ID_INDEX = Internal.createIndex("report_providers_client_id_index", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.CLIENT_ID }, false);
         public static Index REPORT_PROVIDERS_CREATION_TIME_ALBUM_FK_INDEX = Internal.createIndex("report_providers_creation_time_album_fk_index", ReportProviders.REPORT_PROVIDERS, new OrderField[] { ReportProviders.REPORT_PROVIDERS.CREATION_TIME, ReportProviders.REPORT_PROVIDERS.ALBUM_FK }, false);
         public static Index SERIES_MODALITY_INDEX = Internal.createIndex("series_modality_index", Series.SERIES, new OrderField[] { Series.SERIES.MODALITY }, false);
         public static Index SERIES_POPULATED_INDEX = Internal.createIndex("series_populated_index", Series.SERIES, new OrderField[] { Series.SERIES.POPULATED }, false);
-        public static Index STUDY_FK_INDEX = Internal.createIndex("study_fk_index", Series.SERIES, new OrderField[] { Series.SERIES.STUDY_FK }, false);
-        public static Index ACCESSION_NUMBER_INDEX = Internal.createIndex("accession_number_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.ACCESSION_NUMBER }, false);
-        public static Index PATIENT_ID_INDEX = Internal.createIndex("patient_id_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.PATIENT_ID }, false);
-        public static Index POPULATED_INDEX = Internal.createIndex("populated_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.POPULATED }, false);
         public static Index STUDY_DATE_INDEX = Internal.createIndex("study_date_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_DATE }, false);
+        public static Index STUDY_FK_INDEX = Internal.createIndex("study_fk_index", Series.SERIES, new OrderField[] { Series.SERIES.STUDY_FK }, false);
         public static Index STUDY_ID_INDEX = Internal.createIndex("study_id_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_ID }, false);
         public static Index STUDY_TIME_INDEX = Internal.createIndex("study_time_index", Studies.STUDIES, new OrderField[] { Studies.STUDIES.STUDY_TIME }, false);
         public static Index USERS_EMAIL_INDEX = Internal.createIndex("users_email_index", Users.USERS, new OrderField[] { Users.USERS.EMAIL }, false);

@@ -21,9 +21,9 @@ final class ViewerAccessTokenBuilder implements AccessTokenBuilder {
 
         try {
             final JsonWebEncryption jwe = new JsonWebEncryption();
-            jwe.setAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+            jwe.setAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.PERMIT,
                     KeyManagementAlgorithmIdentifiers.A128KW));
-            jwe.setContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.WHITELIST,
+            jwe.setContentEncryptionAlgorithmConstraints(new AlgorithmConstraints(AlgorithmConstraints.ConstraintType.PERMIT,
                     ContentEncryptionAlgorithmIdentifiers.AES_128_CBC_HMAC_SHA_256));
             jwe.setKey(JweAesKey.getInstance().getKey());
 

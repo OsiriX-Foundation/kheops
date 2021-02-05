@@ -165,7 +165,7 @@ public final class StudyQIDOParams {
             if(favoriteFilter.isPresent()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_QUERY_PARAMETER)
-                        .detail("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"=XX as query param")
+                        .detail("If favorite is set, you must specify "+INBOX+"=true OR "+ALBUM+"={albumId} as query param")
                         .build();
                 throw new BadQueryParametersException(errorResponse);
             }
@@ -273,7 +273,7 @@ public final class StudyQIDOParams {
 
     private Optional<Boolean> getFavoriteFilter(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException{
         if (queryParameters.containsKey(FAVORITE)) {
-            if(!Boolean.valueOf(queryParameters.get(FAVORITE).get(0))) {
+            if(!Boolean.TRUE.equals(Boolean.valueOf(queryParameters.get(FAVORITE).get(0)))) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_QUERY_PARAMETER)
                         .detail("'favorite' filter can only be true")

@@ -3,25 +3,23 @@ package online.kheops.auth_server.resource;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.album.AlbumNotFoundException;
-import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.Secured;
 import online.kheops.auth_server.annotation.UIDValidator;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.*;
+import online.kheops.auth_server.fetch.FetchSeriesMetadata;
 import online.kheops.auth_server.fetch.Fetcher;
 import online.kheops.auth_server.principal.KheopsPrincipal;
-import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.webhook.delayed_webhook.DelayedWebhook;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
-import online.kheops.auth_server.webhook.NewSeriesWebhook;
-import online.kheops.auth_server.webhook.WebhookAsyncRequest;
-import online.kheops.auth_server.webhook.WebhookRequestId;
-import online.kheops.auth_server.webhook.WebhookType;
+import online.kheops.auth_server.webhook.*;
 
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -29,14 +27,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
-import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
@@ -49,6 +46,9 @@ public class FetchResource {
 
     @Context
     private ServletContext context;
+
+    @Inject
+    DelayedWebhook delayedWebhook;
 
     @POST
     @Secured
@@ -69,15 +69,7 @@ public class FetchResource {
     public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
-            throws AlbumNotFoundException, UserNotMemberException, ClientIdNotFoundException, SeriesNotFoundException {
-        Fetcher.fetchStudy(studyInstanceUID);
-        for (String seriesInstanceUID: seriesInstanceUIDList) {
-            ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
-                    .study(studyInstanceUID)
-                    .series(seriesInstanceUID)
-                    .action(ActionType.FETCH)
-                    .log();
-        }
+            throws AlbumNotFoundException, SeriesNotFoundException {
 
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -86,6 +78,13 @@ public class FetchResource {
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
+
+        final Map<Series, FetchSeriesMetadata> seriesNumberOfInstance = Fetcher.fetchStudy(studyInstanceUID);
+        final KheopsLogBuilder kheopsLogBuilder = ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
+                .study(studyInstanceUID)
+                .action(ActionType.FETCH);
+        seriesInstanceUIDList.forEach(kheopsLogBuilder::series);
+        kheopsLogBuilder.log();
 
         KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
@@ -118,83 +117,25 @@ public class FetchResource {
             }
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
-
+            final Source source = new Source(callingUser);
             final Album targetAlbum;
-            AlbumUser targetAlbumUser = null;
             if (albumId != null) {
                 targetAlbum = getAlbum(albumId, em);
-                targetAlbumUser = getAlbumUser(targetAlbum, callingUser, em);
+            } else {
+                targetAlbum = kheopsPrincipal.getUser().getInbox();
             }
 
-            final List<Series> seriesList = new ArrayList<>();
-            for (String seriesInstanceUID : seriesInstanceUIDList) {
-                seriesList.add(getSeries(studyInstanceUID, seriesInstanceUID, em));
+
+            kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
+            kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
+            for(String seriesUID : seriesInstanceUIDList) {
+
+                final Series series = getSeries(seriesUID, em);
+                delayedWebhook.addWebhookData(series.getStudy(), series, targetAlbum, albumId==null,
+                        seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
             }
-            final Study study = seriesList.get(0).getStudy();
 
-            if(study.isPopulated()) {
-
-                final List<Series> seriesListWebhook = new ArrayList<>();
-                for (Series series : seriesList) {
-                    if (series.isPopulated()) {
-                        seriesListWebhook.add(series);
-                    }
-                }
-
-                final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
-
-                List<Webhook> webhookList = em.createNamedQuery("Webhook.findAllEnabledAndForNewSeriesByStudyUID", Webhook.class)
-                        .setParameter(StudyInstanceUID, studyInstanceUID)
-                        .getResultList();
-
-                for (Webhook webhook : webhookList) {
-
-                    final List<Series> seriesInWebhook = new ArrayList<>();
-                    final NewSeriesWebhook newSeriesWebhook;
-                    if (albumId != null && webhook.getAlbum().getId().compareTo(albumId) == 0) {
-                        newSeriesWebhook = new NewSeriesWebhook(albumId, targetAlbumUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
-                        for (Series series : seriesListWebhook) {
-                            newSeriesWebhook.addSeries(series);
-                            seriesInWebhook.add(series);
-                        }
-                        if (kheopsPrincipal.getCapability().isPresent() && kheopsPrincipal.getScope() == ScopeType.ALBUM) {
-                            final Capability capability = em.merge(kheopsPrincipal.getCapability().orElseThrow(IllegalStateException::new));
-                            newSeriesWebhook.setCapabilityToken(capability);
-                        } else if (kheopsPrincipal.getClientId().isPresent()) {
-                            ReportProvider reportProvider = getReportProvider(kheopsPrincipal.getClientId().orElseThrow(IllegalStateException::new));
-                            newSeriesWebhook.setReportProvider(reportProvider);
-                        }
-                    } else {
-                        newSeriesWebhook = new NewSeriesWebhook(webhook.getAlbum().getId(), callingUser, context.getInitParameter(HOST_ROOT_PARAMETER), false);
-                        List<Series> seriesInStudy = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class)
-                                .setParameter(StudyInstanceUID, studyInstanceUID)
-                                .setParameter("album", webhook.getAlbum())
-                                .getResultList();
-
-                        for (Series series : seriesListWebhook) {
-                            if (seriesInStudy.contains(series)) {
-                                newSeriesWebhook.addSeries(series);
-                                seriesInWebhook.add(series);
-                            }
-                        }
-                    }
-                    newSeriesWebhook.setFetch();
-
-                    if (!seriesInWebhook.isEmpty()) {
-                        final WebhookTrigger webhookTrigger = new WebhookTrigger(new WebhookRequestId(em).getRequestId(), false, WebhookType.NEW_SERIES, webhook);
-                        em.persist(webhookTrigger);
-                        for (Series series : seriesInWebhook) {
-                            webhookTrigger.addSeries(series);
-                        }
-                        webhookAsyncRequests.add(new WebhookAsyncRequest(webhook, newSeriesWebhook, webhookTrigger));
-                    }
-                }
-
-                tx.commit();
-                for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
-                    webhookAsyncRequest.firstRequest();
-                }
-            }
+            tx.commit();
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
