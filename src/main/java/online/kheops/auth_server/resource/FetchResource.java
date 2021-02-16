@@ -147,7 +147,7 @@ public class FetchResource {
             em.close();
         }
 
-        if (numberOfUnfetchedSeries != 0) {
+        if (numberOfUnfetchedSeries == 0) {
             return Response.ok().build();
         } else {
             return Response.status(BAD_REQUEST).entity("number of unfetched series: " + numberOfUnfetchedSeries).build();
