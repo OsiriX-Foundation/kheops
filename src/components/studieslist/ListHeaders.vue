@@ -217,7 +217,7 @@ export default {
     selectedSeriesNb() {
       let selectedStudiesSeriesNb = 0;
       this.selectedStudies.forEach((study) => {
-        selectedStudiesSeriesNb += study.NumberOfStudyRelatedSeries.Value[0];
+        selectedStudiesSeriesNb += parseInt(study.NumberOfStudyRelatedSeries.Value[0], 10);
       });
 
       let selectedSerieNb = 0;
