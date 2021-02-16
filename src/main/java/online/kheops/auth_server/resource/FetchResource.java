@@ -129,10 +129,11 @@ public class FetchResource {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(String seriesUID : seriesInstanceUIDList) {
-
                 final Series series = getSeries(seriesUID, em);
-                delayedWebhook.addWebhookData(series.getStudy(), series, targetAlbum, albumId==null,
-                        seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
+                if (seriesNumberOfInstance.containsKey(series)) {
+                    delayedWebhook.addWebhookData(series.getStudy(), series, targetAlbum, albumId == null,
+                            seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
+                }
             }
 
             tx.commit();
