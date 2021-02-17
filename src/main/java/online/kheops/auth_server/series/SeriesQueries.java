@@ -4,7 +4,6 @@ import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.study.StudyNotFoundException;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
@@ -12,9 +11,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.*;
 
-import static online.kheops.auth_server.util.Consts.StudyInstanceUID;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 public class SeriesQueries {
 
@@ -24,22 +23,22 @@ public class SeriesQueries {
 
     public static List<Series> findSeriesListByStudyUIDFromInbox(User callingUser, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInbox", Series.class);
-        query.setParameter(StudyInstanceUID, studyInstanceUID);
-        query.setParameter("callingUser", callingUser);
+        query.setParameter(STUDY_UID, studyInstanceUID);
+        query.setParameter(USER, callingUser);
         return query.getResultList();
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbum(Album album, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromAlbum", Series.class);
-        query.setParameter(StudyInstanceUID,studyInstanceUID);
-        query.setParameter("album",album);
+        query.setParameter(STUDY_UID,studyInstanceUID);
+        query.setParameter(ALBUM,album);
         return query.getResultList();
     }
 
     public static List<Series> findSeriesListByStudyUIDFromAlbumAndInbox(User callingUser, String studyInstanceUID, EntityManager em) {
         TypedQuery<Series> query = em.createNamedQuery("Series.findAllByStudyUIDFromInboxAndAlbum", Series.class);
-        query.setParameter(StudyInstanceUID,studyInstanceUID);
-        query.setParameter("callingUser",callingUser);
+        query.setParameter(STUDY_UID,studyInstanceUID);
+        query.setParameter(USER,callingUser);
         return query.getResultList();
     }
 
@@ -48,9 +47,9 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findByStudyUIDFromInbox", Series.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            query.setParameter("callingUser", callingUser);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
+            query.setParameter(USER, callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -66,9 +65,9 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findByStudyUIDFromAlbum", Series.class);
-            query.setParameter("album", album);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
+            query.setParameter(ALBUM, album);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -83,9 +82,9 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUIDAndStudyUIDAndUser", Series.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            query.setParameter("callingUser", callingUser);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
+            query.setParameter(USER, callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -101,9 +100,9 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> seriesQuery = em.createNamedQuery("Series.findBySeriesUIDAndStudyUIDAndUserWithSharePermission", Series.class);
-            seriesQuery.setParameter(StudyInstanceUID, studyInstanceUID);
-            seriesQuery.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            seriesQuery.setParameter("callingUser", callingUser);
+            seriesQuery.setParameter(STUDY_UID, studyInstanceUID);
+            seriesQuery.setParameter(SERIES_UID, seriesInstanceUID);
+            seriesQuery.setParameter(USER, callingUser);
             return seriesQuery.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -119,8 +118,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUIDAndStudyUID", Series.class);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -136,7 +135,7 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesUID", Series.class);
-            query.setParameter(Consts.SeriesInstanceUID, seriesInstanceUID);
+            query.setParameter(SERIES_UID, seriesInstanceUID);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -152,8 +151,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesAndUserWithSharePermission", Series.class);
-            query.setParameter("series", series);
-            query.setParameter("callingUser", callingUser);
+            query.setParameter(SERIES, series);
+            query.setParameter(USER, callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -169,8 +168,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.findBySeriesFromInbox", Series.class);
-            query.setParameter("series", series);
-            query.setParameter("callingUser", callingUser);
+            query.setParameter(SERIES, series);
+            query.setParameter(USER, callingUser);
             return query.getSingleResult();
         } catch (NoResultException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -184,7 +183,7 @@ public class SeriesQueries {
     public static boolean isOrphan(Series series, EntityManager em) {
         try {
             TypedQuery<Series> query = em.createNamedQuery("Series.isOrphan", Series.class);
-            query.setParameter("series", series);
+            query.setParameter(SERIES, series);
             query.getSingleResult();
             return false;
         } catch (NoResultException e) {
@@ -196,9 +195,9 @@ public class SeriesQueries {
             throws StudyNotFoundException {
         try {
             TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromAlbum", SeriesUIDFavoritePair.class);
-            query.setParameter("album", album);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter("user", callingUser);
+            query.setParameter(ALBUM, album);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(USER, callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
             final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
             for(SeriesUIDFavoritePair seriesUIDFavoritePair : seriesUIDFavoritePairSet) {
@@ -219,8 +218,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromInbox", SeriesUIDFavoritePair.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter("user", callingUser);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(USER, callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
             final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
             for(SeriesUIDFavoritePair seriesUIDFavoritePair : seriesUIDFavoritePairSet) {
@@ -241,8 +240,8 @@ public class SeriesQueries {
 
         try {
             TypedQuery<SeriesUIDFavoritePair> query = em.createNamedQuery("Series.findAllUIDByStudyUIDFromInboxAndAlbum", SeriesUIDFavoritePair.class);
-            query.setParameter(StudyInstanceUID, studyInstanceUID);
-            query.setParameter("user", callingUser);
+            query.setParameter(STUDY_UID, studyInstanceUID);
+            query.setParameter(USER, callingUser);
             Set<SeriesUIDFavoritePair> seriesUIDFavoritePairSet = new HashSet<>(query.getResultList());
             final Map<String, Boolean> seriesUIDFavoritePairMap = new HashMap<>();
             for(SeriesUIDFavoritePair seriesUIDFavoritePair : seriesUIDFavoritePairSet) {

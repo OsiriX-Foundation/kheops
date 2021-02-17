@@ -187,7 +187,7 @@ public class Studies {
 
             Attributes attributes = new Attributes();
 
-            qidoParams.getModalityFilter().ifPresent(filter -> {
+            qidoParams.getModalityFilter().ifPresentOrElse(filter -> {
                 //get all the modalities for the STUDY_UID
                 String modalities = create.select(isnull(groupConcatDistinct(SERIES.MODALITY), "NULL"))
                         .from(USERS)
@@ -205,10 +205,11 @@ public class Studies {
                         .fetch().get(0).getValue(0).toString();
 
                 attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.split(","));
-            });
-            if (!qidoParams.getModalityFilter().isPresent()) {
-                attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString().split(","));
-            }
+                },
+
+                ()->attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString().split(","))
+            );
+
 
             //Tag Type (1) Required
             safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, r.getValue(STUDIES.STUDY_UID.getName()).toString());

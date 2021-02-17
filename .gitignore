@@ -6,3 +6,6 @@ build/
 /webapp-config/tomcat-context.xml
 *.iml
 src/main/java/online/kheops/auth_server/resource/DebugResource.java
+gradlew
+gradlew.bat
+gradle/wrapper/

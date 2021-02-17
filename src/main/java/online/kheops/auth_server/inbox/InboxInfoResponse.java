@@ -6,6 +6,8 @@ import org.jooq.Record;
 import javax.xml.bind.annotation.XmlElement;
 import java.math.BigDecimal;
 
+import static online.kheops.auth_server.util.JooqConstances.*;
+
 public class InboxInfoResponse {
 
     @XmlElement(name = "modalities")
@@ -20,16 +22,16 @@ public class InboxInfoResponse {
     private InboxInfoResponse() { /*empty*/ }
 
     protected InboxInfoResponse(Record r) {
-        this.numberOfStudies = (Integer) r.getValue("number_of_studies");
-        this.numberOfSeries = (Integer) r.getValue("number_of_series");
+        this.numberOfStudies = (Integer) r.getValue(NUMBER_OF_STUDIES);
+        this.numberOfSeries = (Integer) r.getValue(NUMBER_OF_SERIES);
         try {
-            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
+            this.numberOfInstances = ((BigDecimal) r.getValue(NUMBER_OF_INSTANCES)).intValue();
         } catch(NullPointerException e) {
             this.numberOfInstances = 0;
         }
 
-        if(r.getValue("modalities") != null) {
-            this.modalities = r.getValue("modalities").toString().split(",");
+        if(r.getValue(MODALITIES) != null) {
+            this.modalities = r.getValue(MODALITIES).toString().split(",");
         } else {
             this.modalities = new String[0];
         }

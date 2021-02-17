@@ -48,7 +48,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             token = getToken(requestContext.getHeaderString(HttpHeaders.AUTHORIZATION));
         } catch (IllegalArgumentException e) {
-            LOG.log(Level.WARNING, "IllegalArgumentException " + getRequestString(requestContext), e);
+            LOG.log(Level.WARNING, String.format("IllegalArgumentException %s", getRequestString(requestContext)), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
                     .header(WWW_AUTHENTICATE,"Basic").header(WWW_AUTHENTICATE,"Bearer").build());
             return;
@@ -58,7 +58,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, token.getAccessToken());
         } catch (AccessTokenVerificationException e) {
-            LOG.log(Level.WARNING, "Received bad accesstoken" + getRequestString(requestContext), e);
+            LOG.log(Level.WARNING, String.format("Received bad accesstoken%s", getRequestString(requestContext)), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }
@@ -67,7 +67,7 @@ public class SecuredFilter implements ContainerRequestFilter {
         try {
             user = getUser(accessToken.getSubject());
         } catch (UserNotFoundException e) {
-            LOG.log(Level.WARNING, "User not found" + requestContext.getUriInfo().getRequestUri(), e);
+            LOG.log(Level.WARNING, String.format("User not found%s", requestContext.getUriInfo().getRequestUri()), e);
             requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).build());
             return;
         }

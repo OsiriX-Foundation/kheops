@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
@@ -16,13 +17,13 @@ import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
 @NamedQueries({
         @NamedQuery(name = "Study.findByUID",
-        query = "SELECT s FROM Study s WHERE s.studyInstanceUID = :StudyInstanceUID"),
+        query = "SELECT s FROM Study s WHERE s.studyInstanceUID = :"+STUDY_UID),
         @NamedQuery(name = "Study.findByUIDAndUser",
-        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:user AND st = :study"),
+        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:"+USER+" AND st = :"+STUDY),
         @NamedQuery(name = "Study.findByStudyAndAlbum",
-        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:album AND st = :study"),
+        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:"+ALBUM+" AND st = :"+STUDY),
         @NamedQuery(name = "Study.findByUIDAndAlbum",
-        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:album AND st.studyInstanceUID = :studyUID")
+        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:"+ALBUM+" AND st.studyInstanceUID = :"+STUDY_UID)
 })
 
 @Entity

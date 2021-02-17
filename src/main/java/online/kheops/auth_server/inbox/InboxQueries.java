@@ -13,6 +13,7 @@ import static online.kheops.auth_server.generated.tables.AlbumSeries.ALBUM_SERIE
 import static online.kheops.auth_server.generated.tables.Albums.ALBUMS;
 import static online.kheops.auth_server.generated.tables.Series.SERIES;
 import static online.kheops.auth_server.generated.tables.Studies.STUDIES;
+import static online.kheops.auth_server.util.JooqConstances.*;
 import static org.jooq.impl.DSL.*;
 
 public class InboxQueries {
@@ -28,10 +29,10 @@ public class InboxQueries {
             final DSLContext create = DSL.using(connection, SQLDialect.POSTGRES);
             final SelectQuery<Record> query = create.selectQuery();
 
-            query.addSelect(countDistinct(SERIES.STUDY_FK).as("number_of_studies"),
-                    countDistinct(SERIES.PK).as("number_of_series"),
-                    sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as("number_of_instances"),
-                    groupConcatDistinct(SERIES.MODALITY).as("modalities"));
+            query.addSelect(countDistinct(SERIES.STUDY_FK).as(NUMBER_OF_STUDIES),
+                    countDistinct(SERIES.PK).as(NUMBER_OF_SERIES),
+                    sum(SERIES.NUMBER_OF_SERIES_RELATED_INSTANCES).as(NUMBER_OF_INSTANCES),
+                    groupConcatDistinct(SERIES.MODALITY).as(MODALITIES));
 
             query.addFrom(USERS);
             query.addJoin(ALBUMS, ALBUMS.PK.eq(USERS.INBOX_FK));

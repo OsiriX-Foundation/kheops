@@ -128,21 +128,21 @@ public final class AlbumQueryParams {
 
     private boolean extractFavorite(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey(FAVORITE)) {
-            return Boolean.valueOf(queryParameters.get(FAVORITE).get(0));
+            return Boolean.parseBoolean(queryParameters.get(FAVORITE).get(0));
         }
         return false;
     }
 
     private boolean extractCanAddSeries(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("canAddSeries")) {
-            return Boolean.valueOf(queryParameters.get("canAddSeries").get(0));
+            return Boolean.parseBoolean(queryParameters.get("canAddSeries").get(0));
         }
         return false;
     }
 
     private boolean extractCanCreateCapabilityToken(MultivaluedMap<String, String> queryParameters) {
         if (queryParameters.containsKey("canCreateCapabilityToken")) {
-            return Boolean.valueOf(queryParameters.get("canCreateCapabilityToken").get(0));
+            return Boolean.parseBoolean(queryParameters.get("canCreateCapabilityToken").get(0));
         }
         return false;
     }

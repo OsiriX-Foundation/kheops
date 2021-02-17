@@ -125,7 +125,6 @@ public class FetchResource {
                 targetAlbum = kheopsPrincipal.getUser().getInbox();
             }
 
-
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(String seriesUID : seriesInstanceUIDList) {
