@@ -90,6 +90,7 @@ public class FetchResource {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
+        int numberOfUnfetchedSeries = 0;
 
         try {
             tx.begin();
@@ -128,10 +129,13 @@ public class FetchResource {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             for(String seriesUID : seriesInstanceUIDList) {
-
                 final Series series = getSeries(seriesUID, em);
-                delayedWebhook.addWebhookData(series.getStudy(), series, targetAlbum, albumId==null,
-                        seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
+                if (seriesNumberOfInstance.containsKey(series)) {
+                    delayedWebhook.addWebhookData(series.getStudy(), series, targetAlbum, albumId == null,
+                            seriesNumberOfInstance.get(series).getNumberOfNewInstances(), source, false, false);
+                } else {
+                    numberOfUnfetchedSeries ++;
+                }
             }
 
             tx.commit();
@@ -142,6 +146,10 @@ public class FetchResource {
             em.close();
         }
 
-        return Response.ok().build();
+        if (numberOfUnfetchedSeries == 0) {
+            return Response.ok().build();
+        } else {
+            return Response.status(BAD_REQUEST).entity("number of unfetched series: " + numberOfUnfetchedSeries).build();
+        }
     }
 }
