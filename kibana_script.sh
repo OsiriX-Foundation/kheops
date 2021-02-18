@@ -26,7 +26,7 @@ else
 fi
 
 
-if [[ -f /run/secret/auth_basic ]]; then
+if [[ -f /run/secrets/auth_basic ]]; then
   echo -e "secret auth_basic \e[92mOK\e[0m"
 else
   echo "Missing auth_basic secret"
