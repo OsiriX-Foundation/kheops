@@ -12,6 +12,7 @@ COPY location_kibana.conf /etc/nginx/kheops/04_location_kibana.conf
 COPY location_unsecured_ui.conf /etc/nginx/kheops/05_location_unsecured_ui.conf
 COPY env_var_script.sh /docker-entrypoint.d/30-env_var_script.sh
 COPY kibana_script.sh /docker-entrypoint.d/35-kibana_script.sh
+COPY kibana_insecure/auth_basic /run/secrets/auth_basic
 
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
