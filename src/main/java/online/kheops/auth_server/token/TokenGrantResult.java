@@ -1,6 +1,5 @@
 package online.kheops.auth_server.token;
 
-import java.util.Objects;
 import java.util.Optional;
 
 public class TokenGrantResult {
