@@ -8,4 +8,5 @@ export const oidcSettings = {
   silentRedirectUri: `${process.env.VUE_APP_URL_ROOT}/silent-renew-oidc.html`,
   post_logout_redirect_uri: process.env.VUE_APP_URL_ROOT,
   scope: 'openid',
+  ...(process.env.VUE_APP_ADDITIONAL_OIDC_OPTIONS && JSON.parse(process.env.VUE_APP_ADDITIONAL_OIDC_OPTIONS)),
 };
