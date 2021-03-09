@@ -42,7 +42,7 @@ fi
 
 sed -i "s|\%{kheops_ui_authority}|$KHEOPS_OIDC_PROVIDER|g" $FILENAME
 sed -i "s|\%{kheops_ui_clientid}|$KHEOPS_UI_CLIENTID|g" $FILENAME
-sed -i "s|\%{kheops_additional_oidc_options}|${KHEOPS_ADDITIONAL_OIDC_OPTIONS//\"/\\\\\"}|g" $FILENAME
+sed -i "s|\%{kheops_ui_additional_oidc_options}|${KHEOPS_UI_ADDITIONAL_OIDC_OPTIONS//\"/\\\\\"}|g" $FILENAME
 sed -i "s|\%{kheops_api_url}|$api|g" $FILENAME
 sed -i "s|\%{kheops_ui_viewer_sm_url}|$KHEOPS_UI_VIEWER_SM_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_root_url}|$KHEOPS_ROOT_URL|g" $FILENAME
