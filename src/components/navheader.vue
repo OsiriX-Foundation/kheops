@@ -137,13 +137,8 @@ export default {
     lang() {
       return this.$i18n.locale;
     },
-    redirect: {
-      get() {
-        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
-      },
-      set() {
-        return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
-      },
+    redirect() {
+      return `${process.env.VUE_APP_URL_ROOT}${this.$route.path}`;
     },
   },
   created() {
