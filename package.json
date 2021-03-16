@@ -31,7 +31,7 @@
     "vuejs-datepicker": "^1.6.2",
     "vuex": "^3.6.2",
     "vuex-oidc": "^3.10.2",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^5.7.3"
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.3.0",
