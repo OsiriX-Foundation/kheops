@@ -36,7 +36,7 @@ export default {
       const value = this.flag.is_selected;
       const StudyInstanceUID = this.studyInstanceUID;
       const studyIndex = this.studies.findIndex((study) => study.StudyInstanceUID.Value[0] === StudyInstanceUID);
-      const paramsSelected = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_selected', !value);
+      const paramsSelected = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_selected', value);
       this.$store.dispatch('setFlagByStudyUID', paramsSelected);
       const paramsIndeterminate = this.createObjectFlag(StudyInstanceUID, studyIndex, 'is_indeterminate', false);
       this.$store.dispatch('setFlagByStudyUID', paramsIndeterminate);
