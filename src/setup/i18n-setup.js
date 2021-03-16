@@ -32,7 +32,8 @@ export function loadLanguageAsync(lang) {
   }
 
   // If the language hasn't been loaded yet
-  return import(/* webpackChunkName: "lang-[request]" */ `@/lang/${lang}.js`).then(
+  // https://github.com/babel/babel-eslint/issues/681 from the response of KrishnaPG, 1 Jul 2020
+  return import(/* webpackChunkName: "lang-[request]" */ "@/lang/"+lang+".js").then(
     (messages) => {
       i18n.setLocaleMessage(lang, messages.default);
       loadedLanguages.push(lang);
