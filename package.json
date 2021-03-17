@@ -36,11 +36,11 @@
     "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-eslint": "^4.5.11",
     "@vue/cli-service": "^3.12.1",
-    "@vue/eslint-config-standard": "^4.0.0",
+    "@vue/eslint-config-standard": "^6.0.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^5.16.0",
-    "eslint-plugin-lodash": "^6.0.0",
-    "eslint-plugin-vue": "^5.2.3",
+    "eslint": "^7.22.0",
+    "eslint-plugin-lodash": "^7.2.0",
+    "eslint-plugin-vue": "^7.7.0",
     "vue-template-compiler": "^2.6.12"
   }
 }
