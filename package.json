@@ -15,7 +15,6 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.1",
     "oidc-client": "^1.11.5",
-    "v-calendar": "^0.9.7",
     "vee-validate": "^2.2.15",
     "vue": "^2.6.12",
     "vue-awesome": "^3.5.4",
