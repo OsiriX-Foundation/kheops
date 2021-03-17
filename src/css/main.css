@@ -36,6 +36,10 @@ footer {
 	word-break: break-all;
 }
 
+.fa-icon{
+	vertical-align: middle !important;
+}
+
 .kheopsicon{
 	color: #FFFFFF;
 	fill: #FFFFFF;
