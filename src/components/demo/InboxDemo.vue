@@ -22,7 +22,7 @@
       no-close-on-backdrop
       size="lg"
     >
-      <template v-slot:modal-title>
+      <template #modal-title>
         Kheops Demonstration
       </template>
       <dl class="my-2 row">

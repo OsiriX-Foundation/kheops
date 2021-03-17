@@ -59,10 +59,9 @@ export default {
   },
   created() {
     const albumId = this.$route.params.album_id;
-    this.$store.dispatch('getUsersAlbum', { album_id: albumId }).then((res) => {
+    this.$store.dispatch('getUsersAlbum', { album_id: albumId }).then(() => {
       this.checkUser();
-    }).catch((err) => {
-      console.log(err);
+    }).catch(() => {
     });
   },
   methods: {

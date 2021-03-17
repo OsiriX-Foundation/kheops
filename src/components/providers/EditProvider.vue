@@ -161,9 +161,8 @@ export default {
         } else {
           this.$emit('done');
         }
-      }).catch((err) => {
+      }).catch(() => {
         this.setStateProvider(false, false, true);
-        console.log(err);
         this.onloading = false;
       });
     },
@@ -184,8 +183,7 @@ export default {
         } else {
           this.$emit('done');
         }
-      }).catch((err) => {
-        console.log(err);
+      }).catch(() => {
         this.onloading = false;
       });
     },

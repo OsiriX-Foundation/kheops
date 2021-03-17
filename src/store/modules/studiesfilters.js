@@ -1,5 +1,3 @@
-import Vue from 'vue';
-
 // initial state
 const state = {
   filters: {

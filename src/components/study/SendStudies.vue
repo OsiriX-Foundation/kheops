@@ -494,13 +494,11 @@ export default {
               reject(err);
             });
           })).catch((err) => {
-            console.log(err);
             this.errorDicomize(file, err);
             this.countSentFiles += 1;
           });
         });
       }).catch((err) => {
-        console.log(err);
         files.forEach((file) => {
           this.errorDicomize(file, err);
           this.countSentFiles += 1;

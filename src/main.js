@@ -17,11 +17,11 @@ import ToggleButton from 'vue-js-toggle-button';
 import '@/filters/filters.js';
 import VueI18n from 'vue-i18n';
 import VueScrollTo from 'vue-scrollto';
-import store from './store';
 import Access from '@/directives/access';
+import { i18n } from '@/setup/i18n-setup';
+import store from './store';
 import router from './router';
 import App from './App';
-import { i18n } from '@/setup/i18n-setup';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;

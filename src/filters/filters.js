@@ -52,7 +52,6 @@ Vue.filter('maxTextLength', (value, maxlength) => {
 
 Vue.filter('capitalizeFirstWord', (value) => {
   const valueSplited = value.split(' ');
-  console.log(valueSplited);
   valueSplited[0] = valueSplited[0].charAt(0).toUpperCase() + valueSplited[0].slice(1);
   return valueSplited.join(' ');
 });

@@ -174,13 +174,14 @@ export default {
         this.count += 1;
         return objFile;
       }
+      return {};
     },
     inputLoadFiles(filesFromInput) {
       const arrayFiles = [];
       for (let i = 0; i < filesFromInput.length; i += 1) {
         const pathFile = filesFromInput[i].webkitRelativePath ? filesFromInput[i].webkitRelativePath : filesFromInput[i].name;
         const objFile = this.createObjFiles(filesFromInput[i], pathFile, filesFromInput[i].name);
-        if (objFile) {
+        if (Object.keys(objFile).length > 0) {
           arrayFiles.push(objFile);
         }
       }
@@ -205,7 +206,7 @@ export default {
       });
     },
     removeNonObjectFiles(array) {
-      return array.filter((val) => (val) !== undefined);
+      return array.filter((val) => (val) !== undefined && Object.keys(val).length > 0);
     },
     arrayFlatten(array) {
       return array.reduce((arrayFlat, arrayToFlatten) => arrayFlat.concat(Array.isArray(arrayToFlatten) ? this.arrayFlatten(arrayToFlatten) : arrayToFlatten), []);

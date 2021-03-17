@@ -16,7 +16,7 @@
       <comments-and-notifications
         v-if="study.flag.view === 'comments'"
         :id="study.StudyInstanceUID.Value[0]"
-        :write-comments="this.$route.name !== 'viewnologin'"
+        :write-comments="$route.name !== 'viewnologin'"
         scope="studies"
       />
       <study-metadata

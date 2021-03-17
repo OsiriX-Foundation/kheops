@@ -217,7 +217,7 @@
       size="lg"
       @hidden="cancel"
     >
-      <template v-slot:modal-title>
+      <template #modal-title>
         {{ token.title }}
       </template>
       <dl class="my-2 row">

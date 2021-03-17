@@ -114,8 +114,8 @@ import SlicerIcon from '@/components/kheopsSVG/SlicerIcon.vue';
 import WeasisIcon from '@/components/kheopsSVG/WeasisIcon.vue';
 import VisibilityIcon from '@/components/kheopsSVG/VisibilityIcon.vue';
 import { ViewerToken } from '@/mixins/tokens.js';
-import { CurrentUser } from '../../mixins/currentuser.js';
 import { Viewer } from '@/mixins/viewer.js';
+import { CurrentUser } from '../../mixins/currentuser.js';
 
 export default {
   name: 'ListIcons',
@@ -261,9 +261,8 @@ export default {
       this.getViewerToken(token, StudyInstanceUID, this.source).then((res) => {
         const queryparams = `accept=application%2Fzip${sourceQuery !== '' ? '&' : ''}${sourceQuery}`;
         const URL = `${process.env.VUE_APP_URL_API}/link/${res.data.access_token}/studies/${StudyInstanceUID}?${queryparams}`;
-        location.href = URL;
-      }).catch((err) => {
-        console.log(err);
+        window.location.href = URL;
+      }).catch(() => {
       });
     },
     openViewer(viewer) {
@@ -295,8 +294,7 @@ export default {
         } else if (viewer === 'default' && openWindow.wsi !== undefined) {
           openWindow.wsi.location.href = this.openWSI(StudyInstanceUID, viewerToken, sourceQuery);
         }
-      }).catch((err) => {
-        console.log(err);
+      }).catch(() => {
       });
     },
     setWindowsProps(viewer, StudyInstanceUID) {

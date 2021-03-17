@@ -271,9 +271,8 @@ export default {
         } else {
           this.$emit('done');
         }
-      }).catch((err) => {
+      }).catch(() => {
         this.onloading = false;
-        console.log(err);
       });
     },
   },

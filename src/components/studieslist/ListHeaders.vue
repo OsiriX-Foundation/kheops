@@ -293,8 +293,7 @@ export default {
           this.$snotify.success(`${this.selectedStudiesNb} ${this.$t('study.studiessharedsuccess')}`);
           this.formSendStudy = false;
           this.deselectStudySeries();
-        }).catch((err) => {
-          console.log(err);
+        }).catch(() => {
         });
       }
     },

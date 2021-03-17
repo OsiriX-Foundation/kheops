@@ -28,7 +28,7 @@
       @row-clicked="selectProvider"
     >
       <template
-        v-slot:cell(url_check)="data"
+        #cell(url_check)="data"
       >
         <state-provider
           :loading="data.item.stateURL.loading"
@@ -38,7 +38,7 @@
       </template>
       <template
         v-if="writePermission"
-        v-slot:cell(btn_edit)="data"
+        #cell(btn_edit)="data"
       >
         <button
           class="btn btn-sm btn-primary"
@@ -47,10 +47,10 @@
           {{ $t('edit') }}
         </button>
       </template>
-      <template v-slot:table-busy>
+      <template #table-busy>
         <loading />
       </template>
-      <template v-slot:empty>
+      <template #empty>
         <div
           class="text-warning text-center"
         >
@@ -61,7 +61,7 @@
           />
         </div>
       </template>
-      <template v-slot:emptyfiltered>
+      <template #emptyfiltered>
         <div
           class="text-warning text-center"
         >
@@ -148,7 +148,7 @@ export default {
   methods: {
     getProviders() {
       this.loadingData = true;
-      return this.$store.dispatch('getProviders', { albumID: this.albumID }).then((res) => {
+      return this.$store.dispatch('getProviders', { albumID: this.albumID }).then(() => {
         this.loadingData = false;
         this.status = -1;
       }).catch((err) => {

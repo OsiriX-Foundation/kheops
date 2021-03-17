@@ -39,9 +39,9 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import BounceLoader from 'vue-spinner/src/BounceLoader.vue';
+import { Viewer } from '@/mixins/viewer.js';
 import { ViewerToken } from '../../mixins/tokens.js';
 import { CurrentUser } from '../../mixins/currentuser.js';
-import { Viewer } from '@/mixins/viewer.js';
 
 export default {
   name: 'SeriesSummary',
@@ -227,8 +227,7 @@ export default {
           url = this.openOhif(queryparams);
         }
         openWindow.location.href = url;
-      }).catch((err) => {
-        console.log(err);
+      }).catch(() => {
       });
     },
     setWindowsProps(series) {

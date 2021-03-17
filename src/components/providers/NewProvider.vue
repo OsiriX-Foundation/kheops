@@ -133,10 +133,9 @@ export default {
         } else {
           this.$emit('done');
         }
-      }).catch((err) => {
+      }).catch(() => {
         this.setStateProvider(false, false, true);
         this.oncreate = false;
-        console.log(err);
       });
     },
     setStateProvider(checkURL, loading, show) {
