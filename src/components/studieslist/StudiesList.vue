@@ -178,7 +178,6 @@
             <v-icon
               class="align-middle"
               :name="row.detailsShowing ? 'chevron-down' : 'chevron-right'"
-              @click.stop="row.toggleDetails"
             />
           </b-button>
           <study-checkbox
