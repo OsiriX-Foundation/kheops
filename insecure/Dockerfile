@@ -1,8 +1,6 @@
-FROM nginx:stable
+FROM nginx:1.19.8
 
 ENV SECRET_FILE_PATH=/run/secrets
-
-RUN mkdir /etc/nginx/kheops
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY insecure/kheops.conf /etc/nginx/conf.d/kheops.conf
