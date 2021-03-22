@@ -43,7 +43,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^7.22.0",
     "eslint-plugin-lodash": "^7.2.0",
-    "eslint-plugin-vue": "^7.7.0",
+    "eslint-plugin-vue": "^7.8.0",
     "vue-template-compiler": "^2.6.12"
   }
 }
