@@ -26,9 +26,6 @@
         </span>
       </b-dropdown-item>
       <b-dropdown-divider />
-      <b-dropdown-header>
-        {{ $t('album.headerlistalbums') }}
-      </b-dropdown-header>
       <b-dropdown-item
         v-for="album in listAlbums"
         :key="album.id"
