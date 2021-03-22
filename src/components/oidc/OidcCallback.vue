@@ -23,8 +23,7 @@ export default {
       .then((redirectPath) => {
         this.$router.push(redirectPath);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
         if (!this.oidcIsAuthenticated) {
           this.$router.push('/oidc-callback-error'); // Handle errors any way you want
         } else {

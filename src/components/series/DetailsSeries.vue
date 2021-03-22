@@ -99,7 +99,7 @@ export default {
       }
       params.queries.includefield = this.includefield;
       this.loadingSerie = true;
-      this.$store.dispatch('getSeries', params).then((res) => {
+      this.$store.dispatch('getSeries', params).then(() => {
         this.errorSeries = false;
         this.loadingSerie = false;
         this.missingSeries();

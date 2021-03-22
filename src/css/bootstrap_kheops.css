@@ -259,3 +259,11 @@ a.text-success:hover, a.text-success:focus {
 		width: 100%;
 	}
 }
+
+.page-item.active .page-link {
+	background-color: #5a4181 !important;
+}
+
+.page-link {
+	background-color: #003866 !important
+}

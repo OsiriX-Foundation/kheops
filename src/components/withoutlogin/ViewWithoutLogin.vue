@@ -78,8 +78,7 @@ export default {
       } else {
         this.active = active;
       }
-    }).catch((err) => {
-      console.log(err);
+    }).catch(() => {
     });
   },
   mounted() {

@@ -30,7 +30,7 @@
       tbody-tr-class="link"
       @row-clicked="showRowDetails"
     >
-      <template v-slot:cell(show_details)="row">
+      <template #cell(show_details)="row">
         <b-button
           size="sm"
           class="mr-1 pt-0"
@@ -54,7 +54,7 @@
         </b-card>
       </template>
       <template
-        v-slot:cell(status)="row"
+        #cell(status)="row"
       >
         <v-icon
           v-if="checkStatus(row.item.attempts) === true"
@@ -66,14 +66,14 @@
           name="ban"
           :color="'red'"
         />
-      </template><template v-slot:empty>
+      </template><template #empty>
         <div
           class="text-warning text-center"
         >
           {{ $t('webhook.noattempts') }}
         </div>
       </template>
-      <template v-slot:table-busy>
+      <template #table-busy>
         <loading />
       </template>
     </b-table>

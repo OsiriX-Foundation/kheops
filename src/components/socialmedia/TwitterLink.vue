@@ -18,7 +18,7 @@
       :show="showRevokeTwitter"
       placement="auto"
     >
-      <template v-slot:title>
+      <template #title>
         <pop-over-title
           title="Twitter"
           @cancel="showRevokeTwitter = false"

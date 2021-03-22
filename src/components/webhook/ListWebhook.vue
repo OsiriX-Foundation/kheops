@@ -26,10 +26,10 @@
       tbody-tr-class="link"
       @row-clicked="rowSelectedWebhook"
     >
-      <template v-slot:table-busy>
+      <template #table-busy>
         <loading />
       </template>
-      <template v-slot:empty>
+      <template #empty>
         <div
           class="text-warning text-center"
         >
@@ -40,14 +40,14 @@
           />
         </div>
       </template>
-      <template v-slot:emptyfiltered>
+      <template #emptyfiltered>
         <div
           class="text-warning text-center"
         >
           {{ $t('webhook.nowebhooks') }}
         </div>
       </template>
-      <template v-slot:cell(enabled)="row">
+      <template #cell(enabled)="row">
         <toggle-button
           :value="row.item.enabled"
           :sync="true"
@@ -56,7 +56,7 @@
         />
       </template>
       <template
-        v-slot:cell(statuswebhook)="data"
+        #cell(statuswebhook)="data"
       >
         <state-icons
           v-if="data.item.number_of_triggers !== undefined && data.item.number_of_triggers > 0"
@@ -66,7 +66,7 @@
         />
       </template>
       <template
-        v-slot:cell(btn_edit)="data"
+        #cell(btn_edit)="data"
       >
         <button
           class="btn btn-sm btn-primary"

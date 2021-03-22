@@ -23,7 +23,7 @@
         HEADER TABLE
       -->
       <template
-        v-slot:head(PatientName)="data"
+        #head(PatientName)="data"
       >
         {{ data.label }}
         <div
@@ -61,7 +61,7 @@
       </template>
 
       <template
-        v-slot:head(PatientID)="data"
+        #head(PatientID)="data"
       >
         {{ data.label }}
         <div
@@ -78,7 +78,7 @@
       </template>
 
       <template
-        v-slot:head(StudyDescription)="data"
+        #head(StudyDescription)="data"
       >
         {{ data.label }}
         <div
@@ -95,7 +95,7 @@
       </template>
 
       <template
-        v-slot:head(StudyDate)="data"
+        #head(StudyDate)="data"
       >
         {{ data.label }}
         <div
@@ -136,7 +136,7 @@
       </template>
 
       <template
-        v-slot:head(ModalitiesInStudy)="data"
+        #head(ModalitiesInStudy)="data"
       >
         {{ data.label }}
         <div
@@ -162,7 +162,7 @@
         CONTENT TABLE
       -->
       <template
-        v-slot:cell(is_selected)="row"
+        #cell(is_selected)="row"
       >
         <span
           v-if="row.item.StudyInstanceUID !== undefined && row.item.StudyInstanceUID.Value !== undefined"
@@ -178,7 +178,6 @@
             <v-icon
               class="align-middle"
               :name="row.detailsShowing ? 'chevron-down' : 'chevron-right'"
-              @click.stop="row.toggleDetails"
             />
           </b-button>
           <study-checkbox
@@ -188,7 +187,7 @@
         </b-button-group>
       </template>
       <template
-        v-slot:cell(PatientName)="row"
+        #cell(PatientName)="row"
       >
         <div
           :class="mobiledetect===true ? '' : 'd-flex flex-wrap'"
@@ -228,7 +227,7 @@
         </div>
       </template>
       <template
-        v-slot:cell(StudyDate)="row"
+        #cell(StudyDate)="row"
       >
         {{ row.value | formatDate }}
       </template>

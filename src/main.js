@@ -14,15 +14,14 @@ import 'vue-awesome/icons';
 import lodash from 'lodash';
 import Icon from 'vue-awesome/components/Icon';
 import ToggleButton from 'vue-js-toggle-button';
-import VeeValidate from 'vee-validate';
 import '@/filters/filters.js';
 import VueI18n from 'vue-i18n';
 import VueScrollTo from 'vue-scrollto';
-import store from './store';
 import Access from '@/directives/access';
+import { i18n } from '@/setup/i18n-setup';
+import store from './store';
 import router from './router';
 import App from './App';
-import { i18n } from '@/setup/i18n-setup';
 
 Vue.config.productionTip = false;
 Vue.config.performance = true;
@@ -36,7 +35,6 @@ const snotifyOptions = {
 
 Vue.use(Snotify, snotifyOptions);
 Vue.use(BootstrapVue);
-Vue.use(VeeValidate, { fieldsBagName: 'formFields' });
 Vue.use(VueI18n);
 Vue.use(lodash);
 Vue.use(ToggleButton);

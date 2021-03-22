@@ -18,7 +18,7 @@
       :show.sync="sharingTokenParams.show"
       placement="auto"
     >
-      <template v-slot:title>
+      <template #title>
         <pop-over-title
           :title="$t('sharinglink.sharingTitle')"
           @cancel="cancelSharingToken"

@@ -71,7 +71,7 @@
       hide-footer
       size="lg"
     >
-      <template v-slot:modal-title>
+      <template #modal-title>
         <span
           v-if="errorTrigger === true"
           class="mr-2"

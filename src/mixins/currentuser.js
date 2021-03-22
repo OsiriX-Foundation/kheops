@@ -26,7 +26,6 @@ export const CurrentUser = {
       return store.state.oidcStore.user !== null ? store.state.oidcStore.user.email : null;
     },
     currentuserFullname() {
-      console.log(store.state.oidcStore.user.name)
       return store.state.oidcStore.user !== null ? store.state.oidcStore.user.name : null;
     },
   },

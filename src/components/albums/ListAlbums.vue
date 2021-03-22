@@ -25,7 +25,7 @@
       @row-unhovered="setItemUnhover"
     >
       <template
-        v-slot:head(name)="data"
+        #head(name)="data"
       >
         {{ data.label }}
         <div
@@ -42,22 +42,22 @@
         </div>
       </template>
       <template
-        v-slot:head(number_of_studies)="data"
+        #head(number_of_studies)="data"
       >
         {{ data.label }}
       </template>
       <template
-        v-slot:head(number_of_users)="data"
+        #head(number_of_users)="data"
       >
         {{ data.label }}
       </template>
       <template
-        v-slot:head(number_of_comments)="data"
+        #head(number_of_comments)="data"
       >
         {{ data.label }}
       </template>
       <template
-        v-slot:head(created_time)="data"
+        #head(created_time)="data"
       >
         {{ data.label }}
         <div
@@ -90,7 +90,7 @@
         </div>
       </template>
       <template
-        v-slot:head(last_event_time)="data"
+        #head(last_event_time)="data"
       >
         {{ data.label }}
         <div
@@ -124,7 +124,7 @@
         </div>
       </template>
       <template
-        v-slot:cell(is_selected)="row"
+        #cell(is_selected)="row"
       >
         <b-button-group>
           <b-form-checkbox
@@ -136,7 +136,7 @@
         </b-button-group>
       </template>
       <template
-        v-slot:cell(name)="row"
+        #cell(name)="row"
       >
         <div
           :class="'d-flex flex-wrap'"
@@ -150,12 +150,12 @@
         </div>
       </template>
       <template
-        v-slot:cell(created_time)="data"
+        #cell(created_time)="data"
       >
         {{ data.item.created_time | formatDate }}
       </template>
       <template
-        v-slot:cell(last_event_time)="data"
+        #cell(last_event_time)="data"
       >
         {{ data.item.last_event_time | formatDate }}
       </template>

@@ -89,9 +89,8 @@ export default {
             if (res.status === 200) {
               this.userSend = true;
             }
-          }).catch((err) => {
+          }).catch(() => {
             this.userSend = true;
-            console.log(err);
           });
         }
       }

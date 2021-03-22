@@ -31,7 +31,7 @@
       @row-clicked="loadToken"
     >
       <template
-        v-slot:cell(scope_type)="data"
+        #cell(scope_type)="data"
       >
         <div v-if="data.value=='album'">
           <router-link
@@ -54,7 +54,7 @@
         </div>
       </template>
       <template
-        v-slot:cell(status)="data"
+        #cell(status)="data"
       >
         <div
           v-if="tokenStatus(data.item)=='active'"
@@ -93,29 +93,29 @@
         </div>
       </template>
       <template
-        v-slot:cell(expiration_time)="data"
+        #cell(expiration_time)="data"
       >
         <span :class="(data.item.revoked)?'text-danger':''">
           {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
         </span>
       </template>
       <template
-        v-slot:cell(issued_at_time)="data"
+        #cell(issued_at_time)="data"
       >
         {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
-        v-slot:cell(last_used)="data"
+        #cell(last_used)="data"
       >
         {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
-        v-slot:cell(permission)="data"
+        #cell(permission)="data"
       >
         {{ data.item|formatPermissions }}
       </template>
       <template
-        v-slot:cell(actions)="data"
+        #cell(actions)="data"
       >
         <span
           v-if="!data.item.revoked"
@@ -140,10 +140,10 @@
           {{ $t('token.revoked') }}
         </span>
       </template>
-      <template v-slot:table-busy>
+      <template #table-busy>
         <loading />
       </template>
-      <template v-slot:empty>
+      <template #empty>
         <div
           class="text-warning text-center"
         >
@@ -154,7 +154,7 @@
           />
         </div>
       </template>
-      <template v-slot:emptyfiltered>
+      <template #emptyfiltered>
         <div
           class="text-warning text-center"
         >
