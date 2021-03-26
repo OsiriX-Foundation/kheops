@@ -142,9 +142,5 @@ fi
 
 remplace_in_file /etc/nginx/conf.d/kheops.conf
 
-mkdir /usr/share/nginx/certificates
-cp "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/privkey.pem" /usr/share/nginx/certificates/privkey.pe
-cp "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/fullchain.pem" /usr/share/nginx/certificates/fullchain.pem
-cp "${LETSENCRYPT_DIR:-/etc/letsencrypt}/live/$roothost/chain.pem" /usr/share/nginx/certificates/chain.pem
 
 echo "Ending setup NGINX env var"
