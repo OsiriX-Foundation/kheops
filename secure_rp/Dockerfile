@@ -16,6 +16,7 @@ COPY locations.conf /etc/nginx/kheops2/01_locations.conf
 COPY location_link_unsecured.conf /etc/nginx/kheops2/03_location_link_unsecured.conf
 COPY location_unsecured_ui.conf /etc/nginx/kheops2/04_location_unsecured_ui.conf
 COPY env_var_script2.sh /docker-entrypoint.d/31-env_var_script2.sh
+RUN chmod +x /docker-entrypoint.d/31-env_var_script2.sh
 
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
