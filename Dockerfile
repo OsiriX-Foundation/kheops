@@ -10,6 +10,7 @@ ENV OPENRESTY_VERSION 1.9.3.1
 ENV OPENRESTY_PREFIX /opt/openresty
 ENV NGINX_PREFIX /opt/openresty/nginx
 ENV VAR_PREFIX /var/nginx
+ENV NGINX_LOG_PATH /var/log/nginx
 
 ARG VCS_REF
 LABEL org.label-schema.vcs-ref=$VCS_REF \
@@ -31,8 +32,8 @@ RUN cd /root \
     --prefix=$OPENRESTY_PREFIX \
     --http-client-body-temp-path=$VAR_PREFIX/client_body_temp \
     --http-proxy-temp-path=$VAR_PREFIX/proxy_temp \
-    --http-log-path=$VAR_PREFIX/access.log \
-    --error-log-path=$VAR_PREFIX/error.log \
+    --http-log-path=$NGINX_LOG_PATH/access.log \
+    --error-log-path=$NGINX_LOG_PATH/error.log \
     --pid-path=$VAR_PREFIX/nginx.pid \
     --lock-path=$VAR_PREFIX/nginx.lock \
     --with-luajit \
