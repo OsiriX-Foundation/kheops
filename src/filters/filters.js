@@ -29,8 +29,6 @@ Vue.filter('formatTime', (value) => {
   return value;
 });
 
-Vue.filter('nl2br', (value) => value.replace('\n', '<br>'));
-
 Vue.filter('formatModality', (value) => value.split(',').join(' / '));
 
 Vue.filter('formatPermissions', (item) => {
