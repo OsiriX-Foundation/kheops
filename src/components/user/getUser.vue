@@ -63,7 +63,7 @@ export default {
     getUser() {
       const headers = this.getHeaders();
       this.$store.dispatch('checkUser', { user: this.new_user_name, headers }).then((sub) => {
-        if (!sub) this.$snotify.error('Sorry, unknown user');
+        if (!sub) this.$snotify.error(this.$t('user.usernotfound'));
         else {
           this.$emit('get-user', sub);
           this.new_user_name = '';

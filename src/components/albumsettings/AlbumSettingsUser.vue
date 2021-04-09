@@ -183,17 +183,17 @@ export default {
           album_id: this.album.album_id,
           user: this.new_user_name,
         };
-        this.$store.dispatch('addAlbumUser', params).then((res) => {
-          if (res.status === 201) {
-            this.new_user_name = '';
-            this.form_add_user = false;
-            this.confirm_delete = '';
+        this.$store.dispatch('addAlbumUser', params).then(() => {
+          this.new_user_name = '';
+          this.form_add_user = false;
+          this.confirm_delete = '';
+          this.onloading = false;
+        }).catch((err) => {
+          if (err.response !== undefined && err.response.data !== undefined && err.response.data.message === 'User Not Found') {
+            this.$snotify.error(this.$t('user.usernotfound'));
           } else {
             this.$snotify.error(this.$t('sorryerror'));
           }
-          this.onloading = false;
-        }).catch((err) => {
-          this.$snotify.error(this.$t('sorryerror'));
           this.onloading = false;
           return err;
         });

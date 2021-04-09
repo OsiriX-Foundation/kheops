@@ -149,7 +149,7 @@ export default {
         const username = this.newUserName;
         this.checkSpecificUser(username).then((res) => {
           if (res.status === 204) {
-            this.$snotify.error(this.$t('user.userunknown', { user: username }));
+            this.$snotify.error(this.$t('user.usernotfound'));
           } else if (!res.data[this.accessVar]) {
             this.$snotify.error(this.scope === 'album' ? this.$t('user.noaccessalbum', { user: username }) : this.$t('user.noaccessstudy', { user: username }));
           } else if (res.status === 200 && res.data[this.accessVar]) {

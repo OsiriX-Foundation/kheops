@@ -304,7 +304,7 @@
 		"nouser": "Aucun utilisateur spécifié",
 		"sub": "Sub",
 		"usersettings": "Préférences utilisateur",
-		"userunknown": "Utilisateur {user} inconnu"
+		"usernotfound": "Désolé, utilisateur pas trouvé"
 	},
 	"valid": "Valider",
 	"viewer": {

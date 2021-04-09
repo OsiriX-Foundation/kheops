@@ -320,7 +320,8 @@
 		"nouser": "No user specified",
 		"sub": "Sub",
 		"usersettings": "User settings",
-		"userunknown": "User {user} unknown"
+		"userunknown": "Sorry, unknown user",
+		"usernotfound": "Sorry, user not found"
 	},
 	"valid": "Valid",
 	"viewer": {
