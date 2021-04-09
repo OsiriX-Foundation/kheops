@@ -12,7 +12,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bootstrap-vue": "^2.21.2",
-    "core-js": "^3.6.5",
+    "core-js": "^3.10.1",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "lodash": "^4.17.21",
@@ -41,7 +41,7 @@
     "@vue/cli-service": "^4.5.12",
     "@vue/eslint-config-standard": "^6.0.0",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.22.0",
+    "eslint": "^7.23.0",
     "eslint-plugin-lodash": "^7.2.0",
     "eslint-plugin-vue": "^7.8.0",
     "vue-template-compiler": "^2.6.12"
