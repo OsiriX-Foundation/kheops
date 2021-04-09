@@ -13,6 +13,12 @@ footer {
   bottom: 0;
 }
 
+.kheopsfont-st0{fill:#808080;}
+.kheopsfont-st1{fill:#103866;}
+.kheopsfont-st2{fill:#F8A638;}
+.kheopsfont-st3{fill:#FFFFFF;}
+.kheopsfont-st4{fill:#fca638}
+
 .link, .pointer{
 	cursor: pointer;
 }
