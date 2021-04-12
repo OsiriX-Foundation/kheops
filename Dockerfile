@@ -6,6 +6,8 @@ COPY entrypoint.sh /entrypoint.sh
 
 USER root
 
+RUN mkdir /registry
+RUN chmod 770 /registry
 RUN chmod 770 /usr/share/filebeat
 RUN chmod -R 777 /filebeattmp 
 RUN chmod +x /entrypoint.sh
