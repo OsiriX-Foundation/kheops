@@ -128,7 +128,8 @@ filebeat.inputs:
 
 #============================= Filebeat registry ==============================
 
-filebeat.registry.path: /registry
+filebeat.registry:
+  path: /registry
 
 #============================= Filebeat modules ===============================
 
