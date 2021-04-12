@@ -10,8 +10,8 @@ COPY location_secured_ui.conf /etc/nginx/kheops/04_location_secured_ui.conf
 
 COPY env_var_script.sh /docker-entrypoint.d/30-env_var_script.sh
 COPY letsencrypt/root_url_script.sh /docker-entrypoint.d/89-root_url_script.sh
-COPY add_crontab.sh /docker-entrypoint.d/72-add_crontab.sh
 
+COPY add_crontab.sh /docker-entrypoint.d/72-add_crontab.sh
 COPY logcrontab.sh /logcrontab.sh
 COPY nginxday /etc/logrotate.d/nginxday
 COPY nginxsize /etc/logrotate.d/nginxsize
