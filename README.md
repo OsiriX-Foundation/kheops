@@ -2,9 +2,13 @@
 
 ## Docker environment variables
 
+#### `KHEOPS_ROOT_OIDC`
+
+The root URL of the OIDC/OAuth2 provider. Use the following example to avoid any problem. `https://keycloak.kheops.online`
+
 #### `KHEOPS_OIDC_PROVIDER`
 
-The URL of the OIDC/OAuth2 provider.
+The full URL of the OIDC/OAuth2 provider.
 
 #### `KHEOPS_UI_CLIENTID`
 
@@ -49,6 +53,12 @@ The API pathname. Start with `/` to avoid any problems.
 #### `KHEOPS_API_URL`
 
 The URL API. Use the following example to avoid any problem. `https://demo.kheops.online/api`
+
+The API can be defined in an other domain. To not violates the Content Security Policy, the following variable must be set.
+
+#### `KHEOPS_ROOT_API_URL`
+
+API root URL. Use the following example to avoid any problem. `https://demo.kheops.online` (optional)
 
 ## Project setup
 ```
