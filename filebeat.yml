@@ -125,6 +125,11 @@ filebeat.inputs:
     multiline.negate: true
     multiline.match: after
 
+
+#============================= Filebeat registry ==============================
+
+filebeat.registry.path: /registry
+
 #============================= Filebeat modules ===============================
 
 filebeat.config.modules:
