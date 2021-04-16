@@ -1,6 +1,11 @@
 name: Docker Image CI
 
-on: [push]
+on: 
+  push:
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   build:
