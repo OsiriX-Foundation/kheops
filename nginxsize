@@ -1,6 +1,6 @@
 /var/log/nginx/*.log {
     rotate 7
-    size 10M
+    size 100M
     missingok
     notifempty
     create 644 root root
