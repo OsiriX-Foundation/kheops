@@ -1,10 +1,4 @@
 <Context>
-    <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
-               override="false"/>
-    <Parameter name="online.kheops.auth_server.uri" value="${kheops_auth_url}"
-               override="false"/>
-    <Parameter name="online.kheops.client.zipperclientid" value="${kheops_client_zipperclientid}"
-               override="false"/>
-    <Parameter name="online.kheops.client.zippersecret" value="${kheops_client_zippersecret}"
+    <Parameter name="online.kheops.dicomwebproxy.uri" value="${kheops_dicomwebproxy_url}"
                override="false"/>
 </Context>

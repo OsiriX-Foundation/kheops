@@ -15,23 +15,8 @@
     </servlet>
 
     <context-param>
-        <description>Base URI for the pacs</description>
-        <param-name>online.kheops.pacs.uri</param-name>
-        <param-value>https://itmi.kheops.online/dicomweb</param-value>
-    </context-param>
-    <context-param>
-        <description>Base URI for the authentication server</description>
-        <param-name>online.kheops.auth_server.uri</param-name>
-        <param-value>https://itmi.kheops.online/authorization</param-value>
-    </context-param>
-    <context-param>
-        <description>Username the zipper uses when connecting to the token endpoint</description>
-        <param-name>online.kheops.client.zipperclientid</param-name>
-        <param-value>zipper</param-value>
-    </context-param>
-    <context-param>
-        <description>Password the zipper uses when connecting to the token endpoint</description>
-        <param-name>online.kheops.client.zippersecret</param-name>
-        <param-value>zipperclientpassword</param-value>
+        <description>Base URI for the dicomwebproxy server</description>
+        <param-name>online.kheops.dicomwebproxy.uri</param-name>
+        <param-value>https://google.kheops.online</param-value>
     </context-param>
 </web-app>
