@@ -3,8 +3,8 @@ name: FilebeatSidecar Docker Image CI
 on:
   push:
     paths:
-      - 'FilebeatSidecar/**'
-      - '.github/workflows/FilebeatSidecar_docker_build_push.yml'
+    - 'FilebeatSidecar/**'
+    - '.github/workflows/FilebeatSidecar_docker_build_push.yml'
 
 jobs:
   build:
