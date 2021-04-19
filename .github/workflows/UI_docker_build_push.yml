@@ -3,7 +3,8 @@ name: Docker Image CI
 on:
   push:
     paths:
-      - 'kheopsUI'
+      - 'UI'
+      - '.github/workflows/UI_docker_build_push.yml'
 
 jobs:
   build:
@@ -35,8 +36,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
-          context: kheopsUI
-          file: kheopsUI/Dockerfile
+          context: UI
+          file: UI/Dockerfile
           platforms: linux/amd64
           push: true
           tags: osirixfoundation/kheops-ui:${{ env.docker_tag }}        
