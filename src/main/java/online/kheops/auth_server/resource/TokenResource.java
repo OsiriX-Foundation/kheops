@@ -77,6 +77,7 @@ public class TokenResource
 
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
+                    .provenance(result.getTokenProvenance())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(grantType.getLogActionType())
                     .link(false);
@@ -146,6 +147,7 @@ public class TokenResource
             }
 
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
+                    .provenance(accessToken)
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .link(false);
@@ -163,6 +165,7 @@ public class TokenResource
                 accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) {
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
+                    .provenance(accessToken)
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .link(false);

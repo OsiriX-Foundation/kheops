@@ -55,19 +55,12 @@ check_secrets "/run/secrets/kheops_authdb_pass" \
               "/run/secrets/kheops_client_dicomwebproxysecret" \
               "/run/secrets/kheops_client_zippersecret"
 
-kheops_welcomebot_webhook=""
 if [ -z "$KHEOPS_WELCOMEBOT_WEBHOOK" ]; then
     echo "No KHEOPS_WELCOMEBOT_WEBHOOK environment variable, welcomebot is disabled"
-else
-    kheops_welcomebot_webhook=$KHEOPS_WELCOMEBOT_WEBHOOK
 fi
 
-use_scope=true
-if [ -z "$KHEOPS_USE_KHEOPS_SCOPE" ]; then
-    echo "KHEOPS_USE_KHEOPS_SCOPE not set, default value is 'true'"
-
-else
-    use_scope=false
+if [ -z "$KHEOPS_OAUTH_SCOPE" ]; then
+    echo "$KHEOPS_OAUTH_SCOPE not set, not requiring any scopes on access_tokens"
 fi
 
 #get secrets and verify content
@@ -102,7 +95,7 @@ sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_use_kheops_scope}|$use_scope|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_oauth_scope}|$KHEOPS_OAUTH_SCOPE|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_welcomebot_webhook}|$KHEOPS_WELCOMEBOT_WEBHOOK|" ${REPLACE_FILE_PATH}
 
 export UMASK=022
