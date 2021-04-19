@@ -26,7 +26,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v2.2.1
         with:
-          context: Authorization
+          context: /Authorization
           file: Authorization/sonarqube.Dockerfile
           platforms: linux/amd64
           push: false
