@@ -3,8 +3,8 @@ name: Docker Image CI
 on:
   push:
     paths:
-      - 'UI/**'
-      - '.github/workflows/UI_docker_build_push.yml'
+      - 'DICOMWebProxy/**'
+      - '.github/workflows/DICOMWebProxy_docker_build_push.yml'
 
 jobs:
   build:
@@ -26,19 +26,18 @@ jobs:
       - name: Extract branch name
         if: startsWith(github.ref , 'refs/heads/')
         shell: bash
-        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV 
-             
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        
       - name: Extract tag name
         if: startsWith(github.ref , 'refs/tags/')
         shell: bash
-        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV        
         
       - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
-          context: UI
-          file: UI/Dockerfile
+          context: DICOMWebProxy
+          file: DICOMWebProxy/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: osirixfoundation/kheops-ui:${{ env.docker_tag }}        
-
+          tags: osirixfoundation/kheops-dicomweb-proxy:${{ env.docker_tag }}   

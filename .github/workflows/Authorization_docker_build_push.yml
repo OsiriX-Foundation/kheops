@@ -1,0 +1,36 @@
+name: Docker Image CI
+
+on:
+  push:
+    paths:
+      - 'Authorization/**'
+      - '.github/workflows/Authorization_sonar.yml'
+
+
+jobs:
+  
+  sonar:
+    if: startsWith(github.ref , 'refs/heads/')
+    runs-on: ubuntu-latest
+    steps:
+    
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+        
+      - name: Build
+        uses: docker/build-push-action@v2.2.1
+        with:
+          context: Authorization
+          file: Authorization/sonarqube.Dockerfile
+          platforms: linux/amd64
+          push: false
+          tags: sonarqube
+          
+      - name: Docker run
+        run: docker run --rm sonarqube gradle sonarqube -Dsonar.organization=osirix-foundation -Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }} -Dsonar.projectKey=KheopsAuthorization -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-daemon
