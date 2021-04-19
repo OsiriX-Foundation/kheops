@@ -3,8 +3,8 @@ name: DICOMWebProxy Docker Image CI
 on:
   push:
     paths:
-      - 'DICOMWebProxy/**'
-      - '.github/workflows/DICOMWebProxy_docker_build_push.yml'
+    - 'DICOMWebProxy/**'
+    - '.github/workflows/DICOMWebProxy_docker_build_push.yml'
 
 jobs:
   build:

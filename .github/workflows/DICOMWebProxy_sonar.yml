@@ -3,8 +3,8 @@ name: DICOMWebProxy Sonar
 on:
   push:
     paths:
-      - 'DICOMWebProxy/**'
-      - '.github/workflows/DICOMWebProxy_sonar.yml'
+    - 'DICOMWebProxy/**'
+    - '.github/workflows/DICOMWebProxy_sonar.yml'
 
 jobs:
         
