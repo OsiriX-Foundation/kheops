@@ -1,0 +1,28 @@
+<Context>
+    <Parameter name="online.kheops.auth.hmacsecret" value="${kheops_auth_hmasecret}"
+               override="false"/>
+    <Parameter name="online.kheops.pacs.uri" value="${kheops_pacs_url}"
+               override="false"/>
+    <Parameter name="online.kheops.jdbc.url" value="jdbc:${kheops_postgresql_url}"
+               override="false"/>
+    <Parameter name="online.kheops.jdbc.user" value="${kheops_postgresql_user}"
+               override="false"/>
+    <Parameter name="online.kheops.jdbc.password" value="${kheops_authdb_pass}"
+               override="false"/>
+    <Parameter name="online.kheops.oidc.provider" value="${kheops_oidc_provider}"
+               override="false"/>
+    <Parameter name="online.kheops.root.uri" value="${kheops_root_url}"
+               override="false"/>
+    <Parameter name="online.kheops.client.dicomwebproxyclientid" value="${kheops_client_dicomwebproxyclientid}"
+               override="false"/>
+    <Parameter name="online.kheops.client.dicomwebproxysecret" value="${kheops_client_dicomwebproxysecret}"
+               override="false"/>
+    <Parameter name="online.kheops.client.zipperclientid" value="${kheops_client_zipperclientid}"
+               override="false"/>
+    <Parameter name="online.kheops.client.zippersecret" value="${kheops_client_zippersecret}"
+               override="false"/>
+    <Parameter name="online.kheops.oauth.scope" value="${kheops_oauth_scope}"
+               override="false"/>
+    <Parameter name="online.kheops.welcomebot.webhook" value="${kheops_welcomebot_webhook}"
+               override="false"/>
+</Context>

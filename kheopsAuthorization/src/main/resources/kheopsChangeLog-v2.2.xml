@@ -1,0 +1,87 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:appdba="http://www.datical.net/xml/ns/appdba" xmlns:datical="http://www.datical.net/xml/ns/datical" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+
+    <changeSet author="kheops" id="v2.2-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="webhook_triggers" columnName="user_fk"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="webhook_triggers">
+            <column name="user_fk" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.2-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_triggers_user_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="user_fk" baseTableName="webhook_triggers" constraintName="webhook_triggers_user_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="users" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.2-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="webhook_trigger_series" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createTable tableName="webhook_trigger_series">
+            <column autoIncrement="true" name="pk" type="BIGINT">
+                <constraints primaryKey="true" primaryKeyName="webhook_trigger_series_pk"/>
+            </column>
+            <column name="webhook_trigger_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="series_fk" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.2-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">select count (*) from INFORMATION_SCHEMA.TABLE_CONSTRAINTS where CONSTRAINT_NAME='webhook_trigger_series_unique'</sqlCheck>
+        </preConditions>
+        <addUniqueConstraint columnNames="webhook_trigger_fk, series_fk" constraintName="webhook_trigger_series_unique" tableName="webhook_trigger_series"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.2-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_trigger_series_webhook_trigger_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="webhook_trigger_fk" baseTableName="webhook_trigger_series" constraintName="webhook_trigger_series_webhook_trigger_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="webhook_triggers" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.2-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="webhook_trigger_series_series_fk_fkey" schemaName="public"/>
+            </not>
+        </preConditions>
+        <addForeignKeyConstraint baseColumnNames="series_fk" baseTableName="webhook_trigger_series" constraintName="webhook_trigger_series_series_fk_fkey" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="NO ACTION" referencedColumnNames="pk" referencedTableName="series" validate="true"/>
+    </changeSet>
+
+    <changeSet author="kheops" id="v2.2-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="webhook_trigger_series_webhook_trigger_fk_index" schemaName="public"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="webhook_trigger_series_webhook_trigger_fk_index" tableName="webhook_trigger_series">
+            <column name="webhook_trigger_fk"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet author="kheops" id="v2.2-8">
+       <tagDatabase tag="v2.2"/>
+    </changeSet>
+
+</databaseChangeLog>

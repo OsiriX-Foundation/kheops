@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+		 http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+    <servlet>
+        <display-name>Kheops Authentication</display-name>
+        <!--suppress ServletWithoutMappingInspection -->
+        <servlet-name>online.kheops.auth_server.AuthApplication</servlet-name>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>online.kheops.auth_server.AuthApplication</param-value>
+        </init-param>
+    </servlet>
+
+
+    <listener>
+        <listener-class>online.kheops.auth_server.OIDCProviderContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>online.kheops.auth_server.EntityManagerListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>online.kheops.auth_server.liquibase.LiquibaseContextListener</listener-class>
+    </listener>
+
+
+    <context-param>
+        <description>HMAC shared secret used to sign tokens</description>
+        <param-name>online.kheops.auth.hmacsecret</param-name>
+        <param-value>P47dnfP28ptS/uzuuvEACmPYdMiOtFNLXiWTIwNNPgUjrvTgF/JCh3qZi47sIcpeZaUXw132mfmR4q5K/fwepA==</param-value>
+    </context-param>
+    <context-param>
+        <description>Root url of the Kheops service</description>
+        <param-name>online.kheops.root.uri</param-name>
+        <param-value>http://localhost:8042</param-value>
+    </context-param>
+    <context-param>
+        <description>Base URI for the pacs from which study and series metadata can be acquired</description>
+        <param-name>online.kheops.pacs.uri</param-name>
+        <param-value>http://localhost:8080/dcm4chee-arc/aets/DCM4CHEE/rs</param-value>
+    </context-param>
+    <context-param>
+        <description>URL for the connection to the PostgreSQL database</description>
+        <param-name>online.kheops.jdbc.url</param-name>
+        <param-value>jdbc:postgresql://172.17.43.167/kheops</param-value>
+    </context-param>
+    <context-param>
+        <description>User name for the PostgreSQL databse</description>
+        <param-name>online.kheops.jdbc.user</param-name>
+        <param-value>kheopsuser</param-value>
+    </context-param>
+    <context-param>
+        <description>Password for the PostgreSQL databse</description>
+        <param-name>online.kheops.jdbc.password</param-name>
+        <param-value>mypwd</param-value>
+    </context-param>
+    <context-param>
+        <description>Username the dicomewebproxy uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.dicomwebproxyclientid</param-name>
+        <param-value>DICOMWebProxy</param-value>
+    </context-param>
+    <context-param>
+        <description>Password the dicomewebproxy uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.dicomwebproxysecret</param-name>
+        <param-value>dicomwebproxyclientpassword</param-value>
+    </context-param>
+    <context-param>
+        <description>Username the zipper uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.zipperclientid</param-name>
+        <param-value>Zipper</param-value>
+    </context-param>
+    <context-param>
+        <description>Password the zipper uses when connecting to the token endpoint</description>
+        <param-name>online.kheops.client.zippersecret</param-name>
+        <param-value>zipperclientpassword</param-value>
+    </context-param>
+    <context-param>
+        <description>Uri for the OIDC provider</description>
+        <param-name>online.kheops.oidc.provider</param-name>
+        <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
+    </context-param>
+    <context-param>
+        <description>Define the scope that must be present in the access_token</description>
+        <param-name>online.kheops.oauth.scope</param-name>
+        <param-value>kheops</param-value>
+    </context-param>
+    <context-param>
+        <description>Use a welcome bot at the fisrt user registration. Default null or the webhook url if required</description>
+        <param-name>online.kheops.welcomebot.webhook</param-name>
+        <param-value></param-value>
+    </context-param>
+
+</web-app>
