@@ -3,8 +3,8 @@ name: Authorization Docker Image CI
 on:
   push:
     paths:
-      - 'Authorization/**'
-      - '.github/workflows/Authorization_docker_build_push.yml'
+    - 'Authorization/**'
+    - '.github/workflows/Authorization_docker_build_push.yml'
 
 
 jobs:

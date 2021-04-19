@@ -3,8 +3,8 @@ name: Authorization Sonar
 on:
   push:
     paths:
-      - 'Authorization/**'
-      - '.github/workflows/Authorization_sonar.yml'
+    - 'Authorization/**'
+    - '.github/workflows/Authorization_sonar.yml'
 
 
 jobs:
