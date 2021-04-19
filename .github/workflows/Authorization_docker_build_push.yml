@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'Authorization/**'
-      - '.github/workflows/Authorization_sonar.yml'
+      - '.github/workflows/Authorization_docker_build_push.yml'
 
 
 jobs:
