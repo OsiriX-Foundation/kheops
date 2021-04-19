@@ -7,17 +7,19 @@ import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings("unused")
 
 @NamedQueries({
         @NamedQuery(name = "ReportProvider.findByClientId",
-                query = "SELECT dsr FROM ReportProvider dsr WHERE :clientId = dsr.clientId AND dsr.removed = false"),
+                query = "SELECT dsr FROM ReportProvider dsr WHERE :"+CLIENT_ID+" = dsr.clientId AND dsr.removed = false"),
         @NamedQuery(name = "ReportProvider.findByClientIdAndAlbumId",
-                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :clientId = dsr.clientId AND :albumId = a.id"),
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :"+CLIENT_ID+" = dsr.clientId AND :"+ALBUM_ID+" = a.id"),
         @NamedQuery(name = "ReportProvider.findAllByAlbumId",
-                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
         @NamedQuery(name = "ReportProvider.countAllByAlbumId",
-                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false")
+                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false")
 })
 
 @Entity

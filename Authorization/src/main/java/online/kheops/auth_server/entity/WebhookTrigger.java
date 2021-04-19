@@ -6,11 +6,13 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.WEBHOOK_TRIGGER_ID;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 
 @NamedQueries({
         @NamedQuery(name = "WebhookTrigger.findById",
-                query = "SELECT w FROM WebhookTrigger w WHERE :webhookTriggerId = w.id")
+                query = "SELECT w FROM WebhookTrigger w WHERE :"+WEBHOOK_TRIGGER_ID+" = w.id")
 })
 
 @Entity

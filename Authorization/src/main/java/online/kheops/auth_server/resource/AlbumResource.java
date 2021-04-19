@@ -88,14 +88,7 @@ public class AlbumResource {
         if (addSeries != null) { usersPermission.setAddSeries(addSeries); }
         if (writeComments != null) { usersPermission.setWriteComments(writeComments); }
 
-        final AlbumResponse albumResponse;
-
-        try {
-            albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        final AlbumResponse albumResponse = Albums.createAlbum(kheopsPrincipal.getUser(), name, description, usersPermission);
         kheopsPrincipal.getKheopsLogBuilder()
                 .album(albumResponse.getId())
                 .action(ActionType.NEW_ALBUM)
@@ -115,13 +108,8 @@ public class AlbumResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final PairListXTotalCount<AlbumResponse> pairAlbumsTotalAlbum;
 
-        try {
-            final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
-            pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        final AlbumQueryParams albumQueryParams = new AlbumQueryParams(kheopsPrincipal, uriInfo.getQueryParameters());
+        pairAlbumsTotalAlbum = Albums.getAlbumList(albumQueryParams);
 
         final GenericEntity<List<AlbumResponse>> genericAlbumResponsesList = new GenericEntity<List<AlbumResponse>>(pairAlbumsTotalAlbum.getAttributesList()) {};
         kheopsPrincipal.getKheopsLogBuilder()
@@ -153,12 +141,7 @@ public class AlbumResource {
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        try {
-            albumResponse = Albums.getAlbum(kheopsPrincipal.getUser(), albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        albumResponse = Albums.getAlbum(kheopsPrincipal.getUser(), albumId, kheopsPrincipal.hasUserAccess(), includeUsers);
 
         final KheopsLogBuilder kheopsLog = kheopsPrincipal.getKheopsLogBuilder();
         if (includeUsers) {
@@ -238,9 +221,6 @@ public class AlbumResource {
             albumResponse = Albums.editAlbum(kheopsPrincipal.getUser(), albumId, name, description, usersPermission, notificationNewComment, notificationNewSeries);
         } catch (UserNotMemberException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
-        } catch (JOOQException e) {
-            LOG.log(Level.WARNING, e.getMessage(), e);
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
         }
 
         kheopsPrincipal.getKheopsLogBuilder()
@@ -367,7 +347,7 @@ public class AlbumResource {
         try {
             targetUser = Albums.removeAdmin(kheopsPrincipal.getUser(), user, albumId);
         } catch (UserNotMemberException e) {
-            LOG.log(Level.INFO, "Remove an admin userName:"+user+" from the album id:" +albumId+  " by user :"+kheopsPrincipal.getName()+ " FAILED", e);
+            LOG.log(Level.INFO, String.format("Remove an admin userName:%s from the album id:%s by user :%s FAILED", user, albumId, kheopsPrincipal.getName()), e);
             return Response.status(NOT_FOUND).entity(e.getMessage()).build();
         }
 

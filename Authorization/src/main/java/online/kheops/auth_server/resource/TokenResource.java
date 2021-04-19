@@ -20,6 +20,7 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -136,7 +137,7 @@ public class TokenResource
                 LOG.log(WARNING, "Unable to get the Report Provider's redirect_uri", e);
                 return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
             } catch (NoResultException e) {
-                LOG.log(WARNING, "ClientId: "+ clientId + " Not Found", e);
+                LOG.log(WARNING, String.format("ClientId: %s Not Found", clientId), e);
                 return Response.status(OK).entity(IntrospectResponse.getInactiveResponseJson()).build();
             } finally {
                 if (tx.isActive()) {
@@ -172,14 +173,15 @@ public class TokenResource
             if (accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN) {
                 final Capability capability;
                 try {
-                    if(accessToken.getCapabilityTokenId().isPresent()) {
-                        capability = getCapabilityWithID(accessToken.getCapabilityTokenId().get());
+                    final Optional<String> capabilityTokenId = accessToken.getCapabilityTokenId();
+                    if(capabilityTokenId.isPresent()) {
+                        capability = getCapabilityWithID(capabilityTokenId.get());
                     } else {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                                 .message("Not Found")
                                 .detail("Capability token not found")
                                 .build();
-                        throw new CapabilityNotFoundException(errorResponse);
+                        return Response.status(BAD_REQUEST).entity(errorResponse).build();
                     }
                 } catch (CapabilityNotFoundException e) {
                     return Response.status(BAD_REQUEST).entity(e.getErrorResponse()).build();

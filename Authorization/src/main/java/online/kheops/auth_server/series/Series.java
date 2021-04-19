@@ -14,12 +14,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.PersistenceException;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.AlbumsSeries.getAlbumSeries;
 import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.Studies.getOrCreateStudy;
 
 public class Series {
+
+    private static final Logger LOG = Logger.getLogger(Series.class.getName());
 
     private Series() {
         throw new IllegalStateException("Utility class");
@@ -60,13 +65,13 @@ public class Series {
                 localEm.persist(series);
                 tx.commit();
                 series = em.merge(series);
-            } catch (PersistenceException ignored2) {
-                ignored2.printStackTrace();
+            } catch (PersistenceException e) {
+                LOG.log(Level.INFO,"", e);
                 try {
                     tx.rollback();
                     series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-                } catch (SeriesNotFoundException e) {
-                    throw new RuntimeException(e);
+                } catch (SeriesNotFoundException e2) {
+                    throw new RuntimeException(e2);
                 }
             } finally {
                 if (tx.isActive()) {

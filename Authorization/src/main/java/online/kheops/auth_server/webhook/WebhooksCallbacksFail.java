@@ -15,9 +15,9 @@ public class WebhooksCallbacksFail {
     private static final Logger LOG = Logger.getLogger(WebhooksCallbacksFail.class.getName());
 
 
-    public WebhooksCallbacksFail(Throwable throwable, WebhookTrigger webhookTrigger, int cnt, WebhookAsyncRequest asyncRequest) {
+    protected WebhooksCallbacksFail(Throwable throwable, WebhookTrigger webhookTrigger, int cnt, WebhookAsyncRequest asyncRequest) {
         cnt--;
-        LOG.log(Level.WARNING, "FAIL WEBHOOK url :"+ asyncRequest.getWebhook().getUrl(), throwable);
+        LOG.log(Level.WARNING, String.format("FAIL WEBHOOK url :%s", asyncRequest.getWebhook().getUrl()), throwable);
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 

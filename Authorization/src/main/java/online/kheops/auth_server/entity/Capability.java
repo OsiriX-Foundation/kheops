@@ -12,34 +12,35 @@ import java.util.Set;
 
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 @SuppressWarnings("unused")
 
 @NamedQueries({
         @NamedQuery(name = "Capability.findBySecret",
-        query = "SELECT c FROM Capability c WHERE c.secret = :secret"),
+        query = "SELECT c FROM Capability c WHERE c.secret = :"+SECRET),
         @NamedQuery(name = "Capability.findByIdAndUser",
-        query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id"),
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:"+USER+" = au.user AND au.admin = true) OR (:"+USER+" = c.user)) AND :"+CAPABILITY_ID+" = c.id"),
         @NamedQuery(name = "Capability.findByIdAndAlbumId",
-        query = "SELECT c FROM Capability c LEFT JOIN c.album a WHERE a.id = :albumId AND :capabilityId = c.id"),
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a WHERE a.id = :"+ALBUM_ID+" AND :"+CAPABILITY_ID+" = c.id"),
         @NamedQuery(name = "Capability.findById",
-        query = "SELECT c FROM Capability c WHERE :capabilityId = c.id"),
+        query = "SELECT c FROM Capability c WHERE :"+CAPABILITY_ID+" = c.id"),
         @NamedQuery(name = "Capability.findAllByUser",
-        query = "SELECT c FROM Capability c WHERE :user = c.user ORDER BY c.issuedAtTime desc"),
+        query = "SELECT c FROM Capability c WHERE :"+USER+" = c.user ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.findAllValidByUser",
-        query = "SELECT c FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow  ORDER BY c.issuedAtTime desc"),
+        query = "SELECT c FROM Capability c WHERE :"+USER+" = c.user AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+"  ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.findAllByAlbum",
-        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id order by c.issuedAtTime desc"),
+        query = "SELECT c FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id order by c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.findAllValidByAlbum",
-        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow ORDER BY c.issuedAtTime desc"),
+        query = "SELECT c FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+" ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.countAllByUser",
-        query = "SELECT count(c) FROM Capability c WHERE :user = c.user"),
+        query = "SELECT count(c) FROM Capability c WHERE :"+USER+" = c.user"),
         @NamedQuery(name = "Capability.countAllValidByUser",
-        query = "SELECT count(c) FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow"),
+        query = "SELECT count(c) FROM Capability c WHERE :"+USER+" = c.user AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+""),
         @NamedQuery(name = "Capability.countAllByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id"),
+        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id"),
         @NamedQuery(name = "Capability.countAllValidByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow")
+        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+"")
 })
 
 @Entity

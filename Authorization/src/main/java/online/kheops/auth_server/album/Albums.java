@@ -31,8 +31,7 @@ public class Albums {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
-            throws JOOQException {
+    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -52,19 +51,18 @@ public class Albums {
             em.persist(newAlbumMutation);
 
             tx.commit();
-
+            return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
     }
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
-            throws AlbumNotFoundException, AlbumForbiddenException, JOOQException, UserNotMemberException {
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -112,20 +110,19 @@ public class Albums {
             }
 
             tx.commit();
-
+            return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
     }
 
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
-            throws JOOQException, BadQueryParametersException {
+            throws BadQueryParametersException {
 
-        return findAlbumsByUserPk(albumQueryParams);
+        return findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
     }
 
     public static void deleteAlbum(ServletContext context, User callingUser, String albumId)
@@ -195,16 +192,21 @@ public class Albums {
     }
 
     public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
-           throws JOOQException, AlbumNotFoundException {
-        AlbumResponse albumResponse;
-        if (withUserAccess) {
-            albumResponse = findAlbumByUserAndAlbumId(albumId, user);
-            if(withUsersList) {
-                albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
+           throws AlbumNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            AlbumResponse albumResponse;
+            if (withUserAccess) {
+                albumResponse = findAlbumByUserAndAlbumId(albumId, user, em);
+                if (withUsersList) {
+                    albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
+                }
+                return albumResponse;
+            } else {
+                return findAlbumByAlbumId(albumId, em);
             }
-            return albumResponse;
-        } else {
-            return findAlbumByAlbumId(albumId);
+        } finally {
+            em.close();
         }
     }
 
@@ -433,6 +435,16 @@ public class Albums {
             throws AlbumNotFoundException {
 
         return findAlbumById(albumId, em);
+    }
+
+    public static Album getAlbum(long albumPk, EntityManager em)
+            throws AlbumNotFoundException {
+        final Album album = em.find(Album.class, albumPk);
+        if (album != null) {
+            return album;
+        } else {
+            throw new AlbumNotFoundException();
+        }
     }
 
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)

@@ -5,20 +5,22 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 
 @SuppressWarnings("unused")
 
 @NamedQueries({
         @NamedQuery(name = "User.findById",
-                query = "SELECT u FROM User u WHERE u.sub = :userId"),
+                query = "SELECT u FROM User u WHERE u.sub = :"+USER_ID),
         @NamedQuery(name = "User.findByEmail",
-                query = "SELECT u FROM User u WHERE u.email = :email"),
+                query = "SELECT u FROM User u WHERE u.email = :"+USER_EMAIL),
         @NamedQuery(name = "User.searchByEmailOrNameInAlbumId",
-                query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a WHERE a.id = :albumId AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
+                query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a WHERE a.id = :"+ALBUM_ID+" AND (LOWER(u.email) LIKE LOWER(:"+SEARCH_EMAIL+") OR LOWER(u.name) LIKE LOWER(:"+SEARCH_NAME+"))"),
         @NamedQuery(name = "User.searchByEmailWithStudyAccess",
-                query = "SELECT DISTINCT u FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries als JOIN als.series se JOIN se.study st WHERE st.studyInstanceUID = :studyUID AND (LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname))"),
+                query = "SELECT DISTINCT u FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries als JOIN als.series se JOIN se.study st WHERE st.studyInstanceUID = :"+STUDY_UID+" AND (LOWER(u.email) LIKE LOWER(:"+SEARCH_EMAIL+") OR LOWER(u.name) LIKE LOWER(:"+SEARCH_NAME+"))"),
         @NamedQuery(name = "User.searchByEmailOrName",
-                query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:searchmail) OR LOWER(u.name) LIKE LOWER(:searchname)")
+                query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:"+SEARCH_EMAIL+") OR LOWER(u.name) LIKE LOWER(:"+SEARCH_NAME+")")
 })
 
 @Entity

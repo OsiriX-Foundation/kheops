@@ -42,10 +42,6 @@ dependencies {
 
     api group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.7.2'
 
-    api group: 'org.jooq', name: 'jooq', version: '3.13.6'
-    api group: 'org.jooq', name: 'jooq-meta', version: '3.13.6'
-    api group: 'org.jooq', name: 'jooq-codegen', version: '3.13.6'
-
     api group: 'org.ehcache', name: 'ehcache', version: '3.6.3'
 
     api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.6') {

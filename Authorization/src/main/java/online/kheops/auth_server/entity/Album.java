@@ -9,13 +9,26 @@ import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 
 @NamedQueries({
         @NamedQuery(name = "Albums.findById",
-        query = "SELECT a FROM Album a WHERE :albumId = a.id"),
+        query = "SELECT a FROM Album a WHERE :"+ALBUM_ID+" = a.id"),
         @NamedQuery(name = "Albums.findWithEnabledNewSeriesWebhooks",
-        query = "SELECT distinct a FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st JOIN a.webhooks w WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :studyInstanceUID"),
+        query = "SELECT distinct a FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st JOIN a.webhooks w " +
+                "WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :"+STUDY_UID),
+        @NamedQuery(name = "Albums.getInboxInfoByUserPk",
+        query = "SELECT NEW online.kheops.auth_server.inbox.InboxInfoResponse(COUNT(DISTINCT st.pk), " +
+                "COUNT(DISTINCT s.pk), SUM(s.numberOfSeriesRelatedInstances), FUNCTION('array_agg', s.modality) ) " +
+                "FROM User u JOIN u.inbox i LEFT OUTER JOIN i.albumSeries alS LEFT OUTER JOIN alS.series s LEFT OUTER JOIN s.study st " +
+                "WHERE u.pk = :"+USER_PK+" AND s.populated = true AND st.populated = true"),
+        @NamedQuery(name = "Albums.getAlbumInfoByAlbumId",
+                query = "SELECT NEW online.kheops.auth_server.album.AlbumResponseBuilder(a, COUNT(DISTINCT st.pk), COUNT(DISTINCT s.pk), " +
+                        "COALESCE(SUM(s.numberOfSeriesRelatedInstances),0), FUNCTION('array_agg', s.modality) ) " +
+                        "FROM Album a LEFT OUTER JOIN a.albumSeries alS LEFT OUTER JOIN alS.series s ON s.populated = true LEFT OUTER JOIN s.study st ON st.populated = true " +
+                        "WHERE a.id = :"+ALBUM_ID+" GROUP BY a"),
 
 })
 
@@ -120,8 +133,8 @@ public class Album {
     public boolean containsSeries(Series series, EntityManager em) {
         try {
             em.createNamedQuery("AlbumSeries.findByAlbumAndSeries", AlbumSeries.class)
-                    .setParameter("series", series)
-                    .setParameter("album", this)
+                    .setParameter(SERIES, series)
+                    .setParameter(ALBUM, this)
                     .getSingleResult();
         } catch (NoResultException e) {
             return false;
@@ -132,9 +145,9 @@ public class Album {
     public void addSeries(AlbumSeries albumSeries) { this.albumSeries.add(albumSeries); }
 
     public void removeSeries(Series series, EntityManager em) {
-        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
-                .setParameter("series", series)
-                .setParameter("album", this)
+        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album", AlbumSeries.class)
+                .setParameter(SERIES, series)
+                .setParameter(ALBUM, this)
                 .getSingleResult();
         series.removeAlbumSeries(localAlbumSeries);
         this.albumSeries.remove(localAlbumSeries);

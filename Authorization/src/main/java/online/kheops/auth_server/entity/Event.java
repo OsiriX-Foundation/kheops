@@ -6,11 +6,13 @@ import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @NamedQueries({
         @NamedQuery(name = "Event.findAllByAlbum",
-        query = "SELECT e FROM Event e WHERE :album = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :user OR e.user = :user) ORDER BY e.eventTime desc"),
+        query = "SELECT e FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+") ORDER BY e.eventTime desc"),
         @NamedQuery(name = "Event.countAllByAlbumAndUser",
-        query = "SELECT count(e) FROM Event e WHERE :album = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :user OR e.user = :user)")
+        query = "SELECT count(e) FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+")")
 })
 
 @Entity

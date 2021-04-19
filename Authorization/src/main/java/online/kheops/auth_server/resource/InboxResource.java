@@ -1,6 +1,5 @@
 package online.kheops.auth_server.resource;
 
-import online.kheops.auth_server.album.JOOQException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.inbox.Inbox;
 import online.kheops.auth_server.inbox.InboxInfoResponse;
@@ -31,11 +30,7 @@ public class InboxResource {
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final InboxInfoResponse inboxInfoResponse;
 
-        try {
-            inboxInfoResponse = Inbox.getInboxInfo(kheopsPrincipal.getUser(), kheopsPrincipal.getKheopsLogBuilder());
-        } catch (JOOQException e) {
-            return Response.status(INTERNAL_SERVER_ERROR).entity(e.getErrorResponse()).build();
-        }
+        inboxInfoResponse = Inbox.getInboxInfo(kheopsPrincipal.getUser(), kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(inboxInfoResponse).build();
     }
