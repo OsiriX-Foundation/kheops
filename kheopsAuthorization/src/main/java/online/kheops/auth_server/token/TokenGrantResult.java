@@ -5,6 +5,7 @@ import java.util.Optional;
 public class TokenGrantResult {
     private final TokenResponseEntity tokenResponseEntity;
     private final String subject;
+    private final TokenProvenance tokenProvenance;
 
     private final String scope;
     private final String studyInstanceUID;
@@ -13,14 +14,16 @@ public class TokenGrantResult {
     TokenGrantResult(TokenResponseEntity tokenResponseEntity, String subject) {
         this.tokenResponseEntity = tokenResponseEntity;
         this.subject = subject;
+        this.tokenProvenance = new TokenProvenance() {};
         this.scope = null;
         this.studyInstanceUID = null;
         this.seriesInstanceUID = null;
     }
 
-    TokenGrantResult(TokenResponseEntity tokenResponseEntity, String subject, String scope, String studyInstanceUID, String seriesInstanceUID) {
+    TokenGrantResult(TokenResponseEntity tokenResponseEntity, String subject, TokenProvenance tokenProvenance, String scope, String studyInstanceUID, String seriesInstanceUID) {
         this.tokenResponseEntity = tokenResponseEntity;
         this.subject = subject;
+        this.tokenProvenance = tokenProvenance;
         this.scope = scope;
         this.studyInstanceUID = studyInstanceUID;
         this.seriesInstanceUID = seriesInstanceUID;
@@ -44,5 +47,9 @@ public class TokenGrantResult {
 
     public Optional<String> getSeriesInstanceUID() {
         return Optional.ofNullable(seriesInstanceUID);
+    }
+
+    public TokenProvenance getTokenProvenance() {
+        return tokenProvenance;
     }
 }

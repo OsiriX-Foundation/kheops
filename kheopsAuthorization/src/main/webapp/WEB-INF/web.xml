@@ -83,9 +83,9 @@
         <param-value>https://keycloak.kheops.online/auth/realms/travis</param-value>
     </context-param>
     <context-param>
-        <description>Define if the scope 'kheops' must be present in the access_token</description>
-        <param-name>online.kheops.use.scope</param-name>
-        <param-value>true</param-value>
+        <description>Define the scope that must be present in the access_token</description>
+        <param-name>online.kheops.oauth.scope</param-name>
+        <param-value>kheops</param-value>
     </context-param>
     <context-param>
         <description>Use a welcome bot at the fisrt user registration. Default null or the webhook url if required</description>

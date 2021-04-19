@@ -57,7 +57,7 @@ class MetricsQueries {
     }
 
     static Long getNumberOfInstances(EntityManager em) {
-        return em.createQuery("SELECT SUM(s.numberOfSeriesRelatedInstances) FROM Series s", Long.class)
+        return em.createQuery("SELECT COALESCE(SUM(s.numberOfSeriesRelatedInstances), 0) FROM Series s", Long.class)
                 .getSingleResult();
     }
 
