@@ -1,4 +1,4 @@
-name: DICDICOMwebProxyOMWebProxy Docker Image CI
+name: DICOMwebProxy Docker Image CI
 
 on:
   push:
