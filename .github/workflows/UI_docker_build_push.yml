@@ -3,8 +3,8 @@ name: UI Docker Image CI
 on:
   push:
     paths:
-      - 'UI/**'
-      - '.github/workflows/UI_docker_build_push.yml'
+    - 'UI/**'
+    - '.github/workflows/UI_docker_build_push.yml'
 
 jobs:
   build:
