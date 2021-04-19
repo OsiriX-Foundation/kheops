@@ -14,11 +14,13 @@ name: "CodeQL"
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'kheopsUI'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]
-  schedule:
-    - cron: '41 0 * * 3'
+    paths:
+      - 'kheopsUI'
 
 jobs:
   analyze:
