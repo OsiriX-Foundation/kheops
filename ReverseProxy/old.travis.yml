@@ -1,0 +1,11 @@
+language: minimal
+
+notifications:
+  email: false
+
+script:
+   - docker build -t osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH .
+   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+after_success:
+   - docker push osirixfoundation/kheops-reverse-proxy:$TRAVIS_BRANCH

@@ -1,0 +1,4 @@
+<Context>
+    <Parameter name="online.kheops.dicomwebproxy.uri" value="${kheops_dicomwebproxy_url}"
+               override="false"/>
+</Context>

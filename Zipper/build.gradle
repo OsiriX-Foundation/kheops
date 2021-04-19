@@ -1,0 +1,53 @@
+plugins {
+    id "org.sonarqube" version "3.0"
+}
+
+apply plugin: 'java-library'
+apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
+apply plugin: 'war'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "https://www.dcm4che.org/maven2/"
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
+    options.deprecation = true
+}
+
+dependencies {
+    api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
+
+    api group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.31'
+    api group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.31'
+    api group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.31'
+    api group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.31'
+
+    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.6') {
+        exclude module: 'slf4j-log4j12'
+    }
+    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.22.6') {
+        exclude module: 'slf4j-log4j12'
+    }
+    compile (group: 'org.dcm4che', name: 'dcm4che-net', version: '5.22.6') {
+        exclude module: 'slf4j-log4j12'
+    }
+    compile (group: 'org.dcm4che', name: 'dcm4che-ws-rs', version: '5.22.6') {
+        exclude module: 'slf4j-log4j12'
+    }
+    compile (group: 'org.dcm4che', name: 'dcm4che-mime', version: '5.22.6') {
+        exclude module: 'slf4j-log4j12'
+    }
+
+    api group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
+}
+
+gretty {
+    httpPort = 7199
+    contextPath = ''
+    servletContainer = 'tomcat9'
+}
