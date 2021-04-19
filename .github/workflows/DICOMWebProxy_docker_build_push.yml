@@ -1,10 +1,10 @@
-name: DICOMWebProxy Docker Image CI
+name: DICDICOMwebProxyOMWebProxy Docker Image CI
 
 on:
   push:
     paths:
-    - 'DICOMWebProxy/**'
-    - '.github/workflows/DICOMWebProxy_docker_build_push.yml'
+    - 'DICOMwebProxy/**'
+    - '.github/workflows/DICOMwebProxy_docker_build_push.yml'
 
 jobs:
   build:
@@ -36,8 +36,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
-          context: ./DICOMWebProxy
-          file: DICOMWebProxy/Dockerfile
+          context: ./DICOMwebProxy
+          file: DICOMwebProxy/Dockerfile
           platforms: linux/amd64
           push: true
           tags: osirixfoundation/kheops-dicomweb-proxy:${{ env.docker_tag }}   
