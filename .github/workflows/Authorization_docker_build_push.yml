@@ -8,29 +8,37 @@ on:
 
 
 jobs:
-  
-  sonar:
-    if: startsWith(github.ref , 'refs/heads/')
+  build:
     runs-on: ubuntu-latest
     steps:
-    
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1.6.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
         
-      - name: Build
+      - name: Extract branch name
+        if: startsWith(github.ref , 'refs/heads/')
+        shell: bash
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+
+      - name: Extract branch tag
+        if: startsWith(github.ref , 'refs/tags/')
+        shell: bash
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+        
+      - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
           context: ./Authorization
-          file: Authorization/sonarqube.Dockerfile
+          file: Authorization/Dockerfile
           platforms: linux/amd64
-          push: false
-          tags: sonarqube
-          
-      - name: Docker run
-        run: docker run --rm sonarqube gradle sonarqube -Dsonar.organization=osirix-foundation -Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }} -Dsonar.projectKey=KheopsAuthorization -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-daemon
+          push: true
+          tags: osirixfoundation/kheops-authorization:${{ env.docker_tag }}
