@@ -1,0 +1,10 @@
+version: '3.1'
+services:
+  kheops-ui:
+    image: kheops-ui:latest
+    #image: osirixfoundation/kheops-ui:latest
+    container_name: kheops-ui
+    ports:
+      - "80:3000"
+    env_file: docker-compose.env
+    restart: on-failure

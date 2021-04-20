@@ -1,0 +1,33 @@
+########################## Metricbeat Configuration ###########################
+
+#============================  Config Reloading ===============================
+
+# Config reloading allows to dynamically load modules. Each file which is
+# monitored must contain one or multiple modules as a list.
+metricbeat.config.modules:
+
+  # Glob pattern for configuration reloading
+  path: ${path.config}/modules.d/*.yml
+
+  # Set to true to enable config reloading
+  reload.enabled: false
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+name: "kheops_metrics"
+
+
+# Optional fields that you can specify to add additional information to the
+# output.
+fields:
+  instance: ${instance}
+#================================ Outputs ======================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+#----------------------------- Logstash output ---------------------------------
+output.logstash:
+  # The Logstash hosts
+  hosts: ["${logstash_url}"]
