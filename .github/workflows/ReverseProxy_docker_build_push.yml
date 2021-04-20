@@ -2,8 +2,9 @@ name: ReverseProxy Docker Image CI
 
 on: 
   push:
-  - 'ReverseProxy/**'
-  - '.github/workflows/ReverseProxy_docker_build_push.yml'
+    paths:
+    - 'ReverseProxy/**'
+    - '.github/workflows/ReverseProxy_docker_build_push.yml'
 
 
 jobs:
