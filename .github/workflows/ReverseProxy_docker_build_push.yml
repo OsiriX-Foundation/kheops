@@ -1,6 +1,10 @@
-name: Docker Image CI
+name: ReverseProxy Docker Image CI
 
-on: [push, pull_request]
+on: 
+  push:
+  - 'ReverseProxy/**'
+  - '.github/workflows/ReverseProxy_docker_build_push.yml'
+
 
 jobs:
   build:
@@ -27,8 +31,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
-          context: .
-          file: Dockerfile
+          context: ./ReverseProxy
+          file: ReverseProxy/Dockerfile
           platforms: linux/amd64
           push: true
           tags: osirixfoundation/kheops-reverse-proxy:${{ steps.extract_branch.outputs.branch }}
