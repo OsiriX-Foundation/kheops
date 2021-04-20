@@ -101,4 +101,15 @@ public class ReportProvider {
     public boolean isRemoved() { return removed; }
 
     public void setAsRemoved() { this.removed = true; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ReportProvider reportProvider = (ReportProvider) o;
+        return clientId.equals(reportProvider.clientId);
+    }
+
+    @Override
+    public int hashCode() { return clientId.hashCode(); }
 }

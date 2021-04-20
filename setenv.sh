@@ -55,12 +55,10 @@ check_secrets "/run/secrets/kheops_authdb_pass" \
               "/run/secrets/kheops_client_dicomwebproxysecret" \
               "/run/secrets/kheops_client_zippersecret"
 
-kheops_welcomebot_webhook=""
 if [ -z "$KHEOPS_WELCOMEBOT_WEBHOOK" ]; then
     echo "No KHEOPS_WELCOMEBOT_WEBHOOK environment variable, welcomebot is disabled"
 fi
 
-kheops_oauth_scope=""
 if [ -z "$KHEOPS_OAUTH_SCOPE" ]; then
     echo "$KHEOPS_OAUTH_SCOPE not set, not requiring any scopes on access_tokens"
 fi
@@ -99,5 +97,7 @@ sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REP
 sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_oauth_scope}|$KHEOPS_OAUTH_SCOPE|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_welcomebot_webhook}|$KHEOPS_WELCOMEBOT_WEBHOOK|" ${REPLACE_FILE_PATH}
+
+export UMASK=022
 
 echo "Ending setup secrets and env var"

@@ -1,7 +1,0 @@
-  - module: http
-    metricsets:
-      - json
-    period: 10s
-    hosts: ["http://localhost:8080"]
-    namespace: "kheopsmetrics"
-    path: "/authorization/metrics"

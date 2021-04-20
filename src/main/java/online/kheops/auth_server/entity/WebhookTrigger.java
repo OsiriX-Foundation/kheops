@@ -1,6 +1,5 @@
 package online.kheops.auth_server.entity;
 
-import online.kheops.auth_server.webhook.WebhookRequestId;
 import online.kheops.auth_server.webhook.WebhookType;
 
 import javax.persistence.*;
@@ -28,19 +27,19 @@ public class WebhookTrigger {
 
     @Basic(optional = false)
     @Column(name = "is_manual_trigger", updatable = false)
-    private Boolean isManualTrigger;
+    private boolean isManualTrigger;
 
     @Basic(optional = false)
     @Column(name = "new_series")
-    private Boolean newSeries;
+    private boolean newSeries;
 
     @Basic(optional = false)
     @Column(name = "remove_series")
-    private Boolean removeSeries;
+    private boolean removeSeries;
 
     @Basic(optional = false)
     @Column(name = "new_user")
-    private Boolean newUser;
+    private boolean newUser;
 
     @OneToMany(mappedBy = "webhookTrigger")
     @OrderBy("attempt desc")
@@ -92,10 +91,10 @@ public class WebhookTrigger {
 
     public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
 
-    public Boolean isManualTrigger() { return isManualTrigger; }
-    public Boolean getNewSeries() { return newSeries; }
-    public Boolean getRemoveSeries() { return removeSeries; }
-    public Boolean getNewUser() { return newUser; }
+    public boolean isManualTrigger() { return isManualTrigger; }
+    public boolean getNewSeries() { return newSeries; }
+    public boolean getRemoveSeries() { return removeSeries; }
+    public boolean getNewUser() { return newUser; }
     public String getId() { return id; }
     public long getPk() { return pk; }
 

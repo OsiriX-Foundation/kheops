@@ -1,5 +1,6 @@
 package online.kheops.auth_server.webhook;
 
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.WebhookAttempt;
 import online.kheops.auth_server.entity.WebhookTrigger;
@@ -31,18 +32,24 @@ public class WebhookTriggerResponse {
 
     private WebhookTriggerResponse() { /*Empty*/ }
 
-    public WebhookTriggerResponse(WebhookTrigger webhookTrigger) {
+    public WebhookTriggerResponse(WebhookTrigger webhookTrigger, KheopsInstance kheopsInstance) {
 
         id = webhookTrigger.getId();
         isManualTrigger = webhookTrigger.isManualTrigger();
         if(webhookTrigger.getNewSeries()) {
             event = WebhookType.NEW_SERIES.name().toLowerCase();
+            StudyResponse.Builder studyResponseBuilder = null;
             for (Series series: webhookTrigger.getSeries()) {
-                if (studyResponse == null) {
-                    studyResponse = new StudyResponse(series.getStudy());
+                if (studyResponseBuilder == null) {
+                    studyResponseBuilder = new StudyResponse.Builder(series.getStudy())
+                            .showRetrieveUrl()
+                            .kheopsInstance(kheopsInstance.get())
+                            .uidOnly(true);
                 }
-                studyResponse.addSeries(series, false);
+                studyResponseBuilder.addSeries(series);
             }
+            studyResponse = studyResponseBuilder.build();
+
         } else if(webhookTrigger.getNewUser()) {
             event = WebhookType.NEW_USER.name().toLowerCase();
             final UserResponseBuilder userResponseBuilder = new UserResponseBuilder();
@@ -52,12 +59,16 @@ public class WebhookTriggerResponse {
                     .build();
         } else if(webhookTrigger.getRemoveSeries()) {
             event = WebhookType.REMOVE_SERIES.name().toLowerCase();
+            StudyResponse.Builder studyResponseBuilder = null;
             for (Series series: webhookTrigger.getSeries()) {
-                if (studyResponse == null) {
-                    studyResponse = new StudyResponse(series.getStudy());
+                if (studyResponseBuilder == null) {
+                    studyResponseBuilder = new StudyResponse.Builder(series.getStudy())
+                            .hideRetrieveUrl()
+                            .uidOnly(true);
                 }
-                studyResponse.addSeries(series, false);
+                studyResponseBuilder.addSeries(series);
             }
+            studyResponse = studyResponseBuilder.build();
         }
 
         if(!webhookTrigger.getWebhookAttempts().isEmpty()) {

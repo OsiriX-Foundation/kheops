@@ -2,16 +2,13 @@ package online.kheops.auth_server.report_provider;
 
 
 import online.kheops.auth_server.entity.ReportProvider;
-import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.util.ErrorResponse;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
-import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.REPORT_PROVIDER_NOT_FOUND;
 
 public class ReportProviderQueries {

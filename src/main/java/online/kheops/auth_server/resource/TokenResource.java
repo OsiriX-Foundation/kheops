@@ -7,17 +7,13 @@ import online.kheops.auth_server.accesstoken.*;
 import online.kheops.auth_server.capability.CapabilityNotFoundException;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.ReportProvider;
-import online.kheops.auth_server.entity.User;
-import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ReportProviderUriNotValidException;
 import online.kheops.auth_server.token.*;
-import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.NoResultException;
 import javax.servlet.ServletContext;
@@ -32,10 +28,8 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.capability.Capabilities.getCapabilityWithID;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getRedirectUri;
-import static online.kheops.auth_server.series.Series.canAccessSeries;
 import static online.kheops.auth_server.token.TokenRequestException.Error.UNSUPPORTED_GRANT_TYPE;
 import static online.kheops.auth_server.token.TokenRequestException.Error.INVALID_REQUEST;
-import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
 
 
@@ -85,6 +79,7 @@ public class TokenResource
 
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder()
                     .user(result.getSubject())
+                    .provenance(result.getTokenProvenance())
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(grantType.getLogActionType())
                     .link(false);
@@ -154,6 +149,7 @@ public class TokenResource
             }
 
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
+                    .provenance(accessToken)
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .link(false);
@@ -171,6 +167,7 @@ public class TokenResource
                 accessToken.getTokenType() == AccessToken.TokenType.ALBUM_CAPABILITY_TOKEN ||
                 accessToken.getTokenType() == AccessToken.TokenType.USER_CAPABILITY_TOKEN) {
             final KheopsLogBuilder logBuilder = new KheopsLogBuilder().user(accessToken.getSubject())
+                    .provenance(accessToken)
                     .clientID(securityContext.getUserPrincipal().getName())
                     .action(ActionType.INTROSPECT_TOKEN)
                     .link(false);

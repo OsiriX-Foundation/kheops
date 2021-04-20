@@ -1,5 +1,6 @@
 package online.kheops.auth_server.token;
 
+import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
 import online.kheops.auth_server.report_provider.*;
@@ -129,8 +130,11 @@ public enum TokenGrantType {
             }
 
             final String subject;
+            final TokenProvenance tokenProvenance;
             try {
-                subject = AccessTokenVerifier.authenticateAccessToken(tokenAuthenticationContext, subjectToken).getSubject();
+                AccessToken accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, subjectToken);
+                tokenProvenance = accessToken;
+                subject = accessToken.getSubject();
             } catch (AccessTokenVerificationException e) {
                 throw new TokenRequestException(INVALID_REQUEST, "Bad subject_token", e);
             }
@@ -152,7 +156,7 @@ public enum TokenGrantType {
                         .withSeriesInstanceUID(seriesInstanceUID)
                         .generate(PEP_TOKEN_LIFETIME);
 
-                return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject, "pep", studyInstanceUID, seriesInstanceUID);
+                return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject, tokenProvenance, "pep", studyInstanceUID, seriesInstanceUID);
             } else if (StringContainsScope(scopeString,"viewer")) {
                 verifyNotDuplicateHeader(form, "source_type");
                 final String sourceType = form.getFirst("source_type");
@@ -187,7 +191,7 @@ public enum TokenGrantType {
                         .withScopes(scopes)
                         .generate(VIEWER_TOKEN_LIFETIME);
 
-                return new TokenGrantResult(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME), subject, "viewer", studyInstanceUID, null);
+                return new TokenGrantResult(TokenResponseEntity.createEntity(viewerToken, VIEWER_TOKEN_LIFETIME), subject, tokenProvenance, "viewer", studyInstanceUID, null);
             } else {
                 throw new TokenRequestException(INVALID_SCOPE);
             }

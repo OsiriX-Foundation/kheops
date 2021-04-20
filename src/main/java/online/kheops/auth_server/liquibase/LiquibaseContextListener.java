@@ -5,7 +5,6 @@ import liquibase.database.Database;
 import liquibase.database.DatabaseFactory;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.DatabaseException;
-import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 import online.kheops.auth_server.EntityManagerListener;
 
@@ -29,13 +28,13 @@ public class LiquibaseContextListener implements ServletContextListener {
         LOG.log(Level.INFO, "Start initializing the DB with Liquibase. Database version : " + DB_VERSION);
 
         JdbcConnection jdbcCon = null;
-        try (Connection con = EntityManagerListener.getConnection()) {
-            try {
-                jdbcCon = new JdbcConnection(con);
+        try (final Connection con = EntityManagerListener.getConnection()) {
+            jdbcCon = new JdbcConnection(con);
 
-                // Initialize Liquibase and run the update
-                Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
-                Liquibase liquibase = new Liquibase(CHANGE_LOG_FILE, new ClassLoaderResourceAccessor(), database);
+            // Initialize Liquibase and run the update
+            final Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(jdbcCon);
+            try (final Liquibase liquibase = new Liquibase(CHANGE_LOG_FILE, new ClassLoaderResourceAccessor(), database)) {
+
                 final String version = DB_VERSION;
 
                 if(liquibase.tagExists("v1.0") && !liquibase.tagExists("v3.0")) {
@@ -50,11 +49,11 @@ public class LiquibaseContextListener implements ServletContextListener {
                     liquibase.update(version, "");
                 }
                 liquibase.validate();
-            } catch (LiquibaseException e) {
+            } catch (Exception e) {
                 LOG.log(Level.SEVERE, "Unable to use liquibase", e);
                 exit(1);
             } finally {
-                if (jdbcCon != null) {
+                if (jdbcCon != null && !jdbcCon.isClosed()) {
                     jdbcCon.close();
                 }
             }

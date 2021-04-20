@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 
+import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.album.AlbumId;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.BadQueryParametersException;
@@ -8,12 +9,14 @@ import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.PairListXTotalCount;
 import online.kheops.auth_server.webhook.*;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -40,6 +43,9 @@ public class WebhookResource {
 
     @Context
     private ServletContext context;
+
+    @Inject
+    KheopsInstance kheopsInstance;
 
     @POST
     @Secured
@@ -125,7 +131,7 @@ public class WebhookResource {
 
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
-        final WebhookResponse webhookResponse = Webhooks.getWebhook(webhookId, albumId, limit, offset, kheopsPrincipal.getKheopsLogBuilder());
+        final WebhookResponse webhookResponse = Webhooks.getWebhook(webhookId, albumId, limit, offset, kheopsInstance, kheopsPrincipal.getKheopsLogBuilder());
 
         return Response.status(OK).entity(webhookResponse).build();
     }
@@ -193,7 +199,7 @@ public class WebhookResource {
                                    @FormParam(SeriesInstanceUID) List<String> seriesUID,
                                    @FormParam(StudyInstanceUID) @UIDValidator String studyUID,
                                    @FormParam("user") String user)
-            throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, UserNotFoundException {
+            throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, StudyNotFoundException, UserNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 

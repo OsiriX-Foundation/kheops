@@ -41,8 +41,7 @@ public class Series {
         return findSeriesBySeriesUID(seriesInstanceUID, em);
     }
 
-    public static online.kheops.auth_server.entity.Series getOrCreateSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em)
-            throws SeriesNotFoundException {
+    public static online.kheops.auth_server.entity.Series getOrCreateSeries(String studyInstanceUID, String seriesInstanceUID, EntityManager em) {
 
         online.kheops.auth_server.entity.Series series;
         try {
@@ -67,7 +66,7 @@ public class Series {
                     tx.rollback();
                     series = getSeries(studyInstanceUID, seriesInstanceUID, em);
                 } catch (SeriesNotFoundException e) {
-                    throw e;
+                    throw new RuntimeException(e);
                 }
             } finally {
                 if (tx.isActive()) {
@@ -105,7 +104,6 @@ public class Series {
             return false;
         }
     }
-
 
     public static void editFavorites(User callingUser, String studyInstanceUID, String seriesInstanceUID, String fromAlbumId, boolean favorite, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, SeriesNotFoundException {

@@ -222,4 +222,20 @@ public class Series {
     public String getBodyPartExamined() { return bodyPartExamined; }
 
     public void setBodyPartExamined(String bodyPartExamined) { this.bodyPartExamined = bodyPartExamined; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Series series = (Series) o;
+        return seriesInstanceUID.equals(series.seriesInstanceUID);
+    }
+
+    @Override
+    public int hashCode() {
+        return seriesInstanceUID.hashCode();
+    }
+
+    @Override
+    public String toString() { return seriesInstanceUID; }
 }

@@ -17,9 +17,12 @@ import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.sharing.Sending;
 import online.kheops.auth_server.token.TokenAuthenticationContext;
+import online.kheops.auth_server.webhook.delayed_webhook.DelayedWebhook;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.util.ErrorResponse;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -57,8 +60,12 @@ public class SendingResource
     @Context
     private SecurityContext securityContext;
 
+    @Inject
+    DelayedWebhook delayedWebhook;
+
     @HeaderParam(X_AUTHORIZATION_SOURCE)
     private String headerXAuthorizationSource;
+
 
     @PUT
     @Secured
@@ -109,7 +116,7 @@ public class SendingResource
             fromInbox = false;
         }
 
-        if(fromInbox && !kheopsPrincipal.hasStudyShareAccess(studyInstanceUID)) {
+        if(Boolean.TRUE.equals(fromInbox) && !kheopsPrincipal.hasStudyShareAccess(studyInstanceUID)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("Study not found in the inbox")
@@ -205,7 +212,7 @@ public class SendingResource
                 if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                     final String albumID = kheopsPrincipal.getAlbumID();
                     if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                        Sending.putSeriesInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                        Sending.putSeriesInAlbum(delayedWebhook, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                         return Response.status(CREATED).build();
                     } else {
                         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -235,7 +242,7 @@ public class SendingResource
             if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                    Sending.putSeriesInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+                    Sending.putSeriesInAlbum(delayedWebhook, kheopsPrincipal, albumID, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(AUTHORIZATION_ERROR)
@@ -259,7 +266,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     public Response appropriateStudy(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @QueryParam(ALBUM) String albumId)
-            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
+            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -321,7 +328,7 @@ public class SendingResource
             if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
                 final String albumID = kheopsPrincipal.getAlbumID();
                 if (kheopsPrincipal.hasAlbumPermission(ADD_SERIES, albumID)) {
-                    Sending.putStudyInAlbum(context, kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
+                    Sending.putStudyInAlbum(delayedWebhook, kheopsPrincipal, albumID, studyInstanceUID, albumId, false, kheopsPrincipal.getKheopsLogBuilder());
                 } else {
                     final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                             .message(AUTHORIZATION_ERROR)
@@ -435,7 +442,7 @@ public class SendingResource
     public Response putSeriesInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                      @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
-            throws AlbumNotFoundException, UserNotMemberException, SeriesNotFoundException {
+            throws AlbumNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -489,7 +496,7 @@ public class SendingResource
         }
 
         try {
-            Sending.putSeriesInAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+            Sending.putSeriesInAlbum(delayedWebhook, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         } catch (ClientIdNotFoundException e) {
             return Response.status(NOT_FOUND).entity(e.getErrorResponse()).build();
         }
@@ -508,7 +515,7 @@ public class SendingResource
                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox)
-            throws AlbumNotFoundException, UserNotMemberException {
+            throws AlbumNotFoundException, StudyNotFoundException, UserNotMemberException {
 
 
         if (((fromAlbumId == null && fromInbox == null) ||
@@ -569,7 +576,7 @@ public class SendingResource
         }
 
         try {
-            Sending.putStudyInAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, fromAlbumId, fromInbox, kheopsPrincipal.getKheopsLogBuilder());
+            Sending.putStudyInAlbum(delayedWebhook, kheopsPrincipal, albumId, studyInstanceUID, fromAlbumId, fromInbox, kheopsPrincipal.getKheopsLogBuilder());
         } catch (SeriesNotFoundException e) {
             LOG.log(WARNING, "not found", e);
             return Response.status(NOT_FOUND).build();

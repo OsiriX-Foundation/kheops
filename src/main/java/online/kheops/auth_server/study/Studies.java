@@ -206,7 +206,7 @@ public class Studies {
 
                 attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.split(","));
             });
-            if (!qidoParams.getModalityFilter().isPresent()) { //todo maybe use ifPresentOrElse(...)
+            if (!qidoParams.getModalityFilter().isPresent()) {
                 attributes.setString(Tag.ModalitiesInStudy, VR.CS, r.getValue("modalities").toString().split(","));
             }
 

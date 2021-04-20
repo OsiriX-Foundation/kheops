@@ -61,6 +61,12 @@ public class AlbumQueries {
         }
     }
 
+    public static List<Album> findAlbumsWithEnabledNewSeriesWebhooks(String studyInstanceUID, EntityManager em ) {
+        return em.createNamedQuery("Albums.findWithEnabledNewSeriesWebhooks", Album.class)
+                .setParameter("studyInstanceUID", studyInstanceUID)
+                .getResultList();
+    }
+
     @FunctionalInterface
     private interface ThrowingConsumer<T> {
         void accept(T t) throws BadQueryParametersException;

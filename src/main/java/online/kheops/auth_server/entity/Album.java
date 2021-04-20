@@ -1,6 +1,7 @@
 package online.kheops.auth_server.entity;
 
 import online.kheops.auth_server.user.UsersPermission;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,7 +13,10 @@ import java.util.Set;
 
 @NamedQueries({
         @NamedQuery(name = "Albums.findById",
-        query = "SELECT a FROM Album a WHERE :albumId = a.id")
+        query = "SELECT a FROM Album a WHERE :albumId = a.id"),
+        @NamedQuery(name = "Albums.findWithEnabledNewSeriesWebhooks",
+        query = "SELECT distinct a FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st JOIN a.webhooks w WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :studyInstanceUID"),
+
 })
 
 @Entity
@@ -52,6 +56,14 @@ public class Album {
 
     @OneToMany(mappedBy = "album")
     private Set<Webhook> webhooks = new HashSet<>();
+
+    @OneToMany(mappedBy = "album")
+    @Where(clause = "enabled=true and new_series = true")
+    private Set<Webhook> webhooksNewSeriesEnabled = new HashSet<>();
+
+    @OneToMany(mappedBy = "album")
+    @Where(clause = "enabled=true and new_user = true")
+    private Set<Webhook> webhooksNewUserEnabled = new HashSet<>();
 
     @OneToMany(mappedBy = "album")
     private Set<Event> events = new HashSet<>();
@@ -157,8 +169,23 @@ public class Album {
 
     public Set<Webhook> getWebhooks() { return webhooks; }
 
+    public Set<Webhook> getWebhooksNewSeriesEnabled() { return webhooksNewSeriesEnabled; }
+
+    public Set<Webhook> getWebhooksNewUserEnabled() { return webhooksNewUserEnabled; }
+
     @Override
     public String toString() {
         return "[Album_id:"+id+"]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Album album = (Album) o;
+        return id.equals(album.id);
+    }
+
+    @Override
+    public int hashCode() { return id.hashCode(); }
 }
