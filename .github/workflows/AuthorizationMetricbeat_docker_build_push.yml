@@ -1,10 +1,11 @@
-name: FilebeatSidecar Docker Image CI
+name: AuthorizationMetricbeat Docker Image CI
 
-on:
+on: 
   push:
     paths:
-    - 'FilebeatSidecar/**'
-    - '.github/workflows/FilebeatSidecar_docker_build_push.yml'
+    - 'AuthorizationMetricbeat/**'
+    - '.github/workflows/AuthorizationMetricbeat_docker_build_push.yml'
+
 
 jobs:
   build:
@@ -26,7 +27,7 @@ jobs:
       - name: Extract branch name
         if: startsWith(github.ref , 'refs/heads/')
         shell: bash
-        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
+        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV 
                
       - name: Extract tag name
         if: startsWith(github.ref , 'refs/tags/')
@@ -36,8 +37,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
-          context: ./FilebeatSidecar
-          file: FilebeatSidecar/Dockerfile
+          context: ./AuthorizationMetricbeat
+          file: AuthorizationMetricbeat/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: osirixfoundation/kheops-filebeat-sidecar:${{ env.docker_tag }}
+          tags: osirixfoundation/kheops-authorization-metricbeat:${{ env.docker_tag }}        

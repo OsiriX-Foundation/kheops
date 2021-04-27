@@ -26,7 +26,7 @@ public class ErrorResponse implements Serializable {
         private String help;
 
         public ErrorResponseBuilder() {
-            this.help = "https://github.com/OsiriX-Foundation/KheopsAuthorization/wiki";
+            this.help = "https://github.com/OsiriX-Foundation/kheops/wiki";
         }
 
         public ErrorResponseBuilder message (String message) {

@@ -1,0 +1,7 @@
+- module: http
+  metricsets:
+    - json
+  period: 10s
+  hosts: ["${kheops_authorization_url}"]
+  namespace: "kheopsmetrics"
+  path: "/authorization/metrics"
