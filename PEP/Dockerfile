@@ -12,7 +12,6 @@ COPY hosts/proxy/default/nginx/script.sh $NGINX_PREFIX/script.sh
 
 COPY hosts/proxy/default/nginx/lua /opt/openresty/nginx/lua/
 
-RUN chmod +x $NGINX_PREFIX/script.sh
+#RUN chmod +x $NGINX_PREFIX/script.sh
 
-#CMD ["nginx", "-g", "daemon off; error_log /dev/stderr info;"]
 CMD . $NGINX_PREFIX/script.sh
