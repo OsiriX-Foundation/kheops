@@ -1,6 +1,6 @@
 #!/bin/bash
 
-chmod a+w /opt/openresty/nginx/conf/nginx.conf
+chmod a+w /usr/local/openresty/nginx/conf/nginx.conf
 
 missing_env_var_secret=false
 
@@ -53,8 +53,9 @@ fi
 
 
 #set env var
-sed -i "s|\${pacs_wado_uri}|$KHEOPS_PROXY_PACS_WADO_URI|" /opt/openresty/nginx/conf/nginx.conf
-sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /opt/openresty/nginx/conf/nginx.conf
+sed -i "s|\${pacs_wado_uri}|$KHEOPS_PROXY_PACS_WADO_URI|" /usr/local/openresty/nginx/conf/nginx.conf
+sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /usr/local/openresty/nginx/conf/nginx.conf
+
 
 #set secrets
 export JWT_SECRET=$kheops_auth_hmasecret
@@ -63,4 +64,4 @@ export JWT_POST_SECRET=$kheops_auth_hmasecret_post
 
 echo "Ending setup PEP secrets and env var"
 
-nginx -g 'daemon off; error_log /dev/stderr info;'
+/usr/local/openresty/bin/openresty -g 'daemon off; error_log /dev/stderr info;'

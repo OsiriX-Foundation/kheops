@@ -16,7 +16,7 @@ local M = {}
 function M.auth(claim_specs, use_post_secret)
     -- require Authorization request header
 
-   local auth_header = ngx.var.http_Authorization
+    local auth_header = ngx.var.http_Authorization
     local token = nil
     local validation_secret = nil
     if auth_header ~= nil then
@@ -43,18 +43,18 @@ function M.auth(claim_specs, use_post_secret)
         ngx.exit(ngx.HTTP_UNAUTHORIZED)
     end
 
-   if jwt_obj.payload["sub"] ~= nil then
-      ngx.var.lua_remote_user = jwt_obj.payload["sub"]
-   end
-   if jwt_obj.payload["azp"] ~= nil then
-      ngx.var.azp = jwt_obj.payload["azp"]
-   end
-   if jwt_obj.payload["cap_token"] ~= nil then
-      ngx.var.cap_token = jwt_obj.payload["cap_token"]
-   end 
-   if jwt_obj.payload["act"] ~= nil then
-      ngx.var.act = jwt_obj.payload["act"]
-   end
+    if jwt_obj.payload["sub"] ~= nil then
+        ngx.var.lua_remote_user = jwt_obj.payload["sub"]
+    end
+    if jwt_obj.payload["azp"] ~= nil then
+        ngx.var.azp = jwt_obj.payload["azp"]
+    end
+    if jwt_obj.payload["cap_token"] ~= nil then
+        ngx.var.cap_token = jwt_obj.payload["cap_token"]
+    end 
+    if jwt_obj.payload["act"] ~= nil then
+        ngx.var.act = jwt_obj.payload["act"]
+    end
    
     -- if wado uri request
     if string.starts(ngx.var.request_uri, "/wado") then
