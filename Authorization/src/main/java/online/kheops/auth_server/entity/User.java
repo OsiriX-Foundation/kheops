@@ -68,9 +68,6 @@ public class User {
     @JoinColumn(name = "inbox_fk", unique = true, nullable = false, updatable = false)
     private Album inbox;
 
-    //@OneToOne(mappedBy = "user_fk",fetch = FetchType.LAZY)
-    //private WebhookTrigger webhookTrigger;
-
     public User() {}
 
     public User(String sub) {

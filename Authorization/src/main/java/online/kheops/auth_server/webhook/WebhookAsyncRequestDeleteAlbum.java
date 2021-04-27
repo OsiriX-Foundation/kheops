@@ -9,15 +9,12 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.concurrent.*;
-import java.util.logging.Logger;
 
 import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
 import static online.kheops.auth_server.util.Consts.SECONDE_BEFORE_RETRY_WEBHOOK;
 import static online.kheops.auth_server.util.HttpHeaders.*;
 
 public class WebhookAsyncRequestDeleteAlbum {
-
-    private static final Logger LOG = Logger.getLogger(WebhookAsyncRequestDeleteAlbum.class.getName());
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final ExecutorService CALLBACK_SCHEDULER = Executors.newFixedThreadPool(4);
@@ -40,7 +37,7 @@ public class WebhookAsyncRequestDeleteAlbum {
     }
 
     public void retry(int cnt) {
-        SCHEDULER.schedule(()->request(cnt),SECONDE_BEFORE_RETRY_WEBHOOK * cnt, TimeUnit.SECONDS);
+        SCHEDULER.schedule(()->request(cnt), SECONDE_BEFORE_RETRY_WEBHOOK * cnt, TimeUnit.SECONDS);
     }
 
     private void request(int cnt) {
@@ -65,9 +62,7 @@ public class WebhookAsyncRequestDeleteAlbum {
         } else {
             final Entity entity = Entity.json(data);
             final CompletionStage<Response> completionStage = asyncInvoker.post(entity);
-            completionStage.thenAcceptAsync((response) -> {
-                new WebhooksCallbacksDeleteAlbum(response,  cnt, this);
-            }, CALLBACK_SCHEDULER);
+            completionStage.thenAcceptAsync(response -> new WebhooksCallbacksDeleteAlbum(response,  cnt, this), CALLBACK_SCHEDULER);
             completionStage.exceptionally(throwable -> {
                 new WebhooksCallbacksFailDeleteAlbum(throwable,  cnt, this);
                 return null;
