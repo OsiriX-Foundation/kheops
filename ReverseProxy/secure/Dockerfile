@@ -1,4 +1,4 @@
-FROM nginx:1.19.8
+FROM nginx:1.20.0
 
 ENV SECRET_FILE_PATH=/run/secrets
 
