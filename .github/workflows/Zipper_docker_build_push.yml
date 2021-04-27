@@ -1,10 +1,10 @@
-name: FilebeatSidecar Docker Image CI
+name: Zipper Docker Image CI
 
 on:
   push:
     paths:
-    - 'FilebeatSidecar/**'
-    - '.github/workflows/FilebeatSidecar_docker_build_push.yml'
+    - 'Zipper/**'
+    - '.github/workflows/Zipper_docker_build_push.yml'
 
 jobs:
   build:
@@ -24,20 +24,15 @@ jobs:
         uses: docker/setup-buildx-action@v1
         
       - name: Extract branch name
-        if: startsWith(github.ref , 'refs/heads/')
         shell: bash
-        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_ENV
-               
-      - name: Extract tag name
-        if: startsWith(github.ref , 'refs/tags/')
-        shell: bash
-        run: echo "docker_tag=$(echo ${GITHUB_REF#refs/tags/})" >> $GITHUB_ENV
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
         
       - name: Build and push
         uses: docker/build-push-action@v2.2.1
         with:
-          context: ./FilebeatSidecar
-          file: FilebeatSidecar/Dockerfile
+          context: ./Zipper
+          file: Zipper/Dockerfile
           platforms: linux/amd64
           push: true
-          tags: osirixfoundation/kheops-filebeat-sidecar:${{ env.docker_tag }}
+          tags: osirixfoundation/kheops-zipper:${{ steps.extract_branch.outputs.branch }}

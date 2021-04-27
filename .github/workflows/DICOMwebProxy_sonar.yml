@@ -1,14 +1,13 @@
-name: Authorization Sonar
+name: DICOMwebProxy Sonar
 
 on:
   push:
     paths:
-    - 'Authorization/**'
-    - '.github/workflows/Authorization_sonar.yml'
-
+    - 'DICOMwebProxy/**'
+    - '.github/workflows/DICOMwebProxy_sonar.yml'
 
 jobs:
-  
+        
   sonar:
     if: startsWith(github.ref , 'refs/heads/')
     runs-on: ubuntu-latest
@@ -26,11 +25,11 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v2.2.1
         with:
-          context: ./Authorization
-          file: Authorization/sonarqube.Dockerfile
+          context: ./DICOMwebProxy
+          file: DICOMwebProxy/sonarqube.Dockerfile
           platforms: linux/amd64
           push: false
           tags: sonarqube
           
       - name: Docker run
-        run: docker run --rm sonarqube gradle sonarqube -Dsonar.organization=osirix-foundation -Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }} -Dsonar.projectKey=KheopsAuthorization -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-daemon
+        run: docker run --rm sonarqube gradle sonarqube -Dsonar.organization=osirix-foundation -Dsonar.branch.name=${{ steps.extract_branch.outputs.branch }} -Dsonar.projectKey=KheopsDICOMwebProxy -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --no-daemon
