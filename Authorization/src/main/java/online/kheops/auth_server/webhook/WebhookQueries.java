@@ -69,12 +69,29 @@ public class WebhookQueries {
                     .getResultList();
     }
 
-    public static Long getNumberOfWebhooks( Album album, EntityManager em) {
+    public static Long getNumberOfWebhookTrigger(Webhook webhook, EntityManager em) {
+        return em.createNamedQuery("WebhookTrigger.countAllByWebhookPk", Long.class)
+                .setParameter(WEBHOOK_PK, webhook.getPk())
+                .getSingleResult();
+    }
+
+    public static List<WebhookTrigger> getWebhookTriggers(Webhook webhook, int limit, int offset, EntityManager em) {
+        return em.createNamedQuery("WebhookTrigger.GetAllByWebhookPk", WebhookTrigger.class)
+                .setParameter(WEBHOOK_PK, webhook.getPk())
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+
+
+    public static Long getNumberOfWebhooks(Album album, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbum", Long.class)
                 .setParameter(ALBUM, album)
                 .getSingleResult();
     }
-    public static Long getNumberOfWebhooks( Album album, String url, EntityManager em) {
+
+    public static Long getNumberOfWebhooks(Album album, String url, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbumAndUrl", Long.class)
                 .setParameter(ALBUM, album)
                 .setParameter(WEBHOOK_URL, url)

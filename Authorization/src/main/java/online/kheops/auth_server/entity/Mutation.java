@@ -51,7 +51,7 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         toUser = targetUser;
 
-        targetUser.addMutation(this);
+        //targetUser.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, MutationType mutationType) {
@@ -93,7 +93,7 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         this.capability = capability;
 
-        capability.addMutation(this);
+        //capability.addMutation(this);
 
         for (Series series : seriesList) {
             this.addSeries(series);
@@ -106,6 +106,6 @@ public class Mutation extends Event{
         this.getSeries().add(series);
         this.capability = capability;
 
-        capability.addMutation(this);
+        //capability.addMutation(this);
     }
 }

@@ -36,8 +36,7 @@ import static online.kheops.auth_server.util.Consts.VALID_SCHEMES_WEBHOOK_URL;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.KheopsLogBuilder.ActionType.*;
-import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookById;
-import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookTriggerById;
+import static online.kheops.auth_server.webhook.WebhookQueries.*;
 
 public class Webhooks {
 
@@ -65,7 +64,7 @@ public class Webhooks {
             final Mutation mutation = Events.albumPostMutation(callingUser, album, CREATE_WEBHOOK);
             em.persist(mutation);
 
-            webhookResponse = new WebhookResponse(newWebhook);
+            webhookResponse = new WebhookResponse(newWebhook, em);
             kheopsLogBuilder.action(NEW_WEBHOOK)
                     .album(webhookPostParameters.getAlbumId())
                     .webhookID(newWebhook.getId())
@@ -112,16 +111,17 @@ public class Webhooks {
             final Mutation mutation = Events.albumPostMutation(callingUser, album, EDIT_WEBHOOK);
             em.persist(mutation);
 
-            webhookResponse = new WebhookResponse(webhook);
+            webhookResponse = new WebhookResponse(webhook, em);
 
-            int maxHistory = 5;
+            /*int maxHistory = 5;
             for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
                 webhookResponse.addTrigger(webhookTrigger);
                 maxHistory--;
                 if(maxHistory == 0) {
                     break;
                 }
-            }
+            }*/
+            getWebhookTriggers(webhook, 5, 0, em).forEach(webhookResponse::addTrigger);
 
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.EDIT_WEBHOOK)
                     .album(webhookPatchParameters.getAlbumId())
@@ -173,13 +173,6 @@ public class Webhooks {
     }
 
     public static void deleteWebhook(Webhook webhook, EntityManager em) {
-        for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-            for(WebhookAttempt webhookAttempt:webhookTrigger.getWebhookAttempts()) {
-                em.remove(webhookAttempt);
-            }
-            webhookTrigger.removeAllSeries();
-            em.remove(webhookTrigger);
-        }
         em.remove(webhook);
     }
 
@@ -202,9 +195,9 @@ public class Webhooks {
                     .webhookID(webhookID)
                     .log();
 
-            webhookResponse = new WebhookResponse(webhook);
+            webhookResponse = new WebhookResponse(webhook, em);
 
-            for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
+            /*for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
                 if (triggerOffset > 0) {
                     triggerOffset--;
                 } else {
@@ -214,7 +207,9 @@ public class Webhooks {
                         break;
                     }
                 }
-            }
+            }*/
+            getWebhookTriggers(webhook, triggerLimit, triggerOffset, em).forEach(webhookTrigger ->  webhookResponse.addFullTriggers(webhookTrigger, kheopsInstance));
+
 
             tx.commit();
         } finally {
@@ -247,16 +242,17 @@ public class Webhooks {
             }
 
             for(Webhook webhook:webhookList) {
-                final WebhookResponse webhookResponse = new WebhookResponse(webhook);
+                final WebhookResponse webhookResponse = new WebhookResponse(webhook, em);
                 webhookResponseList.add(webhookResponse);
-                int maxHistory = 5;
+                /*int maxHistory = 5;
                 for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
                     webhookResponse.addTrigger(webhookTrigger);
                     maxHistory--;
                     if(maxHistory == 0) {
                         break;
                     }
-                }
+                }*/
+                getWebhookTriggers(webhook, 5, 0, em).forEach(webhookResponse::addTrigger);
             }
 
         } finally {

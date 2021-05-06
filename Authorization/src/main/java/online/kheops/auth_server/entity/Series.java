@@ -94,8 +94,8 @@ public class Series {
     @JoinColumn(name = "study_fk", insertable = true, updatable=false)
     private Study study;
 
-    @OneToMany(mappedBy = "series")
-    private Set<AlbumSeries> albumsSeries = new HashSet<>();
+    //@OneToMany(mappedBy = "series")
+    //private Set<AlbumSeries> albumsSeries = new HashSet<>();
 
     public Series() {}
 
@@ -216,9 +216,9 @@ public class Series {
         this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
 
-    public void addAlbumSeries(AlbumSeries albumSeries) { albumsSeries.add(albumSeries); }
+    //public void addAlbumSeries(AlbumSeries albumSeries) { albumsSeries.add(albumSeries); }
 
-    public void removeAlbumSeries(AlbumSeries albumSeries) { albumsSeries.remove(albumSeries); }
+    //public void removeAlbumSeries(AlbumSeries albumSeries) { albumsSeries.remove(albumSeries); }
 
     public String getBodyPartExamined() { return bodyPartExamined; }
 

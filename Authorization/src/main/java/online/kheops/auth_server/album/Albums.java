@@ -154,23 +154,23 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
-            for (Event event:album.getEvents()) {
+            /*for (Event event:album.getEvents()) {
                 event.removeAllSeries();
                 em.remove(event);
-            }
+            }*/
 
-            for (ReportProvider reportProvider:album.getReportProviders()) {
+            /*for (ReportProvider reportProvider:album.getReportProviders()) {
                 em.remove(reportProvider);
-            }
+            }*/
 
             for (AlbumUser albumUser:album.getAlbumUser()) {
                 em.remove(albumUser);
             }
 
-            for (Capability capability:album.getCapabilities()) {
+            /*for (Capability capability:album.getCapabilities()) {
                 capability.setRevoked(true);
                 em.remove(capability);
-            }
+            }*/
 
             for (AlbumSeries albumSeries:album.getAlbumSeries()) {
                 em.remove(albumSeries);

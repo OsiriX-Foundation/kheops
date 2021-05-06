@@ -61,7 +61,7 @@ public class Events {
                 }
 
                 comment.setPrivateTargetUser(targetUser);
-                targetUser.getComments().add(comment);
+                //targetUser.getComments().add(comment);
             } else {
                 album.updateLastEventTime();
             }
@@ -277,7 +277,7 @@ public class Events {
                 }
 
                 comment.setPrivateTargetUser(targetUser);
-                targetUser.getComments().add(comment);
+                //targetUser.getComments().add(comment);
             }
 
             em.persist(comment);

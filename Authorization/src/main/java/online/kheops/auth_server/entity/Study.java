@@ -87,8 +87,8 @@ public class Study {
     @OneToMany(mappedBy = "study")
     private Set<Series> series = new HashSet<>();
 
-    @OneToMany(mappedBy = "study")
-    private Set<Event> events = new HashSet<>();
+    //@OneToMany(mappedBy = "study")
+    //private Set<Event> events = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -263,11 +263,11 @@ public class Study {
         return updatedTime;
     }
 
-    public Set<Event> getEvents() { return events; }
+    //public Set<Event> getEvents() { return events; }
 
-    public void setEvents(Set<Event> events) { this.events = events; }
+    //public void setEvents(Set<Event> events) { this.events = events; }
 
-    public void addEvents(Event event) { this.events.add(event); }
+    //public void addEvents(Event event) { this.events.add(event); }
 
     @Override
     public boolean equals(Object o) {

@@ -6,13 +6,17 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static online.kheops.auth_server.util.JPANamedQueryConstants.WEBHOOK_TRIGGER_ID;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 
 @NamedQueries({
         @NamedQuery(name = "WebhookTrigger.findById",
-                query = "SELECT w FROM WebhookTrigger w WHERE :"+WEBHOOK_TRIGGER_ID+" = w.id")
+                query = "SELECT w FROM WebhookTrigger w WHERE :"+WEBHOOK_TRIGGER_ID+" = w.id"),
+        @NamedQuery(name = "WebhookTrigger.countAllByWebhookPk",
+                query = "SELECT count(wt) FROM Webhook w JOIN w.webhookTriggers wt WHERE :"+WEBHOOK_PK+" = w.pk"),
+        @NamedQuery(name = "WebhookTrigger.GetAllByWebhookPk",
+                query = "SELECT wt FROM Webhook w JOIN w.webhookTriggers wt WHERE :"+WEBHOOK_PK+" = w.pk ORDER BY wt.pk desc")
 })
 
 @Entity
@@ -43,7 +47,7 @@ public class WebhookTrigger {
     @Column(name = "new_user")
     private boolean newUser;
 
-    @OneToMany(mappedBy = "webhookTrigger")
+    @OneToMany(mappedBy = "webhookTrigger", cascade = CascadeType.REMOVE)
     @OrderBy("attempt desc")
     private Set<WebhookAttempt> webhookAttempts = new HashSet<>();
 
@@ -69,7 +73,7 @@ public class WebhookTrigger {
         this.id = id;
         this.isManualTrigger = isManualTrigger;
         this.webhook = webhook;
-        webhook.addWebhookTrigger(this);
+        //webhook.addWebhookTrigger(this);
         if(type.equals(WebhookType.NEW_USER)) {
             this.newUser = true;
             this.newSeries = false;
@@ -91,7 +95,7 @@ public class WebhookTrigger {
 
     public User getUser() {return user; }
 
-    public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
+    //public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
 
     public boolean isManualTrigger() { return isManualTrigger; }
     public boolean getNewSeries() { return newSeries; }
@@ -115,13 +119,13 @@ public class WebhookTrigger {
         this.series.add(series);
     }
 
-    public void removeSeries(Series series) {
-        this.series.remove(series);
-    }
+    //public void removeSeries(Series series) {
+    //    this.series.remove(series);
+    //}
 
-    public void removeAllSeries() {
-        this.series.clear();
-    }
+    //public void removeAllSeries() {
+    //    this.series.clear();
+    //}
 
     public Set<Series> getSeries() { return series; }
 

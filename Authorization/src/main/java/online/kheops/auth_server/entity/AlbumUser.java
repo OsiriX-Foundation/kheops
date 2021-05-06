@@ -52,7 +52,7 @@ public class AlbumUser {
         this.admin = isAdmin;
 
         album.addAlbumUser(this);
-        user.addAlbumUser(this);
+        //user.addAlbumUser(this);
     }
 
     public long getPk() { return pk; }

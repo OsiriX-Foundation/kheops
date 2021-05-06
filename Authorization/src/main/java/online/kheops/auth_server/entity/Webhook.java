@@ -83,7 +83,7 @@ public class Webhook {
     @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
-    @OneToMany(mappedBy = "webhook")
+    @OneToMany(mappedBy = "webhook", cascade = CascadeType.REMOVE)
     @OrderBy("pk DESC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
@@ -109,7 +109,7 @@ public class Webhook {
         creationTime = LocalDateTime.now();
 
         album.addWebhook(this);
-        user.addWebhook(this);
+        //user.addWebhook(this);
     }
 
     public String getId() {
@@ -154,13 +154,11 @@ public class Webhook {
 
 
 
-    public Set<WebhookTrigger> getWebhookTriggers() {
-        return webhookTriggers;
-    }
+    public Set<WebhookTrigger> getWebhookTriggers() { return webhookTriggers; }
 
-    public void addWebhookTrigger(WebhookTrigger webhookTrigger) {
-        this.webhookTriggers.add(webhookTrigger);
-    }
+    //public void addWebhookTrigger(WebhookTrigger webhookTrigger) {
+    //    this.webhookTriggers.add(webhookTrigger);
+    //}
 
     public void setName(String name) {
         this.name = name;

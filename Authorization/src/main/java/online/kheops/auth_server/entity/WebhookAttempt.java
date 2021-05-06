@@ -34,7 +34,7 @@ public class WebhookAttempt {
         this.attempt = attempt;
         time = LocalDateTime.now();
         this.webhookTrigger = webhookTrigger;
-        webhookTrigger.addWebhookAttempt(this);
+        //webhookTrigger.addWebhookAttempt(this);
     }
 
     public long getStatus() { return status; }

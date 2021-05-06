@@ -67,16 +67,16 @@ public class Album {
     @Where(clause = "enabled=true and new_user = true")
     private Set<Webhook> webhooksNewUserEnabled = new HashSet<>();
 
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
     private Set<Event> events = new HashSet<>();
 
     @OneToOne(mappedBy = "inbox")
     private User inboxUser;
 
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
     private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist
@@ -138,7 +138,7 @@ public class Album {
                 .setParameter(SERIES, series)
                 .setParameter(ALBUM, this)
                 .getSingleResult();
-        series.removeAlbumSeries(localAlbumSeries);
+        //series.removeAlbumSeries(localAlbumSeries);
         this.albumSeries.remove(localAlbumSeries);
         em.remove(localAlbumSeries);
     }
@@ -153,11 +153,11 @@ public class Album {
 
     public void setInboxUser(User inboxUser) { this.inboxUser = inboxUser; }
 
-    public Set<Event> getEvents() { return events; }
+    // Set<Event> getEvents() { return events; }
 
-    public void setEvents(Set<Event> events) { this.events = events; }
+   // public void setEvents(Set<Event> events) { this.events = events; }
 
-    public void addEvents(Event event) { this.events.add(event); }
+    //public void addEvents(Event event) { this.events.add(event); }
 
     public void addCapability(Capability capability) { this.capabilities.add(capability); }
 
@@ -165,7 +165,7 @@ public class Album {
 
     public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
-    public Set<ReportProvider> getReportProviders() {return reportProviders; }
+    //public Set<ReportProvider> getReportProviders() {return reportProviders; }
 
     public void addWebhook(Webhook webhook) { this.webhooks.add(webhook); }
 

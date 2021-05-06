@@ -60,30 +60,30 @@ public abstract class Event {
 
     protected Event(User callingUser) {
         user = callingUser;
-        callingUser.addEvents(this);
+        //callingUser.addEvents(this);
     }
 
     protected Event(User callingUser, Album album) {
         user = callingUser;
         this.album = album;
-        callingUser.addEvents(this);
-        album.addEvents(this);
+        //callingUser.addEvents(this);
+        //album.addEvents(this);
     }
 
     protected Event(User callingUser, Album album, Study study) {
         user = callingUser;
         this.album = album;
         this.study = study;
-        callingUser.addEvents(this);
-        album.addEvents(this);
-        study.addEvents(this);
+        //callingUser.addEvents(this);
+        //album.addEvents(this);
+        //study.addEvents(this);
     }
 
     protected Event(User callingUser, Study study) {
         user = callingUser;
         this.study = study;
-        callingUser.addEvents(this);
-        study.addEvents(this);
+        //callingUser.addEvents(this);
+        //study.addEvents(this);
     }
 
     public long getPk() { return pk; }
