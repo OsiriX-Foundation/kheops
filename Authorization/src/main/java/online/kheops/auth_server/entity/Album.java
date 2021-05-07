@@ -67,8 +67,8 @@ public class Album {
     @Where(clause = "enabled=true and new_user = true")
     private Set<Webhook> webhooksNewUserEnabled = new HashSet<>();
 
-    @OneToMany(mappedBy = "album")
-    private Set<Event> events = new HashSet<>();
+    //@OneToMany(mappedBy = "album")
+    //private Set<Event> events = new HashSet<>();
 
     @OneToOne(mappedBy = "inbox")
     private User inboxUser;
@@ -76,8 +76,8 @@ public class Album {
     @OneToMany(mappedBy = "album")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany(mappedBy = "album")
-    private Set<ReportProvider> reportProviders = new HashSet<>();
+    //@OneToMany(mappedBy = "album")
+    //private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -131,7 +131,7 @@ public class Album {
         return true;
     }
 
-    public void addSeries(AlbumSeries albumSeries) { this.albumSeries.add(albumSeries); }
+    //public void addSeries(AlbumSeries albumSeries) { this.albumSeries.add(albumSeries); }
 
     public void removeSeries(Series series, EntityManager em) {
         AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album", AlbumSeries.class)
@@ -139,11 +139,11 @@ public class Album {
                 .setParameter(ALBUM, this)
                 .getSingleResult();
         //series.removeAlbumSeries(localAlbumSeries);
-        this.albumSeries.remove(localAlbumSeries);
+        //this.albumSeries.remove(localAlbumSeries);
         em.remove(localAlbumSeries);
     }
 
-    public Set<AlbumSeries> getAlbumSeries() { return albumSeries; }
+    //public Set<AlbumSeries> getAlbumSeries() { return albumSeries; }
 
     public Set<AlbumUser> getAlbumUser() { return albumUser; }
 
@@ -163,7 +163,7 @@ public class Album {
 
     public Set<Capability> getCapabilities() { return capabilities; }
 
-    public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
+    //public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
 
     //public Set<ReportProvider> getReportProviders() {return reportProviders; }
 

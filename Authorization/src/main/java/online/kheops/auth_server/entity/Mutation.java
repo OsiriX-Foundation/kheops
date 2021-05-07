@@ -64,14 +64,14 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         this.reportProvider = reportProvider;
 
-        reportProvider.addMutation(this);
+        //reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType, Series series) {
         this(callingUser, album, mutationType, series);
         this.reportProvider = reportProvider;
 
-        reportProvider.addMutation(this);
+        //reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, MutationType mutationType, Series series) {

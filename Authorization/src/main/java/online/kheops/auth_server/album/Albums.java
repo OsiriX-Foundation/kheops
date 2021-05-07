@@ -19,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
+import static online.kheops.auth_server.capability.CapabilitiesQueries.deleteAllCapabilitiesByAlbum;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventsByAlbum;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.deleteAllReportProviderByAlbum;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
@@ -159,29 +162,34 @@ public class Albums {
                 event.removeAllSeries();
                 em.remove(event);
             }*/
-            em.createNamedQuery("Event.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            //em.createNamedQuery("Event.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            deleteAllEventsByAlbum(album, em);
 
             /*for (ReportProvider reportProvider:album.getReportProviders()) {
                 em.remove(reportProvider);
             }*/
-            em.createNamedQuery("ReportProvider.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            //em.createNamedQuery("ReportProvider.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            deleteAllReportProviderByAlbum(album, em);
 
 
             /*for (AlbumUser albumUser:album.getAlbumUser()) {
                 em.remove(albumUser);
             }*/
-            em.createNamedQuery("AlbumUser.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            //em.createNamedQuery("AlbumUser.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            deleteAllAlbumUserByAlbum(album, em);
 
             /*for (Capability capability:album.getCapabilities()) {
                 capability.setRevoked(true);
                 em.remove(capability);
             }*/
-            em.createNamedQuery("Capability.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            //em.createNamedQuery("Capability.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            deleteAllCapabilitiesByAlbum(album, em);
 
             /*for (AlbumSeries albumSeries:album.getAlbumSeries()) {
                 em.remove(albumSeries);
             }*/
-            em.createNamedQuery("AlbumSeries.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            //em.createNamedQuery("AlbumSeries.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            deleteAllAlbumSeriesByAlbum(album, em);
 
             /*for (Webhook webhook:album.getWebhooks()) {
                 deleteWebhook(webhook, em);

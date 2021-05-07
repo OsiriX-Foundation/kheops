@@ -40,7 +40,7 @@ public class AlbumSeries {
         this.album = album;
         this.series = series;
         favorite = false;
-        this.album.addSeries(this);
+        //this.album.addSeries(this);
         //this.series.addAlbumSeries(this);
     }
 

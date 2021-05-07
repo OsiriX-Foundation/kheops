@@ -369,4 +369,18 @@ public class AlbumQueries {
             return condition;
         }
     }
+
+    public static void deleteAllAlbumUserByAlbum (Album album, EntityManager em) {
+        em.createNamedQuery("AlbumUser.deleteAllByAlbum")
+                .setParameter(ALBUM, album)
+                .executeUpdate();
+
+    }
+
+    public static void deleteAllAlbumSeriesByAlbum (Album album, EntityManager em) {
+        em.createNamedQuery("AlbumSeries.deleteAllByAlbum")
+                .setParameter(ALBUM, album)
+                .executeUpdate();
+
+    }
 }

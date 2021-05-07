@@ -84,8 +84,8 @@ public class Study {
     @Column(name = "populated")
     private boolean populated = false;
 
-    @OneToMany(mappedBy = "study")
-    private Set<Series> series = new HashSet<>();
+    //@OneToMany(mappedBy = "study")
+    //private Set<Series> series = new HashSet<>();
 
     //@OneToMany(mappedBy = "study")
     //private Set<Event> events = new HashSet<>();
@@ -251,7 +251,7 @@ public class Study {
     }
 
     public void addSeries (Series series) {
-        this.series.add(series);
+        //this.series.add(series);
         series.setStudy(this);
     }
 
