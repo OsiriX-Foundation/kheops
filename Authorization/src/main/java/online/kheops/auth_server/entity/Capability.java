@@ -119,9 +119,6 @@ public class Capability {
     @JoinColumn(name = "album_fk", insertable = true, updatable=false)
     private Album album;
 
-    //@OneToMany(mappedBy = "capability")
-    //private Set<Mutation> mutations = new HashSet<>();
-
     @PrePersist
     public void onPrePersist() {
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -163,7 +160,6 @@ public class Capability {
         this.writePermission = builder.writePermission;
         this.appropriatePermission = builder.appropriatePermission;
         this.downloadPermission = builder.downloadPermission;
-        //builder.user.getCapabilities().add(this);
     }
 
     public LocalDateTime getExpirationTime() { return expirationTime; }
@@ -244,10 +240,6 @@ public class Capability {
     public void setAlbum(Album album) { this.album = album; }
 
     public String getSecretBeforeHash() { return secretBeforeHash; }
-
-    //public void addMutation(Mutation mutation) { mutations.add(mutation); }
-
-
 
     public static class CapabilityBuilder {
 

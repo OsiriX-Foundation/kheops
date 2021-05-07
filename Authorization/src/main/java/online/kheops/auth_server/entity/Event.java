@@ -62,30 +62,22 @@ public abstract class Event {
 
     protected Event(User callingUser) {
         user = callingUser;
-        //callingUser.addEvents(this);
     }
 
     protected Event(User callingUser, Album album) {
         user = callingUser;
         this.album = album;
-        //callingUser.addEvents(this);
-        //album.addEvents(this);
     }
 
     protected Event(User callingUser, Album album, Study study) {
         user = callingUser;
         this.album = album;
         this.study = study;
-        //callingUser.addEvents(this);
-        //album.addEvents(this);
-        //study.addEvents(this);
     }
 
     protected Event(User callingUser, Study study) {
         user = callingUser;
         this.study = study;
-        //callingUser.addEvents(this);
-        //study.addEvents(this);
     }
 
     public long getPk() { return pk; }
@@ -104,14 +96,6 @@ public abstract class Event {
 
     public void addSeries(Series series) {
         this.series.add(series);
-    }
-
-    public void removeSeries(Series series) {
-        this.series.remove(series);
-    }
-
-    public void removeAllSeries() {
-        this.series.clear();
     }
 
     public Set<Series> getSeries() { return series; }

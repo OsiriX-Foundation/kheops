@@ -73,7 +73,6 @@ public class WebhookTrigger {
         this.id = id;
         this.isManualTrigger = isManualTrigger;
         this.webhook = webhook;
-        //webhook.addWebhookTrigger(this);
         if(type.equals(WebhookType.NEW_USER)) {
             this.newUser = true;
             this.newSeries = false;
@@ -94,8 +93,6 @@ public class WebhookTrigger {
     }
 
     public User getUser() {return user; }
-
-    //public void addWebhookAttempt(WebhookAttempt webhookAttempt) { this.webhookAttempts.add(webhookAttempt); }
 
     public boolean isManualTrigger() { return isManualTrigger; }
     public boolean getNewSeries() { return newSeries; }
@@ -118,14 +115,6 @@ public class WebhookTrigger {
     public void addSeries(Series series) {
         this.series.add(series);
     }
-
-    //public void removeSeries(Series series) {
-    //    this.series.remove(series);
-    //}
-
-    //public void removeAllSeries() {
-    //    this.series.clear();
-    //}
 
     public Set<Series> getSeries() { return series; }
 

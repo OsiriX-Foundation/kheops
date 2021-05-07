@@ -50,8 +50,6 @@ public class Mutation extends Event{
         super(callingUser, album);
         this.mutationType = mutationType;
         toUser = targetUser;
-
-        //targetUser.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, MutationType mutationType) {
@@ -63,15 +61,11 @@ public class Mutation extends Event{
         super(callingUser, album);
         this.mutationType = mutationType;
         this.reportProvider = reportProvider;
-
-        //reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType, Series series) {
         this(callingUser, album, mutationType, series);
         this.reportProvider = reportProvider;
-
-        //reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, MutationType mutationType, Series series) {
@@ -93,8 +87,6 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         this.capability = capability;
 
-        //capability.addMutation(this);
-
         for (Series series : seriesList) {
             this.addSeries(series);
         }
@@ -105,7 +97,5 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         this.getSeries().add(series);
         this.capability = capability;
-
-        //capability.addMutation(this);
     }
 }

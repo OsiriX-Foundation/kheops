@@ -67,17 +67,11 @@ public class Album {
     @Where(clause = "enabled=true and new_user = true")
     private Set<Webhook> webhooksNewUserEnabled = new HashSet<>();
 
-    //@OneToMany(mappedBy = "album")
-    //private Set<Event> events = new HashSet<>();
-
     @OneToOne(mappedBy = "inbox")
     private User inboxUser;
 
     @OneToMany(mappedBy = "album")
     private Set<Capability> capabilities = new HashSet<>();
-
-    //@OneToMany(mappedBy = "album")
-    //private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -131,19 +125,13 @@ public class Album {
         return true;
     }
 
-    //public void addSeries(AlbumSeries albumSeries) { this.albumSeries.add(albumSeries); }
-
     public void removeSeries(Series series, EntityManager em) {
         AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album", AlbumSeries.class)
                 .setParameter(SERIES, series)
                 .setParameter(ALBUM, this)
                 .getSingleResult();
-        //series.removeAlbumSeries(localAlbumSeries);
-        //this.albumSeries.remove(localAlbumSeries);
         em.remove(localAlbumSeries);
     }
-
-    //public Set<AlbumSeries> getAlbumSeries() { return albumSeries; }
 
     public Set<AlbumUser> getAlbumUser() { return albumUser; }
 
@@ -153,19 +141,9 @@ public class Album {
 
     public void setInboxUser(User inboxUser) { this.inboxUser = inboxUser; }
 
-    // Set<Event> getEvents() { return events; }
-
-   // public void setEvents(Set<Event> events) { this.events = events; }
-
-    //public void addEvents(Event event) { this.events.add(event); }
-
     public void addCapability(Capability capability) { this.capabilities.add(capability); }
 
     public Set<Capability> getCapabilities() { return capabilities; }
-
-    //public void addReportProvider(ReportProvider reportProvider) { this.reportProviders.add(reportProvider); }
-
-    //public Set<ReportProvider> getReportProviders() {return reportProviders; }
 
     public void addWebhook(Webhook webhook) { this.webhooks.add(webhook); }
 

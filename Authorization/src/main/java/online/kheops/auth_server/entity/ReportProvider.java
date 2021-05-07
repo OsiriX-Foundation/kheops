@@ -58,9 +58,6 @@ public class ReportProvider {
     @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
-    //@OneToMany(mappedBy = "reportProvider")
-    //private Set<Mutation> mutations = new HashSet<>();
-
     @PrePersist
     public void onPrePersist() {
         creationTime = LocalDateTime.now(ZoneOffset.UTC);
@@ -74,8 +71,6 @@ public class ReportProvider {
         this.url = url;
         this.name = name;
         this.album = album;
-
-        //album.addReportProvider(this);
     }
 
     public LocalDateTime getCreationTime() {
@@ -95,8 +90,6 @@ public class ReportProvider {
     }
 
     public Album getAlbum() { return album; }
-
-    //public void addMutation(Mutation mutation) { mutations.add(mutation); }
 
     public void setUrl(String url) { this.url = url; }
 

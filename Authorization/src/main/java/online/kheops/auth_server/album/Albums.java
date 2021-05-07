@@ -158,44 +158,11 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
-            /*for (Event event:album.getEvents()) {
-                event.removeAllSeries();
-                em.remove(event);
-            }*/
-            //em.createNamedQuery("Event.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
             deleteAllEventsByAlbum(album, em);
-
-            /*for (ReportProvider reportProvider:album.getReportProviders()) {
-                em.remove(reportProvider);
-            }*/
-            //em.createNamedQuery("ReportProvider.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
             deleteAllReportProviderByAlbum(album, em);
-
-
-            /*for (AlbumUser albumUser:album.getAlbumUser()) {
-                em.remove(albumUser);
-            }*/
-            //em.createNamedQuery("AlbumUser.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
             deleteAllAlbumUserByAlbum(album, em);
-
-            /*for (Capability capability:album.getCapabilities()) {
-                capability.setRevoked(true);
-                em.remove(capability);
-            }*/
-            //em.createNamedQuery("Capability.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
             deleteAllCapabilitiesByAlbum(album, em);
-
-            /*for (AlbumSeries albumSeries:album.getAlbumSeries()) {
-                em.remove(albumSeries);
-            }*/
-            //em.createNamedQuery("AlbumSeries.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
             deleteAllAlbumSeriesByAlbum(album, em);
-
-            /*for (Webhook webhook:album.getWebhooks()) {
-                deleteWebhook(webhook, em);
-            }*/
-            //em.createNamedQuery("Webhook.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
-
 
             em.remove(album);
 

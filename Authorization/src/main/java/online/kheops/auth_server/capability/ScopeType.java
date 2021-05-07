@@ -40,7 +40,6 @@ public enum ScopeType {
         @Override
         public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) {
             capability.setScopeType(this);
-            //capability.getUser().getCapabilities().add(capability);
         }
     },
     ALBUM {

@@ -111,7 +111,6 @@ public class Webhook {
         creationTime = LocalDateTime.now();
 
         album.addWebhook(this);
-        //user.addWebhook(this);
     }
 
     public String getId() {
@@ -157,10 +156,6 @@ public class Webhook {
 
 
     public Set<WebhookTrigger> getWebhookTriggers() { return webhookTriggers; }
-
-    //public void addWebhookTrigger(WebhookTrigger webhookTrigger) {
-    //    this.webhookTriggers.add(webhookTrigger);
-    //}
 
     public void setName(String name) {
         this.name = name;

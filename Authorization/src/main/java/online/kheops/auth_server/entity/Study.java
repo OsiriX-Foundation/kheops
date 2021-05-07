@@ -84,12 +84,6 @@ public class Study {
     @Column(name = "populated")
     private boolean populated = false;
 
-    //@OneToMany(mappedBy = "study")
-    //private Set<Series> series = new HashSet<>();
-
-    //@OneToMany(mappedBy = "study")
-    //private Set<Event> events = new HashSet<>();
-
     @PrePersist
     public void onPrePersist() {
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -251,7 +245,6 @@ public class Study {
     }
 
     public void addSeries (Series series) {
-        //this.series.add(series);
         series.setStudy(this);
     }
 
@@ -262,12 +255,6 @@ public class Study {
     public LocalDateTime getUpdatedTime() {
         return updatedTime;
     }
-
-    //public Set<Event> getEvents() { return events; }
-
-    //public void setEvents(Set<Event> events) { this.events = events; }
-
-    //public void addEvents(Event event) { this.events.add(event); }
 
     @Override
     public boolean equals(Object o) {
