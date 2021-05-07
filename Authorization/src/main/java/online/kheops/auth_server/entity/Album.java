@@ -56,7 +56,7 @@ public class Album {
     @OneToMany(mappedBy = "album")
     private Set<AlbumUser> albumUser = new HashSet<>();
 
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
     private Set<Webhook> webhooks = new HashSet<>();
 
     @OneToMany(mappedBy = "album")

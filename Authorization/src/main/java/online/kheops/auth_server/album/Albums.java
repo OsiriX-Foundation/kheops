@@ -186,7 +186,7 @@ public class Albums {
             /*for (Webhook webhook:album.getWebhooks()) {
                 deleteWebhook(webhook, em);
             }*/
-            em.createNamedQuery("Webhook.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+            //em.createNamedQuery("Webhook.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
 
 
             em.remove(album);
