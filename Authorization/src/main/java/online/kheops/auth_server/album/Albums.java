@@ -23,6 +23,7 @@ import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.ALBUM;
 import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
 
 public class Albums {
@@ -158,28 +159,36 @@ public class Albums {
                 event.removeAllSeries();
                 em.remove(event);
             }*/
+            em.createNamedQuery("Event.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
 
             /*for (ReportProvider reportProvider:album.getReportProviders()) {
                 em.remove(reportProvider);
             }*/
+            em.createNamedQuery("ReportProvider.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
 
-            for (AlbumUser albumUser:album.getAlbumUser()) {
+
+            /*for (AlbumUser albumUser:album.getAlbumUser()) {
                 em.remove(albumUser);
-            }
+            }*/
+            em.createNamedQuery("AlbumUser.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
 
             /*for (Capability capability:album.getCapabilities()) {
                 capability.setRevoked(true);
                 em.remove(capability);
             }*/
+            em.createNamedQuery("Capability.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
 
-            for (AlbumSeries albumSeries:album.getAlbumSeries()) {
+            /*for (AlbumSeries albumSeries:album.getAlbumSeries()) {
                 em.remove(albumSeries);
-            }
+            }*/
+            em.createNamedQuery("AlbumSeries.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
 
-            for (Webhook webhook:album.getWebhooks()) {
+            /*for (Webhook webhook:album.getWebhooks()) {
                 deleteWebhook(webhook, em);
-            }
-            
+            }*/
+            em.createNamedQuery("Webhook.deleteAllByAlbum").setParameter(ALBUM, album).executeUpdate();
+
+
             em.remove(album);
 
             tx.commit();

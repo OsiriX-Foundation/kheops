@@ -19,7 +19,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "ReportProvider.findAllByAlbumId",
                 query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
         @NamedQuery(name = "ReportProvider.countAllByAlbumId",
-                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false")
+                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false"),
+        @NamedQuery(name = "ReportProvider.deleteAllByAlbum",
+                query = "DELETE FROM ReportProvider rp WHERE rp.album = :"+ALBUM)
 })
 
 @Entity

@@ -40,7 +40,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "Capability.countAllByAlbum",
         query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id"),
         @NamedQuery(name = "Capability.countAllValidByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+"")
+        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+""),
+        @NamedQuery(name = "Capability.deleteAllByAlbum",
+        query = "DELETE FROM Capability c WHERE c.album = :"+ALBUM)
 })
 
 @Entity

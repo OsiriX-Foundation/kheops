@@ -67,16 +67,16 @@ public class Album {
     @Where(clause = "enabled=true and new_user = true")
     private Set<Webhook> webhooksNewUserEnabled = new HashSet<>();
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "album")
     private Set<Event> events = new HashSet<>();
 
     @OneToOne(mappedBy = "inbox")
     private User inboxUser;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "album")
     private Set<Capability> capabilities = new HashSet<>();
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "album")
     private Set<ReportProvider> reportProviders = new HashSet<>();
 
     @PrePersist

@@ -12,7 +12,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "Event.findAllByAlbum",
         query = "SELECT e FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+") ORDER BY e.eventTime desc"),
         @NamedQuery(name = "Event.countAllByAlbumAndUser",
-        query = "SELECT count(e) FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+")")
+        query = "SELECT count(e) FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+")"),
+        @NamedQuery(name = "Event.deleteAllByAlbum",
+        query = "DELETE FROM Event e WHERE e.album = :"+ALBUM)
 })
 
 @Entity

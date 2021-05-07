@@ -25,7 +25,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "Webhook.countByAlbumAndUrl",
         query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM+" AND w.url = :"+WEBHOOK_URL),
         @NamedQuery(name = "Webhook.findAllEnabledAndForNewSeriesByStudyUID",
-        query = "SELECT DISTINCT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :"+STUDY_UID+" AND w.enabled = true AND w.newSeries = true")
+        query = "SELECT DISTINCT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :"+STUDY_UID+" AND w.enabled = true AND w.newSeries = true"),
+        @NamedQuery(name = "Webhook.deleteAllByAlbum",
+        query = "DELETE FROM Webhook w WHERE w.album = :"+ALBUM)
 })
 
 @Entity
