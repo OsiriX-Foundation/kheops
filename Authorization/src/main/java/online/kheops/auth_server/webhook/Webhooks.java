@@ -113,14 +113,6 @@ public class Webhooks {
 
             webhookResponse = new WebhookResponse(webhook, em);
 
-            /*int maxHistory = 5;
-            for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                webhookResponse.addTrigger(webhookTrigger);
-                maxHistory--;
-                if(maxHistory == 0) {
-                    break;
-                }
-            }*/
             getWebhookTriggers(webhook, 5, 0, em).forEach(webhookResponse::addTrigger);
 
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.EDIT_WEBHOOK)
@@ -196,18 +188,6 @@ public class Webhooks {
                     .log();
 
             webhookResponse = new WebhookResponse(webhook, em);
-
-            /*for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                if (triggerOffset > 0) {
-                    triggerOffset--;
-                } else {
-                    webhookResponse.addFullTriggers(webhookTrigger, kheopsInstance);
-                    triggerLimit--;
-                    if (triggerLimit == 0) {
-                        break;
-                    }
-                }
-            }*/
             getWebhookTriggers(webhook, triggerLimit, triggerOffset, em).forEach(webhookTrigger ->  webhookResponse.addFullTriggers(webhookTrigger, kheopsInstance));
 
 
@@ -244,14 +224,6 @@ public class Webhooks {
             for(Webhook webhook:webhookList) {
                 final WebhookResponse webhookResponse = new WebhookResponse(webhook, em);
                 webhookResponseList.add(webhookResponse);
-                /*int maxHistory = 5;
-                for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                    webhookResponse.addTrigger(webhookTrigger);
-                    maxHistory--;
-                    if(maxHistory == 0) {
-                        break;
-                    }
-                }*/
                 getWebhookTriggers(webhook, 5, 0, em).forEach(webhookResponse::addTrigger);
             }
 
