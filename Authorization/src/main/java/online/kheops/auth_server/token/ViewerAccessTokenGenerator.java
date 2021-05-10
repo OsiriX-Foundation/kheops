@@ -122,7 +122,7 @@ class ViewerAccessTokenGenerator {
             data.put(Consts.JWE.IS_INBOX, (sourceType != null && sourceType.equals(INBOX)));
             data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
             data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
-            if (scopes != null && scopes.size() > 0) {
+            if (scopes != null && !scopes.isEmpty()) {
                 data.put(Consts.JWE.SCOPE, String.join(" ", scopes));
             }
 

@@ -50,9 +50,7 @@ public class WebhookAsyncRequestDeleteAlbum {
         if(secret != null) {
             final SignedEntity signedEntity = new SignedEntity(data, secret);
             final CompletionStage<Response> completionStage = asyncInvoker.post(Entity.entity(signedEntity, MediaType.APPLICATION_JSON));
-            completionStage.thenAcceptAsync((response) -> {
-                new WebhooksCallbacksDeleteAlbum(response,  cnt, this);
-            }, CALLBACK_SCHEDULER);
+            completionStage.thenAcceptAsync(response -> new WebhooksCallbacksDeleteAlbum(response,  cnt, this), CALLBACK_SCHEDULER);
             completionStage.exceptionally(throwable -> {
                 new WebhooksCallbacksFailDeleteAlbum(throwable,  cnt, this);
                 return null;
