@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static online.kheops.auth_server.accesstoken.AccessTokenUtils.stringContainsScope;
-import static online.kheops.auth_server.accesstoken.AccessTokenUtils.ValidateScopeString;
+import static online.kheops.auth_server.accesstoken.AccessTokenUtils.validateScopeString;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -107,7 +107,7 @@ public enum TokenGrantType {
             if (!subjectTokenType.equals("urn:ietf:params:oauth:token-type:access_token")) {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown subject token type");
             }
-            if (!ValidateScopeString(scopeString)) {
+            if (!validateScopeString(scopeString)) {
                 throw new TokenRequestException(INVALID_SCOPE);
             }
 
