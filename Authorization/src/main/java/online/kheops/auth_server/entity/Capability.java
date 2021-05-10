@@ -7,8 +7,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;

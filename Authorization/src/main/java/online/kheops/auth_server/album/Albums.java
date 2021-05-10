@@ -26,8 +26,6 @@ import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
-import static online.kheops.auth_server.util.JPANamedQueryConstants.ALBUM;
-import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
 
 public class Albums {
 

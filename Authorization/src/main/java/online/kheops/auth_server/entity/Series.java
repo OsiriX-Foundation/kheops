@@ -7,8 +7,6 @@ import org.dcm4che3.data.VR;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Set;
 
 import static online.kheops.auth_server.series.Series.safeAttributeSetString;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;

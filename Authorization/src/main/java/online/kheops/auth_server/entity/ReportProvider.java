@@ -4,8 +4,6 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Set;
 
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
