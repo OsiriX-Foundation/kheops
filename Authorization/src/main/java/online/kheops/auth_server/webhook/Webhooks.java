@@ -167,8 +167,7 @@ public class Webhooks {
     public static void deleteWebhook(Webhook webhook, EntityManager em) {
         em.remove(webhook);
     }
-
-
+    
     public static WebhookResponse getWebhook(String webhookID, String albumId, Integer triggerLimit, Integer triggerOffset, KheopsInstance kheopsInstance, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
@@ -200,6 +199,7 @@ public class Webhooks {
         }
         return webhookResponse;
     }
+
     public static PairListXTotalCount<WebhookResponse> getWebhooks(String albumId, String url, Integer limit, Integer offset)
             throws AlbumNotFoundException {
 
