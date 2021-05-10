@@ -167,7 +167,7 @@ public class Webhooks {
     public static void deleteWebhook(Webhook webhook, EntityManager em) {
         em.remove(webhook);
     }
-    
+
     public static WebhookResponse getWebhook(String webhookID, String albumId, Integer triggerLimit, Integer triggerOffset, KheopsInstance kheopsInstance, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
 
@@ -349,10 +349,10 @@ public class Webhooks {
     }
 
     public static void validName(String name) throws BadQueryParametersException {
-        if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
+        if(name.length() > Consts.DbColumnSize.WEBHOOK_NAME) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
+                    .detail("Param 'name' is too long max expected: " + Consts.DbColumnSize.WEBHOOK_NAME + " characters but got :" + name.length())
                     .build();
             throw new  BadQueryParametersException(errorResponse);
         } else if (name.length() == 0) {
@@ -365,10 +365,10 @@ public class Webhooks {
     }
 
     public static void validSecret(String secret) throws BadQueryParametersException {
-        if (secret != null && secret.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET) {
+        if (secret != null && secret.length() > Consts.DbColumnSize.WEBHOOK_SECRET) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'secret' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET + " characters but got :" + secret.length())
+                    .detail("Param 'secret' is too long max expected: " + Consts.DbColumnSize.WEBHOOK_SECRET + " characters but got :" + secret.length())
                     .build();
             throw new  BadQueryParametersException(errorResponse);
         } else if (secret != null && secret.length() == 0) {
@@ -381,10 +381,10 @@ public class Webhooks {
     }
 
     public static void validUrl(String url) throws BadQueryParametersException {
-        if(url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
+        if(url.length() > Consts.DbColumnSize.WEBHOOK_URL) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'url' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_URL + " characters but got :" + url.length())
+                    .detail("Param 'url' is too long max expected: " + Consts.DbColumnSize.WEBHOOK_URL + " characters but got :" + url.length())
                     .build();
             throw new  BadQueryParametersException(errorResponse);
         }

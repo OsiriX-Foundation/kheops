@@ -53,7 +53,7 @@ public class FetchResource {
     @POST
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/fetch")
-    public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID) {
+    public Response getStudies(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID) {
         Fetcher.fetchStudy(studyInstanceUID);
         ((KheopsPrincipal) securityContext.getUserPrincipal()).getKheopsLogBuilder()
                 .study(studyInstanceUID)
@@ -66,15 +66,15 @@ public class FetchResource {
     @Secured
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/fetch")
-    public Response getStudies(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                               @FormParam(SeriesInstanceUID) List<String> seriesInstanceUIDList,
+    public Response getStudies(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                               @FormParam(SERIES_INSTANCE_UID) List<String> seriesInstanceUIDList,
                                @FormParam("album") String albumIdParam)
             throws AlbumNotFoundException, SeriesNotFoundException {
 
         if(seriesInstanceUIDList == null || seriesInstanceUIDList.isEmpty()) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("'" + SeriesInstanceUID + "' formparam is empty")
+                    .detail("'" + SERIES_INSTANCE_UID + "' formparam is empty")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }

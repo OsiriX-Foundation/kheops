@@ -10,7 +10,7 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
 import online.kheops.auth_server.user.UserResponse;
 import online.kheops.auth_server.user.UsersPermission;
-import online.kheops.auth_server.util.Consts.DB_COLUMN_SIZE;
+import online.kheops.auth_server.util.Consts.DbColumnSize;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.ErrorResponse.ErrorResponseBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.ActionType;
@@ -62,17 +62,17 @@ public class AlbumResource {
 
         name = name.trim();
         description = description.trim();
-        if(name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+        if(name.length() > DbColumnSize.ALBUM_NAME) {
             final ErrorResponse errorResponse = new ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'name' is too long max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length())
+                    .detail("Param 'name' is too long max expected: " + DbColumnSize.ALBUM_NAME + " characters but got :" + name.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
-        if(description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+        if(description.length() > DbColumnSize.ALBUM_DESCRIPTION) {
             final ErrorResponse errorResponse = new ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'description' is too long max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length())
+                    .detail("Param 'description' is too long max expected: " + DbColumnSize.ALBUM_DESCRIPTION + " characters but got :" + description.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -189,34 +189,34 @@ public class AlbumResource {
 
         if(name != null) {
             name = name .trim();
-            if (name.length() > DB_COLUMN_SIZE.ALBUM_NAME) {
+            if (name.length() > DbColumnSize.ALBUM_NAME) {
                 final ErrorResponse errorResponse = new ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'name' is too long max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got :" + name.length())
+                        .detail("Param 'name' is too long max expected: " + DbColumnSize.ALBUM_NAME + " characters but got :" + name.length())
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if (name.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'name' can not be empty max expected: " + DB_COLUMN_SIZE.ALBUM_NAME + " characters but got 0")
+                        .detail("Param 'name' can not be empty max expected: " + DbColumnSize.ALBUM_NAME + " characters but got 0")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
         if(description != null) {
             description = description.trim();
-            if (description.length() > DB_COLUMN_SIZE.ALBUM_DESCRIPTION) {
+            if (description.length() > DbColumnSize.ALBUM_DESCRIPTION) {
                 final ErrorResponse errorResponse = new ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'description' is too long max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got :" + description.length())
+                        .detail("Param 'description' is too long max expected: " + DbColumnSize.ALBUM_DESCRIPTION + " characters but got :" + description.length())
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
             if (description.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'description' can not be empty max expected: " + DB_COLUMN_SIZE.ALBUM_DESCRIPTION + " characters but got 0")
+                        .detail("Param 'description' can not be empty max expected: " + DbColumnSize.ALBUM_DESCRIPTION + " characters but got 0")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
