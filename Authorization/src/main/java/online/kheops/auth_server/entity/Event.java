@@ -12,7 +12,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "Event.findAllByAlbum",
         query = "SELECT e FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+") ORDER BY e.eventTime desc"),
         @NamedQuery(name = "Event.countAllByAlbumAndUser",
-        query = "SELECT count(e) FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+")")
+        query = "SELECT count(e) FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+")"),
+        @NamedQuery(name = "Event.deleteAllByAlbum",
+        query = "DELETE FROM Event e WHERE e.album = :"+ALBUM)
 })
 
 @Entity
@@ -60,30 +62,22 @@ public abstract class Event {
 
     protected Event(User callingUser) {
         user = callingUser;
-        callingUser.addEvents(this);
     }
 
     protected Event(User callingUser, Album album) {
         user = callingUser;
         this.album = album;
-        callingUser.addEvents(this);
-        album.addEvents(this);
     }
 
     protected Event(User callingUser, Album album, Study study) {
         user = callingUser;
         this.album = album;
         this.study = study;
-        callingUser.addEvents(this);
-        album.addEvents(this);
-        study.addEvents(this);
     }
 
     protected Event(User callingUser, Study study) {
         user = callingUser;
         this.study = study;
-        callingUser.addEvents(this);
-        study.addEvents(this);
     }
 
     public long getPk() { return pk; }
@@ -102,14 +96,6 @@ public abstract class Event {
 
     public void addSeries(Series series) {
         this.series.add(series);
-    }
-
-    public void removeSeries(Series series) {
-        this.series.remove(series);
-    }
-
-    public void removeAllSeries() {
-        this.series.clear();
     }
 
     public Set<Series> getSeries() { return series; }

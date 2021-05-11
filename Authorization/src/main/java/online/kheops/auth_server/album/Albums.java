@@ -19,11 +19,13 @@ import java.util.Collections;
 import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
+import static online.kheops.auth_server.capability.CapabilitiesQueries.deleteAllCapabilitiesByAlbum;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventsByAlbum;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.deleteAllReportProviderByAlbum;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
-import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
 
 public class Albums {
 
@@ -151,32 +153,12 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
-            for (Event event:album.getEvents()) {
-                event.removeAllSeries();
-                em.remove(event);
-            }
+            deleteAllEventsByAlbum(album, em);
+            deleteAllReportProviderByAlbum(album, em);
+            deleteAllAlbumUserByAlbum(album, em);
+            deleteAllCapabilitiesByAlbum(album, em);
+            deleteAllAlbumSeriesByAlbum(album, em);
 
-            for (ReportProvider reportProvider:album.getReportProviders()) {
-                em.remove(reportProvider);
-            }
-
-            for (AlbumUser albumUser:album.getAlbumUser()) {
-                em.remove(albumUser);
-            }
-
-            for (Capability capability:album.getCapabilities()) {
-                capability.setRevoked(true);
-                em.remove(capability);
-            }
-
-            for (AlbumSeries albumSeries:album.getAlbumSeries()) {
-                em.remove(albumSeries);
-            }
-
-            for (Webhook webhook:album.getWebhooks()) {
-                deleteWebhook(webhook, em);
-            }
-            
             em.remove(album);
 
             tx.commit();

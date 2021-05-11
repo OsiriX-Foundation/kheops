@@ -7,8 +7,6 @@ import org.dcm4che3.data.VR;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Set;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
@@ -83,12 +81,6 @@ public class Study {
     @Basic(optional = false)
     @Column(name = "populated")
     private boolean populated = false;
-
-    @OneToMany(mappedBy = "study")
-    private Set<Series> series = new HashSet<>();
-
-    @OneToMany(mappedBy = "study")
-    private Set<Event> events = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -251,7 +243,6 @@ public class Study {
     }
 
     public void addSeries (Series series) {
-        this.series.add(series);
         series.setStudy(this);
     }
 
@@ -262,12 +253,6 @@ public class Study {
     public LocalDateTime getUpdatedTime() {
         return updatedTime;
     }
-
-    public Set<Event> getEvents() { return events; }
-
-    public void setEvents(Set<Event> events) { this.events = events; }
-
-    public void addEvents(Event event) { this.events.add(event); }
 
     @Override
     public boolean equals(Object o) {

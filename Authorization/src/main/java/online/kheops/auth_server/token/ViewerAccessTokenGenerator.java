@@ -115,15 +115,15 @@ class ViewerAccessTokenGenerator {
                 encodedToken = token;
             }
 
-            data.put(Consts.JWE.TOKEN, encodedToken);
+            data.put(Consts.Jwe.TOKEN, encodedToken);
             if (sourceId != null) {
-                data.put(Consts.JWE.SOURCE_ID, sourceId);
+                data.put(Consts.Jwe.SOURCE_ID, sourceId);
             }
-            data.put(Consts.JWE.IS_INBOX, (sourceType != null && sourceType.equals(INBOX)));
-            data.put(Consts.JWE.STUDY_INSTANCE_UID, studyInstanceUID);
-            data.put(Consts.JWE.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
-            if (scopes != null && scopes.size() > 0) {
-                data.put(Consts.JWE.SCOPE, String.join(" ", scopes));
+            data.put(Consts.Jwe.IS_INBOX, (sourceType != null && sourceType.equals(INBOX)));
+            data.put(Consts.Jwe.STUDY_INSTANCE_UID, studyInstanceUID);
+            data.put(Consts.Jwe.EXP, Date.from(Instant.now().plus(expiresIn, ChronoUnit.SECONDS)));
+            if (scopes != null && !scopes.isEmpty()) {
+                data.put(Consts.Jwe.SCOPE, String.join(" ", scopes));
             }
 
             final JsonWebEncryption jwe = new JsonWebEncryption();

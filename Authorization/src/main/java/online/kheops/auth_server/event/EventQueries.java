@@ -141,4 +141,11 @@ public class EventQueries {
         query.setParameter(STUDY_UID, studyUID);
         return query.getSingleResult();
     }
+
+    public static void deleteAllEventsByAlbum (Album album, EntityManager em) {
+        em.createNamedQuery("Event.deleteAllByAlbum")
+                .setParameter(ALBUM, album)
+                .executeUpdate();
+
+    }
 }

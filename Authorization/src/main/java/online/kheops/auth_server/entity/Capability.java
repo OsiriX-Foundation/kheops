@@ -7,8 +7,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
@@ -40,7 +38,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "Capability.countAllByAlbum",
         query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id"),
         @NamedQuery(name = "Capability.countAllValidByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+"")
+        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+""),
+        @NamedQuery(name = "Capability.deleteAllByAlbum",
+        query = "DELETE FROM Capability c WHERE c.album = :"+ALBUM)
 })
 
 @Entity
@@ -117,9 +117,6 @@ public class Capability {
     @JoinColumn(name = "album_fk", insertable = true, updatable=false)
     private Album album;
 
-    @OneToMany(mappedBy = "capability")
-    private Set<Mutation> mutations = new HashSet<>();
-
     @PrePersist
     public void onPrePersist() {
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -161,7 +158,6 @@ public class Capability {
         this.writePermission = builder.writePermission;
         this.appropriatePermission = builder.appropriatePermission;
         this.downloadPermission = builder.downloadPermission;
-        builder.user.getCapabilities().add(this);
     }
 
     public LocalDateTime getExpirationTime() { return expirationTime; }
@@ -242,10 +238,6 @@ public class Capability {
     public void setAlbum(Album album) { this.album = album; }
 
     public String getSecretBeforeHash() { return secretBeforeHash; }
-
-    public void addMutation(Mutation mutation) { mutations.add(mutation); }
-
-
 
     public static class CapabilityBuilder {
 

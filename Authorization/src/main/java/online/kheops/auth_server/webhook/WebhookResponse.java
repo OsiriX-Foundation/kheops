@@ -4,9 +4,12 @@ import online.kheops.auth_server.KheopsInstance;
 import online.kheops.auth_server.entity.Webhook;
 import online.kheops.auth_server.entity.WebhookTrigger;
 
+import javax.persistence.EntityManager;
 import javax.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
+
+import static online.kheops.auth_server.webhook.WebhookQueries.getNumberOfWebhookTrigger;
 
 public class WebhookResponse {
 
@@ -26,13 +29,13 @@ public class WebhookResponse {
     @XmlElement(name = "last_triggers")
     private List<WebhookLastTriggerResponse> lastTriggers;
     @XmlElement(name = "number_of_triggers")
-    private Integer numberOfTriggers;
+    private Long numberOfTriggers;
     @XmlElement(name = "triggers")
     private List<WebhookTriggerResponse> fullTriggers;
 
     private WebhookResponse() { /*Empty*/ }
 
-    public WebhookResponse(Webhook webhook) {
+    public WebhookResponse(Webhook webhook, EntityManager em) {
 
         id = webhook.getId();
         name = webhook.getName();
@@ -53,7 +56,7 @@ public class WebhookResponse {
         }
 
         enabled = webhook.isEnabled();
-        numberOfTriggers = webhook.getWebhookTriggers().size();
+        numberOfTriggers = getNumberOfWebhookTrigger(webhook, em);
     }
 
     public void addTrigger(WebhookTrigger webhookTrigger) {

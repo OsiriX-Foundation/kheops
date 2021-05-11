@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static online.kheops.auth_server.album.Albums.getAlbum;
-import static online.kheops.auth_server.album.Albums.getAlbumUser;
+import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
@@ -222,12 +221,7 @@ public class Sending {
             }
             removeSeriesWebhookBuilder.source(source);
             removeSeriesWebhookBuilder.isAdmin(callingAlbumUser.isAdmin());
-
-            if (findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).isEmpty()) {
-                removeSeriesWebhookBuilder.removeAllSeries(true);
-            } else {
-                removeSeriesWebhookBuilder.removeAllSeries(false);
-            }
+            removeSeriesWebhookBuilder.removeAllSeries(findSeriesListByStudyUIDFromAlbum(callingAlbum, studyInstanceUID, em).isEmpty());
 
             em.persist(mutation);
             callingAlbum.updateLastEventTime();
@@ -270,7 +264,9 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
-            final AlbumUser albumUser = getAlbumUser(targetAlbum, callingUser, em);
+            if (!isMemberOfAlbum(callingUser, targetAlbum, em)) {
+                throw new UserNotMemberException();
+            }
 
             final Series availableSeries = getOrCreateSeries(studyInstanceUID, seriesInstanceUID, em);
 
@@ -332,7 +328,9 @@ public class Sending {
 
             final User callingUser = em.merge(kheopsPrincipal.getUser());
             final Album targetAlbum = getAlbum(albumId, em);
-            final AlbumUser albumUser = getAlbumUser(targetAlbum, callingUser, em);
+            if (!isMemberOfAlbum(callingUser, targetAlbum, em)) {
+                throw new UserNotMemberException();
+            }
             final Study study = getStudy(studyInstanceUID, em);
 
             final List<Series> availableSeries = getSeriesList(callingUser, studyInstanceUID, fromAlbumId, fromInbox, em);

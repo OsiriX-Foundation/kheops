@@ -7,8 +7,6 @@ import org.dcm4che3.data.VR;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Set;
 
 import static online.kheops.auth_server.series.Series.safeAttributeSetString;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
@@ -93,9 +91,6 @@ public class Series {
     @ManyToOne
     @JoinColumn(name = "study_fk", insertable = true, updatable=false)
     private Study study;
-
-    @OneToMany(mappedBy = "series")
-    private Set<AlbumSeries> albumsSeries = new HashSet<>();
 
     public Series() {}
 
@@ -215,10 +210,6 @@ public class Series {
     public void setNumberOfSeriesRelatedInstances(int numberOfSeriesRelatedInstances) {
         this.numberOfSeriesRelatedInstances = numberOfSeriesRelatedInstances;
     }
-
-    public void addAlbumSeries(AlbumSeries albumSeries) { albumsSeries.add(albumSeries); }
-
-    public void removeAlbumSeries(AlbumSeries albumSeries) { albumsSeries.remove(albumSeries); }
 
     public String getBodyPartExamined() { return bodyPartExamined; }
 

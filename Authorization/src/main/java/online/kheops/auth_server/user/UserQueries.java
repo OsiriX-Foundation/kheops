@@ -36,7 +36,7 @@ public class UserQueries {
     }
 
 
-    public static List<User> SearchUserByAlbumId(String search, String albumId, Integer limit, Integer offset, EntityManager em) {
+    public static List<User> searchUserByAlbumId(String search, String albumId, Integer limit, Integer offset, EntityManager em) {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailOrNameInAlbumId", User.class);
         query.setParameter(ALBUM_ID, albumId);
@@ -47,7 +47,7 @@ public class UserQueries {
         return query.getResultList();
     }
 
-    public static List<User> SearchUserByStudyUID(String search, String studyUID, Integer limit, Integer offset, EntityManager em) {
+    public static List<User> searchUserByStudyUID(String search, String studyUID, Integer limit, Integer offset, EntityManager em) {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailWithStudyAccess", User.class);
         query.setParameter(STUDY_UID, studyUID);
@@ -59,7 +59,7 @@ public class UserQueries {
     }
 
 
-    public static List<User> SearchUser(String search, Integer limit, Integer offset, EntityManager em) {
+    public static List<User> searchUser(String search, Integer limit, Integer offset, EntityManager em) {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailOrName", User.class);
         query.setParameter(SEARCH_EMAIL, searchByMail(search));

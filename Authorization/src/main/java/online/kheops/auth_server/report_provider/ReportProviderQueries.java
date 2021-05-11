@@ -1,6 +1,7 @@
 package online.kheops.auth_server.report_provider;
 
 
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.util.ErrorResponse;
 
@@ -54,6 +55,13 @@ public class ReportProviderQueries {
         return em.createNamedQuery("ReportProvider.countAllByAlbumId", Long.class)
                 .setParameter(ALBUM_ID, albumId)
                 .getSingleResult();
+    }
+
+    public static void deleteAllReportProviderByAlbum (Album album, EntityManager em) {
+        em.createNamedQuery("ReportProvider.deleteAllByAlbum")
+                .setParameter(ALBUM, album)
+                .executeUpdate();
+
     }
 
 }

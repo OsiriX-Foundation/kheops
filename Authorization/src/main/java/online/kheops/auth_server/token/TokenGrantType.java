@@ -15,8 +15,8 @@ import javax.ws.rs.core.SecurityContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import static online.kheops.auth_server.accesstoken.AccessTokenUtils.StringContainsScope;
-import static online.kheops.auth_server.accesstoken.AccessTokenUtils.ValidateScopeString;
+import static online.kheops.auth_server.accesstoken.AccessTokenUtils.stringContainsScope;
+import static online.kheops.auth_server.accesstoken.AccessTokenUtils.validateScopeString;
 import static online.kheops.auth_server.util.Consts.ALBUM;
 import static online.kheops.auth_server.token.TokenRequestException.Error.*;
 import static online.kheops.auth_server.util.Consts.INBOX;
@@ -107,7 +107,7 @@ public enum TokenGrantType {
             if (!subjectTokenType.equals("urn:ietf:params:oauth:token-type:access_token")) {
                 throw new TokenRequestException(INVALID_REQUEST, "Unknown subject token type");
             }
-            if (!ValidateScopeString(scopeString)) {
+            if (!validateScopeString(scopeString)) {
                 throw new TokenRequestException(INVALID_SCOPE);
             }
 
@@ -121,7 +121,7 @@ public enum TokenGrantType {
                 throw new TokenRequestException(INVALID_REQUEST, "Bad subject_token", e);
             }
 
-            if (StringContainsScope(scopeString, "pep")) {
+            if (stringContainsScope(scopeString, "pep")) {
                 verifySingleHeader(form, "seriesUID");
                 final String seriesInstanceUID = form.getFirst("seriesUID");
                 if (!checkValidUID(seriesInstanceUID)) {
@@ -139,7 +139,7 @@ public enum TokenGrantType {
                         .generate(PEP_TOKEN_LIFETIME);
 
                 return new TokenGrantResult(TokenResponseEntity.createEntity(pepToken, PEP_TOKEN_LIFETIME), subject, tokenProvenance, "pep", studyInstanceUID, seriesInstanceUID);
-            } else if (StringContainsScope(scopeString,"viewer")) {
+            } else if (stringContainsScope(scopeString,"viewer")) {
                 verifyNotDuplicateHeader(form, "source_type");
                 final String sourceType = form.getFirst("source_type");
 
@@ -158,10 +158,10 @@ public enum TokenGrantType {
                 }
 
                 final List<String> scopes = new ArrayList<>();
-                if (StringContainsScope(scopeString,"read")) {
+                if (stringContainsScope(scopeString,"read")) {
                     scopes.add("read");
                 }
-                if (StringContainsScope(scopeString,"write")) {
+                if (stringContainsScope(scopeString,"write")) {
                     scopes.add("write");
                 }
 

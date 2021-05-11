@@ -43,7 +43,7 @@ import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
 import static online.kheops.auth_server.study.Studies.findAttributesByUserPK;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
-import static online.kheops.auth_server.util.Consts.USER_IN_ROLE.VIEWER_TOKEN;
+import static online.kheops.auth_server.util.Consts.UserInRole.VIEWER_TOKEN;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -145,7 +145,7 @@ public class QIDOResource {
     @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response getSeries(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                               @QueryParam(ALBUM) String fromAlbumId,
                               @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(FAVORITE) Boolean favoriteFilter,
@@ -342,7 +342,7 @@ public class QIDOResource {
     @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
-    public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response getStudiesMetadata(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) String fromAlbumId,
                                        @QueryParam(INBOX) Boolean fromInbox)
             throws AlbumNotFoundException, StudyNotFoundException {

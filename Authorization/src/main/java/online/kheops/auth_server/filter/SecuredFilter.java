@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import static javax.ws.rs.core.HttpHeaders.WWW_AUTHENTICATE;
 import static javax.ws.rs.core.SecurityContext.BASIC_AUTH;
 import static online.kheops.auth_server.user.Users.getUser;
-import static online.kheops.auth_server.util.Consts.USER_IN_ROLE;
+import static online.kheops.auth_server.util.Consts.UserInRole;
 import static online.kheops.auth_server.util.HttpHeaders.X_LINK_AUTHORIZATION;
 
 @Secured
@@ -88,9 +88,9 @@ public class SecuredFilter implements ContainerRequestFilter {
 
             @Override
             public boolean isUserInRole(String role) {
-                if (role.equals(USER_IN_ROLE.CAPABILITY)) {
+                if (role.equals(UserInRole.CAPABILITY)) {
                     return accessToken.getTokenType() == AccessToken.TokenType.KEYCLOAK_TOKEN;
-                } else if (role.equals(USER_IN_ROLE.VIEWER_TOKEN)) {
+                } else if (role.equals(UserInRole.VIEWER_TOKEN)) {
                     return accessToken.getTokenType() == AccessToken.TokenType.VIEWER_TOKEN;
                 }
                 return false;

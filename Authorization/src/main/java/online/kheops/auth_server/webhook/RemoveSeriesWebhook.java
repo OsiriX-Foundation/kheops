@@ -41,7 +41,6 @@ public class RemoveSeriesWebhook implements WebhookResult{
 
         private String kheopsInstance;
         private String albumId;
-        private UserResponse sourceUser;
         private boolean isManualTrigger;
         private boolean removeAllSeries;
         private Study study;
@@ -116,7 +115,7 @@ public class RemoveSeriesWebhook implements WebhookResult{
             }
             removeSeriesWebhook.removedStudy = studyResponseBuilder.build();
 
-            sourceUser = new UserResponse(source.getUser());
+            final UserResponse sourceUser = new UserResponse(source.getUser());
             if (isAdmin != null) {
                 sourceUser.setIsAdmin(isAdmin);
             }

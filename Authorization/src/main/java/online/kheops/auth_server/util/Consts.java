@@ -10,8 +10,8 @@ public class Consts {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String StudyInstanceUID = "StudyInstanceUID";
-    public static final String SeriesInstanceUID = "SeriesInstanceUID";
+    public static final String STUDY_INSTANCE_UID = "StudyInstanceUID";
+    public static final String SERIES_INSTANCE_UID = "SeriesInstanceUID";
 
     public static final String QUERY_PARAMETER_LIMIT = "limit";
     public static final String QUERY_PARAMETER_OFFSET = "offset";
@@ -23,8 +23,8 @@ public class Consts {
 
     public static final String INCLUDE_FIELD = "includefield";
 
-    public abstract static class USER_IN_ROLE {
-        private USER_IN_ROLE() {}
+    public abstract static class UserInRole {
+        private UserInRole() {}
         public static final String CAPABILITY = "capability";
         public static final String VIEWER_TOKEN = "viewerToken";
         public static final String RP_TOKEN = "reportProviderToken";
@@ -54,13 +54,15 @@ public class Consts {
     public static final int VIEWER_TOKEN_ACCESS_PRIORITY = Priorities.USER - 2;
 
     //Cache
-    public static class CACHE_USER {
+    public abstract static class CacheUser {
+        private CacheUser() {}
         public static final Duration DURATION = Duration.ofMinutes(20);
         public static final int SIZE = 100;
     }
 
     //size column in db
-    public static class DB_COLUMN_SIZE {
+    public abstract static class DbColumnSize {
+        private DbColumnSize() {}
         public static final int ALBUM_NAME = 255;
         public static final int WEBHOOK_NAME = 255;
         public static final int WEBHOOK_URL = 1024;
@@ -71,7 +73,8 @@ public class Consts {
     }
 
     //JSON JWE
-    public static class JWE {
+    public abstract static class Jwe {
+        private Jwe() {}
         public static final String TOKEN = "token";
         public static final String SOURCE_ID = "sourceId";
         public static final String IS_INBOX = "isInbox";

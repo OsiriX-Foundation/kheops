@@ -154,7 +154,7 @@ public class Users {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
-            final List<User> userList = SearchUserByAlbumId(search, albumId, limit, offset, em);
+            final List<User> userList = searchUserByAlbumId(search, albumId, limit, offset, em);
             final List<UserResponse> userResponseList = new ArrayList<>();
             final Album album = getAlbum(albumId, em);
             for (User user : userList) {
@@ -171,7 +171,7 @@ public class Users {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
-            final List<User> userList = SearchUserByStudyUID(search, studyInstanceUID, limit, offset, em);
+            final List<User> userList = searchUserByStudyUID(search, studyInstanceUID, limit, offset, em);
             final List<UserResponse> userResponseList = new ArrayList<>();
             for (User user : userList) {
                 userResponseList.add(new UserResponse(user));
@@ -185,7 +185,7 @@ public class Users {
     public static List<UserResponse> searchUsers(String search, Integer limit, Integer offset) {
         final EntityManager em = EntityManagerListener.createEntityManager();
         try {
-            final List<User> userList = SearchUser(search, limit, offset, em);
+            final List<User> userList = searchUser(search, limit, offset, em);
             final List<UserResponse> userResponseList = new ArrayList<>();
             for (User user : userList) {
                 userResponseList.add(new UserResponse(user));

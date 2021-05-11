@@ -1,5 +1,6 @@
 package online.kheops.auth_server.capability;
 
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.ErrorResponse;
@@ -138,5 +139,12 @@ public class CapabilitiesQueries {
         query.setParameter(ALBUM_ID, albumId);
         query.setParameter(DATE_TIME_NOW, LocalDateTime.now());
         return query.getSingleResult();
+    }
+
+    public static void deleteAllCapabilitiesByAlbum (Album album, EntityManager em) {
+        em.createNamedQuery("Capability.deleteAllByAlbum")
+                .setParameter(ALBUM, album)
+                .executeUpdate();
+
     }
 }

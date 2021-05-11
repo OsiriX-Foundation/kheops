@@ -29,6 +29,7 @@ public class JPANamedQueryConstants {
     public static final String CAPABILITY_SCOPE_TYPE = "capabilityScopeType";
 
     public static final String WEBHOOK_ID = "webhookId";
+    public static final String WEBHOOK_PK = "webhookPk";
     public static final String WEBHOOK_URL = "webhookUrl";
     public static final String WEBHOOK_TRIGGER_ID = "webhookTriggerId";
 
