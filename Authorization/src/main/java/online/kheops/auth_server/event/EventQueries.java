@@ -67,17 +67,17 @@ public class EventQueries {
 
         final List<Predicate> filters = new ArrayList<>();
 
-        filters.add(cb.equal(mutation.get(Mutation_.album).get(Album_.id), albumId));
+        filters.add(cb.equal(mutation.get(Event_.album).get(Album_.id), albumId));
 
         mutationQueryParams.getReportProviders().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.reportProvider, JoinType.LEFT).get(ReportProvider_.clientId).in(lst))));
-        mutationQueryParams.getSeries().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.series, JoinType.LEFT).get(Series_.seriesInstanceUID).in(lst))));
-        mutationQueryParams.getStudies().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.study, JoinType.LEFT).get(Study_.studyInstanceUID).in(lst))));
+        mutationQueryParams.getSeries().ifPresent(lst -> filters.add(cb.or(mutation.join(Event_.series, JoinType.LEFT).get(Series_.seriesInstanceUID).in(lst))));
+        mutationQueryParams.getStudies().ifPresent(lst -> filters.add(cb.or(mutation.join(Event_.study, JoinType.LEFT).get(Study_.studyInstanceUID).in(lst))));
         mutationQueryParams.getTypes().ifPresent(lst -> filters.add(cb.or(mutation.get(Mutation_.mutationType).in(lst))));
         mutationQueryParams.getCapabilityTokens().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.capability, JoinType.LEFT).get(Capability_.id).in(lst))));
-        mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.join(Mutation_.user, JoinType.LEFT).get(User_.sub).in(lst)), cb.or(mutation.join(Mutation_.toUser, JoinType.LEFT).get(User_.sub).in(lst)))));
+        mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.join(Event_.user, JoinType.LEFT).get(User_.sub).in(lst)), cb.or(mutation.join(Mutation_.toUser, JoinType.LEFT).get(User_.sub).in(lst)))));
 
-        mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get(Mutation_.eventTime), date)));
-        mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get(Mutation_.eventTime), date)));
+        mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get(Event_.eventTime), date)));
+        mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get(Event_.eventTime), date)));
 
         c.where(cb.and(filters.toArray(new Predicate[0])));
 
@@ -94,20 +94,20 @@ public class EventQueries {
 
         final List<Predicate> filters = new ArrayList<>();
 
-        filters.add(cb.equal(mutation.get(Mutation_.album).get(Album_.id), albumId));
+        filters.add(cb.equal(mutation.get(Event_.album).get(Album_.id), albumId));
 
         mutationQueryParams.getReportProviders().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.reportProvider, JoinType.LEFT).get(ReportProvider_.clientId).in(lst))));
-        mutationQueryParams.getSeries().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.series, JoinType.LEFT).get(Series_.seriesInstanceUID).in(lst))));
-        mutationQueryParams.getStudies().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.study, JoinType.LEFT).get(Study_.studyInstanceUID).in(lst))));
+        mutationQueryParams.getSeries().ifPresent(lst -> filters.add(cb.or(mutation.join(Event_.series, JoinType.LEFT).get(Series_.seriesInstanceUID).in(lst))));
+        mutationQueryParams.getStudies().ifPresent(lst -> filters.add(cb.or(mutation.join(Event_.study, JoinType.LEFT).get(Study_.studyInstanceUID).in(lst))));
         mutationQueryParams.getTypes().ifPresent(lst -> filters.add(cb.or(mutation.get(Mutation_.mutationType).in(lst))));
         mutationQueryParams.getCapabilityTokens().ifPresent(lst -> filters.add(cb.or(mutation.join(Mutation_.capability, JoinType.LEFT).get(Capability_.id).in(lst))));
-        mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.join(Mutation_.user, JoinType.LEFT).get(User_.sub).in(lst)), cb.or(mutation.join(Mutation_.toUser, JoinType.LEFT).get(User_.sub).in(lst)))));
+        mutationQueryParams.getUsers().ifPresent(lst -> filters.add(cb.or(cb.or(mutation.join(Event_.user, JoinType.LEFT).get(User_.sub).in(lst)), cb.or(mutation.join(Mutation_.toUser, JoinType.LEFT).get(User_.sub).in(lst)))));
 
-        mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get(Mutation_.eventTime), date)));
-        mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get(Mutation_.eventTime), date)));
+        mutationQueryParams.getStartDate().ifPresent(date -> filters.add(cb.greaterThanOrEqualTo(mutation.get(Event_.eventTime), date)));
+        mutationQueryParams.getEndDate().ifPresent(date -> filters.add(cb.lessThanOrEqualTo(mutation.get(Event_.eventTime), date)));
 
         c.where(cb.and(filters.toArray(new Predicate[0])));
-        c.orderBy(cb.desc(mutation.get(Mutation_.eventTime)));
+        c.orderBy(cb.desc(mutation.get(Event_.eventTime)));
 
         TypedQuery<Mutation> q = em.createQuery(c);
         q.setMaxResults(limit).setFirstResult(offset);

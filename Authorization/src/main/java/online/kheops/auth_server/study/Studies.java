@@ -115,10 +115,10 @@ public class Studies {
 
         final Subquery<Long> subqueryNbComments = c.subquery(Long.class);
         final Root <Comment> subqueryCommentRoot = subqueryNbComments.from(Comment.class);
-        final Predicate privateMessage = cb.or(subqueryCommentRoot.get(Comment_.privateTargetUser).isNull(), cb.equal(subqueryCommentRoot.get(Comment_.privateTargetUser).get(User_.pk), callingUserPK));
-        final Predicate author = cb.equal(subqueryCommentRoot.get(Comment_.user).get(User_.pk), callingUserPK);
-        subqueryNbComments.where(cb.and(cb.and(cb.equal(subqueryCommentRoot.type(), Comment.class), cb.or(privateMessage, author))), cb.equal(subqueryCommentRoot.get(Comment_.study), st));
-        subqueryNbComments.select(cb.countDistinct(subqueryCommentRoot.get(Comment_.pk)));
+        final Predicate privateMessage = cb.or(subqueryCommentRoot.get(Event_.privateTargetUser).isNull(), cb.equal(subqueryCommentRoot.get(Event_.privateTargetUser).get(User_.pk), callingUserPK));
+        final Predicate author = cb.equal(subqueryCommentRoot.get(Event_.user).get(User_.pk), callingUserPK);
+        subqueryNbComments.where(cb.and(cb.and(cb.equal(subqueryCommentRoot.type(), Comment.class), cb.or(privateMessage, author))), cb.equal(subqueryCommentRoot.get(Event_.study), st));
+        subqueryNbComments.select(cb.countDistinct(subqueryCommentRoot.get(Event_.pk)));
 
         c.select(cb.construct(StudyResponseDICOM.class, st.get(Study_.studyInstanceUID), st.get(Study_.studyID), st.get(Study_.studyDate), st.get(Study_.studyTime),st.get(Study_.timezoneOffsetFromUTC),
                 st.get(Study_.studyDescription), st.get(Study_.referringPhysicianName), st.get(Study_.accessionNumber), st.get(Study_.patientName), st.get(Study_.patientBirthDate), st.get(Study_.patientID), st.get(Study_.patientSex),
