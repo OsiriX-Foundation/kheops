@@ -29,7 +29,7 @@ public class DelayedWebhookImpl implements DelayedWebhook {
     private static final Logger LOG = Logger.getLogger(DelayedWebhookImpl.class.getName());
 
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private static final int TIME_TO_LIVE = 10;//seconds
+    private static final int TIME_TO_LIVE = 30;//seconds
 
     private static DataStructure dataStructure = new DataStructure();
 

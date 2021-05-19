@@ -70,7 +70,7 @@ public class QIDOResource {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
                                @QueryParam(INBOX) Boolean fromInbox)
-            throws AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException {
+            throws AlbumForbiddenException, BadQueryParametersException {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
