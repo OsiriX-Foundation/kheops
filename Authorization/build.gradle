@@ -17,6 +17,7 @@ repositories {
 tasks.withType(JavaCompile) {
     options.deprecation = true
     options.compilerArgs << '-Xlint:unchecked'
+    //options.annotationProcessorGeneratedSourcesDirectory = file("src/main/java/online/kheops/auth_server/entity")
 }
 
 dependencies {
@@ -54,6 +55,10 @@ dependencies {
     api group: 'javax.activation', name: 'activation', version: '1.1.1'
 
     api group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
+
+    //https://www.baeldung.com/hibernate-criteria-queries-metamodel uncomment line 20 and 60 + make : gradle clean compileJava
+    //annotationProcessor 'org.hibernate:hibernate-jpamodelgen:6.0.0.Alpha7'
+
 }
 
 
