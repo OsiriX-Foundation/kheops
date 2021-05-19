@@ -52,12 +52,6 @@ public class EventQueries {
         return query.getResultList();
     }
 
-    public static long getTotalMutationByAlbum(Album album, EntityManager em) {
-        TypedQuery<Long> query = em.createNamedQuery("Mutation.countAllByAlbum", Long.class);
-        query.setParameter(ALBUM, album);
-        return query.getSingleResult();
-    }
-
     public static long getTotalMutationByAlbum(String albumId, MutationQueryParams mutationQueryParams, EntityManager em) {
 
         final CriteriaBuilder cb = em.getCriteriaBuilder();
