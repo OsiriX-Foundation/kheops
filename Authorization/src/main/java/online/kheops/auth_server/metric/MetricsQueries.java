@@ -38,7 +38,7 @@ class MetricsQueries {
     }
 
     static Long getNumberOfOrphanSeries(EntityManager em) {
-        return em.createQuery("SELECT COUNT(s.pk) FROM Series s LEFT JOIN s.albumsSeries als WHERE als.album = null", Long.class)
+        return em.createQuery("SELECT COUNT(s.pk) FROM AlbumSeries als RIGHT JOIN als.series s WHERE als.album = null", Long.class)
                 .getSingleResult();
     }
 

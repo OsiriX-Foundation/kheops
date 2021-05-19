@@ -1,8 +1,6 @@
 package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.*;
-import online.kheops.auth_server.entity.Comment;
-import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.JPANamedQueryConstants;
 import online.kheops.auth_server.util.PairListXTotalCount;
@@ -85,20 +83,24 @@ public class AlbumQueries {
         st.on(cb.isTrue(st.get(Study_.populated)));
         final Join<Album, AlbumUser> alU = al.join(Album_.albumUser);
         final Join<AlbumUser, User> u = alU.join(AlbumUser_.user, javax.persistence.criteria.JoinType.LEFT);
-        final Join<Album, Event> com = al.join(Album_.events, javax.persistence.criteria.JoinType.LEFT);
 
-        final Predicate privateMessage = cb.or(com.get(Comment_.privateTargetUser).isNull(), cb.equal(com.get(Comment_.privateTargetUser), albumQueryParams.getUser()));
-        final Predicate author = cb.equal(com.get(Comment_.user), albumQueryParams.getUser());
-        com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
+        final Subquery<Long> subqueryNbComments = c.subquery(Long.class);
+        final Root <Comment> subqueryCommentRoot = subqueryNbComments.from(Comment.class);
+        final Predicate privateMessage = cb.or(subqueryCommentRoot.get(Comment_.privateTargetUser).isNull(), cb.equal(subqueryCommentRoot.get(Comment_.privateTargetUser).get(User_.pk), albumQueryParams.getUser().getPk()));
+        final Predicate author = cb.equal(subqueryCommentRoot.get(Comment_.user).get(User_.pk), albumQueryParams.getUser().getPk());
+        subqueryNbComments.where(cb.and(cb.and(cb.equal(subqueryCommentRoot.type(), Comment.class), cb.or(privateMessage, author))), cb.equal(subqueryCommentRoot.get(Comment_.album), al));
+        subqueryNbComments.select(cb.countDistinct(subqueryCommentRoot.get(Comment_.pk)));
 
         final Subquery<Long> subqueryNbUser = c.subquery(Long.class);
         final Root <AlbumUser> subqueryRoot = subqueryNbUser.from(AlbumUser.class);
         subqueryNbUser.where(cb.equal(al, subqueryRoot.get(AlbumUser_.album)));
         subqueryNbUser.select(cb.countDistinct(subqueryRoot.get(AlbumUser_.pk)));
 
-        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get(Study_.pk)), cb.countDistinct(se.get(Series_.pk)),
+        c.select(cb.construct(AlbumResponseBuilder.class, al.get(Album_.id), al.get(Album_.name), al.get(Album_.description), al.get(Album_.createdTime), al.get(Album_.lastEventTime), al.get(Album_.userPermission),
+                alU.get(AlbumUser_.admin), alU.get(AlbumUser_.favorite), alU.get(AlbumUser_.newCommentNotifications), alU.get(AlbumUser_.newSeriesNotifications),
+                cb.countDistinct(st.get(Study_.pk)), cb.countDistinct(se.get(Series_.pk)),
                 cb.sum(cb.<Long>selectCase().when(se.get(Series_.numberOfSeriesRelatedInstances).isNull(), 0L).otherwise(se.get(Series_.NUMBER_OF_SERIES_RELATED_INSTANCES))),
-                subqueryNbUser.getSelection(), cb.countDistinct(com.get(Comment_.pk)), cb.function("array_agg", String.class ,se.get(Series_.modality))));
+                subqueryNbUser.getSelection(), subqueryNbComments.getSelection(), cb.function("array_agg", String.class ,se.get(Series_.modality))));
 
         final List<Predicate> criteria = new ArrayList<>();
         albumQueryParams.getName().ifPresent(name -> createCondition(name, criteria, al, cb, albumQueryParams.isFuzzyMatching()));
@@ -121,24 +123,21 @@ public class AlbumQueries {
 
         albumQueryParams.getModality().ifPresent(filter -> {
             final Subquery<Album> subqueryModality = c.subquery(Album.class);
-            final Root<Series> subqueryRoot2 = subqueryModality.from(Series.class);
-            final Join<Series, AlbumSeries> alSSub = subqueryRoot2.join(Series_.albumsSeries);
-            final Join<Series, Study> stSub = subqueryRoot2.join(Series_.study);
-            final Join<AlbumSeries, Album> alSub = alSSub.join(AlbumSeries_.album);
+            final Root<Album> subqueryRoot2 = subqueryModality.from(Album.class);
+            final Join<Album, AlbumSeries> alSSub = subqueryRoot2.join(Album_.albumSeries);
+            final Join<AlbumSeries, Series> seSub = alSSub.join(AlbumSeries_.series);
+            final Join<Series, Study> stSub = seSub.join(Series_.study);
 
             final List<Predicate> criteriaSub = new ArrayList<>();
-            criteriaSub.add(cb.equal(alSub, al));
-            criteriaSub.add(cb.isTrue(subqueryRoot2.get(Series_.populated)));
+            criteriaSub.add(cb.equal(subqueryRoot2, al));
+            criteriaSub.add(cb.isTrue(seSub.get(Series_.populated)));
             criteriaSub.add(cb.isTrue(stSub.get(Study_.populated)));
-            criteriaSub.add(cb.equal(cb.lower(subqueryRoot2.get(Series_.modality)), filter.toLowerCase()));
+            criteriaSub.add(cb.equal(cb.lower(seSub.get(Series_.modality)), filter.toLowerCase()));
 
-            if (criteriaSub.size() == 1) {
-                subqueryModality.where(cb.and(criteriaSub.get(0)));
-            } else if (criteriaSub.size() > 1) {
-                subqueryModality.where(cb.and(criteriaSub.toArray(new Predicate[0])));
-            }
-            subqueryModality.groupBy(alSub);
-            subqueryModality.select(alSub);
+            subqueryModality.where(cb.and(criteriaSub.toArray(new Predicate[0])));
+
+            subqueryModality.groupBy(subqueryRoot2);
+            subqueryModality.select(subqueryRoot2);
 
             c.having(cb.equal(al, cb.any(subqueryModality)));
         });
@@ -180,20 +179,24 @@ public class AlbumQueries {
         st.on(cb.isTrue(st.get(Study_.populated)));
         final Join<Album, AlbumUser> alU = al.join(Album_.albumUser);
         final Join<AlbumUser, User> u = alU.join(AlbumUser_.user, javax.persistence.criteria.JoinType.LEFT);
-        final Join<Album, Event> com = al.join(Album_.events, javax.persistence.criteria.JoinType.LEFT);
 
-        final Predicate privateMessage = cb.or(com.get(Comment_.privateTargetUser).isNull(), cb.equal(com.get(Comment_.privateTargetUser), user));
-        final Predicate author = cb.equal(com.get(Comment_.user), user);
-        com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
+        final Subquery<Long> subqueryNbComments = c.subquery(Long.class);
+        final Root <Comment> subqueryCommentRoot = subqueryNbComments.from(Comment.class);
+        final Predicate privateMessage = cb.or(subqueryCommentRoot.get(Comment_.privateTargetUser).isNull(), cb.equal(subqueryCommentRoot.get(Comment_.privateTargetUser).get(User_.pk), user.getPk()));
+        final Predicate author = cb.equal(subqueryCommentRoot.get(Comment_.user).get(User_.pk), user.getPk());
+        subqueryNbComments.where(cb.and(cb.and(cb.equal(subqueryCommentRoot.type(), Comment.class), cb.or(privateMessage, author))), cb.equal(subqueryCommentRoot.get(Comment_.album), al));
+        subqueryNbComments.select(cb.countDistinct(subqueryCommentRoot.get(Comment_.pk)));
 
         final Subquery<Long> subqueryNbUser = c.subquery(Long.class);
         final Root <AlbumUser> subqueryRoot = subqueryNbUser.from(AlbumUser.class);
         subqueryNbUser.where(cb.equal(al, subqueryRoot.get(AlbumUser_.album)));
         subqueryNbUser.select(cb.countDistinct(subqueryRoot.get(AlbumUser_.pk)));
 
-        c.select(cb.construct(AlbumResponseBuilder.class, al, alU, cb.countDistinct(st.get(Study_.pk)), cb.countDistinct(se.get(Series_.pk)),
+        c.select(cb.construct(AlbumResponseBuilder.class,  al.get(Album_.id), al.get(Album_.name), al.get(Album_.description), al.get(Album_.createdTime), al.get(Album_.lastEventTime), al.get(Album_.userPermission),
+                alU.get(AlbumUser_.admin), alU.get(AlbumUser_.favorite), alU.get(AlbumUser_.newCommentNotifications), alU.get(AlbumUser_.newSeriesNotifications),
+                cb.countDistinct(st.get(Study_.pk)), cb.countDistinct(se.get(Series_.pk)),
                 cb.sum(cb.<Long>selectCase().when(se.get(Series_.numberOfSeriesRelatedInstances).isNull(), 0L).otherwise(se.get(Series_.NUMBER_OF_SERIES_RELATED_INSTANCES))),
-                subqueryNbUser.getSelection(), cb.countDistinct(com.get(Comment_.pk)), cb.function("array_agg", String.class ,se.get(Series_.modality))));
+                subqueryNbUser.getSelection(), subqueryNbComments.getSelection(), cb.function("array_agg", String.class ,se.get(Series_.modality))));
 
         c.where(cb.and(cb.equal(u, user), cb.equal(al.get(Album_.id), albumId)));
         c.groupBy(al, alU);

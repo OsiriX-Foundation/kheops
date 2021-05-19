@@ -2,6 +2,7 @@ package online.kheops.auth_server.album;
 
 import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.UserPermission;
 import online.kheops.auth_server.user.UserResponse;
 
 import java.time.LocalDateTime;
@@ -37,28 +38,28 @@ public class AlbumResponseBuilder {
         users = new ArrayList<>();
     }
 
-    public AlbumResponseBuilder(Album album, AlbumUser albumUser, long nbStudy, long nbSeries, long nbInstance, long nbUsers, long nbComment, String modalitiesLst) {
+    public AlbumResponseBuilder(String albumId, String albumName, String albumDescription, LocalDateTime albumCreatedTime, LocalDateTime albumLastEventTime, UserPermission userPermission, boolean albumUserAdmin, boolean albumUserFavorite, boolean albumUserNewCommentNotifications, boolean albumUserNewSeriesNotifications, long nbStudy, long nbSeries, long nbInstance, long nbUsers, long nbComment, String modalitiesLst) {
         users = new ArrayList<>();
-        this.id = album.getId();
-        this.name = album.getName();
-        this.description = album.getDescription();
-        this.createdTime = album.getCreatedTime();
-        this.lastEventTime = album.getLastEventTime();
+        this.id = albumId;
+        this.name = albumName;
+        this.description = albumDescription;
+        this.createdTime = albumCreatedTime;
+        this.lastEventTime = albumLastEventTime;
         this.numberOfUsers = ((Long)nbUsers).intValue();
         this.numberOfStudies = ((Long) nbStudy).intValue();
         this.numberOfSeries = ((Long)nbSeries).intValue();
         this.numberOfInstances = ((Long) nbInstance).intValue();
-        this.addSeries = album.getUserPermission().isAddSeries();
-        this.addUser = album.getUserPermission().isAddUser();
-        this.deleteSeries = album.getUserPermission().isDeleteSeries();
-        this.downloadSeries = album.getUserPermission().isDownloadSeries();
-        this.sendSeries = album.getUserPermission().isSendSeries();
-        this.writeComments = album.getUserPermission().isWriteComments();
+        this.addSeries = userPermission.isAddSeries();
+        this.addUser = userPermission.isAddUser();
+        this.deleteSeries = userPermission.isDeleteSeries();
+        this.downloadSeries = userPermission.isDownloadSeries();
+        this.sendSeries = userPermission.isSendSeries();
+        this.writeComments = userPermission.isWriteComments();
         this.numberOfComments = ((Long)nbComment).intValue();
-        this.isFavorite = albumUser.isFavorite();
-        this.notificationNewComment = albumUser.isNewCommentNotifications();
-        this.notificationNewSeries = albumUser.isNewSeriesNotifications();
-        this.isAdmin = albumUser.isAdmin();
+        this.isFavorite = albumUserFavorite;
+        this.notificationNewComment = albumUserNewCommentNotifications;
+        this.notificationNewSeries = albumUserNewSeriesNotifications;
+        this.isAdmin = albumUserAdmin;
 
         this.modalities = new TreeSet<>();
         this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));

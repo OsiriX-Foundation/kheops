@@ -113,16 +113,20 @@ public class Studies {
         final Join<Series, Study> st = se.join(Series_.study);
         st.on(cb.isTrue(st.get(Study_.populated)));
 
-        final Join<Study, Event> com = st.join(Study_.events, javax.persistence.criteria.JoinType.LEFT);
-        final Predicate privateMessage = cb.or(com.get(Comment_.privateTargetUser).isNull(), cb.equal(com.get(Comment_.privateTargetUser).get(User_.pk), callingUserPK));
-        final Predicate author = cb.equal(com.get(Comment_.user).get(User_.pk), callingUserPK);
-        com.on(cb.and(cb.equal(com.type(), Comment.class), cb.or(privateMessage, author)));
+        final Subquery<Long> subqueryNbComments = c.subquery(Long.class);
+        final Root <Comment> subqueryCommentRoot = subqueryNbComments.from(Comment.class);
+        final Predicate privateMessage = cb.or(subqueryCommentRoot.get(Comment_.privateTargetUser).isNull(), cb.equal(subqueryCommentRoot.get(Comment_.privateTargetUser).get(User_.pk), callingUserPK));
+        final Predicate author = cb.equal(subqueryCommentRoot.get(Comment_.user).get(User_.pk), callingUserPK);
+        subqueryNbComments.where(cb.and(cb.and(cb.equal(subqueryCommentRoot.type(), Comment.class), cb.or(privateMessage, author))), cb.equal(subqueryCommentRoot.get(Comment_.study), st));
+        subqueryNbComments.select(cb.countDistinct(subqueryCommentRoot.get(Comment_.pk)));
 
-        c.select(cb.construct(StudyResponseDICOM.class, st, cb.countDistinct(se.get(Series_.pk)),
+        c.select(cb.construct(StudyResponseDICOM.class, st.get(Study_.studyInstanceUID), st.get(Study_.studyID), st.get(Study_.studyDate), st.get(Study_.studyTime),st.get(Study_.timezoneOffsetFromUTC),
+                st.get(Study_.studyDescription), st.get(Study_.referringPhysicianName), st.get(Study_.accessionNumber), st.get(Study_.patientName), st.get(Study_.patientBirthDate), st.get(Study_.patientID), st.get(Study_.patientSex),
+                cb.countDistinct(se.get(Series_.pk)),
                 cb.sum(cb.<Long>selectCase().when(se.get(Series_.numberOfSeriesRelatedInstances).isNull(), 0L).otherwise(se.get(Series_.NUMBER_OF_SERIES_RELATED_INSTANCES))),
                 cb.function("array_agg", String.class ,se.get(Series_.modality)),
                 cb.sum(cb.<Long>selectCase().when(cb.isTrue(alS.get(AlbumSeries_.favorite)), 1L).otherwise(0L)),
-                cb.countDistinct(com.get(Comment_.pk))));
+                subqueryNbComments.getSelection()));
 
         //filtre
         applyIfPresent(qidoParams::getStudyDateFilter, filter -> createConditionStudyDate(filter, criteria, cb, st.get(Study_.studyDate)));
