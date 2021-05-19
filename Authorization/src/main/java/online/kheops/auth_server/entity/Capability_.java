@@ -2,7 +2,6 @@ package online.kheops.auth_server.entity;
 
 import java.time.LocalDateTime;
 import javax.annotation.Generated;
-import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 import online.kheops.auth_server.capability.ScopeType;
@@ -19,7 +18,6 @@ public abstract class Capability_ {
 	public static volatile SingularAttribute<Capability, LocalDateTime> lastUsed;
 	public static volatile SingularAttribute<Capability, LocalDateTime> notBeforeTime;
 	public static volatile SingularAttribute<Capability, LocalDateTime> issuedAtTime;
-	public static volatile SetAttribute<Capability, Mutation> mutations;
 	public static volatile SingularAttribute<Capability, ScopeType> scopeType;
 	public static volatile SingularAttribute<Capability, LocalDateTime> expirationTime;
 	public static volatile SingularAttribute<Capability, LocalDateTime> revokedTime;
@@ -38,7 +36,6 @@ public abstract class Capability_ {
 	public static final String LAST_USED = "lastUsed";
 	public static final String NOT_BEFORE_TIME = "notBeforeTime";
 	public static final String ISSUED_AT_TIME = "issuedAtTime";
-	public static final String MUTATIONS = "mutations";
 	public static final String SCOPE_TYPE = "scopeType";
 	public static final String EXPIRATION_TIME = "expirationTime";
 	public static final String REVOKED_TIME = "revokedTime";

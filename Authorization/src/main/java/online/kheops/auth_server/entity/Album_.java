@@ -18,14 +18,12 @@ public abstract class Album_ {
 	public static volatile SingularAttribute<Album, String> description;
 	public static volatile SetAttribute<Album, AlbumSeries> albumSeries;
 	public static volatile SingularAttribute<Album, User> inboxUser;
-	public static volatile SetAttribute<Album, ReportProvider> reportProviders;
 	public static volatile SetAttribute<Album, Webhook> webhooks;
 	public static volatile SingularAttribute<Album, String> name;
 	public static volatile SingularAttribute<Album, LocalDateTime> createdTime;
 	public static volatile SingularAttribute<Album, LocalDateTime> lastEventTime;
 	public static volatile SingularAttribute<Album, Long> pk;
 	public static volatile SingularAttribute<Album, String> id;
-	public static volatile SetAttribute<Album, Event> events;
 
 	public static final String WEBHOOKS_NEW_SERIES_ENABLED = "webhooksNewSeriesEnabled";
 	public static final String WEBHOOKS_NEW_USER_ENABLED = "webhooksNewUserEnabled";
@@ -35,14 +33,12 @@ public abstract class Album_ {
 	public static final String DESCRIPTION = "description";
 	public static final String ALBUM_SERIES = "albumSeries";
 	public static final String INBOX_USER = "inboxUser";
-	public static final String REPORT_PROVIDERS = "reportProviders";
 	public static final String WEBHOOKS = "webhooks";
 	public static final String NAME = "name";
 	public static final String CREATED_TIME = "createdTime";
 	public static final String LAST_EVENT_TIME = "lastEventTime";
 	public static final String PK = "pk";
 	public static final String ID = "id";
-	public static final String EVENTS = "events";
 
 }
 

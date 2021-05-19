@@ -2,7 +2,6 @@ package online.kheops.auth_server.entity;
 
 import java.time.LocalDateTime;
 import javax.annotation.Generated;
-import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
@@ -22,12 +21,10 @@ public abstract class Study_ {
 	public static volatile SingularAttribute<Study, String> referringPhysicianName;
 	public static volatile SingularAttribute<Study, String> accessionNumber;
 	public static volatile SingularAttribute<Study, String> patientBirthDate;
-	public static volatile SetAttribute<Study, Series> series;
 	public static volatile SingularAttribute<Study, LocalDateTime> createdTime;
 	public static volatile SingularAttribute<Study, String> studyDate;
 	public static volatile SingularAttribute<Study, String> studyID;
 	public static volatile SingularAttribute<Study, Long> pk;
-	public static volatile SetAttribute<Study, Event> events;
 
 	public static final String UPDATED_TIME = "updatedTime";
 	public static final String PATIENT_NAME = "patientName";
@@ -41,12 +38,10 @@ public abstract class Study_ {
 	public static final String REFERRING_PHYSICIAN_NAME = "referringPhysicianName";
 	public static final String ACCESSION_NUMBER = "accessionNumber";
 	public static final String PATIENT_BIRTH_DATE = "patientBirthDate";
-	public static final String SERIES = "series";
 	public static final String CREATED_TIME = "createdTime";
 	public static final String STUDY_DATE = "studyDate";
 	public static final String STUDY_ID = "studyID";
 	public static final String PK = "pk";
-	public static final String EVENTS = "events";
 
 }
 

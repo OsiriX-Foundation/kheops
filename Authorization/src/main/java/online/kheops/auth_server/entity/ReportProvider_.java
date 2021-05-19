@@ -2,7 +2,6 @@ package online.kheops.auth_server.entity;
 
 import java.time.LocalDateTime;
 import javax.annotation.Generated;
-import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
@@ -11,7 +10,6 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class ReportProvider_ {
 
 	public static volatile SingularAttribute<ReportProvider, String> clientId;
-	public static volatile SetAttribute<ReportProvider, Mutation> mutations;
 	public static volatile SingularAttribute<ReportProvider, LocalDateTime> creationTime;
 	public static volatile SingularAttribute<ReportProvider, Boolean> removed;
 	public static volatile SingularAttribute<ReportProvider, Album> album;
@@ -20,7 +18,6 @@ public abstract class ReportProvider_ {
 	public static volatile SingularAttribute<ReportProvider, String> url;
 
 	public static final String CLIENT_ID = "clientId";
-	public static final String MUTATIONS = "mutations";
 	public static final String CREATION_TIME = "creationTime";
 	public static final String REMOVED = "removed";
 	public static final String ALBUM = "album";
