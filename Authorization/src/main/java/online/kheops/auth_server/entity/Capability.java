@@ -117,6 +117,10 @@ public class Capability {
     @JoinColumn(name = "album_fk", insertable = true, updatable=false)
     private Album album;
 
+    @ManyToOne
+    @JoinColumn(name = "revoked_by_user_fk", insertable = true, updatable=false)
+    private User revokedByUser;
+
     @PrePersist
     public void onPrePersist() {
         final LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
@@ -192,6 +196,10 @@ public class Capability {
     public User getUser() { return user; }
 
     public void setUser(User user) { this.user = user; }
+
+    public User getRevokedByUser() { return revokedByUser; }
+
+    public void setRevokedByUser(User revokedByUser) { this.revokedByUser = revokedByUser; }
 
     public long getPk() { return pk; }
 
