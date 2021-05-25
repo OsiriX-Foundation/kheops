@@ -183,7 +183,6 @@ public class Capability {
         }
         this.revokedByUser = revokedByUser;
         this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
-
     }
 
     public long getPk() { return pk; }
