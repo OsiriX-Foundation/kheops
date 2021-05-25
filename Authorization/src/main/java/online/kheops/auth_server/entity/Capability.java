@@ -27,18 +27,10 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         query = "SELECT c FROM Capability c WHERE :"+USER+" = c.user ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.findAllValidByUser",
         query = "SELECT c FROM Capability c WHERE :"+USER+" = c.user AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+"  ORDER BY c.issuedAtTime desc"),
-        @NamedQuery(name = "Capability.findAllByAlbum",
-        query = "SELECT c FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id order by c.issuedAtTime desc"),
-        @NamedQuery(name = "Capability.findAllValidByAlbum",
-        query = "SELECT c FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+" ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.countAllByUser",
         query = "SELECT count(c) FROM Capability c WHERE :"+USER+" = c.user"),
         @NamedQuery(name = "Capability.countAllValidByUser",
         query = "SELECT count(c) FROM Capability c WHERE :"+USER+" = c.user AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+""),
-        @NamedQuery(name = "Capability.countAllByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id"),
-        @NamedQuery(name = "Capability.countAllValidByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :"+ALBUM_ID+" = c.album.id AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+""),
         @NamedQuery(name = "Capability.deleteAllByAlbum",
         query = "DELETE FROM Capability c WHERE c.album = :"+ALBUM)
 })

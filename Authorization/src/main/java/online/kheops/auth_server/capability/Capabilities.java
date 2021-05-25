@@ -23,6 +23,7 @@ import static online.kheops.auth_server.album.Albums.getAlbumUser;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.*;
 import static online.kheops.auth_server.capability.CapabilitiesQueries.findAllCapabilitiesByAlbum;
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
+import static online.kheops.auth_server.user.Users.getUser;
 
 public class Capabilities {
 
@@ -186,7 +187,8 @@ public class Capabilities {
         return new PairListXTotalCount<>(totalCount, capabilityResponses);
     }
 
-    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(String albumId, boolean valid, Integer limit, Integer offset) {
+    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(String albumId, String userSub, boolean valid, Integer limit, Integer offset)
+            throws UserNotFoundException {
 
         final List<CapabilitiesResponse> capabilityResponses = new ArrayList<>();
         final long totalCount;
@@ -195,13 +197,14 @@ public class Capabilities {
 
         final List<Capability> capabilities;
         try {
-            if(valid) {
-                capabilities = findCapabilitiesByAlbumValidOnly(albumId, limit, offset, em);
-                totalCount = countCapabilitiesByAlbumValidOnly(albumId, em);
-            } else {
-                capabilities = findAllCapabilitiesByAlbum(albumId, limit, offset, em);
-                totalCount = countAllCapabilitiesByAlbum(albumId, em);
+
+            User user = null;
+            if (userSub != null) {
+                user = getUser(userSub, em);
             }
+
+            capabilities = findAllCapabilitiesByAlbum(albumId, user, limit, offset, valid, em);
+            totalCount = countCapabilitiesByAlbum(albumId, user, valid, em);
 
             for (Capability capability: capabilities) {
                 capabilityResponses.add(new CapabilitiesResponse(capability, false, false));
