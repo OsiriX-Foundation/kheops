@@ -170,14 +170,6 @@ public class Capability {
 
     public boolean isRevoked() { return revokedTime != null; }
 
-    public void setRevoked(boolean revoked) {
-        if (!revoked && this.revokedTime != null) {
-            throw new IllegalStateException("Can't unrevoke a revoked capability");
-        } else if (revoked && this.revokedTime == null) {
-            this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
-        }
-    }
-
     public LocalDateTime getRevokedTime() { return revokedTime; }
 
     public String getTitle() { return title; }
