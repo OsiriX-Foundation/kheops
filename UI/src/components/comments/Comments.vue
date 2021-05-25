@@ -94,9 +94,6 @@ export default {
       this.$store.dispatch('deleteStoreComment', { StudyInstanceUID: this.id });
       this.offset = 0;
       this.limit = 50;
-      console.log('init');
-      console.log(this.offset);
-      console.log(this.limit);
       this.infiniteId += 1;
     },
   },
