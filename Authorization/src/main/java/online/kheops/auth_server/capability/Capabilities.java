@@ -140,7 +140,7 @@ public class Capabilities {
             callingUser = em.merge(callingUser);
             final Capability capability = getCapability(callingUser, capabilityId, em);
 
-            capability.setRevoked(true);
+            capability.setRevokedByUser(callingUser);
             em.persist(capability);
 
             capabilityResponse = new CapabilitiesResponse(capability, false, false);

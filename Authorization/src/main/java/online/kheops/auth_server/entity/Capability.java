@@ -118,7 +118,7 @@ public class Capability {
     private Album album;
 
     @ManyToOne
-    @JoinColumn(name = "revoked_by_user_fk", insertable = true, updatable=false)
+    @JoinColumn(name = "revoked_by_user_fk", insertable = true, updatable=true)
     private User revokedByUser;
 
     @PrePersist
@@ -180,13 +180,6 @@ public class Capability {
 
     public LocalDateTime getRevokedTime() { return revokedTime; }
 
-    public void setRevokedTime(LocalDateTime revokedTime) {
-        if (this.revokedTime != null) {
-            throw new IllegalStateException("Can't update the revokedTime on an already revoked capability");
-        }
-        this.revokedTime = revokedTime;
-    }
-
     public String getTitle() { return title; }
 
     public String getId() { return id; }
@@ -199,7 +192,15 @@ public class Capability {
 
     public User getRevokedByUser() { return revokedByUser; }
 
-    public void setRevokedByUser(User revokedByUser) { this.revokedByUser = revokedByUser; }
+    public void setRevokedByUser(User revokedByUser) {
+
+        if (this.revokedTime != null) {
+            throw new IllegalStateException("Can't unrevoke a revoked capability");
+        }
+        this.revokedByUser = revokedByUser;
+        this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
+
+    }
 
     public long getPk() { return pk; }
 
