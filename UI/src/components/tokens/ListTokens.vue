@@ -74,7 +74,7 @@
           <v-icon
             name="ban"
             class="mr-2"
-          />{{ $t("token.revoked") }}<br>{{ data.item.revoke_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.revoke_time|formatTime }}</small>
+          />{{ $t("token.revoked") }}
         </div>
         <div
           v-if="tokenStatus(data.item)=='expired'"
@@ -83,7 +83,7 @@
           <v-icon
             name="ban"
             class="mr-2"
-          />{{ $t("token.expired") }}<br>{{ data.item.expiration_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.expiration_time|formatTime }}</small>
+          />{{ $t("token.expired") }}
         </div>
         <div v-if="tokenStatus(data.item)=='wait'">
           <v-icon
@@ -95,9 +95,7 @@
       <template
         #cell(expiration_time)="data"
       >
-        <span :class="(data.item.revoked)?'text-danger':''">
-          {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
-        </span>
+        {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
         #cell(issued_at_time)="data"
@@ -118,19 +116,7 @@
         #cell(actions)="data"
       >
         <span
-          v-if="data.item.revoked"
-          class="text-danger"
-        >
-          {{ $t('token.revoked') }}
-        </span>
-        <span
-          v-else-if="tokenStatus(data.item)=='expired'"
-          class="text-danger"
-        >
-          {{ $t('token.expired') }}
-        </span>
-        <span
-          v-else
+          v-if="tokenStatus(data.item) !== 'revoked' && tokenStatus(data.item) !== 'expired'"
         >
           <button
             v-if="onloading[data.item.id] === undefined || onloading[data.item.id] === false"
