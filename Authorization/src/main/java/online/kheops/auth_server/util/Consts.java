@@ -20,6 +20,7 @@ public class Consts {
 
     public static final String ALBUM = "album";
     public static final String INBOX = "inbox";
+    public static final String USER = "user";
 
     public static final String INCLUDE_FIELD = "includefield";
 

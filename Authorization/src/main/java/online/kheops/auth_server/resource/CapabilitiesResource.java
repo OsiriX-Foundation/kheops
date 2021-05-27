@@ -169,15 +169,17 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapabilities(@QueryParam("valid") boolean valid,
                                     @QueryParam(ALBUM) String albumId,
+                                    @QueryParam(USER) String user,
                                     @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                    @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
+                                    @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
+            throws UserNotFoundException {
 
         final PairListXTotalCount<CapabilitiesResponse> pair;
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
         final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
         if(albumId != null) {
-            pair = Capabilities.getCapabilities(albumId, valid, limit, offset);
+            pair = Capabilities.getCapabilities(albumId, user, valid, limit, offset);
             kheopsLogBuilder.album(albumId)
             .scope("album");
         } else {
