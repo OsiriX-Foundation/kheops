@@ -330,6 +330,14 @@ public class Albums {
                     throw new AlbumForbiddenException(errorResponse);
                 }
 
+                if (removedAlbumUser.isAdmin()) {
+                    for (Capability capability: album.getCapabilities()) {
+                        if (capability.getUser() == removedUser) {
+                            capability.setRevokedByUser(callingUser);
+                        }
+                    }
+                }
+
                 final Mutation mutation = Events.albumPostUserMutation(callingUser, album, mutationType, removedUser);
                 em.persist(mutation);
                 em.remove(removedAlbumUser);
@@ -365,6 +373,11 @@ public class Albums {
             em.persist(mutation);
             removedAlbumUser.setAdmin(false);
 
+            for (Capability capability: targetAlbum.getCapabilities()) {
+                if (capability.getUser() == removedUser) {
+                    capability.setRevokedByUser(callingUser);
+                }
+            }
             targetAlbum.updateLastEventTime();
             tx.commit();
             return removedUser;
