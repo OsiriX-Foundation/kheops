@@ -225,7 +225,7 @@ export default {
     permissions() {
       const perms = [];
       Object.keys(this.token).forEach((key) => {
-        if (key.indexOf('permission') > -1) {
+        if (key.indexOf('permission') > -1 && this.token[key] === true) {
           perms.push(this.$t(`token.${key.replace('_permission', '')}`));
         }
       });
