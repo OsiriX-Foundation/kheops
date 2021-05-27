@@ -166,6 +166,7 @@
         </div>
       </div>
       <done-delete-button
+        v-if="tokenStatus(token) !== 'revoked' && tokenStatus(token) !== 'expired'"
         class-row="mt-2"
         class-col="offset-md-3 col-sm-12 col-md-4 col-lg-2 d-block"
         class-col-warning-remove="offset-md-3 col-12 col-md-9"
@@ -182,10 +183,12 @@
 <script>
 import { mapGetters } from 'vuex';
 import DoneDeleteButton from '@/components/globalbutton/DoneDeleteButton';
+import { validator } from '@/mixins/validator';
 
 export default {
   name: 'Token',
   components: { DoneDeleteButton },
+  mixins: [validator],
   data() {
     return {
       confirmRevoke: false,
@@ -198,9 +201,10 @@ export default {
     }),
     permissions() {
       const perms = [];
-      _.forEach(this.token, (value, key) => {
-        if (key.indexOf('permission') > -1 && value) {
-          perms.push(key.replace('_permission', ''));
+
+      Object.keys(this.token).forEach((key) => {
+        if (key.indexOf('permission') > -1) {
+          perms.push(this.$t(`token.${key.replace('_permission', '')}`));
         }
       });
       return perms.length ? perms.join(', ') : '-';
