@@ -193,6 +193,7 @@ export default {
           key: 'status',
           label: this.$t('token.status'),
           sortable: true,
+          tdClass: 'nowrap',
         },
         {
           key: 'title',
