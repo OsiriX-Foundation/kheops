@@ -4,6 +4,9 @@ import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.glassfish.jersey.media.multipart.MultiPart;
 
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MultivaluedHashMap;
+
 public final class SeriesID extends MultiPart {
     private final String studyUID;
     private final String seriesUID;
@@ -105,10 +108,32 @@ public final class SeriesID extends MultiPart {
     public String getStudyUID() {
         return studyUID;
     }
-
     public String getSeriesUID() {
         return seriesUID;
     }
+
+    public Entity getEntity() {
+        final MultivaluedHashMap entity = new MultivaluedHashMap();
+        entity.add("studyInstanceUID", studyUID);
+        entity.add("studyDate", studyDate);
+        entity.add("studyTime", studyTime);
+        entity.add("timzoneOffsetFromUtc", timzoneOffsetFromUtc);
+        entity.add("accessionNumber", accessionNumber);
+        entity.add("referringPhysicianName", referringPhysicianName);
+        entity.add("patientName", patientName);
+        entity.add("patientId", patientId);
+        entity.add("patientBirthDate", patientBirthDate);
+        entity.add("patientSex", patientSex);
+        entity.add("studyId", studyId);
+        entity.add("studyDescription",studyDescription);
+        entity.add("seriesInstanceUID", seriesUID);
+        entity.add("modality", modality);
+        entity.add("seriesDescription", seriesDescription);
+        entity.add("seriesNumber", Integer.toString(seriesNumber));
+        entity.add("bodyPartExamined", bodyPartExamined);
+
+        return Entity.form(entity);
+        }
 
     @Override
     public boolean equals(Object o) {

@@ -47,6 +47,7 @@ public final class AuthorizationManager {
     private final Set<InstanceID> forbiddenInstanceIDs = new HashSet<>();
     private final Set<ContentLocation> authorizedContentLocations = new HashSet<>();
     private final UriBuilder authorizationUriBuilder;
+    private final UriBuilder verifyUriBuilder;
     private final AuthorizationToken bearerToken;
     private final String headerXLinkAuthorization;
 
@@ -70,6 +71,7 @@ public final class AuthorizationManager {
         this.bearerToken = Objects.requireNonNull(authorizationToken);
         this.headerXLinkAuthorization = headerXLinkAuthorization;
         authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
+        verifyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("verifyInstance");
         if (albumId != null) {
             authorizationUriBuilder.path("/albums/" + albumId);
         }
@@ -211,9 +213,35 @@ public final class AuthorizationManager {
             return false;
         }
 
-        URI uri = authorizationUriBuilder.build(seriesID.getStudyUID(), seriesID.getSeriesUID());
+        URI verifyUri = verifyUriBuilder.build();
 
-        try (final Response response = CLIENT.target(uri)
+        try (final Response response = CLIENT.target(verifyUri)
+                .request()
+                .header(AUTHORIZATION, bearerToken.getHeaderValue())
+                .header(HEADER_X_LINK_AUTHORIZATION, headerXLinkAuthorization)
+                .post(seriesID.getEntity())) {
+
+            if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
+                LOG.log(WARNING, () -> "Instances verification rejected for series:" + seriesID);
+                forbiddenSeriesIDs.add(seriesID);
+                forbiddenInstanceIDs.add(instanceID);
+                return false;
+            }
+
+        } catch (ProcessingException e) {
+            forbiddenSeriesIDs.add(seriesID);
+            forbiddenInstanceIDs.add(instanceID);
+            throw new GatewayException("Error while verifying the instance", e);
+        }  catch (WebApplicationException e) {
+            LOG.log(WARNING, e, () -> "Unable to verify series using " + e.getResponse().getLocation());
+            forbiddenSeriesIDs.add(seriesID);
+            forbiddenInstanceIDs.add(instanceID);
+            return false;
+        }
+
+        URI authorizationUri = authorizationUriBuilder.build(seriesID.getStudyUID(), seriesID.getSeriesUID());
+
+        try (final Response response = CLIENT.target(authorizationUri)
                     .request()
                     .header(AUTHORIZATION, bearerToken.getHeaderValue())
                     .header(HEADER_X_LINK_AUTHORIZATION, headerXLinkAuthorization)

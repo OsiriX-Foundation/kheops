@@ -57,7 +57,6 @@ public class VerifyInstanceResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyInstance(
-            @FormParam(ALBUM) String albumId,
 
             @FormParam("studyInstanceUID") @UIDValidator String studyInstanceUID,
             @FormParam("studyDate") String studyDate,
@@ -76,9 +75,7 @@ public class VerifyInstanceResource {
             @FormParam("modality") String modality,
             @FormParam("seriesDescription") String seriesDescription,
             @FormParam("seriesNumber") int seriesNumber,
-            @FormParam("bodyPartExamined") String bodyPartExamined,
-
-            @FormParam("instancesUID") @UIDValidator String instancesUID) {
+            @FormParam("bodyPartExamined") String bodyPartExamined) {
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
@@ -107,6 +104,7 @@ public class VerifyInstanceResource {
         seriesParam.seriesInstanceUID = seriesInstanceUID;
         seriesParam.timzoneOffsetFromUtc = timzoneOffsetFromUtc;
         seriesParam.studyInstanceUID = studyInstanceUID;
+        seriesParam.seriesNumber = seriesNumber;
 
         final Study study;
         final Series series;
