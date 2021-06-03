@@ -223,18 +223,15 @@ public final class AuthorizationManager {
 
             if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
                 LOG.log(WARNING, () -> "Instances verification rejected for series:" + seriesID);
-                forbiddenSeriesIDs.add(seriesID);
                 forbiddenInstanceIDs.add(instanceID);
                 return false;
             }
 
         } catch (ProcessingException e) {
-            forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
             throw new GatewayException("Error while verifying the instance", e);
         }  catch (WebApplicationException e) {
             LOG.log(WARNING, e, () -> "Unable to verify series using " + e.getResponse().getLocation());
-            forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
             return false;
         }

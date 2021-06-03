@@ -7,21 +7,31 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
+import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import org.dcm4che3.data.Attributes;
+import org.dcm4che3.data.Tag;
+import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import java.util.logging.Logger;
+
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.getSeries;
-import static online.kheops.auth_server.util.Consts.ALBUM;
+import static online.kheops.auth_server.study.Studies.getStudy;
+import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
 @Path("/")
 public class VerifyInstanceResource {
+
+    private static final Logger LOG = Logger.getLogger(VerifyInstanceResource.class.getName());
 
     @Context
     private SecurityContext securityContext;
@@ -49,6 +59,22 @@ public class VerifyInstanceResource {
         int seriesNumber;
         String bodyPartExamined;
         String timzoneOffsetFromUtc;
+    }
+
+
+    private void loglog(String a, String b, String name, String patientName) {
+
+        if(name.equalsIgnoreCase("patientName") || name.equalsIgnoreCase("referringPhysicianName")) {
+            if (!isSamePN(a, b)) {
+                LOG.warning(patientName + "___" + name + ": " + a + "=/=" + b);
+            }
+        } else {
+            if ((a == null && b != null) ||
+                    (a != null && b == null) ||
+                    (a != null && b != null && !a.equals(b))) {
+                LOG.warning(patientName + "___" + name + ": " + a + "=/=" + b);
+            }
+        }
     }
 
     @POST
@@ -106,40 +132,120 @@ public class VerifyInstanceResource {
         seriesParam.studyInstanceUID = studyInstanceUID;
         seriesParam.seriesNumber = seriesNumber;
 
-        final Study study;
-        final Series series;
+        Study study = null;
+        Series series = null;
 
         final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
 
         try {
 
-            series = getSeries(studyInstanceUID, seriesInstanceUID, em);
-            study = series.getStudy();
-
-            if (!isSameSeries(series, seriesParam)) {
-                return Response.status(UNAUTHORIZED).build();
-            }
+            study = getStudy(studyInstanceUID, em);
 
             if (!isSameStudy(study, studyParam)) {
+                loglog(study.getStudyDate(), studyParam.studyDate , "studyDate", study.getPatientName());
+                loglog(study.getStudyTime(), studyParam.studyTime , "studyTime", study.getPatientName());
+                loglog(study.getStudyDescription(), studyParam.studyDescription , "studyDescription", study.getPatientName());
+                loglog(study.getTimezoneOffsetFromUTC(), studyParam.timzoneOffsetFromUtc , "timzoneOffsetFromUtc", study.getPatientName());
+                loglog(study.getAccessionNumber(), studyParam.accessionNumber , "accessionNumber", study.getPatientName());
+                loglog(study.getReferringPhysicianName(), studyParam.referringPhysicianName , "referringPhysicianName", study.getPatientName());
+                loglog(study.getPatientName(), studyParam.patientName , "patientName", study.getPatientName());
+                loglog(study.getPatientID(), studyParam.patientId , "patientId", study.getPatientName());
+                loglog(study.getPatientBirthDate(), studyParam.patientBirthDate , "patientBirthDate", study.getPatientName());
+                loglog(study.getPatientSex(), studyParam.patientSex , "patientSex", study.getPatientName());
+                loglog(study.getStudyID(), studyParam.studyId , "studyId", study.getPatientName());
                 return Response.status(UNAUTHORIZED).build();
             }
 
+            series = getSeries(studyInstanceUID, seriesInstanceUID, em);
+
+            if (!isSameSeries(series, seriesParam)) {
+                loglog(series.getModality(), seriesParam.modality , "modality", study.getPatientName());
+                loglog(series.getSeriesDescription(), seriesParam.seriesDescription , "seriesDescription", study.getPatientName());
+                loglog(series.getBodyPartExamined(), seriesParam.bodyPartExamined , "bodyPartExamined", study.getPatientName());
+                loglog(series.getTimezoneOffsetFromUTC(), seriesParam.timzoneOffsetFromUtc , "timzoneOffsetFromUtc", study.getPatientName());
+                loglog(series.getStudy().getStudyInstanceUID(), seriesParam.studyInstanceUID , "studyInstanceUID", study.getPatientName());
+
+                if (series.getSeriesNumber() != seriesParam.seriesNumber) {
+                    LOG.warning("seriesNumber: " + series.getSeriesNumber()+"=/="+seriesParam.seriesNumber);
+                }
+                return Response.status(UNAUTHORIZED).build();
+            }
+
+        } catch (StudyNotFoundException e) {
+            tx.begin();
+            
+            study = new Study(studyInstanceUID);
+            final Attributes studyAttributes = new Attributes();
+
+            studyAttributes.setString(Tag.StudyDate, VR.DA, studyDate);
+            studyAttributes.setString(Tag.StudyTime, VR.TM, studyTime);
+            studyAttributes.setString(Tag.StudyDescription, VR.LO, studyDescription);
+            studyAttributes.setString(Tag.TimezoneOffsetFromUTC, VR.SH, timzoneOffsetFromUtc);
+            studyAttributes.setString(Tag.AccessionNumber, VR.SH, accessionNumber);
+            referringPhysicianName = referringPhysicianName != null && referringPhysicianName.equals("^^^^") ? null : referringPhysicianName;
+            studyAttributes.setString(Tag.ReferringPhysicianName, VR.PN, referringPhysicianName);
+            studyAttributes.setString(Tag.PatientName, VR.PN, patientName);
+            studyAttributes.setString(Tag.PatientID, VR.LO, patientId);
+            studyAttributes.setString(Tag.PatientBirthDate, VR.DA, patientBirthDate);
+            studyAttributes.setString(Tag.PatientSex, VR.CS, patientSex);
+            studyAttributes.setString(Tag.StudyID, VR.SH, studyId);
+
+            study.mergeAttributes(studyAttributes);
+            study.setPopulated(false);
+            em.persist(study);
+
+            
+            series = new Series(seriesInstanceUID);
+            final Attributes seriesAttributes = new Attributes();
+            seriesAttributes.setString(Tag.Modality, VR.CS, modality);
+            seriesAttributes.setString(Tag.BodyPartExamined, VR.CS, bodyPartExamined);
+            seriesAttributes.setString(Tag.SeriesDescription, VR.LO, seriesDescription);
+            seriesAttributes.setString(Tag.TimezoneOffsetFromUTC, VR.SH, timzoneOffsetFromUtc);
+            seriesAttributes.setInt(Tag.SeriesNumber, VR.IS, seriesNumber);
+
+            series.mergeAttributes(seriesAttributes);
+
+            series.setStudy(study);
+            series.setPopulated(false);
+
+            em.persist(series);
+
+            tx.commit();
+            return Response.status(NO_CONTENT).build();
         } catch (SeriesNotFoundException e) {
+            //create series add metadata populate = false
+            tx.begin();
+
+            series = new Series(seriesInstanceUID);
+            final Attributes attributes = new Attributes();
+            attributes.setString(Tag.Modality, VR.CS, modality);
+            attributes.setString(Tag.BodyPartExamined, VR.CS, bodyPartExamined);
+            attributes.setString(Tag.SeriesDescription, VR.LO, seriesDescription);
+            attributes.setString(Tag.TimezoneOffsetFromUTC, VR.SH, timzoneOffsetFromUtc);
+            attributes.setInt(Tag.SeriesNumber, VR.IS, seriesNumber);
+
+            series.mergeAttributes(attributes);
+
+            series.setStudy(study);
+            series.setPopulated(false);
+
+            em.persist(series);
+
+            tx.commit();
+            return Response.status(NO_CONTENT).build();
+        } finally {
             kheopsPrincipal.getKheopsLogBuilder()
                     .action(KheopsLogBuilder.ActionType.VERIFY_INSTANCE)
                     .study(studyInstanceUID)
                     .series(seriesInstanceUID)
                     .log();
-            return Response.status(NO_CONTENT).build();
-        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
             em.close();
         }
 
-        kheopsPrincipal.getKheopsLogBuilder()
-                .action(KheopsLogBuilder.ActionType.VERIFY_INSTANCE)
-                .study(studyInstanceUID)
-                .series(seriesInstanceUID)
-                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -158,11 +264,17 @@ public class VerifyInstanceResource {
                 (study.getStudyDescription() == null ? studyParam.studyDescription == null : study.getStudyDescription().equals(studyParam.studyDescription)) &&
                 (study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc)) &&
                 (study.getAccessionNumber() == null ? studyParam.accessionNumber == null : study.getAccessionNumber().equals(studyParam.accessionNumber)) &&
-                (study.getReferringPhysicianName() == null ? studyParam.referringPhysicianName == null : study.getReferringPhysicianName().equals(studyParam.referringPhysicianName)) &&
-                (study.getPatientName() == null ? studyParam.patientName == null : study.getPatientName().equals(studyParam.patientName)) &&
+                isSamePN(study.getReferringPhysicianName(), studyParam.referringPhysicianName) &&
+                isSamePN(study.getPatientName(), studyParam.patientName) &&
                 (study.getPatientID() == null ? studyParam.patientId == null : study.getPatientID().equals(studyParam.patientId)) &&
                 (study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : study.getPatientBirthDate().equals(studyParam.patientBirthDate)) &&
                 (study.getPatientSex() == null ? studyParam.patientSex == null : study.getPatientSex().equals(studyParam.patientSex)) &&
                 (study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId));
+    }
+
+    private static boolean isSamePN(final String personNameA, final String personNameB) {
+        String pna = personNameA == null ? "" : personNameA.replace("^", "").replace("=", "");
+        String pnb = personNameB == null ? "" : personNameB.replace("^", "").replace("=", "");
+        return pna.equals(pnb);
     }
 }

@@ -14,7 +14,7 @@ public final class SeriesID extends MultiPart {
     private final String studyDate;
     private final String studyTime;
     private final String studyDescription;
-    private final String timzoneOffsetFromUtc;
+    private final String timezoneOffsetFromUtc;
     private final String accessionNumber;
     private final String referringPhysicianName;
     private final String patientName;
@@ -35,7 +35,7 @@ public final class SeriesID extends MultiPart {
         this.studyDate = studyDate;
         this.studyTime = studyTime;
         this.studyDescription = studyDescription;
-        this.timzoneOffsetFromUtc = timzoneOffsetFromUtc;
+        this.timezoneOffsetFromUtc = timzoneOffsetFromUtc;
         this.accessionNumber = accessionNumber;
         this.referringPhysicianName = referringPhysicianName;
         this.patientName = patientName;
@@ -56,7 +56,7 @@ public final class SeriesID extends MultiPart {
         this.studyDate = null;
         this.studyTime = null;
         this.studyDescription = null;
-        this.timzoneOffsetFromUtc = null;
+        this.timezoneOffsetFromUtc = null;
         this.accessionNumber = null;
         this.referringPhysicianName = null;
         this.patientName = null;
@@ -117,7 +117,7 @@ public final class SeriesID extends MultiPart {
         entity.add("studyInstanceUID", studyUID);
         entity.add("studyDate", studyDate);
         entity.add("studyTime", studyTime);
-        entity.add("timzoneOffsetFromUtc", timzoneOffsetFromUtc);
+        entity.add("timzoneOffsetFromUtc", timezoneOffsetFromUtc);
         entity.add("accessionNumber", accessionNumber);
         entity.add("referringPhysicianName", referringPhysicianName);
         entity.add("patientName", patientName);
@@ -135,17 +135,47 @@ public final class SeriesID extends MultiPart {
         return Entity.form(entity);
         }
 
+        
     @Override
     public boolean equals(Object o) {
         return o instanceof SeriesID &&
-                studyUID.equals(((SeriesID) o).getStudyUID()) &&
-                seriesUID.equals(((SeriesID) o).getSeriesUID());
+                (((SeriesID) o).modality == null ? modality == null : ((SeriesID) o).modality.equals(modality)) &&
+                (((SeriesID) o).seriesDescription == null ? seriesDescription == null : ((SeriesID) o).seriesDescription.equals(seriesDescription)) &&
+                ((SeriesID) o).seriesNumber == seriesNumber &&
+                (((SeriesID) o).bodyPartExamined == null ? bodyPartExamined == null : ((SeriesID) o).bodyPartExamined.equals(bodyPartExamined)) &&
+                (((SeriesID) o).timezoneOffsetFromUtc == null ? timezoneOffsetFromUtc == null : ((SeriesID) o).timezoneOffsetFromUtc.equals(timezoneOffsetFromUtc)) &&
+                (((SeriesID) o).studyUID == null ? studyUID == null : ((SeriesID) o).studyUID.equals(studyUID)) &&
+                (((SeriesID) o).studyDate == null ? studyDate == null : ((SeriesID) o).studyDate.equals(studyDate)) &&
+                (((SeriesID) o).studyTime == null ? studyTime == null : ((SeriesID) o).studyTime.equals(studyTime)) &&
+                (((SeriesID) o).studyDescription == null ? studyDescription == null : ((SeriesID) o).studyDescription.equals(studyDescription)) &&
+                (((SeriesID) o).accessionNumber == null ? accessionNumber == null : ((SeriesID) o).accessionNumber.equals(accessionNumber)) &&
+                (((SeriesID) o).referringPhysicianName == null ? referringPhysicianName == null : ((SeriesID) o).referringPhysicianName.equals(referringPhysicianName)) &&
+                (((SeriesID) o).patientName == null ? patientName == null : ((SeriesID) o).patientName.equals(patientName)) &&
+                (((SeriesID) o).patientId == null ? patientId == null : ((SeriesID) o).patientId.equals(patientId)) &&
+                (((SeriesID) o).patientBirthDate == null ? patientBirthDate == null : ((SeriesID) o).patientBirthDate.equals(patientBirthDate)) &&
+                (((SeriesID) o).patientSex == null ? patientSex == null : ((SeriesID) o).patientSex.equals(patientSex)) &&
+                (((SeriesID) o).studyId == null ? studyId == null : ((SeriesID) o).studyId.equals(studyId));
     }
 
 
     @Override
     public int hashCode() {
-        return studyUID.hashCode() | seriesUID.hashCode();
+        return studyUID.hashCode() | seriesUID.hashCode()
+        | (studyDate == null ? 1 : studyDate.hashCode())
+        | (studyTime == null ? 1 : studyTime.hashCode())
+        | (studyDescription == null ? 1 : studyDescription.hashCode())
+        | (timezoneOffsetFromUtc == null ? 1 : timezoneOffsetFromUtc.hashCode())
+        | (accessionNumber == null ? 1 : accessionNumber.hashCode())
+        | (referringPhysicianName == null ? 1 : referringPhysicianName.hashCode())
+        | (patientName == null ? 1 : patientName.hashCode())
+        | (patientId == null ? 1 : patientId.hashCode())
+        | (patientBirthDate == null ? 1 : patientBirthDate.hashCode())
+        | (patientSex == null ? 1 : patientSex.hashCode())
+        | (studyId == null ? 1 : studyId.hashCode())
+        | (modality == null ? 1 : modality.hashCode())
+        | (seriesDescription == null ? 1 : seriesDescription.hashCode())
+        | seriesNumber
+        | (bodyPartExamined == null ? 1 : bodyPartExamined.hashCode());
     }
 
     @Override
