@@ -21,16 +21,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import java.util.logging.Logger;
-
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.study.Studies.getStudy;
-import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
 @Path("/")
 public class VerifyInstanceResource {
-    
+
     @Context
     private SecurityContext securityContext;
 
