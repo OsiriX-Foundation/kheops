@@ -30,9 +30,7 @@ import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
 @Path("/")
 public class VerifyInstanceResource {
-
-    private static final Logger LOG = Logger.getLogger(VerifyInstanceResource.class.getName());
-
+    
     @Context
     private SecurityContext securityContext;
 
