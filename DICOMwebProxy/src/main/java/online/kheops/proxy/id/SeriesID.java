@@ -6,6 +6,7 @@ import org.glassfish.jersey.media.multipart.MultiPart;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MultivaluedHashMap;
+import java.util.Objects;
 
 public final class SeriesID extends MultiPart {
     private final String studyUID;
@@ -139,43 +140,47 @@ public final class SeriesID extends MultiPart {
     @Override
     public boolean equals(Object o) {
         return o instanceof SeriesID &&
-                (((SeriesID) o).modality == null ? modality == null : ((SeriesID) o).modality.equals(modality)) &&
-                (((SeriesID) o).seriesDescription == null ? seriesDescription == null : ((SeriesID) o).seriesDescription.equals(seriesDescription)) &&
+                Objects.equals(((SeriesID) o).modality, modality) &&
+                Objects.equals(((SeriesID) o).seriesDescription, seriesDescription) &&
                 ((SeriesID) o).seriesNumber == seriesNumber &&
-                (((SeriesID) o).bodyPartExamined == null ? bodyPartExamined == null : ((SeriesID) o).bodyPartExamined.equals(bodyPartExamined)) &&
-                (((SeriesID) o).timezoneOffsetFromUtc == null ? timezoneOffsetFromUtc == null : ((SeriesID) o).timezoneOffsetFromUtc.equals(timezoneOffsetFromUtc)) &&
-                (((SeriesID) o).studyUID == null ? studyUID == null : ((SeriesID) o).studyUID.equals(studyUID)) &&
-                (((SeriesID) o).studyDate == null ? studyDate == null : ((SeriesID) o).studyDate.equals(studyDate)) &&
-                (((SeriesID) o).studyTime == null ? studyTime == null : ((SeriesID) o).studyTime.equals(studyTime)) &&
-                (((SeriesID) o).studyDescription == null ? studyDescription == null : ((SeriesID) o).studyDescription.equals(studyDescription)) &&
-                (((SeriesID) o).accessionNumber == null ? accessionNumber == null : ((SeriesID) o).accessionNumber.equals(accessionNumber)) &&
-                (((SeriesID) o).referringPhysicianName == null ? referringPhysicianName == null : ((SeriesID) o).referringPhysicianName.equals(referringPhysicianName)) &&
-                (((SeriesID) o).patientName == null ? patientName == null : ((SeriesID) o).patientName.equals(patientName)) &&
-                (((SeriesID) o).patientId == null ? patientId == null : ((SeriesID) o).patientId.equals(patientId)) &&
-                (((SeriesID) o).patientBirthDate == null ? patientBirthDate == null : ((SeriesID) o).patientBirthDate.equals(patientBirthDate)) &&
-                (((SeriesID) o).patientSex == null ? patientSex == null : ((SeriesID) o).patientSex.equals(patientSex)) &&
-                (((SeriesID) o).studyId == null ? studyId == null : ((SeriesID) o).studyId.equals(studyId));
+                Objects.equals(((SeriesID) o).bodyPartExamined, bodyPartExamined) &&
+                Objects.equals(((SeriesID) o).timezoneOffsetFromUtc, timezoneOffsetFromUtc) &&
+                Objects.equals(((SeriesID) o).studyUID, studyUID) &&
+                Objects.equals(((SeriesID) o).studyDate, studyDate) &&
+                Objects.equals(((SeriesID) o).studyTime, studyTime) &&
+                Objects.equals(((SeriesID) o).studyDescription, studyDescription) &&
+                Objects.equals(((SeriesID) o).accessionNumber, accessionNumber) &&
+                Objects.equals(((SeriesID) o).referringPhysicianName, referringPhysicianName) &&
+                Objects.equals(((SeriesID) o).patientName, patientName) &&
+                Objects.equals(((SeriesID) o).patientId, patientId) &&
+                Objects.equals(((SeriesID) o).patientBirthDate, patientBirthDate) &&
+                Objects.equals(((SeriesID) o).patientSex, patientSex) &&
+                Objects.equals(((SeriesID) o).studyId, studyId);
     }
 
 
     @Override
     public int hashCode() {
-        return studyUID.hashCode() | seriesUID.hashCode()
-        | (studyDate == null ? 1 : studyDate.hashCode())
-        | (studyTime == null ? 1 : studyTime.hashCode())
-        | (studyDescription == null ? 1 : studyDescription.hashCode())
-        | (timezoneOffsetFromUtc == null ? 1 : timezoneOffsetFromUtc.hashCode())
-        | (accessionNumber == null ? 1 : accessionNumber.hashCode())
-        | (referringPhysicianName == null ? 1 : referringPhysicianName.hashCode())
-        | (patientName == null ? 1 : patientName.hashCode())
-        | (patientId == null ? 1 : patientId.hashCode())
-        | (patientBirthDate == null ? 1 : patientBirthDate.hashCode())
-        | (patientSex == null ? 1 : patientSex.hashCode())
-        | (studyId == null ? 1 : studyId.hashCode())
-        | (modality == null ? 1 : modality.hashCode())
-        | (seriesDescription == null ? 1 : seriesDescription.hashCode())
-        | seriesNumber
-        | (bodyPartExamined == null ? 1 : bodyPartExamined.hashCode());
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + studyUID.hashCode();
+        result = prime * result + seriesUID.hashCode();
+        result = prime * result + (studyDate == null ? 0 : studyDate.hashCode());
+        result = prime * result + (studyTime == null ? 0 : studyTime.hashCode());
+        result = prime * result + (studyDescription == null ? 0 : studyDescription.hashCode());
+        result = prime * result + (timezoneOffsetFromUtc == null ? 0 : timezoneOffsetFromUtc.hashCode());
+        result = prime * result + (accessionNumber == null ? 0 : accessionNumber.hashCode());
+        result = prime * result + (referringPhysicianName == null ? 0 : referringPhysicianName.hashCode());
+        result = prime * result + (patientName == null ? 0 : patientName.hashCode());
+        result = prime * result + (patientId == null ? 0 : patientId.hashCode());
+        result = prime * result + (patientBirthDate == null ? 0 : patientBirthDate.hashCode());
+        result = prime * result + (patientSex == null ? 0 : patientSex.hashCode());
+        result = prime * result + (studyId == null ? 0 : studyId.hashCode());
+        result = prime * result + (modality == null ? 0 : modality.hashCode());
+        result = prime * result + (seriesDescription == null ? 0 : seriesDescription.hashCode());
+        result = prime * result + seriesNumber;
+        result = prime * result + (bodyPartExamined == null ? 0 : bodyPartExamined.hashCode());
+        return result;
     }
 
     @Override
