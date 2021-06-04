@@ -133,9 +133,6 @@ public class VerifyInstanceResource {
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
             if (!isSameSeries(series, seriesParam)) {
-                if (series.getSeriesNumber() != seriesParam.seriesNumber) {
-                    LOG.warning("seriesNumber: " + series.getSeriesNumber()+"=/="+seriesParam.seriesNumber);
-                }
                 return Response.status(UNAUTHORIZED).build();
             }
 
