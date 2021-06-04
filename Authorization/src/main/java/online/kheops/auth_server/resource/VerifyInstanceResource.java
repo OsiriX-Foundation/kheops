@@ -181,7 +181,6 @@ public class VerifyInstanceResource {
             tx.commit();
             return Response.status(NO_CONTENT).build();
         } catch (SeriesNotFoundException e) {
-            //create series add metadata populate = false
             tx.begin();
 
             series = new Series(seriesInstanceUID);
