@@ -61,22 +61,6 @@ public class VerifyInstanceResource {
         String timzoneOffsetFromUtc;
     }
 
-
-    private void loglog(String a, String b, String name, String patientName) {
-
-        if(name.equalsIgnoreCase("patientName") || name.equalsIgnoreCase("referringPhysicianName")) {
-            if (!isSamePN(a, b)) {
-                LOG.warning(patientName + "___" + name + ": " + a + "=/=" + b);
-            }
-        } else {
-            if ((a == null && b != null) ||
-                    (a != null && b == null) ||
-                    (a != null && b != null && !a.equals(b))) {
-                LOG.warning(patientName + "___" + name + ": " + a + "=/=" + b);
-            }
-        }
-    }
-
     @POST
     @Secured
     @Path("verifyInstance")
@@ -143,29 +127,12 @@ public class VerifyInstanceResource {
             study = getStudy(studyInstanceUID, em);
 
             if (!isSameStudy(study, studyParam)) {
-                loglog(study.getStudyDate(), studyParam.studyDate , "studyDate", study.getPatientName());
-                loglog(study.getStudyTime(), studyParam.studyTime , "studyTime", study.getPatientName());
-                loglog(study.getStudyDescription(), studyParam.studyDescription , "studyDescription", study.getPatientName());
-                loglog(study.getTimezoneOffsetFromUTC(), studyParam.timzoneOffsetFromUtc , "timzoneOffsetFromUtc", study.getPatientName());
-                loglog(study.getAccessionNumber(), studyParam.accessionNumber , "accessionNumber", study.getPatientName());
-                loglog(study.getReferringPhysicianName(), studyParam.referringPhysicianName , "referringPhysicianName", study.getPatientName());
-                loglog(study.getPatientName(), studyParam.patientName , "patientName", study.getPatientName());
-                loglog(study.getPatientID(), studyParam.patientId , "patientId", study.getPatientName());
-                loglog(study.getPatientBirthDate(), studyParam.patientBirthDate , "patientBirthDate", study.getPatientName());
-                loglog(study.getPatientSex(), studyParam.patientSex , "patientSex", study.getPatientName());
-                loglog(study.getStudyID(), studyParam.studyId , "studyId", study.getPatientName());
                 return Response.status(UNAUTHORIZED).build();
             }
 
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
             if (!isSameSeries(series, seriesParam)) {
-                loglog(series.getModality(), seriesParam.modality , "modality", study.getPatientName());
-                loglog(series.getSeriesDescription(), seriesParam.seriesDescription , "seriesDescription", study.getPatientName());
-                loglog(series.getBodyPartExamined(), seriesParam.bodyPartExamined , "bodyPartExamined", study.getPatientName());
-                loglog(series.getTimezoneOffsetFromUTC(), seriesParam.timzoneOffsetFromUtc , "timzoneOffsetFromUtc", study.getPatientName());
-                loglog(series.getStudy().getStudyInstanceUID(), seriesParam.studyInstanceUID , "studyInstanceUID", study.getPatientName());
-
                 if (series.getSeriesNumber() != seriesParam.seriesNumber) {
                     LOG.warning("seriesNumber: " + series.getSeriesNumber()+"=/="+seriesParam.seriesNumber);
                 }
