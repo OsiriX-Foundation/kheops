@@ -15,7 +15,7 @@ public abstract class QueryParamTools {
         final Integer limit;
         try {
             limit = Integer.parseInt(queryParameters.get(Consts.QUERY_PARAMETER_LIMIT).get(0));
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_QUERY_PARAMETER)
                     .detail("'" + Consts.QUERY_PARAMETER_LIMIT + "' must be an integer >= 1")
