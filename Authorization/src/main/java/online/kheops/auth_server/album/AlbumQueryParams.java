@@ -3,7 +3,7 @@ package online.kheops.auth_server.album;
 import online.kheops.auth_server.entity.User;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.util.ErrorResponse;
-import online.kheops.auth_server.util.JOOQTools;
+import online.kheops.auth_server.util.QueryParamTools;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.util.*;
@@ -111,7 +111,7 @@ public final class AlbumQueryParams {
     private OptionalInt extractLimit(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         if (queryParameters.containsKey(QUERY_PARAMETER_LIMIT)) {
-            return JOOQTools.getLimit(queryParameters);
+            return QueryParamTools.getLimit(queryParameters);
         } else {
             return OptionalInt.empty();
         }
@@ -120,7 +120,7 @@ public final class AlbumQueryParams {
     private OptionalInt extractOffset(MultivaluedMap<String, String> queryParameters)
             throws BadQueryParametersException {
         if (queryParameters.containsKey(QUERY_PARAMETER_OFFSET)) {
-            return JOOQTools.getOffset(queryParameters);
+            return QueryParamTools.getOffset(queryParameters);
         } else {
             return OptionalInt.empty();
         }

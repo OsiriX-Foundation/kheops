@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
-import static online.kheops.auth_server.util.JOOQTools.checkDate;
+import static online.kheops.auth_server.util.QueryParamTools.checkDate;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 public class AlbumQueries {

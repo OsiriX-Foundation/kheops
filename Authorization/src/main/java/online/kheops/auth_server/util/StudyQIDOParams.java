@@ -106,13 +106,13 @@ public final class StudyQIDOParams {
         }
 
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-            limit = JOOQTools.getLimit(queryParameters);
+            limit = QueryParamTools.getLimit(queryParameters);
         } else {
             limit = OptionalInt.empty();
         }
 
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-            offset = JOOQTools.getOffset(queryParameters);
+            offset = QueryParamTools.getOffset(queryParameters);
         } else {
             offset = OptionalInt.empty();
         }

@@ -12,7 +12,7 @@ public class InboxQueries {
     }
 
 
-    public static InboxInfoResponse getInboxInfoJPA(long userPk, EntityManager em) {
+    public static InboxInfoResponse getInboxInfo(long userPk, EntityManager em) {
 
         TypedQuery<InboxInfoResponse> query = em.createNamedQuery("Albums.getInboxInfoByUserPk", InboxInfoResponse.class);
         query.setParameter(USER_PK, userPk);

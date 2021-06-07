@@ -17,7 +17,7 @@ public class Inbox {
     public static InboxInfoResponse getInboxInfo(User user, KheopsLogBuilder kheopsLogBuilder) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
-        final InboxInfoResponse inboxInfoResponse = InboxQueries.getInboxInfoJPA(user.getPk(), em);
+        final InboxInfoResponse inboxInfoResponse = InboxQueries.getInboxInfo(user.getPk(), em);
 
         kheopsLogBuilder.action(KheopsLogBuilder.ActionType.INBOX_INFO)
                 .log();

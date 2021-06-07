@@ -7,9 +7,9 @@ import java.util.OptionalInt;
 
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 
-public abstract class JOOQTools {
+public abstract class QueryParamTools {
 
-    private JOOQTools() { throw new IllegalStateException("Utility class"); }
+    private QueryParamTools() { throw new IllegalStateException("Utility class"); }
 
     public static OptionalInt getLimit(MultivaluedMap<String, String> queryParameters) throws BadQueryParametersException {
         final Integer limit;
