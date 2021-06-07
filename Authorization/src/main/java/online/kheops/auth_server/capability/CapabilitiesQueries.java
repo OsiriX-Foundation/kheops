@@ -1,6 +1,5 @@
 package online.kheops.auth_server.capability;
 
-import online.kheops.auth_server.album.AlbumResponseBuilder;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.util.ErrorResponse;
 
