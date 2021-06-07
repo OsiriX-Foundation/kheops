@@ -62,7 +62,7 @@ public class StudyResponseDICOM {
     public Attributes getAttribute(StudyQIDOParams qidoParams) {
         Attributes attributes = new Attributes();
 
-        attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.split(","));
+        attributes.setValue(Tag.ModalitiesInStudy, VR.CS, modalities.replace("\"", "").split(","));
 
         //Tag Type (1) Required
         safeAttributeSetString(attributes, Tag.StudyInstanceUID, VR.UI, studyInstanceUID);
