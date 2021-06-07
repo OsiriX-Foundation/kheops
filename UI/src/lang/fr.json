@@ -17,6 +17,7 @@
 		"delete": "Effacer l'album",
 		"id": "ID de l'album",
 		"lastadmin": "Vous êtes le dernier administrateur, vous pouvez définir un nouveau administrateur ou laisser l'album sans.",
+		"lastadmintoken": "Attention ! Une fois l'album quitté, les tokens créés seront supprimés.",
 		"lastuser": "Vous êtes le dernier utilisateur, si vous quittez l'album, il sera supprimé.",
 		"quit": "Quitter l'album",
 		"quitalbum": "Etes-vous sûr de vouloir quitter l'album ?"

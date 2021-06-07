@@ -17,6 +17,7 @@
 		"delete": "Delete album",
 		"id": "Album ID",
 		"lastadmin": "You are the last data steward, you can assign a new one or leave the album without one.",
+		"lastadmintoken": "Warning ! Once the album is quit, the tokens you created below will be revoked.",
 		"lastuser": "You are the last user in the album, if you leave it, the album will be deleted.",
 		"quit": "Leave album",
 		"quitalbum": "Are you sure you want to leave the album?"
