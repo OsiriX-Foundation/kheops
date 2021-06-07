@@ -21,21 +21,6 @@ Props :
     class="container"
   >
     <div
-      v-if="showQuit && confirmQuit"
-      class="row"
-    >
-      <div
-        class="btnalbum offset-lg-4 col-lg-8 d-md-block text-md-right"
-      >
-        <p v-if="confirmQuit && !lastAdmin && !lastUser">
-          {{ $t("albumsettings.quitalbum") }}
-        </p>
-        <p v-else-if="confirmQuit && lastUser">
-          {{ $t('albumsettings.lastuser') }}
-        </p>
-      </div>
-    </div>
-    <div
       v-if="showQuit"
       class="row"
     >
@@ -55,8 +40,32 @@ Props :
           :show-change-role="true"
         />
       </div>
-
+      <album-admin-token
+        v-if="album.is_admin && confirmQuit"
+        :albumid="album.album_id"
+        :user="currentuserEmail"
+      />
+    </div>
+    <div
+      v-if="showQuit && confirmQuit"
+      class="row"
+    >
       <div
+        class="btnalbum offset-lg-4 col-lg-8 d-md-block text-md-right"
+      >
+        <p v-if="confirmQuit && !lastUser">
+          {{ $t("albumsettings.quitalbum") }}
+        </p>
+        <p v-else-if="confirmQuit && lastUser">
+          {{ $t('albumsettings.lastuser') }}
+        </p>
+      </div>
+    </div>
+    <div
+      class="row"
+    >
+      <div
+        v-if="confirmDeletion === false"
         class="btnalbum offset-md-8 offset-lg-9 col-md-4 col-lg-3"
       >
         <button
@@ -81,7 +90,7 @@ Props :
       class="row"
     >
       <div
-        class="btnalbum offset-md-4 offset-lg-6 col-12 col-md-8 col-lg-6"
+        class="btnalbum offset-md-4 offset-lg-6 col-12 col-md-8 col-lg-6 pt-5"
       >
         <p
           v-if="confirmDeletion"
@@ -92,7 +101,7 @@ Props :
       </div>
     </div>
     <div
-      v-if="showDelete"
+      v-if="showDelete && confirmQuit === false"
       class="row"
     >
       <div
@@ -120,12 +129,13 @@ Props :
 
 <script>
 import AlbumUsers from '@/components/albumsettings/AlbumUsers';
+import AlbumAdminToken from '@/components/albumsettings/AlbumAdminToken';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'AlbumButtons',
-  components: { AlbumUsers, KheopsClipLoader },
+  components: { AlbumUsers, AlbumAdminToken, KheopsClipLoader },
   mixins: [CurrentUser],
   props: {
     album: {

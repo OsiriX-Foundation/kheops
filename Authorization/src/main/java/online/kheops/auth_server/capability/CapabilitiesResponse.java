@@ -56,6 +56,8 @@ public class CapabilitiesResponse {
     private String study;
     @XmlElement(name = "created_by")
     private UserResponse createdBy;
+    @XmlElement(name = "revoked_by")
+    private UserResponse revokedBy;
 
     private CapabilitiesResponse() { /*empty*/ }
 
@@ -103,4 +105,5 @@ public class CapabilitiesResponse {
     public void setSeries(String series) { this.series = series; }
     public void setStudy(String study) { this.study = study; }
     public void setOriginNull() { this.createdBy = null; }
+    public void setRevokedBy(UserResponse userResponse) { revokedBy = userResponse; }
 }

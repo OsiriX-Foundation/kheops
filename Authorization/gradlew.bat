@@ -101,4 +101,8 @@ exit /b 1
 :mainEnd
 if "%OS%"=="Windows_NT" endlocal
 
+<<<<<<< HEAD
 :omega
+=======
+:omega
+>>>>>>> main

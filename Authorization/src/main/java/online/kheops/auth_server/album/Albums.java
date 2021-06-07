@@ -333,7 +333,7 @@ public class Albums {
                 if (removedAlbumUser.isAdmin()) {
                     for (Capability capability: album.getCapabilities()) {
                         if (capability.getUser() == removedUser) {
-                            capability.setRevoked(true);
+                            capability.setRevokedByUser(callingUser);
                         }
                     }
                 }
@@ -375,7 +375,7 @@ public class Albums {
 
             for (Capability capability: targetAlbum.getCapabilities()) {
                 if (capability.getUser() == removedUser) {
-                    capability.setRevoked(true);
+                    capability.setRevokedByUser(callingUser);
                 }
             }
             targetAlbum.updateLastEventTime();

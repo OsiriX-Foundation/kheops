@@ -74,7 +74,7 @@
           <v-icon
             name="ban"
             class="mr-2"
-          />{{ $t("revoked") }}<br>{{ data.item.revoke_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.revoke_time|formatTime }}</small>
+          />{{ $t("token.revoked") }}
         </div>
         <div
           v-if="tokenStatus(data.item)=='expired'"
@@ -83,7 +83,7 @@
           <v-icon
             name="ban"
             class="mr-2"
-          />{{ $t("expired") }}<br>{{ data.item.expiration_time|formatDate }} <br class="d-lg-none"> <small>{{ data.item.expiration_time|formatTime }}</small>
+          />{{ $t("token.expired") }}
         </div>
         <div v-if="tokenStatus(data.item)=='wait'">
           <v-icon
@@ -95,9 +95,7 @@
       <template
         #cell(expiration_time)="data"
       >
-        <span :class="(data.item.revoked)?'text-danger':''">
-          {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
-        </span>
+        {{ data.value|formatDate }} <br class="d-lg-none"> <small>{{ data.value|formatTime }}</small>
       </template>
       <template
         #cell(issued_at_time)="data"
@@ -118,7 +116,7 @@
         #cell(actions)="data"
       >
         <span
-          v-if="!data.item.revoked"
+          v-if="tokenStatus(data.item) !== 'revoked' && tokenStatus(data.item) !== 'expired'"
         >
           <button
             v-if="onloading[data.item.id] === undefined || onloading[data.item.id] === false"
@@ -132,12 +130,6 @@
             v-else
             :loading="onloading[data.item.id]"
           />
-        </span>
-        <span
-          v-if="data.item.revoked"
-          class="text-danger"
-        >
-          {{ $t('token.revoked') }}
         </span>
       </template>
       <template #table-busy>
@@ -168,15 +160,16 @@
 <script>
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
-import moment from 'moment';
 import Loading from '@/components/globalloading/Loading';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
 import ListEmpty from '@/components/globallist/ListEmpty';
 import httpoperations from '@/mixins/httpoperations';
+import { validator } from '@/mixins/validator';
 
 export default {
   name: 'ListTokens',
   components: { Loading, ListEmpty, KheopsClipLoader },
+  mixins: [validator],
   props: {
     scope: {
       type: String,
@@ -200,6 +193,7 @@ export default {
           key: 'status',
           label: this.$t('token.status'),
           sortable: true,
+          tdClass: 'nowrap',
         },
         {
           key: 'title',
@@ -325,16 +319,6 @@ export default {
     clickNew() {
       const action = 'newtoken';
       this.$router.push({ name: this.routername.action, params: { action } });
-    },
-    tokenStatus(itemToken) {
-      if (itemToken.revoked) {
-        return 'revoked';
-      } if (moment(itemToken.not_before_time) > moment()) {
-        return 'wait';
-      } if (moment(itemToken.expiration_time) < moment()) {
-        return 'expired';
-      }
-      return 'active';
     },
     revoke(tokenId) {
       Vue.set(this.onloading, tokenId, true);

@@ -13,6 +13,7 @@ public abstract class Capability_ {
 	public static volatile SingularAttribute<Capability, Boolean> downloadPermission;
 	public static volatile SingularAttribute<Capability, LocalDateTime> updatedTime;
 	public static volatile SingularAttribute<Capability, Album> album;
+	public static volatile SingularAttribute<Capability, User> revokedByUser;
 	public static volatile SingularAttribute<Capability, String> secret;
 	public static volatile SingularAttribute<Capability, String> title;
 	public static volatile SingularAttribute<Capability, LocalDateTime> lastUsed;
@@ -31,6 +32,7 @@ public abstract class Capability_ {
 	public static final String DOWNLOAD_PERMISSION = "downloadPermission";
 	public static final String UPDATED_TIME = "updatedTime";
 	public static final String ALBUM = "album";
+	public static final String REVOKED_BY_USER = "revokedByUser";
 	public static final String SECRET = "secret";
 	public static final String TITLE = "title";
 	public static final String LAST_USED = "lastUsed";

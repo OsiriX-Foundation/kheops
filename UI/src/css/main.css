@@ -349,11 +349,6 @@ input::placeholder {
 	padding-left: 10px
 }
 
-div.user-table-container{
-	min-height: 200px;
-	padding: 25px 0;
-}
-
 label.user-settings{
   	margin-left: 10px;
 }
