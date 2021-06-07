@@ -7,7 +7,7 @@ Props :
   showChangeRole  Boolean
 -->
 <template>
-  <div class="user-table-container">
+  <div>
     <table class="table">
       <thead>
         <tr>
