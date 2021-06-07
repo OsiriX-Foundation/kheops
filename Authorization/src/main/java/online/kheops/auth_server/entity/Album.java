@@ -137,7 +137,7 @@ public class Album {
     }
 
     public void removeSeries(Series series, EntityManager em) {
-        AlbumSeries localAlbumSeries = em.createQuery("SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album", AlbumSeries.class)
+        AlbumSeries localAlbumSeries = em.createNamedQuery("AlbumSeries.findByAlbumAndSeries", AlbumSeries.class)
                 .setParameter(SERIES, series)
                 .setParameter(ALBUM, this)
                 .getSingleResult();

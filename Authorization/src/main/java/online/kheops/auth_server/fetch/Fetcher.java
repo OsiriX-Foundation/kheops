@@ -81,14 +81,14 @@ public abstract class Fetcher {
         try {
             tx.begin();
 
-            TypedQuery<Study> queryStudy = em.createQuery("select s from Study s where s.studyInstanceUID = :"+STUDY_UID, Study.class);
+            TypedQuery<Study> queryStudy = em.createNamedQuery("Study.findByUID", Study.class);
             queryStudy.setParameter(STUDY_UID, studyInstanceUID);
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             final Study study = queryStudy.getSingleResult();
             study.mergeAttributes(attributes);
             study.setPopulated(true);
 
-            final TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :"+STUDY_UID, String.class);
+            final TypedQuery<String> query = em.createNamedQuery("Series.findSeriesUIDByStudyUID", String.class);
             query.setParameter(STUDY_UID, studyInstanceUID);
             seriesUIDList = query.getResultList();
 

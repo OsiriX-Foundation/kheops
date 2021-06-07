@@ -15,7 +15,7 @@ public class AlbumsSeries {
     }
 
     public static AlbumSeries getAlbumSeries(Album album, Series series, EntityManager em) {
-        return em.createQuery("SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album", AlbumSeries.class)
+        return em.createNamedQuery("AlbumSeries.findByAlbumAndSeries", AlbumSeries.class)
                 .setParameter(SERIES, series)
                 .setParameter(ALBUM, album)
                 .getSingleResult();
