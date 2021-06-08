@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="tokens.length > 0 || error === true"
+    v-if="tokens.length > 0 || status > -1"
     class="col-12"
   >
     <p
@@ -62,7 +62,15 @@
         <loading />
       </template>
       <template #empty>
-        blabla
+        <div
+          class="text-warning text-center"
+        >
+          <list-empty
+            :status="status"
+            :text-empty="$t('token.notokens')"
+            @reload="getTokens()"
+          />
+        </div>
       </template>
     </b-table>
   </div>
@@ -70,11 +78,13 @@
 
 <script>
 import Loading from '@/components/globalloading/Loading';
+import ListEmpty from '@/components/globallist/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'AlbumAdminToken',
   components: {
-    Loading,
+    Loading, ListEmpty,
   },
   mixins: [],
   props: {
@@ -92,7 +102,7 @@ export default {
   data() {
     return {
       tokens: [],
-      error: false,
+      status: -1,
       isLoading: false,
       fields: [
         {
@@ -145,7 +155,7 @@ export default {
         this.isLoading = true;
       }).catch((err) => {
         this.isLoading = true;
-        this.error = true;
+        this.status = httpoperations.getStatusError(err);
         Promise.reject(err);
       });
     },
