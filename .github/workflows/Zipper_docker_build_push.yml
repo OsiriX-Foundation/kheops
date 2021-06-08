@@ -1,6 +1,7 @@
 name: Zipper Docker Image CI
 
 on:
+  create:
   push:
     paths:
     - 'Zipper/**'

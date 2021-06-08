@@ -1,6 +1,7 @@
 name: DICOMwebProxy Sonar
 
 on:
+  create:
   push:
     paths:
     - 'DICOMwebProxy/**'

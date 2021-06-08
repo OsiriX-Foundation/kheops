@@ -1,6 +1,7 @@
 name: Zipper Sonar
 
 on:
+  create:
   push:
     paths:
     - 'Zipper/**'

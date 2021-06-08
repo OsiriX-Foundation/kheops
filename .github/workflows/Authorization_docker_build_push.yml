@@ -1,6 +1,7 @@
 name: Authorization Docker Image CI
 
 on:
+  create:
   push:
     paths:
     - 'Authorization/**'
