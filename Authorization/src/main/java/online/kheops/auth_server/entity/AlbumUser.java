@@ -3,10 +3,14 @@ package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 @NamedQueries({
         @NamedQuery(name = "AlbumUser.findByAlbumIdAndUser",
-                query = "SELECT au FROM AlbumUser au WHERE :targetUser = au.user AND :targetAlbum = au.album AND au.user.inbox <> album")
+                query = "SELECT au FROM AlbumUser au WHERE :"+USER+" = au.user AND :"+ALBUM+" = au.album AND au.user.inbox <> album"),
+        @NamedQuery(name = "AlbumUser.deleteAllByAlbum",
+                query = "DELETE FROM AlbumUser au WHERE au.album = :"+ALBUM)
 })
 
 @Entity
@@ -50,7 +54,6 @@ public class AlbumUser {
         this.admin = isAdmin;
 
         album.addAlbumUser(this);
-        user.addAlbumUser(this);
     }
 
     public long getPk() { return pk; }

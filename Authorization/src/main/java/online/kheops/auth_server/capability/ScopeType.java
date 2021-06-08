@@ -9,6 +9,7 @@ import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.user.UserNotFoundException;
+import online.kheops.auth_server.user.UserResponseBuilder;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 
@@ -40,7 +41,6 @@ public enum ScopeType {
         @Override
         public void setCapabilityEntityScope(Capability capability, Album album, Study study, Series series) {
             capability.setScopeType(this);
-            capability.getUser().getCapabilities().add(capability);
         }
     },
     ALBUM {
@@ -72,6 +72,9 @@ public enum ScopeType {
             capabilityResponse.setDownloadPermission(capability.hasDownloadButtonPermission());
             capabilityResponse.setReadPermission(capability.hasReadPermission());
             capabilityResponse.setWritePermission(capability.hasWritePermission());
+            if (capability.getRevokedByUser() != null) {
+                capabilityResponse.setRevokedBy(new UserResponseBuilder().setUser(capability.getRevokedByUser()).build());
+            }
         }
 
         @Override

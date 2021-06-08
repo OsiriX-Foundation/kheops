@@ -20,7 +20,7 @@ public class OtherExceptionMapper implements ExceptionMapper<Exception> {
 
         final String id = newId();
 
-        LOG.log(Level.SEVERE, "id:" + id, e);
+        LOG.log(Level.SEVERE, String.format("id:%s", id), e);
 
         final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                 .message("Internal server error")

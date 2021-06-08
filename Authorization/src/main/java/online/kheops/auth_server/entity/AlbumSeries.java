@@ -3,11 +3,16 @@ package online.kheops.auth_server.entity;
 
 import javax.persistence.*;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 @NamedQueries({
 
         @NamedQuery(name = "AlbumSeries.findByAlbumAndSeries",
-                query = "SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album")
+                query = "SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album"),
+        @NamedQuery(name = "AlbumSeries.deleteAllByAlbum",
+                query = "DELETE FROM AlbumSeries aSe WHERE aSe.album = :"+ALBUM)
+
 })
 
 @Entity
@@ -36,8 +41,6 @@ public class AlbumSeries {
         this.album = album;
         this.series = series;
         favorite = false;
-        this.album.addSeries(this);
-        this.series.addAlbumSeries(this);
     }
 
     public void setFavorite(boolean favorite) { this.favorite = favorite; }

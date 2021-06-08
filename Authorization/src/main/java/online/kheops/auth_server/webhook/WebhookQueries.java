@@ -8,6 +8,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import java.util.List;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 public class WebhookQueries {
 
     private WebhookQueries() {
@@ -19,7 +21,7 @@ public class WebhookQueries {
 
         try {
             return em.createNamedQuery("Webhook.findById", Webhook.class)
-                    .setParameter("webhookId", webhookID)
+                    .setParameter(WEBHOOK_ID, webhookID)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new WebhookNotFoundException();
@@ -31,7 +33,7 @@ public class WebhookQueries {
 
         try {
             return em.createNamedQuery("WebhookTrigger.findById", WebhookTrigger.class)
-                    .setParameter("webhookTriggerId", webhookTriggerID)
+                    .setParameter(WEBHOOK_TRIGGER_ID, webhookTriggerID)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new WebhookNotFoundException();
@@ -42,8 +44,8 @@ public class WebhookQueries {
             throws WebhookNotFoundException {
         try {
             return em.createNamedQuery("Webhook.findByIdAndAlbum", Webhook.class)
-                    .setParameter("webhookId", webhookID)
-                    .setParameter("album", album)
+                    .setParameter(WEBHOOK_ID, webhookID)
+                    .setParameter(ALBUM, album)
                     .getSingleResult();
         } catch (NoResultException e) {
             throw new WebhookNotFoundException();
@@ -52,7 +54,7 @@ public class WebhookQueries {
 
     public static List<Webhook> getWebhooks(Album album, Integer limit, Integer offset, EntityManager em) {
             return em.createNamedQuery("Webhook.findAllByAlbum", Webhook.class)
-                    .setParameter("album", album)
+                    .setParameter(ALBUM, album)
                     .setFirstResult(offset)
                     .setMaxResults(limit)
                     .getResultList();
@@ -60,22 +62,39 @@ public class WebhookQueries {
 
     public static List<Webhook> getWebhooks(Album album, Integer limit, String url, Integer offset, EntityManager em) {
             return em.createNamedQuery("Webhook.findAllByAlbumAndUrl", Webhook.class)
-                    .setParameter("album", album)
-                    .setParameter("url", url)
+                    .setParameter(ALBUM, album)
+                    .setParameter(WEBHOOK_URL, url)
                     .setFirstResult(offset)
                     .setMaxResults(limit)
                     .getResultList();
     }
 
-    public static Long getNumberOfWebhooks( Album album, EntityManager em) {
-        return em.createNamedQuery("Webhook.countByAlbum", Long.class)
-                .setParameter("album", album)
+    public static Long getNumberOfWebhookTrigger(Webhook webhook, EntityManager em) {
+        return em.createNamedQuery("WebhookTrigger.countAllByWebhookPk", Long.class)
+                .setParameter(WEBHOOK_PK, webhook.getPk())
                 .getSingleResult();
     }
-    public static Long getNumberOfWebhooks( Album album, String url, EntityManager em) {
+
+    public static List<WebhookTrigger> getWebhookTriggers(Webhook webhook, int limit, int offset, EntityManager em) {
+        return em.createNamedQuery("WebhookTrigger.GetAllByWebhookPk", WebhookTrigger.class)
+                .setParameter(WEBHOOK_PK, webhook.getPk())
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+
+
+    public static Long getNumberOfWebhooks(Album album, EntityManager em) {
+        return em.createNamedQuery("Webhook.countByAlbum", Long.class)
+                .setParameter(ALBUM, album)
+                .getSingleResult();
+    }
+
+    public static Long getNumberOfWebhooks(Album album, String url, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbumAndUrl", Long.class)
-                .setParameter("album", album)
-                .setParameter("url", url)
+                .setParameter(ALBUM, album)
+                .setParameter(WEBHOOK_URL, url)
                 .getSingleResult();
     }
 }

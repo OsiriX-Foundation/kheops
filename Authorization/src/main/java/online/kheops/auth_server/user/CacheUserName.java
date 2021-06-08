@@ -1,6 +1,6 @@
 package online.kheops.auth_server.user;
 
-import online.kheops.auth_server.util.Consts.CACHE_USER;
+import online.kheops.auth_server.util.Consts.CacheUser;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
@@ -17,8 +17,8 @@ public class CacheUserName {
 
     private CacheUserName() {
         CacheManager cacheManager = CacheManagerBuilder.newCacheManagerBuilder()
-                .withCache(CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, UserCachedData.class, ResourcePoolsBuilder.heap(CACHE_USER.SIZE))
-                        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(CACHE_USER.DURATION)))
+                .withCache(CACHE_ALIAS, CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, UserCachedData.class, ResourcePoolsBuilder.heap(CacheUser.SIZE))
+                        .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(CacheUser.DURATION)))
                 .build();
         cacheManager.init();
 

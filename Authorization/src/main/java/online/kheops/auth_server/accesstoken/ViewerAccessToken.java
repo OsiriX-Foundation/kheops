@@ -41,7 +41,7 @@ public final class ViewerAccessToken implements AccessToken {
             throws AccessTokenVerificationException {
 
         this.jwe = jwe;
-        this.accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.JWE.TOKEN), false);
+        this.accessToken = AccessTokenVerifier.authenticateAccessToken(servletContext, jwe.getString(Consts.Jwe.TOKEN), false);
         this.originalToken = originalToken;
     }
 
@@ -50,19 +50,19 @@ public final class ViewerAccessToken implements AccessToken {
     }
 
     public boolean isInbox() {
-        return jwe.getBoolean(Consts.JWE.IS_INBOX);
+        return jwe.getBoolean(Consts.Jwe.IS_INBOX);
     }
 
     public String getSourceId() {
-        if (jwe.containsKey(Consts.JWE.SOURCE_ID)) {
-            return jwe.getString(Consts.JWE.SOURCE_ID);
+        if (jwe.containsKey(Consts.Jwe.SOURCE_ID)) {
+            return jwe.getString(Consts.Jwe.SOURCE_ID);
         } else {
             return null;
         }
     }
 
     public String getStudyInstanceUID() {
-        return jwe.getString(Consts.JWE.STUDY_INSTANCE_UID);
+        return jwe.getString(Consts.Jwe.STUDY_INSTANCE_UID);
     }
 
     @Override
@@ -75,8 +75,8 @@ public final class ViewerAccessToken implements AccessToken {
 
     @Override
     public Optional<String> getScope() {
-        if (jwe.containsKey(Consts.JWE.SCOPE)) {
-            return Optional.of(jwe.getString(Consts.JWE.SCOPE));
+        if (jwe.containsKey(Consts.Jwe.SCOPE)) {
+            return Optional.of(jwe.getString(Consts.Jwe.SCOPE));
         } else {
             return Optional.of("read");
         }

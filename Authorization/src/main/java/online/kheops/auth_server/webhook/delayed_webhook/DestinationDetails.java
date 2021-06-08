@@ -6,22 +6,22 @@ import java.util.Objects;
 
 public class DestinationDetails {
 
-    private Album destination;
+    private long destinationPk;
 
-    public DestinationDetails(Album destination) { this.destination = destination; }
+    public DestinationDetails(Album destination) { this.destinationPk = destination.getPk(); }
 
-    public Album getAlbum() { return destination; }
+    public long getAlbumPk() { return destinationPk; }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DestinationDetails destinationDetails = (DestinationDetails) o;
-        return destinationDetails.destination.equals(this.destination);
+        return destinationDetails.destinationPk == this.destinationPk;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(destination);
+        return Objects.hash(destinationPk);
     }
 }

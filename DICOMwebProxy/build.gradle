@@ -1,5 +1,5 @@
 plugins {
-  id "org.sonarqube" version "3.0"
+  id "org.sonarqube" version "3.1.1"
 }
 
 apply plugin: 'java-library'
@@ -22,31 +22,31 @@ tasks.withType(JavaCompile) {
 dependencies {
     api group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.3'
 
-    api group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.31'
-    api group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.31'
-    api group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.31'
-    api group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.31'
+    api group: 'org.glassfish.jersey.containers', name: 'jersey-container-servlet', version: '2.33'
+    api group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '2.33'
+    api group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.33'
+    api group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.33'
 
-    api group: 'com.auth0', name: 'java-jwt', version: '3.10.3'
+    api group: 'com.auth0', name: 'java-jwt', version: '3.14.0'
 
-    api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.1') {
+    api (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.23.1') {
         exclude module: 'slf4j-log4j12'
     }
-    api (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.22.1') {
+    api (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.23.1') {
         exclude module: 'slf4j-log4j12'
     }
-    api (group: 'org.dcm4che', name: 'dcm4che-mime', version: '5.22.1') {
+    api (group: 'org.dcm4che', name: 'dcm4che-mime', version: '5.23.1') {
         exclude module: 'slf4j-log4j12'
     }
-    api (group: 'org.dcm4che', name: 'dcm4che-ws-rs', version: '5.22.1') {
+    api (group: 'org.dcm4che', name: 'dcm4che-ws-rs', version: '5.23.1') {
         exclude module: 'slf4j-log4j12'
     }
-    api (group: 'org.dcm4che', name: 'dcm4che-net', version: '5.22.1') {
+    api (group: 'org.dcm4che', name: 'dcm4che-net', version: '5.23.1') {
         exclude module: 'slf4j-log4j12'
     }
 
     api group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.30'
-    api group: 'commons-io', name: 'commons-io', version: '2.7'
+    api group: 'commons-io', name: 'commons-io', version: '2.8.0'
 }
 
 gretty {

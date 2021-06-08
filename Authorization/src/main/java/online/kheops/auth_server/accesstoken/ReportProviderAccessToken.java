@@ -75,8 +75,8 @@ public class ReportProviderAccessToken implements AccessToken {
             }
 
             try {
-                final boolean hasReadAccess = AccessTokenUtils.StringContainsScope(scopeClaim.asString(), "read");
-                final boolean hasWriteAccess = AccessTokenUtils.StringContainsScope(scopeClaim.asString(), "write");
+                final boolean hasReadAccess = AccessTokenUtils.stringContainsScope(scopeClaim.asString(), "read");
+                final boolean hasWriteAccess = AccessTokenUtils.stringContainsScope(scopeClaim.asString(), "write");
                 final Instant exp = jwt.getExpiresAt().toInstant();
                 final Instant iat = jwt.getIssuedAt().toInstant();
                 final Instant nbf = jwt.getNotBefore().toInstant();

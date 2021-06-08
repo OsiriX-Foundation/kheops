@@ -1,15 +1,14 @@
 package online.kheops.auth_server.inbox;
 
 
-import org.jooq.Record;
 
 import javax.xml.bind.annotation.XmlElement;
-import java.math.BigDecimal;
+import java.util.*;
 
 public class InboxInfoResponse {
 
     @XmlElement(name = "modalities")
-    private String[] modalities;
+    private SortedSet<String> modalities;
     @XmlElement(name = "number_of_studies")
     private Integer numberOfStudies;
     @XmlElement(name = "number_of_series")
@@ -19,20 +18,12 @@ public class InboxInfoResponse {
 
     private InboxInfoResponse() { /*empty*/ }
 
-    protected InboxInfoResponse(Record r) {
-        this.numberOfStudies = (Integer) r.getValue("number_of_studies");
-        this.numberOfSeries = (Integer) r.getValue("number_of_series");
-        try {
-            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
-        } catch(NullPointerException e) {
-            this.numberOfInstances = 0;
-        }
-
-        if(r.getValue("modalities") != null) {
-            this.modalities = r.getValue("modalities").toString().split(",");
-        } else {
-            this.modalities = new String[0];
-        }
+    public InboxInfoResponse(long nbStudies, long nbSeries, long nbInstances, String modalitiesLst) {
+        this.numberOfStudies = ((Long) nbStudies).intValue();
+        this.numberOfSeries = ((Long) nbSeries).intValue();
+        this.numberOfInstances = ((Long) nbInstances).intValue();
+        this.modalities = new TreeSet<>();
+        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length()-1).split(",")));
     }
 
 }

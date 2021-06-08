@@ -2,6 +2,7 @@ package online.kheops.auth_server.webhook.delayed_webhook;
 
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.KheopsInstance;
+import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.entity.*;
 import online.kheops.auth_server.webhook.*;
@@ -17,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static online.kheops.auth_server.album.AlbumQueries.findAlbumsWithEnabledNewSeriesWebhooks;
+import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.album.Albums.getAlbumUser;
 
 public class DelayedWebhookImpl implements DelayedWebhook {
@@ -27,7 +29,7 @@ public class DelayedWebhookImpl implements DelayedWebhook {
     private static final Logger LOG = Logger.getLogger(DelayedWebhookImpl.class.getName());
 
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    private static final int TIME_TO_LIVE = 10;//seconds
+    private static final int TIME_TO_LIVE = 30;//seconds
 
     private static DataStructure dataStructure = new DataStructure();
 
@@ -38,10 +40,10 @@ public class DelayedWebhookImpl implements DelayedWebhook {
     }
 
     private void addData(Study study, Series series, Album destination, boolean isInbox, Integer numberOfNewInstances, Source source, boolean isNewInDestination, boolean isSend) {
-        dataStructure.put(scheduler.schedule(() -> callWebhook(study, source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, numberOfNewInstances, source, destination, isInbox, isNewInDestination, isSend);
+        dataStructure.put(scheduler.schedule(() -> callWebhook(study.getPk(), source), TIME_TO_LIVE, TimeUnit.SECONDS), study, series, numberOfNewInstances, source, destination, isInbox, isNewInDestination, isSend);
     }
 
-    private void callWebhook(Study studyIn, Source source) {
+    private void callWebhook(long studyInPk, Source source) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -50,22 +52,21 @@ public class DelayedWebhookImpl implements DelayedWebhook {
             tx.begin();
 
             final List<WebhookAsyncRequest> webhookAsyncRequests = new ArrayList<>();
-            Study study = em.merge(studyIn);
-            em.refresh(study);
-            final StudySourceKey studySourceKey = new StudySourceKey(study, source);
+            final Study study = em.find(Study.class, studyInPk);
+            final StudySourceKey studySourceKey = new StudySourceKey(study.getPk(), source);
             final DestinationSeries destinationSeries = dataStructure.get(studySourceKey);
             final Set<DestinationDetails> destinationDetails = destinationSeries.getKeys();
 
             final HashMap<Series, Integer> newUploadedSeries = getNewUploadedSeries(destinationSeries, destinationDetails, em);
 
             for (DestinationDetails details : destinationDetails) {
-                final Album album = em.merge(details.getAlbum());
+                final Album album = getAlbum(details.getAlbumPk(), em);
                 final SeriesData seriesData = destinationSeries.get(details);
                 Boolean isAdmin = null;
                 try {
                     final AlbumUser albumUser = getAlbumUser(album, source.getUser(), em);
                     isAdmin = albumUser.isAdmin();
-                } catch (UserNotMemberException e){ /*empty*/ }
+                } catch (UserNotMemberException e) { /*empty*/ }
 
                 final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
                         .setKheopsInstance(kheopsInstance.get())
@@ -75,11 +76,10 @@ public class DelayedWebhookImpl implements DelayedWebhook {
                         .setStudy(study)
                         .setDestination(album.getId());
 
-                for (Series unmergedSeries : seriesData.getSeries()) {
-                    Series series = em.merge(unmergedSeries);
-                    em.refresh(series);
+                for (long unmergedSeriesPk : seriesData.getSeriesPk()) {
+                    final Series series = em.find(Series.class, unmergedSeriesPk);
 
-                    if(seriesData.get(series).isSendUpload()) {
+                    if (seriesData.get(series).isSendUpload()) {
                         newSeriesWebhookBuilder.isSent();
                         newSeriesWebhookBuilder.addSeries(series);
                     } else {
@@ -94,7 +94,7 @@ public class DelayedWebhookImpl implements DelayedWebhook {
                     }
                 }
 
-                for (Map.Entry<Series, Integer> s: newUploadedSeries.entrySet()) {
+                for (Map.Entry<Series, Integer> s : newUploadedSeries.entrySet()) {
                     if (album.containsSeries(s.getKey(), em) && !newSeriesWebhookBuilder.getSeries().contains(s.getKey())) {
                         newSeriesWebhookBuilder.addSeries(s.getKey(), s.getValue());
                     }
@@ -115,11 +115,11 @@ public class DelayedWebhookImpl implements DelayedWebhook {
             for (Album album : findAlbumsWithEnabledNewSeriesWebhooks(study.getStudyInstanceUID(), em)) {
                 if (!destinationDetails.contains(new DestinationDetails(album))) {
                     final NewSeriesWebhook.Builder newSeriesWebhookBuilder = NewSeriesWebhook.builder()
-                        .setKheopsInstance(kheopsInstance.get())
-                        .isAutomatedTrigger()
-                        .setSource(source)
-                        .setStudy(study)
-                        .setDestination(album.getId());
+                            .setKheopsInstance(kheopsInstance.get())
+                            .isAutomatedTrigger()
+                            .setSource(source)
+                            .setStudy(study)
+                            .setDestination(album.getId());
                     for (Map.Entry<Series, Integer> s : newUploadedSeries.entrySet()) {
                         if (album.containsSeries(s.getKey(), em)) {
                             newSeriesWebhookBuilder.addSeries(s.getKey(), s.getValue());
@@ -141,6 +141,9 @@ public class DelayedWebhookImpl implements DelayedWebhook {
             for (WebhookAsyncRequest webhookAsyncRequest : webhookAsyncRequests) {
                 webhookAsyncRequest.firstRequest();
             }
+        } catch (AlbumNotFoundException e) {
+            /*Empty*/
+            /*album was removed before sending the webhook*/
         } catch (Exception e) {
             LOG.log(Level.WARNING,"", e);
         } finally {
@@ -148,7 +151,7 @@ public class DelayedWebhookImpl implements DelayedWebhook {
                 tx.rollback();
             }
             em.close();
-            dataStructure.remove(studyIn, source);
+            dataStructure.remove(studyInPk, source);
         }
     }
 
@@ -156,8 +159,8 @@ public class DelayedWebhookImpl implements DelayedWebhook {
         final HashMap<Series, Integer> newUploadedSeries = new HashMap<>();
         for (DestinationDetails details : destinationDetails) {
             final SeriesData seriesData = destinationSeries.get(details);
-            for (Series unmergedSeries : seriesData.getSeries()) {
-                Series series = em.merge(unmergedSeries);
+            for (long unmergedSeriesPk : seriesData.getSeriesPk()) {
+                final Series series = em.find(Series.class, unmergedSeriesPk);
                 em.refresh(series);
                 if(destinationSeries.get(details).get(series).getNumberOfNewInstances() != 0) {
                     newUploadedSeries.compute(series, (s, nb) -> (nb == null)

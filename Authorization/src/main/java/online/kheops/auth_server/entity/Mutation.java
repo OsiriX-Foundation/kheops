@@ -6,11 +6,13 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.ALBUM;
+
 @NamedQueries({
         @NamedQuery(name = "Mutation.findAllByAlbum",
-                query = "SELECT m FROM Mutation m WHERE :album = m.album ORDER BY m.eventTime desc"),
+                query = "SELECT m FROM Mutation m WHERE :"+ALBUM+" = m.album ORDER BY m.eventTime desc"),
         @NamedQuery(name = "Mutation.countAllByAlbum",
-                query = "SELECT count(m) FROM Mutation m WHERE :album = m.album")
+                query = "SELECT count(m) FROM Mutation m WHERE :"+ALBUM+" = m.album")
 })
 
 @Entity(name = "Mutation")
@@ -48,8 +50,6 @@ public class Mutation extends Event{
         super(callingUser, album);
         this.mutationType = mutationType;
         toUser = targetUser;
-
-        targetUser.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, MutationType mutationType) {
@@ -61,15 +61,11 @@ public class Mutation extends Event{
         super(callingUser, album);
         this.mutationType = mutationType;
         this.reportProvider = reportProvider;
-
-        reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, ReportProvider reportProvider, MutationType mutationType, Series series) {
         this(callingUser, album, mutationType, series);
         this.reportProvider = reportProvider;
-
-        reportProvider.addMutation(this);
     }
 
     public Mutation(User callingUser, Album album, MutationType mutationType, Series series) {
@@ -81,7 +77,7 @@ public class Mutation extends Event{
     public Mutation(User callingUser, Album album, MutationType mutationType, Study study, List<Series> seriesList) {
         super(callingUser, album, study);
         this.mutationType = mutationType;
-        for (Series series :seriesList) {
+        for (Series series : seriesList) {
             this.addSeries(series);
         }
     }
@@ -91,9 +87,7 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         this.capability = capability;
 
-        capability.addMutation(this);
-
-        for (Series series :seriesList) {
+        for (Series series : seriesList) {
             this.addSeries(series);
         }
     }
@@ -103,7 +97,5 @@ public class Mutation extends Event{
         this.mutationType = mutationType;
         this.getSeries().add(series);
         this.capability = capability;
-
-        capability.addMutation(this);
     }
 }

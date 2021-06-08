@@ -69,7 +69,7 @@ public class SendingResource
     @AlbumPermissionSecured(permission = SEND_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareStudyWithUser(@PathParam("user") String username,
-                                       @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                       @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) String fromAlbumId,
                                        @QueryParam(INBOX) Boolean fromInbox,
                                        @Context HttpServletRequest request,
@@ -134,8 +134,8 @@ public class SendingResource
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/users/{user}")
     public Response shareSeriesWithUser(@PathParam("user") String username,
-                                        @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                        @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
+                                        @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                                        @PathParam(SERIES_INSTANCE_UID) @UIDValidator String seriesInstanceUID)
             throws SeriesNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -160,8 +160,8 @@ public class SendingResource
     @PUT
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
-    public Response appropriateSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                      @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
+    public Response appropriateSeries(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                                      @PathParam(SERIES_INSTANCE_UID) @UIDValidator String seriesInstanceUID)
             throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -260,7 +260,7 @@ public class SendingResource
     @AlbumAccessSecured
     @AlbumPermissionSecured(permission = SEND_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
-    public Response appropriateStudy(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response appropriateStudy(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                      @QueryParam(ALBUM) String albumId)
             throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException, UserNotMemberException {
 
@@ -346,7 +346,7 @@ public class SendingResource
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
-    public Response deleteStudyFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response deleteStudyFromInbox(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                          @Context HttpServletRequest request,
                                          @Context HttpServletResponse response)
             throws AlbumNotFoundException, SeriesNotFoundException {
@@ -389,8 +389,8 @@ public class SendingResource
     @Secured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
-    public Response deleteSeriesFromInbox(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID,
+    public Response deleteSeriesFromInbox(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                                          @PathParam(SERIES_INSTANCE_UID) @UIDValidator String seriesInstanceUID,
                                           @Context HttpServletRequest request,
                                           @Context HttpServletResponse response)
             throws AlbumNotFoundException, SeriesNotFoundException {
@@ -436,8 +436,8 @@ public class SendingResource
     @AlbumPermissionSecured(permission = ADD_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response putSeriesInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                     @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                     @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
+                                     @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                                     @PathParam(SERIES_INSTANCE_UID) @UIDValidator String seriesInstanceUID)
             throws AlbumNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -508,7 +508,7 @@ public class SendingResource
     @AlbumPermissionSecured(permission = ADD_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+ AlbumId.ID_PATTERN+"}")
     public Response putStudyInAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                    @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+                                    @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                     @QueryParam(ALBUM) String fromAlbumId,
                                     @QueryParam(INBOX) Boolean fromInbox)
             throws AlbumNotFoundException, StudyNotFoundException, UserNotMemberException {
@@ -587,7 +587,7 @@ public class SendingResource
     @AlbumPermissionSecured(permission = DELETE_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteStudyFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                         @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID)
+                                         @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID)
             throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
@@ -602,8 +602,8 @@ public class SendingResource
     @AlbumPermissionSecured(permission = DELETE_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteSeriesFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
-                                          @PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
-                                          @PathParam(SeriesInstanceUID) @UIDValidator String seriesInstanceUID)
+                                          @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                                          @PathParam(SERIES_INSTANCE_UID) @UIDValidator String seriesInstanceUID)
             throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());

@@ -7,7 +7,6 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.*;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.user.UserNotFoundException;
-import online.kheops.auth_server.util.Consts;
 import online.kheops.auth_server.util.ErrorResponse;
 import online.kheops.auth_server.util.KheopsLogBuilder;
 import online.kheops.auth_server.util.KheopsLogBuilder.*;
@@ -60,10 +59,10 @@ public class CapabilitiesResource {
                                         @DefaultValue("false") @FormParam("write_permission") boolean writePermission)
             throws AlbumNotFoundException, UserNotFoundException {
 
-        if(title.length() > Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION) {
+        if(title.length() > DbColumnSize.CAPABILITY_DESCRIPTION) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'title' is too long max expected: " + Consts.DB_COLUMN_SIZE.CAPABILITY_DESCRIPTION + " characters but got :" + title.length())
+                    .detail("Param 'title' is too long max expected: " + DbColumnSize.CAPABILITY_DESCRIPTION + " characters but got :" + title.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -170,15 +169,17 @@ public class CapabilitiesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCapabilities(@QueryParam("valid") boolean valid,
                                     @QueryParam(ALBUM) String albumId,
+                                    @QueryParam(USER) String user,
                                     @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
-                                    @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
+                                    @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset)
+            throws UserNotFoundException {
 
         final PairListXTotalCount<CapabilitiesResponse> pair;
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal)securityContext.getUserPrincipal();
         final KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder();
 
         if(albumId != null) {
-            pair = Capabilities.getCapabilities(albumId, valid, limit, offset);
+            pair = Capabilities.getCapabilities(albumId, user, valid, limit, offset);
             kheopsLogBuilder.album(albumId)
             .scope("album");
         } else {

@@ -51,7 +51,7 @@ public final class StudyQIDOParams {
     private final boolean studyDescriptionField;
 
     public StudyQIDOParams(KheopsPrincipal kheopsPrincipal, MultivaluedMap<String, String> queryParameters)
-            throws BadQueryParametersException, AlbumNotFoundException, AlbumForbiddenException , NoResultException {
+            throws BadQueryParametersException, AlbumForbiddenException , NoResultException {
 
         String albumIDLocal = null;
         boolean fromInboxLocal = false;
@@ -106,13 +106,13 @@ public final class StudyQIDOParams {
         }
 
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_LIMIT)) {
-            limit = JOOQTools.getLimit(queryParameters);
+            limit = QueryParamTools.getLimit(queryParameters);
         } else {
             limit = OptionalInt.empty();
         }
 
         if (queryParameters.containsKey(Consts.QUERY_PARAMETER_OFFSET)) {
-            offset = JOOQTools.getOffset(queryParameters);
+            offset = QueryParamTools.getOffset(queryParameters);
         } else {
             offset = OptionalInt.empty();
         }

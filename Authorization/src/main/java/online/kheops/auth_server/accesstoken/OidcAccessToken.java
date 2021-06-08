@@ -128,7 +128,7 @@ public final class OidcAccessToken implements AccessToken {
                 if (scopeClaim.isNull() || scopeClaim.asString() == null) {
                     throw new AccessTokenVerificationException("Missing scope claim in token");
                 } else {
-                    if (AccessTokenUtils.StringContainsScope(scopeClaim.asString(), oauthScope)) {
+                    if (AccessTokenUtils.stringContainsScope(scopeClaim.asString(), oauthScope)) {
                         throw new AccessTokenVerificationException("Missing scope '" + oauthScope + "' in token");
                     }
                 }
