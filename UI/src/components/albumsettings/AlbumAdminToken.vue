@@ -113,7 +113,7 @@ export default {
         {
           key: 'expiration_time',
           label: this.$t('token.expirationdate'),
-          class: 'd-none d-lg-table-cell',
+          class: 'd-none d-sm-table-cell',
         },
         {
           key: 'issued_at_time',
@@ -128,7 +128,6 @@ export default {
         {
           key: 'permission',
           label: this.$t('token.permission'),
-          class: 'd-none d-sm-table-cell',
         },
         {
           key: 'actions',
