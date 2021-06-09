@@ -41,9 +41,10 @@ Props :
         />
       </div>
       <album-admin-token
-        v-if="album.is_admin && confirmQuit"
+        v-if="album.is_admin && !lastUser && confirmQuit"
         :albumid="album.album_id"
         :user="currentuserEmail"
+        :warning-message="$t('albumsettings.lastadmintoken')"
       />
     </div>
     <div

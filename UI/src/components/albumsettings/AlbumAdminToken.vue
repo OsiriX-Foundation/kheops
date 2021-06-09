@@ -1,12 +1,12 @@
 <template>
   <div
-    v-if="tokens.length > 0 || error === true"
-    class="col-12"
+    v-if="tokens.length > 0 || status > -1"
+    :class="`col-12 ${className}`"
   >
     <p
       class="text-warning"
     >
-      {{ $t('albumsettings.lastadmintoken') }}
+      {{ warningMessage }}
     </p>
 
     <b-table
@@ -62,7 +62,15 @@
         <loading />
       </template>
       <template #empty>
-        blabla
+        <div
+          class="text-warning text-center"
+        >
+          <list-empty
+            :status="status"
+            :text-empty="$t('token.notokens')"
+            @reload="getTokens()"
+          />
+        </div>
       </template>
     </b-table>
   </div>
@@ -70,11 +78,13 @@
 
 <script>
 import Loading from '@/components/globalloading/Loading';
+import ListEmpty from '@/components/globallist/ListEmpty';
+import httpoperations from '@/mixins/httpoperations';
 
 export default {
   name: 'AlbumAdminToken',
   components: {
-    Loading,
+    Loading, ListEmpty,
   },
   mixins: [],
   props: {
@@ -88,11 +98,21 @@ export default {
       required: false,
       default: null,
     },
+    className: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    warningMessage: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   data() {
     return {
       tokens: [],
-      error: false,
+      status: -1,
       isLoading: false,
       fields: [
         {
@@ -103,7 +123,7 @@ export default {
         {
           key: 'expiration_time',
           label: this.$t('token.expirationdate'),
-          class: 'd-none d-lg-table-cell',
+          class: 'd-none d-sm-table-cell',
         },
         {
           key: 'issued_at_time',
@@ -118,7 +138,6 @@ export default {
         {
           key: 'permission',
           label: this.$t('token.permission'),
-          class: 'd-none d-sm-table-cell',
         },
         {
           key: 'actions',
@@ -145,7 +164,7 @@ export default {
         this.isLoading = true;
       }).catch((err) => {
         this.isLoading = true;
-        this.error = true;
+        this.status = httpoperations.getStatusError(err);
         Promise.reject(err);
       });
     },
