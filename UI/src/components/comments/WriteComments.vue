@@ -112,7 +112,7 @@ export default {
   },
   methods: {
     setEnabledVariables() {
-      this.disabledText = !this.statusMsgPrivate;
+      this.disabledText = this.statusMsgPrivate;
     },
     setPrivateUser(user) {
       if (user !== '') {
