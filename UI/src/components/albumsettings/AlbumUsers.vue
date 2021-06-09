@@ -109,15 +109,12 @@ Props :
           </div>
         </div>
       </div>
-      <div
-        class="wrapper-table-content-flex"
-      >
-        <album-admin-token
-          v-if="user.is_admin && confirmResetAdmin === user.email"
-          :albumid="album.album_id"
-          :user="user.email"
-        />
-      </div>
+      <album-admin-token
+        v-if="user.is_admin && (confirmResetAdmin === user.email || confirmDelete === user.email)"
+        :warning-message="$t('albumuser.revokeadmintoken')"
+        :albumid="album.album_id"
+        :user="user.email"
+      />
     </div>
   </div>
 </template>

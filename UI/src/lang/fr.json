@@ -35,6 +35,7 @@
 		"changeroleuser": "changer le rôle pour utilisateur",
 		"remove": "Retirer l'utilisateur",
 		"username": "Utilisateur",
+		"revokeadmintoken": "Attention ! Les tokens suivant vont être révoqués",
 		"warningtoggleadmin": "Attention ! Voulez-vous vraiment révoquer le rôle de gardien des données ?  ",
 		"warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?"
 	},

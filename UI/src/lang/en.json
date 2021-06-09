@@ -35,6 +35,7 @@
 		"changeroleuser": "change role to user",
 		"remove": "Remove user",
 		"username": "User name",
+		"revokeadmintoken": "Warning ! The following tokens will be revoked",
 		"warningtoggleadmin": "Warning! Do you really want to revoke the data steward role? ",
 		"warningtoggledelete": "Do you really want to delete this user ?"
 	},
