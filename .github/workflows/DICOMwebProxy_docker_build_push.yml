@@ -1,6 +1,7 @@
 name: DICOMwebProxy Docker Image CI
 
 on:
+  create:
   push:
     paths:
     - 'DICOMwebProxy/**'

@@ -12,6 +12,7 @@
 name: "UI CodeQL"
 
 on:
+  create:
   push:
     branches: 
       - main

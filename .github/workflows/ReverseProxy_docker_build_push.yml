@@ -1,6 +1,7 @@
 name: ReverseProxy Docker Image CI
 
-on: 
+on:
+  create:
   push:
     paths:
     - 'ReverseProxy/**'

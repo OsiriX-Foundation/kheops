@@ -1,6 +1,7 @@
 name: AuthorizationMetricbeat Docker Image CI
 
-on: 
+on:
+  create:
   push:
     paths:
     - 'AuthorizationMetricbeat/**'
