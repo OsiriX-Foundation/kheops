@@ -171,7 +171,7 @@
         class-col="offset-md-3 col-sm-12 col-md-4 col-lg-2 d-block"
         class-col-warning-remove="offset-md-3 col-12 col-md-9"
         :text-warning-remove="$t('token.warningrevoke')"
-        :text-button-remove="$t('disable')"
+        :text-button-remove="$t('revoke')"
         :show-done="false"
         :loading="onloading"
         @remove="revoke"

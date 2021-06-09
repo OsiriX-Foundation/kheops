@@ -138,7 +138,7 @@
             class="btn btn-danger btn-xs"
             @click.stop="revoke(data.item.id)"
           >
-            {{ $t('disable') }}
+            {{ $t('revoke') }}
           </button>
           <kheops-clip-loader
             v-else

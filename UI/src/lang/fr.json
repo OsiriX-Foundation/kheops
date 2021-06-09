@@ -94,7 +94,7 @@
 	"copysuccess": "Copié avec succès",
 	"create": "Créer",
 	"delete": "Supprimer",
-	"disable": "Désactiver",
+	"revoke": "Révoquer",
 	"doctitle": {
 		"album": "{appTitle} - Album",
 		"albums": "{appTitle} - Albums",
