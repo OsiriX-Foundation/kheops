@@ -112,7 +112,7 @@
 	"copysuccess": "Successfully copied",
 	"create": "Create",
 	"delete": "Delete",
-	"disable": "Revoke",
+	"revoke": "Revoke",
 	"doctitle": {
 		"album": "{appTitle} - Album",
 		"albums": "{appTitle} - Albums",

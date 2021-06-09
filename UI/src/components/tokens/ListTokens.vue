@@ -110,7 +110,7 @@
       <template
         #cell(permission)="data"
       >
-        {{ data.item|formatPermissions }}
+        {{ formatPermissions(data.item) }}
       </template>
       <template
         #cell(actions)="data"
@@ -124,7 +124,7 @@
             class="btn btn-danger btn-xs"
             @click.stop="revoke(data.item.id)"
           >
-            {{ $t('disable') }}
+            {{ $t('revoke') }}
           </button>
           <kheops-clip-loader
             v-else
@@ -332,6 +332,15 @@ export default {
         Vue.set(this.onloading, tokenId, false);
         this.$snotify.error(this.$t('sorryerror'));
       });
+    },
+    formatPermissions(items) {
+      const perms = [];
+      Object.keys(items).forEach((key) => {
+        if (key.indexOf('permission') > -1 && items[key] === true) {
+          perms.push(this.$t(`token.${key.replace('_permission', '')}`));
+        }
+      });
+      return perms.length ? perms.join(', ') : '-';
     },
   },
 };

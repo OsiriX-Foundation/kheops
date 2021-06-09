@@ -31,16 +31,6 @@ Vue.filter('formatTime', (value) => {
 
 Vue.filter('formatModality', (value) => value.split(',').join(' / '));
 
-Vue.filter('formatPermissions', (item) => {
-  const perms = [];
-  _.forEach(item, (value, key) => {
-    if (key.indexOf('permission') > -1 && value) {
-      perms.push(key.replace('_permission', ''));
-    }
-  });
-  return (perms.length) ? perms.join(', ') : '-';
-});
-
 Vue.filter('maxTextLength', (value, maxlength) => {
   if (value.length > maxlength) {
     return `${value.slice(0, maxlength)} ...`;
