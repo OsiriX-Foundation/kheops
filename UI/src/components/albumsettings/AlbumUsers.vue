@@ -112,6 +112,7 @@ Props :
       <album-admin-token
         v-if="user.is_admin && (confirmResetAdmin === user.email || confirmDelete === user.email)"
         :warning-message="$t('albumuser.revokeadmintoken')"
+        class-name="mt-2"
         :albumid="album.album_id"
         :user="user.email"
       />
