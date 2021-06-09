@@ -1,12 +1,12 @@
 <template>
   <div
     v-if="tokens.length > 0 || status > -1"
-    class="col-12"
+    :class="`col-12 ${className}`"
   >
     <p
       class="text-warning"
     >
-      {{ $t('albumsettings.lastadmintoken') }}
+      {{ warningMessage }}
     </p>
 
     <b-table
@@ -97,6 +97,16 @@ export default {
       type: String,
       required: false,
       default: null,
+    },
+    className: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    warningMessage: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   data() {
