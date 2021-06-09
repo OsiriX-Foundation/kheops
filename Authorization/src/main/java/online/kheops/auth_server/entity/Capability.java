@@ -177,12 +177,10 @@ public class Capability {
     public User getRevokedByUser() { return revokedByUser; }
 
     public void setRevokedByUser(User revokedByUser) {
-
-        if (this.revokedTime != null) {
-            throw new IllegalStateException("Can't unrevoke a revoked capability");
+        if (!this.isRevoked() && !ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
+            this.revokedByUser = revokedByUser;
+            this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
         }
-        this.revokedByUser = revokedByUser;
-        this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
     }
 
     public long getPk() { return pk; }
