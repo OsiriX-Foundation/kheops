@@ -532,3 +532,59 @@ table.tableAddUserNewAlbum tr {
 	max-height: 250px;
 	overflow: auto;
 }
+
+.wrapper-table {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 2em;
+}
+
+.wrapper-table-title {
+	width: 100%;
+	font-weight: 700;
+	border-bottom: 2px solid #47526d;
+	border-top: 2px solid #47526d;
+}
+
+.wrapper-table-content-flex {
+	display: flex;
+	width: 100%;
+	border-bottom: 1px solid #47526d;
+	justify-content: space-between;
+}
+
+.wrapper-table-content-action {
+	width: 300px;
+	justify-self: end;
+	text-align: right;
+}
+
+@media screen and (max-width: 991px) {
+	.wrapper-table-content-action {
+		width: 250px;
+	}
+}
+
+@media screen and (max-width: 580px) {
+	.wrapper-table-content-flex {
+		flex-wrap: wrap;
+	}
+
+	.wrapper-table-content-username {
+		width: 100%;
+	}
+
+	.wrapper-table-content-action {
+		width: 100%;
+		justify-self: start;
+		text-align: left;
+	}
+}
+
+.wrapper-table-content-admin-token {
+	width: 100%;
+}
+
+.wrapper-table > div {
+	padding: 0.75em;
+}

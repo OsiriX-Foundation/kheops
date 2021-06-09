@@ -7,196 +7,105 @@ Props :
   showChangeRole  Boolean
 -->
 <template>
-  <div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>{{ $t('albumuser.username') }}</th>
-          <th v-if="album.is_admin" />
-        </tr>
-      </thead>
-      <tbody>
-        <tr
-          v-for="user in users"
-          :key="user.email"
+  <div
+    class="wrapper-table"
+  >
+    <div
+      class="wrapper-table-title"
+    >
+      {{ $t('albumuser.username') }}
+    </div>
+    <div
+      v-for="user in users"
+      :key="user.email"
+      class="wrapper-table-content-flex"
+    >
+      <div
+        class="wrapper-table-content-username"
+      >
+        {{ user|getUsername }} {{ user.name !== undefined ? `- ( ${user.name} )` : '' }}
+        <span
+          v-if="user.is_admin"
+          class="font-neutral"
         >
-          <td>
-            {{ user|getUsername }} {{ user.name !== undefined ? `- ( ${user.name} )` : '' }}
-            <span
-              v-if="user.is_admin"
-            >
-              -
-              <span
-                class="font-neutral"
-              >
-                {{ $t("albumuser.Admin") }}
-              </span>
-            </span>
-            <!-- on mobile -->
-            <div
-              v-if="album.is_admin && onloading[user.sub] === false"
-              class="d-sm-none"
-            >
-              <div
-                v-if="confirmDelete !== user.email && confirmResetAdmin !== user.email"
-                class="user_actions"
-              >
-                <a
-                  v-if="showChangeRole"
-                  @click.stop="toggleAdmin(user)"
-                >
-                  {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
-                  <v-icon
-                    name="user"
-                  />
-                </a>
-                <br>
-                <a
-                  v-if="album.is_admin && showDeleteUser && user.sub !== currentuserSub"
-                  class="text-danger"
-                  @click.stop="deleteUser(user)"
-                >
-                  {{ $t('albumuser.remove') }}
-                  <v-icon name="trash" />
-                </a>
-              </div>
-              <div v-if="confirmDelete === user.email">
-                <span class="text-danger mr-2">
-                  {{ $t("albumuser.warningtoggledelete") }}
-                </span>
-                <br>
-                <div class="btn-group">
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger"
-                    @click.stop="deleteUser(user)"
-                  >
-                    {{ $t('confirm') }}
-                  </button><button
-                    type="button"
-                    class="btn btn-sm btn-secondary"
-                    @click.stop="confirmDelete=''"
-                  >
-                    {{ $t('cancel') }}
-                  </button>
-                </div>
-              </div>
-              <div v-if="confirmResetAdmin === user.email">
-                <span class="text-danger mr-2">
-                  {{ $t("albumuser.warningtoggleadmin") }}
-                </span>
-                <br>
-                <div class="btn-group">
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger"
-                    @click.stop="toggleAdmin(user)"
-                  >
-                    {{ $t('confirm') }}
-                  </button><button
-                    type="button"
-                    class="btn btn-sm btn-secondary"
-                    @click.stop="confirmResetAdmin=''"
-                  >
-                    {{ $t('cancel') }}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div
-              v-if="onloading[user.sub] === true"
-              class="d-sm-none"
-            >
-              <kheops-clip-loader
-                size="30px"
-                class="text-left mt-2"
-              />
-            </div>
-            <!-- end on mobile -->
-          </td>
-          <td
-            v-if="album.is_admin && onloading[user.sub] === false && mobiledetect === false"
-            class="text-right d-none d-sm-table-cell"
-            :class="mobiledetect ? '' : 'showOnTrHover'"
+          - {{ $t("albumuser.Admin") }}
+        </span>
+      </div>
+      <div
+        class="wrapper-table-content-action"
+      >
+        <div
+          v-if="onloading[user.sub] === true"
+        >
+          <kheops-clip-loader />
+        </div>
+        <div
+          v-else-if="confirmDelete !== user.email && confirmResetAdmin !== user.email"
+        >
+          <a
+            v-if="showChangeRole"
+            class="font-white"
+            @click.stop="toggleAdmin(user)"
           >
-            <div
-              v-if="confirmDelete !== user.email && confirmResetAdmin !== user.email"
-              class="user_actions"
-            >
-              <a
-                v-if="showChangeRole"
-                class="font-white"
-                @click.stop="toggleAdmin(user)"
-              >
-                {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
-                <v-icon
-                  name="user"
-                />
-              </a>
-              <br>
-              <a
-                v-if="album.is_admin && showDeleteUser && user.sub !== currentuserSub"
-                class="text-danger"
-                @click.stop="deleteUser(user)"
-              >
-                {{ $t('albumuser.remove') }}
-                <v-icon name="trash" />
-              </a>
-            </div>
-            <div v-if="confirmDelete === user.email">
-              <span class="text-danger mr-2">
-                {{ $t("albumuser.warningtoggledelete") }}
-              </span>
-              <br>
-              <div class="btn-group">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-danger"
-                  @click.stop="deleteUser(user)"
-                >
-                  {{ $t('confirm') }}
-                </button><button
-                  type="button"
-                  class="btn btn-sm btn-secondary"
-                  @click.stop="confirmDelete=''"
-                >
-                  {{ $t('cancel') }}
-                </button>
-              </div>
-            </div>
-            <div v-if="confirmResetAdmin === user.email">
-              <span class="text-danger mr-2">
-                {{ $t("albumuser.warningtoggleadmin") }}
-              </span>
-              <br>
-              <div class="btn-group">
-                <button
-                  type="button"
-                  class="btn btn-sm btn-danger"
-                  @click.stop="toggleAdmin(user)"
-                >
-                  {{ $t('confirm') }}
-                </button><button
-                  type="button"
-                  class="btn btn-sm btn-secondary"
-                  @click.stop="confirmResetAdmin=''"
-                >
-                  {{ $t('cancel') }}
-                </button>
-              </div>
-            </div>
-          </td>
-          <td
-            v-if="onloading[user.sub] === true && mobiledetect === false"
-          >
-            <kheops-clip-loader
-              size="30px"
-              class="text-right"
+            {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
+            <v-icon
+              name="user"
             />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </a>
+          <br>
+          <a
+            v-if="album.is_admin && showDeleteUser && user.sub !== currentuserSub"
+            class="text-danger"
+            @click.stop="deleteUser(user)"
+          >
+            {{ $t('albumuser.remove') }}
+            <v-icon name="trash" />
+          </a>
+        </div>
+        <div v-else-if="confirmDelete === user.email">
+          <span class="text-danger mr-2">
+            {{ $t("albumuser.warningtoggledelete") }}
+          </span>
+          <br>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-sm btn-danger"
+              @click.stop="deleteUser(user)"
+            >
+              {{ $t('confirm') }}
+            </button><button
+              type="button"
+              class="btn btn-sm btn-secondary"
+              @click.stop="confirmDelete=''"
+            >
+              {{ $t('cancel') }}
+            </button>
+          </div>
+        </div>
+        <div v-else-if="confirmResetAdmin === user.email">
+          <span class="text-danger mr-2">
+            {{ $t("albumuser.warningtoggleadmin") }}
+          </span>
+          <br>
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-sm btn-danger"
+              @click.stop="toggleAdmin(user)"
+            >
+              {{ $t('confirm') }}
+            </button><button
+              type="button"
+              class="btn btn-sm btn-secondary"
+              @click.stop="confirmResetAdmin=''"
+            >
+              {{ $t('cancel') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -266,8 +175,14 @@ export default {
         this.confirmResetAdmin = user.email;
         return;
       }
-
       Vue.set(this.onloading, user.sub, true);
+
+      if (user.is_admin && this.confirmResetAdmin !== user.email) {
+        Vue.set(this.onloading, user.sub, false);
+        this.confirmResetAdmin = user.email;
+        return;
+      }
+
       const params = {
         album_id: this.album.album_id,
         user_name: user.email,

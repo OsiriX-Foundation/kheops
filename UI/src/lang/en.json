@@ -35,7 +35,7 @@
 		"changeroleuser": "change role to user",
 		"remove": "Remove user",
 		"username": "User name",
-		"warningtoggleadmin": "Warning! Do you really want to revoke your data steward role? ",
+		"warningtoggleadmin": "Warning! Do you really want to revoke the data steward role? ",
 		"warningtoggledelete": "Do you really want to delete this user ?"
 	},
 	"albumusersettings": {

@@ -35,7 +35,7 @@
 		"changeroleuser": "changer le rôle pour utilisateur",
 		"remove": "Retirer l'utilisateur",
 		"username": "Utilisateur",
-		"warningtoggleadmin": "Attention ! Voulez-vous vraiment renoncer à vos droits admin ?  ",
+		"warningtoggleadmin": "Attention ! Voulez-vous vraiment révoquer le rôle de gardien des données ?  ",
 		"warningtoggledelete": "Voulez-vous vraiment supprimer cet utilisateur ?"
 	},
 	"albumusersettings": {
