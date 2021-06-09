@@ -18,92 +18,105 @@ Props :
     <div
       v-for="user in users"
       :key="user.email"
-      class="wrapper-table-content-flex"
+      class="wrapper-table-content"
     >
       <div
-        class="wrapper-table-content-username"
-      >
-        {{ user|getUsername }} {{ user.name !== undefined ? `- ( ${user.name} )` : '' }}
-        <span
-          v-if="user.is_admin"
-          class="font-neutral"
-        >
-          - {{ $t("albumuser.Admin") }}
-        </span>
-      </div>
-      <div
-        class="wrapper-table-content-action"
+        class="wrapper-table-content-flex"
       >
         <div
-          v-if="onloading[user.sub] === true"
+          class="wrapper-table-content-username"
         >
-          <kheops-clip-loader />
-        </div>
-        <div
-          v-else-if="confirmDelete !== user.email && confirmResetAdmin !== user.email"
-        >
-          <a
-            v-if="showChangeRole"
-            class="font-white"
-            @click.stop="toggleAdmin(user)"
+          {{ user|getUsername }} {{ user.name !== undefined ? `- ( ${user.name} )` : '' }}
+          <span
+            v-if="user.is_admin"
+            class="font-neutral"
           >
-            {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
-            <v-icon
-              name="user"
-            />
-          </a>
-          <br>
-          <a
-            v-if="album.is_admin && showDeleteUser && user.sub !== currentuserSub"
-            class="text-danger"
-            @click.stop="deleteUser(user)"
-          >
-            {{ $t('albumuser.remove') }}
-            <v-icon name="trash" />
-          </a>
-        </div>
-        <div v-else-if="confirmDelete === user.email">
-          <span class="text-danger mr-2">
-            {{ $t("albumuser.warningtoggledelete") }}
+            - {{ $t("albumuser.Admin") }}
           </span>
-          <br>
-          <div class="btn-group">
-            <button
-              type="button"
-              class="btn btn-sm btn-danger"
-              @click.stop="deleteUser(user)"
-            >
-              {{ $t('confirm') }}
-            </button><button
-              type="button"
-              class="btn btn-sm btn-secondary"
-              @click.stop="confirmDelete=''"
-            >
-              {{ $t('cancel') }}
-            </button>
+        </div>
+        <div
+          class="wrapper-table-content-action"
+        >
+          <div
+            v-if="onloading[user.sub] === true"
+          >
+            <kheops-clip-loader />
           </div>
-        </div>
-        <div v-else-if="confirmResetAdmin === user.email">
-          <span class="text-danger mr-2">
-            {{ $t("albumuser.warningtoggleadmin") }}
-          </span>
-          <br>
-          <div class="btn-group">
-            <button
-              type="button"
-              class="btn btn-sm btn-danger"
+          <div
+            v-else-if="confirmDelete !== user.email && confirmResetAdmin !== user.email"
+          >
+            <a
+              v-if="showChangeRole"
+              class="font-white"
               @click.stop="toggleAdmin(user)"
             >
-              {{ $t('confirm') }}
-            </button><button
-              type="button"
-              class="btn btn-sm btn-secondary"
-              @click.stop="confirmResetAdmin=''"
+              {{ (user.is_admin)?$t('albumuser.changeroleuser'):$t("albumuser.changeroleadmin") }}
+              <v-icon
+                name="user"
+              />
+            </a>
+            <br>
+            <a
+              v-if="album.is_admin && showDeleteUser && user.sub !== currentuserSub"
+              class="text-danger"
+              @click.stop="deleteUser(user)"
             >
-              {{ $t('cancel') }}
-            </button>
+              {{ $t('albumuser.remove') }}
+              <v-icon name="trash" />
+            </a>
+          </div>
+          <div v-else-if="confirmDelete === user.email">
+            <span class="text-danger mr-2">
+              {{ $t("albumuser.warningtoggledelete") }}
+            </span>
+            <br>
+            <div class="btn-group">
+              <button
+                type="button"
+                class="btn btn-sm btn-danger"
+                @click.stop="deleteUser(user)"
+              >
+                {{ $t('confirm') }}
+              </button><button
+                type="button"
+                class="btn btn-sm btn-secondary"
+                @click.stop="confirmDelete=''"
+              >
+                {{ $t('cancel') }}
+              </button>
+            </div>
+          </div>
+          <div v-else-if="confirmResetAdmin === user.email">
+            <span class="text-danger mr-2">
+              {{ $t("albumuser.warningtoggleadmin") }}
+            </span>
+            <br>
+            <div class="btn-group">
+              <button
+                type="button"
+                class="btn btn-sm btn-danger"
+                @click.stop="toggleAdmin(user)"
+              >
+                {{ $t('confirm') }}
+              </button><button
+                type="button"
+                class="btn btn-sm btn-secondary"
+                @click.stop="confirmResetAdmin=''"
+              >
+                {{ $t('cancel') }}
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+      <div
+        class="wrapper-table-content-flex"
+      >
+        <album-admin-token
+          v-if="user.is_admin && confirmResetAdmin === user.email"
+          :albumid="album.album_id"
+          :user="user.email"
+        />
       </div>
     </div>
   </div>
@@ -112,11 +125,12 @@ Props :
 import Vue from 'vue';
 import mobiledetect from '@/mixins/mobiledetect.js';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import AlbumAdminToken from '@/components/albumsettings/AlbumAdminToken';
 import { CurrentUser } from '@/mixins/currentuser.js';
 
 export default {
   name: 'AlbumUsers',
-  components: { KheopsClipLoader },
+  components: { KheopsClipLoader, AlbumAdminToken },
   mixins: [CurrentUser],
   props: {
     album: {

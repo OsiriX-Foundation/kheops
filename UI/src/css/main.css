@@ -546,10 +546,13 @@ table.tableAddUserNewAlbum tr {
 	border-top: 2px solid #47526d;
 }
 
-.wrapper-table-content-flex {
-	display: flex;
+.wrapper-table-content {
 	width: 100%;
 	border-bottom: 1px solid #47526d;
+}
+
+.wrapper-table-content-flex {
+	display: flex;
 	justify-content: space-between;
 }
 
