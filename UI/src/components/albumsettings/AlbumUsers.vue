@@ -35,6 +35,7 @@ Props :
           </span>
         </div>
         <div
+          v-if="album.is_admin"
           class="wrapper-table-content-action"
         >
           <div
@@ -110,7 +111,7 @@ Props :
         </div>
       </div>
       <album-admin-token
-        v-if="user.is_admin && (confirmResetAdmin === user.email || confirmDelete === user.email)"
+        v-if="album.is_admin === true && user.is_admin && (confirmResetAdmin === user.email || confirmDelete === user.email)"
         :warning-message="$t('albumuser.revokeadmintoken')"
         class-name="mt-2"
         :albumid="album.album_id"
