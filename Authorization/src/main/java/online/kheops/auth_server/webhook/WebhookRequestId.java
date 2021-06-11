@@ -4,7 +4,6 @@ import javax.persistence.EntityManager;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import static online.kheops.auth_server.webhook.Webhooks.webhookExist;
 import static online.kheops.auth_server.webhook.Webhooks.webhookTriggerExist;
 
 public class WebhookRequestId {
