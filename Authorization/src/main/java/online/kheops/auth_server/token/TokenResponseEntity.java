@@ -7,7 +7,7 @@ class TokenResponseEntity {
     @XmlElement(name = "access_token")
     private final String accessToken;
     @XmlElement(name = "token_type")
-    private final String tokenType = "bearer";
+    private static final String TOKEN_TYPE = "bearer";
     @XmlElement(name = "expires_in")
     private final Long expiresIn;
 
