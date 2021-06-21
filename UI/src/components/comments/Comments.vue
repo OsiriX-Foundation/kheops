@@ -128,7 +128,6 @@ export default {
         }
       }).catch((err) => {
         $state.error();
-        console.error(err);
         return err;
       });
     },
