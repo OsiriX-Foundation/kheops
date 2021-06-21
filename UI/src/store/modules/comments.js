@@ -81,7 +81,13 @@ const mutations = {
       params.comments.forEach((comment, index) => {
         if (stateComments[index] === undefined) {
           state.comments[params.StudyInstanceUID].push(comment);
-        } else if (stateComments[index].post_date !== comment.post_date) {
+        } else if (stateComments[index].event_type === 'Comment'
+          && stateComments[index].post_date !== comment.post_date
+          && stateComments[index].comment !== comment.comment) {
+          state.comments[params.StudyInstanceUID].splice(index, 0, comment);
+        } else if (stateComments[index].event_type === 'Mutation'
+          && stateComments[index].post_date !== comment.post_date
+          && stateComments[index].mutation_type !== comment.mutation_type) {
           state.comments[params.StudyInstanceUID].splice(index, 0, comment);
         }
       });
