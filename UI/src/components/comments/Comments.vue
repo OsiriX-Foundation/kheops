@@ -160,6 +160,11 @@ export default {
       this.limit = this.incrementLimit;
       this.infiniteId += 1;
     },
+    updateComments() {
+      this.getComments().then(() => {
+        this.scrollBottom();
+      });
+    },
   },
 };
 

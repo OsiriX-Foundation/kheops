@@ -9,6 +9,7 @@
       />
       <comments
         :id="id"
+        ref="comments"
         :scope="scope"
         :write-comments="writeComments"
         :notification="includeNotifications"
@@ -21,8 +22,8 @@
       :id="id"
       ref="privateuser"
       :scope="scope"
-      @add-study-comment="getStudyComments"
-      @add-album-comment="getAlbumComments"
+      @add-study-comment="updateComments"
+      @add-album-comment="updateComments"
     />
   </div>
 </template>
@@ -57,7 +58,6 @@ export default {
   data() {
     return {
       includeNotifications: false,
-      loading: true,
     };
   },
   destroyed() {
@@ -70,16 +70,8 @@ export default {
     toggleChange(value) {
       this.includeNotifications = value;
     },
-    getStudyComments() {
-      this.$store.dispatch('getStudyComments', { StudyInstanceUID: this.id }).then(() => {
-        this.loading = false;
-      });
-    },
-    getAlbumComments() {
-      const types = (this.includeNotifications) ? undefined : { types: 'comments' };
-      this.$store.dispatch('getAlbumComments', { album_id: this.id, queries: types }).then(() => {
-        this.loading = false;
-      });
+    updateComments() {
+      this.$refs.comments.updateComments();
     },
   },
 };
