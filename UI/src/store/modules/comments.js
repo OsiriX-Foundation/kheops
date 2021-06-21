@@ -12,7 +12,7 @@ const getters = {
   comments: (state) => state.comments,
   getCommentsByUID: (state) => (uid) => {
     if (state.comments[uid] !== undefined) {
-      return state.comments[uid];
+      return [...state.comments[uid]];
     }
     return [];
   },
@@ -29,7 +29,7 @@ const actions = {
     }
 
     return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
-      commit('SET_COMMENTS', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data.reverse() });
+      commit('SET_COMMENTS', { StudyInstanceUID: params.StudyInstanceUID, comments: res.data });
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -50,7 +50,7 @@ const actions = {
       queries = httpoperations.getQueriesParameters(params.queries);
     }
     return HTTP.get(`${request}${queries}`, { headers: { Accept: 'application/json' } }).then((res) => {
-      commit('SET_COMMENTS', { StudyInstanceUID: params.album_id, comments: res.data.reverse() });
+      commit('SET_COMMENTS', { StudyInstanceUID: params.album_id, comments: res.data });
       return res;
     }).catch((err) => Promise.reject(err));
   },
@@ -76,7 +76,18 @@ const mutations = {
     state.comments = {};
   },
   SET_COMMENTS(state, params) {
-    Vue.set(state.comments, params.StudyInstanceUID, params.comments);
+    const stateComments = state.comments[params.StudyInstanceUID];
+    if (Object.keys(state.comments).includes(params.StudyInstanceUID)) {
+      params.comments.forEach((comment, index) => {
+        if (stateComments[index] === undefined) {
+          state.comments[params.StudyInstanceUID].push(comment);
+        } else if (stateComments[index].post_date !== comment.post_date) {
+          state.comments[params.StudyInstanceUID].splice(index, 0, comment);
+        }
+      });
+    } else {
+      Vue.set(state.comments, params.StudyInstanceUID, params.comments);
+    }
   },
   DELETE_COMMENTS(state, params) {
     Vue.delete(state.comments, params.StudyInstanceUID);

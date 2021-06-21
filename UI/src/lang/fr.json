@@ -62,6 +62,7 @@
 		"deletewebhook": "{user} a supprimé un webhook",
 		"editreportprovider": "{user} a édité le report provider {reportname}",
 		"editwebhook": "{user} a édité un webhook",
+		"error": "Une erreur s'est produite, veuillez recharger les commentaires.",
 		"hasadd": "a ajouté",
 		"hascreated": "a créé",
 		"hasedited": "a édité",

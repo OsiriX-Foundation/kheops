@@ -12,13 +12,23 @@
       <div slot="spinner">
         <loading />
       </div>
+      <div slot="no-more" />
+      <div slot="no-results" />
       <div slot="error">
-        error
+        {{ $t('comment.error') }} <br> <br>
+        <button
+          type="button"
+          class=" btn btn-md"
+          @click="reloadComments()"
+        >
+          {{ $t('reload') }}
+        </button>
       </div>
     </infinite-loading>
     <div
-      v-for="comment in comments"
+      v-for="(comment, index) in comments"
       :key="comment.id"
+      :index="index"
     >
       <user-comments
         v-if="comment.event_type === 'Comment'"
@@ -78,12 +88,14 @@ export default {
     return {
       infiniteId: 0,
       offset: 0,
+      incrementLimit: 50,
       limit: 50,
     };
   },
   computed: {
     comments() {
-      return this.$store.getters.getCommentsByUID(this.id);
+      const commentToReverse = this.$store.getters.getCommentsByUID(this.id);
+      return commentToReverse.reverse();
     },
     container_id() {
       return (this.scope === 'album') ? 'album_comment_container' : `study_${this.id.replace(/\./g, '_')}_comment_container`;
@@ -91,10 +103,7 @@ export default {
   },
   watch: {
     notification() {
-      this.$store.dispatch('deleteStoreComment', { StudyInstanceUID: this.id });
-      this.offset = 0;
-      this.limit = 50;
-      this.infiniteId += 1;
+      this.reloadComments();
     },
   },
   destroyed() {
@@ -105,17 +114,21 @@ export default {
     infiniteHandler($state) {
       const firstLoading = this.comments.length === 0;
       this.getComments().then((res) => {
-        if (res.data.length === parseInt(res.headers['x-total-count'], 10)) {
+        if (res.data.length === 0) {
+          $state.complete();
+        } else if (res.data.length === parseInt(res.headers['x-total-count'], 10)) {
+          $state.loaded();
           $state.complete();
         } else {
           $state.loaded();
-          this.offset += this.limit;
+          this.limit += this.incrementLimit;
         }
         if (firstLoading) {
           this.scrollBottom();
         }
       }).catch((err) => {
         $state.error();
+        console.error(err);
         return err;
       });
     },
@@ -142,6 +155,11 @@ export default {
     },
     clickPrivateUser(email) {
       this.$emit('click-private-user', email);
+    },
+    reloadComments() {
+      this.$store.dispatch('deleteStoreComment', { StudyInstanceUID: this.id });
+      this.limit = this.incrementLimit;
+      this.infiniteId += 1;
     },
   },
 };
