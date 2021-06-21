@@ -16,6 +16,11 @@ if [ -z "$KHEOPS_OIDC_PROVIDER" ]; then
     missing_env_var_secret=true
 fi
 
+if [ -z "$KHEOPS_ROOT_OIDC" ]; then
+    echo "Missing KHEOPS_ROOT_OIDC environment variable"
+    missing_env_var_secret=true
+fi
+
 if [ -z "$KHEOPS_ROOT_URL" ]; then
     echo "Missing KHEOPS_ROOT_URL environment variable"
     missing_env_var_secret=true

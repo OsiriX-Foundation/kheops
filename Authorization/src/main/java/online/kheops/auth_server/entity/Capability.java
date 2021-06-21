@@ -7,39 +7,32 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 import static online.kheops.auth_server.capability.CapabilityToken.hashCapability;
 import static online.kheops.auth_server.util.Consts.CAPABILITY_LEEWAY_SECOND;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 @SuppressWarnings("unused")
 
 @NamedQueries({
         @NamedQuery(name = "Capability.findBySecret",
-        query = "SELECT c FROM Capability c WHERE c.secret = :secret"),
+        query = "SELECT c FROM Capability c WHERE c.secret = :"+SECRET),
         @NamedQuery(name = "Capability.findByIdAndUser",
-        query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:user = au.user AND au.admin = true) OR (:user = c.user)) AND :capabilityId = c.id"),
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a LEFT JOIN a.albumUser au WHERE ((:"+USER+" = au.user AND au.admin = true) OR (:"+USER+" = c.user)) AND :"+CAPABILITY_ID+" = c.id"),
         @NamedQuery(name = "Capability.findByIdAndAlbumId",
-        query = "SELECT c FROM Capability c LEFT JOIN c.album a WHERE a.id = :albumId AND :capabilityId = c.id"),
+        query = "SELECT c FROM Capability c LEFT JOIN c.album a WHERE a.id = :"+ALBUM_ID+" AND :"+CAPABILITY_ID+" = c.id"),
         @NamedQuery(name = "Capability.findById",
-        query = "SELECT c FROM Capability c WHERE :capabilityId = c.id"),
+        query = "SELECT c FROM Capability c WHERE :"+CAPABILITY_ID+" = c.id"),
         @NamedQuery(name = "Capability.findAllByUser",
-        query = "SELECT c FROM Capability c WHERE :user = c.user ORDER BY c.issuedAtTime desc"),
+        query = "SELECT c FROM Capability c WHERE :"+USER+" = c.user ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.findAllValidByUser",
-        query = "SELECT c FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow  ORDER BY c.issuedAtTime desc"),
-        @NamedQuery(name = "Capability.findAllByAlbum",
-        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id order by c.issuedAtTime desc"),
-        @NamedQuery(name = "Capability.findAllValidByAlbum",
-        query = "SELECT c FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow ORDER BY c.issuedAtTime desc"),
+        query = "SELECT c FROM Capability c WHERE :"+USER+" = c.user AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+"  ORDER BY c.issuedAtTime desc"),
         @NamedQuery(name = "Capability.countAllByUser",
-        query = "SELECT count(c) FROM Capability c WHERE :user = c.user"),
+        query = "SELECT count(c) FROM Capability c WHERE :"+USER+" = c.user"),
         @NamedQuery(name = "Capability.countAllValidByUser",
-        query = "SELECT count(c) FROM Capability c WHERE :user = c.user AND c.revokedTime = null AND c.expirationTime > :dateTimeNow"),
-        @NamedQuery(name = "Capability.countAllByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id"),
-        @NamedQuery(name = "Capability.countAllValidByAlbum",
-        query = "SELECT count(c) FROM Capability c WHERE :albumId = c.album.id AND c.revokedTime = null AND c.expirationTime > :dateTimeNow")
+        query = "SELECT count(c) FROM Capability c WHERE :"+USER+" = c.user AND c.revokedTime = null AND c.expirationTime > :"+DATE_TIME_NOW+""),
+        @NamedQuery(name = "Capability.deleteAllByAlbum",
+        query = "DELETE FROM Capability c WHERE c.album = :"+ALBUM)
 })
 
 @Entity
@@ -116,8 +109,9 @@ public class Capability {
     @JoinColumn(name = "album_fk", insertable = true, updatable=false)
     private Album album;
 
-    @OneToMany(mappedBy = "capability")
-    private Set<Mutation> mutations = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "revoked_by_user_fk", insertable = true, updatable=true)
+    private User revokedByUser;
 
     @PrePersist
     public void onPrePersist() {
@@ -160,7 +154,6 @@ public class Capability {
         this.writePermission = builder.writePermission;
         this.appropriatePermission = builder.appropriatePermission;
         this.downloadPermission = builder.downloadPermission;
-        builder.user.getCapabilities().add(this);
     }
 
     public LocalDateTime getExpirationTime() { return expirationTime; }
@@ -169,22 +162,7 @@ public class Capability {
 
     public boolean isRevoked() { return revokedTime != null; }
 
-    public void setRevoked(boolean revoked) {
-        if (!revoked && this.revokedTime != null) {
-            throw new IllegalStateException("Can't unrevoke a revoked capability");
-        } else if (revoked && this.revokedTime == null) {
-            this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
-        }
-    }
-
     public LocalDateTime getRevokedTime() { return revokedTime; }
-
-    public void setRevokedTime(LocalDateTime revokedTime) {
-        if (this.revokedTime != null) {
-            throw new IllegalStateException("Can't update the revokedTime on an already revoked capability");
-        }
-        this.revokedTime = revokedTime;
-    }
 
     public String getTitle() { return title; }
 
@@ -195,6 +173,15 @@ public class Capability {
     public User getUser() { return user; }
 
     public void setUser(User user) { this.user = user; }
+
+    public User getRevokedByUser() { return revokedByUser; }
+
+    public void setRevokedByUser(User revokedByUser) {
+        if (!this.isRevoked() && !ZonedDateTime.of(getExpirationTime().plusSeconds(CAPABILITY_LEEWAY_SECOND), ZoneOffset.UTC).isBefore(ZonedDateTime.now())) {
+            this.revokedByUser = revokedByUser;
+            this.revokedTime = LocalDateTime.now(ZoneOffset.UTC);
+        }
+    }
 
     public long getPk() { return pk; }
 
@@ -241,10 +228,6 @@ public class Capability {
     public void setAlbum(Album album) { this.album = album; }
 
     public String getSecretBeforeHash() { return secretBeforeHash; }
-
-    public void addMutation(Mutation mutation) { mutations.add(mutation); }
-
-
 
     public static class CapabilityBuilder {
 

@@ -3,16 +3,16 @@ package online.kheops.auth_server.util;
 import java.util.List;
 
 public class PairListXTotalCount<T> {
-    private long XTotalCount;
+    private long xTotalCount;
     private List<T> attributesList;
 
-    public PairListXTotalCount(long XTotalCount, List<T> attributesList) {
+    public PairListXTotalCount(long xTotalCount, List<T> attributesList) {
         this.attributesList = attributesList;
-        this.XTotalCount = XTotalCount;
+        this.xTotalCount = xTotalCount;
     }
 
     public long getXTotalCount() {
-        return XTotalCount;
+        return xTotalCount;
     }
 
     public List<T> getAttributesList() {

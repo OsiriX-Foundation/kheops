@@ -19,11 +19,13 @@ import java.util.Collections;
 import java.util.List;
 
 import static online.kheops.auth_server.album.AlbumQueries.*;
+import static online.kheops.auth_server.capability.CapabilitiesQueries.deleteAllCapabilitiesByAlbum;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventsByAlbum;
+import static online.kheops.auth_server.report_provider.ReportProviderQueries.deleteAllReportProviderByAlbum;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.AUTHORIZATION_ERROR;
-import static online.kheops.auth_server.webhook.Webhooks.deleteWebhook;
 
 public class Albums {
 
@@ -31,8 +33,7 @@ public class Albums {
         throw new IllegalStateException("Utility class");
     }
 
-    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission)
-            throws JOOQException {
+    public static AlbumResponse createAlbum(User callingUser, String name, String description, UsersPermission usersPermission) {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -52,19 +53,18 @@ public class Albums {
             em.persist(newAlbumMutation);
 
             tx.commit();
-
+            return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return findAlbumByUserAndAlbumId(newAlbum.getId(), callingUser);
     }
 
     public static AlbumResponse editAlbum(User callingUser, String albumId, String name, String description, UsersPermission usersPermission,
                                                         Boolean notificationNewComment , Boolean notificationNewSeries)
-            throws AlbumNotFoundException, AlbumForbiddenException, JOOQException, UserNotMemberException {
+            throws AlbumNotFoundException, AlbumForbiddenException, UserNotMemberException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -112,20 +112,19 @@ public class Albums {
             }
 
             tx.commit();
-
+            return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser, em);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
-        return findAlbumByUserAndAlbumId(editAlbum.getId(), callingUser);
     }
 
     public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
-            throws JOOQException, BadQueryParametersException {
+            throws BadQueryParametersException {
 
-        return findAlbumsByUserPk(albumQueryParams);
+        return findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
     }
 
     public static void deleteAlbum(ServletContext context, User callingUser, String albumId)
@@ -154,32 +153,12 @@ public class Albums {
                 throw new AlbumNotFoundException();
             }
 
-            for (Event event:album.getEvents()) {
-                event.removeAllSeries();
-                em.remove(event);
-            }
+            deleteAllEventsByAlbum(album, em);
+            deleteAllReportProviderByAlbum(album, em);
+            deleteAllAlbumUserByAlbum(album, em);
+            deleteAllCapabilitiesByAlbum(album, em);
+            deleteAllAlbumSeriesByAlbum(album, em);
 
-            for (ReportProvider reportProvider:album.getReportProviders()) {
-                em.remove(reportProvider);
-            }
-
-            for (AlbumUser albumUser:album.getAlbumUser()) {
-                em.remove(albumUser);
-            }
-
-            for (Capability capability:album.getCapabilities()) {
-                capability.setRevoked(true);
-                em.remove(capability);
-            }
-
-            for (AlbumSeries albumSeries:album.getAlbumSeries()) {
-                em.remove(albumSeries);
-            }
-
-            for (Webhook webhook:album.getWebhooks()) {
-                deleteWebhook(webhook, em);
-            }
-            
             em.remove(album);
 
             tx.commit();
@@ -195,16 +174,21 @@ public class Albums {
     }
 
     public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
-           throws JOOQException, AlbumNotFoundException {
-        AlbumResponse albumResponse;
-        if (withUserAccess) {
-            albumResponse = findAlbumByUserAndAlbumId(albumId, user);
-            if(withUsersList) {
-                albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
+           throws AlbumNotFoundException {
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        try {
+            AlbumResponse albumResponse;
+            if (withUserAccess) {
+                albumResponse = findAlbumByUserAndAlbumId(albumId, user, em);
+                if (withUsersList) {
+                    albumResponse.setUsers(getUsers(albumId, Integer.MAX_VALUE, 0).getAttributesList());
+                }
+                return albumResponse;
+            } else {
+                return findAlbumByAlbumId(albumId, em);
             }
-            return albumResponse;
-        } else {
-            return findAlbumByAlbumId(albumId);
+        } finally {
+            em.close();
         }
     }
 
@@ -349,7 +333,7 @@ public class Albums {
                 if (removedAlbumUser.isAdmin()) {
                     for (Capability capability: album.getCapabilities()) {
                         if (capability.getUser() == removedUser) {
-                            capability.setRevoked(true);
+                            capability.setRevokedByUser(callingUser);
                         }
                     }
                 }
@@ -391,7 +375,7 @@ public class Albums {
 
             for (Capability capability: targetAlbum.getCapabilities()) {
                 if (capability.getUser() == removedUser) {
-                    capability.setRevoked(true);
+                    capability.setRevokedByUser(callingUser);
                 }
             }
             targetAlbum.updateLastEventTime();
@@ -433,6 +417,16 @@ public class Albums {
             throws AlbumNotFoundException {
 
         return findAlbumById(albumId, em);
+    }
+
+    public static Album getAlbum(long albumPk, EntityManager em)
+            throws AlbumNotFoundException {
+        final Album album = em.find(Album.class, albumPk);
+        if (album != null) {
+            return album;
+        } else {
+            throw new AlbumNotFoundException();
+        }
     }
 
     public static AlbumUser getAlbumUser(Album album, User user, EntityManager em)

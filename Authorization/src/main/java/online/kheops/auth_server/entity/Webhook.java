@@ -7,23 +7,27 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 
 @NamedQueries({
         @NamedQuery(name = "Webhook.findById", 
-        query = "SELECT w FROM Webhook w WHERE :webhookId = w.id"),
+        query = "SELECT w FROM Webhook w WHERE :"+WEBHOOK_ID+" = w.id"),
         @NamedQuery(name = "Webhook.findByIdAndAlbum",
-        query = "SELECT w FROM Webhook w JOIN w.album a WHERE :webhookId = w.id AND a = :album"),
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE :"+WEBHOOK_ID+" = w.id AND a = :"+ALBUM),
         @NamedQuery(name = "Webhook.findAllByAlbum",
-        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :album ORDER BY w.creationTime desc"),
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM+" ORDER BY w.creationTime desc"),
         @NamedQuery(name = "Webhook.findAllByAlbumAndUrl",
-        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url ORDER BY w.creationTime desc"),
+        query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM+" AND w.url = :"+WEBHOOK_URL+" ORDER BY w.creationTime desc"),
         @NamedQuery(name = "Webhook.countByAlbum",
-        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album"),
+        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM),
         @NamedQuery(name = "Webhook.countByAlbumAndUrl",
-        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :album AND w.url = :url"),
+        query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM+" AND w.url = :"+WEBHOOK_URL),
         @NamedQuery(name = "Webhook.findAllEnabledAndForNewSeriesByStudyUID",
-        query = "SELECT DISTINCT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :StudyInstanceUID AND w.enabled = true AND w.newSeries = true")
+        query = "SELECT DISTINCT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :"+STUDY_UID+" AND w.enabled = true AND w.newSeries = true"),
+        @NamedQuery(name = "Webhook.deleteAllByAlbum",
+        query = "DELETE FROM Webhook w WHERE w.album = :"+ALBUM)
 })
 
 @Entity
@@ -81,7 +85,7 @@ public class Webhook {
     @JoinColumn (name = "user_fk", nullable=false, insertable = true, updatable = false)
     private User user;
 
-    @OneToMany(mappedBy = "webhook")
+    @OneToMany(mappedBy = "webhook", cascade = CascadeType.REMOVE)
     @OrderBy("pk DESC")
     private Set<WebhookTrigger> webhookTriggers = new HashSet<>();
 
@@ -107,7 +111,6 @@ public class Webhook {
         creationTime = LocalDateTime.now();
 
         album.addWebhook(this);
-        user.addWebhook(this);
     }
 
     public String getId() {
@@ -152,13 +155,7 @@ public class Webhook {
 
 
 
-    public Set<WebhookTrigger> getWebhookTriggers() {
-        return webhookTriggers;
-    }
-
-    public void addWebhookTrigger(WebhookTrigger webhookTrigger) {
-        this.webhookTriggers.add(webhookTrigger);
-    }
+    public Set<WebhookTrigger> getWebhookTriggers() { return webhookTriggers; }
 
     public void setName(String name) {
         this.name = name;

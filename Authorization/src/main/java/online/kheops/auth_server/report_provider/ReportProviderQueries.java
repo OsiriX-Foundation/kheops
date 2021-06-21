@@ -1,6 +1,7 @@
 package online.kheops.auth_server.report_provider;
 
 
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.ReportProvider;
 import online.kheops.auth_server.util.ErrorResponse;
 
@@ -10,6 +11,7 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 
 import static online.kheops.auth_server.util.ErrorResponse.Message.REPORT_PROVIDER_NOT_FOUND;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 public class ReportProviderQueries {
 
@@ -20,7 +22,7 @@ public class ReportProviderQueries {
     public static ReportProvider getReportProviderWithClientId(String clientId, EntityManager em) {
 
         return em.createNamedQuery("ReportProvider.findByClientId", ReportProvider.class)
-                .setParameter("clientId", clientId)
+                .setParameter(CLIENT_ID, clientId)
                 .getSingleResult();
     }
 
@@ -28,8 +30,8 @@ public class ReportProviderQueries {
         throws ReportProviderNotFoundException{
 
         TypedQuery<ReportProvider> q = em.createNamedQuery("ReportProvider.findByClientIdAndAlbumId", ReportProvider.class)
-                .setParameter("clientId", clientId)
-                .setParameter("albumId", albumId);
+                .setParameter(CLIENT_ID, clientId)
+                .setParameter(ALBUM_ID, albumId);
         try {
             return q.getSingleResult();
         } catch (NoResultException e) {
@@ -43,7 +45,7 @@ public class ReportProviderQueries {
 
     public static List<ReportProvider> getReportProvidersWithAlbumId(String albumId, Integer limit, Integer offset, EntityManager em) {
         return em.createNamedQuery("ReportProvider.findAllByAlbumId", ReportProvider.class)
-                .setParameter("albumId", albumId)
+                .setParameter(ALBUM_ID, albumId)
                 .setMaxResults(limit)
                 .setFirstResult(offset)
                 .getResultList();
@@ -51,8 +53,15 @@ public class ReportProviderQueries {
 
     public static long countReportProviderWithAlbumId(String albumId, EntityManager em) {
         return em.createNamedQuery("ReportProvider.countAllByAlbumId", Long.class)
-                .setParameter("albumId", albumId)
+                .setParameter(ALBUM_ID, albumId)
                 .getSingleResult();
+    }
+
+    public static void deleteAllReportProviderByAlbum (Album album, EntityManager em) {
+        em.createNamedQuery("ReportProvider.deleteAllByAlbum")
+                .setParameter(ALBUM, album)
+                .executeUpdate();
+
     }
 
 }

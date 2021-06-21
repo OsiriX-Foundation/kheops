@@ -154,7 +154,7 @@ public class ReportProviderResource {
             reportProvider = getReportProviderWithClientId(clientId, em);
             album = reportProvider.getAlbum();
         } catch (NoResultException e) {
-            LOG.log(Level.WARNING, "Report provider with clientId: " + clientId + "not found", e);
+            LOG.log(Level.WARNING, String.format("Report provider with clientId: %snot found", clientId), e);
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message("Client ID not found")
                     .detail("Client ID not found")

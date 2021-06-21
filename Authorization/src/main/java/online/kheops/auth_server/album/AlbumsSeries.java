@@ -6,6 +6,8 @@ import online.kheops.auth_server.entity.Series;
 
 import javax.persistence.EntityManager;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 public class AlbumsSeries {
 
     private AlbumsSeries() {
@@ -13,9 +15,9 @@ public class AlbumsSeries {
     }
 
     public static AlbumSeries getAlbumSeries(Album album, Series series, EntityManager em) {
-        return em.createQuery("SELECT alS from AlbumSeries alS where :series = alS.series and :album = alS.album", AlbumSeries.class)
-                .setParameter("series", series)
-                .setParameter("album", album)
+        return em.createNamedQuery("AlbumSeries.findByAlbumAndSeries", AlbumSeries.class)
+                .setParameter(SERIES, series)
+                .setParameter(ALBUM, album)
                 .getSingleResult();
     }
 }

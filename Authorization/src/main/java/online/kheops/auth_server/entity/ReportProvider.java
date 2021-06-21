@@ -4,20 +4,22 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Set;
+
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 @SuppressWarnings("unused")
 
 @NamedQueries({
         @NamedQuery(name = "ReportProvider.findByClientId",
-                query = "SELECT dsr FROM ReportProvider dsr WHERE :clientId = dsr.clientId AND dsr.removed = false"),
+                query = "SELECT dsr FROM ReportProvider dsr WHERE :"+CLIENT_ID+" = dsr.clientId AND dsr.removed = false"),
         @NamedQuery(name = "ReportProvider.findByClientIdAndAlbumId",
-                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :clientId = dsr.clientId AND :albumId = a.id"),
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :"+CLIENT_ID+" = dsr.clientId AND :"+ALBUM_ID+" = a.id"),
         @NamedQuery(name = "ReportProvider.findAllByAlbumId",
-                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
+                query = "SELECT dsr FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false ORDER BY dsr.creationTime desc"),
         @NamedQuery(name = "ReportProvider.countAllByAlbumId",
-                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :albumId = a.id AND dsr.removed = false")
+                query = "SELECT count(dsr) FROM ReportProvider dsr JOIN dsr.album a WHERE :"+ALBUM_ID+" = a.id AND dsr.removed = false"),
+        @NamedQuery(name = "ReportProvider.deleteAllByAlbum",
+                query = "DELETE FROM ReportProvider rp WHERE rp.album = :"+ALBUM)
 })
 
 @Entity
@@ -54,9 +56,6 @@ public class ReportProvider {
     @JoinColumn (name = "album_fk", nullable=false, insertable = true, updatable = false)
     private Album album;
 
-    @OneToMany(mappedBy = "reportProvider")
-    private Set<Mutation> mutations = new HashSet<>();
-
     @PrePersist
     public void onPrePersist() {
         creationTime = LocalDateTime.now(ZoneOffset.UTC);
@@ -70,8 +69,6 @@ public class ReportProvider {
         this.url = url;
         this.name = name;
         this.album = album;
-
-        album.addReportProvider(this);
     }
 
     public LocalDateTime getCreationTime() {
@@ -91,8 +88,6 @@ public class ReportProvider {
     }
 
     public Album getAlbum() { return album; }
-
-    public void addMutation(Mutation mutation) { mutations.add(mutation); }
 
     public void setUrl(String url) { this.url = url; }
 

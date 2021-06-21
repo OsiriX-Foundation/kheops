@@ -9,15 +9,12 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.util.concurrent.*;
-import java.util.logging.Logger;
 
 import static online.kheops.auth_server.util.Consts.NUMBER_OF_RETRY_WEBHOOK;
 import static online.kheops.auth_server.util.Consts.SECONDE_BEFORE_RETRY_WEBHOOK;
 import static online.kheops.auth_server.util.HttpHeaders.*;
 
 public class WebhookAsyncRequest {
-
-    private static final Logger LOG = Logger.getLogger(WebhookAsyncRequest.class.getName());
 
     private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor();
     private static final ExecutorService CALLBACK_SCHEDULER = Executors.newFixedThreadPool(4);
@@ -54,9 +51,7 @@ public class WebhookAsyncRequest {
         if(webhook.useSecret()) {
             final SignedEntity signedEntity = new SignedEntity(data, webhook.getSecret());
             final CompletionStage<Response> completionStage = asyncInvoker.post(Entity.entity(signedEntity, MediaType.APPLICATION_JSON));
-            completionStage.thenAcceptAsync((response) -> {
-                new WebhooksCallbacks(response, webhookTrigger, cnt, this);
-            }, CALLBACK_SCHEDULER);
+            completionStage.thenAcceptAsync(response -> new WebhooksCallbacks(response, webhookTrigger, cnt, this), CALLBACK_SCHEDULER);
             completionStage.exceptionally(throwable -> {
                 new WebhooksCallbacksFail(throwable, webhookTrigger, cnt, this);
                 return null;
@@ -66,9 +61,7 @@ public class WebhookAsyncRequest {
         } else {
             final Entity entity = Entity.json(data);
             final CompletionStage<Response> completionStage = asyncInvoker.post(entity);
-            completionStage.thenAcceptAsync((response) -> {
-                new WebhooksCallbacks(response, webhookTrigger, cnt, this);
-            }, CALLBACK_SCHEDULER);
+            completionStage.thenAcceptAsync(response -> new WebhooksCallbacks(response, webhookTrigger, cnt, this), CALLBACK_SCHEDULER);
             completionStage.exceptionally(throwable -> {
                 new WebhooksCallbacksFail(throwable, webhookTrigger, cnt, this);
                 return null;

@@ -1,6 +1,7 @@
 name: Authorization Sonar
 
 on:
+  create:
   push:
     paths:
     - 'Authorization/**'

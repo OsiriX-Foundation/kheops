@@ -10,11 +10,11 @@ public final class AccessTokenUtils {
 
     private AccessTokenUtils() {}
 
-    public static boolean ValidateScopeString(final String scopeString) {
+    public static boolean validateScopeString(final String scopeString) {
         return scopeStringValidator.matcher(scopeString).matches();
     }
 
-    public static boolean StringContainsScope(final String scopeString, final String scope) {
+    public static boolean stringContainsScope(final String scopeString, final String scope) {
         if (!scopeValidator.matcher(scope).matches()) {
             throw new IllegalArgumentException("Scope contains illegal characters");
         }

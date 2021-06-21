@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 
-import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.NotAlbumScopeTypeException;
 import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.album.AlbumForbiddenException;
@@ -32,8 +31,6 @@ import javax.ws.rs.core.*;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,10 +40,10 @@ import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.filter.AlbumPermissionSecuredContext.QUERY_PARAM;
 import static online.kheops.auth_server.filter.SecuredFilter.LINK_AUTH;
 import static online.kheops.auth_server.sharing.Sending.availableSeriesUIDs;
-import static online.kheops.auth_server.study.Studies.findAttributesByUserPKJOOQ;
+import static online.kheops.auth_server.study.Studies.findAttributesByUserPK;
 import static online.kheops.auth_server.user.AlbumUserPermissions.READ_SERIES;
 import static online.kheops.auth_server.util.Consts.*;
-import static online.kheops.auth_server.util.Consts.USER_IN_ROLE.VIEWER_TOKEN;
+import static online.kheops.auth_server.util.Consts.UserInRole.VIEWER_TOKEN;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_TOTAL_COUNT;
 
@@ -73,7 +70,7 @@ public class QIDOResource {
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
     public Response getStudies(@QueryParam(ALBUM) String fromAlbumId,
                                @QueryParam(INBOX) Boolean fromInbox)
-            throws AlbumNotFoundException, AlbumForbiddenException, BadQueryParametersException {
+            throws AlbumForbiddenException, BadQueryParametersException {
 
         if (fromAlbumId != null && fromInbox != null) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -96,9 +93,9 @@ public class QIDOResource {
 
         final PairListXTotalCount<Attributes> pair;
         final StudyQIDOParams qidoParams;
-        try (Connection connection = EntityManagerListener.getConnection()) {
+        try {
             qidoParams = new StudyQIDOParams(kheopsPrincipal, uriInfo.getQueryParameters());
-            pair = findAttributesByUserPKJOOQ(callingUserPk, qidoParams, connection);
+            pair = findAttributesByUserPK(callingUserPk, qidoParams);
         } catch (BadRequestException e) {
             LOG.log(Level.SEVERE, "Error 400 :", e);
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -108,13 +105,6 @@ public class QIDOResource {
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         } catch (NoResultException e) {
             return Response.status(NO_CONTENT).header(X_TOTAL_COUNT, 0).build();
-        } catch (SQLException e) {
-            LOG.log(Level.SEVERE, "Error while connecting to the database", e);
-            final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
-                    .message("Database error")
-                    .detail("Database Connection Error")
-                    .build();
-            return Response.status(INTERNAL_SERVER_ERROR).entity(errorResponse).build();
         }
         if(pair.getAttributesList().isEmpty()) {
             return Response.status(NO_CONTENT)
@@ -155,7 +145,7 @@ public class QIDOResource {
     @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series")
     @Produces({"application/dicom+json;qs=1,multipart/related;type=\"application/dicom+xml\";qs=0.9,application/json;qs=0.8"})
-    public Response getSeries(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response getSeries(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                               @QueryParam(ALBUM) String fromAlbumId,
                               @QueryParam(INBOX) Boolean fromInbox,
                               @QueryParam(FAVORITE) Boolean favoriteFilter,
@@ -352,7 +342,7 @@ public class QIDOResource {
     @AlbumPermissionSecured(permission = READ_SERIES, context = QUERY_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/metadata")
     @Produces("application/dicom+json;qs=1,application/json;qs=0.9")
-    public Response getStudiesMetadata(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response getStudiesMetadata(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                        @QueryParam(ALBUM) String fromAlbumId,
                                        @QueryParam(INBOX) Boolean fromInbox)
             throws AlbumNotFoundException, StudyNotFoundException {

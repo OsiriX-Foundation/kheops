@@ -1,6 +1,7 @@
 name: PEP Docker Image CI
 
 on:
+  create:
   push:
     paths:
     - 'PEP/**'

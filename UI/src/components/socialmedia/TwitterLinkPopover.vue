@@ -16,7 +16,7 @@
             class="btn btn-danger btn-block"
             @click="revoke"
           >
-            {{ $t('disable') }}
+            {{ $t('revoke') }}
           </button>
           <kheops-clip-loader
             v-if="loading === true"

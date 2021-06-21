@@ -107,10 +107,10 @@ public class EventResource {
                                      @FormParam("comment") @NotNull @NotEmpty String comment)
             throws AlbumNotFoundException, UserNotFoundException {
 
-        if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
+        if(comment.length() > DbColumnSize.COMMENT) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'comment' is too long max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
+                    .detail("Param 'comment' is too long max expected: " + DbColumnSize.COMMENT + " characters but got :" + comment.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -130,7 +130,7 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
-    public Response getComments(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response getComments(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                 @QueryParam(QUERY_PARAMETER_LIMIT) @Min(0) @DefaultValue(""+Integer.MAX_VALUE) Integer limit,
                                 @QueryParam(QUERY_PARAMETER_OFFSET) @Min(0) @DefaultValue("0") Integer offset) {
 
@@ -161,7 +161,7 @@ public class EventResource {
     @UserAccessSecured
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/comments")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public Response postStudiesComment(@PathParam(StudyInstanceUID) @UIDValidator String studyInstanceUID,
+    public Response postStudiesComment(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                        @FormParam("to_user") String user,
                                        @FormParam("comment") @NotNull @NotEmpty String comment)
             throws StudyNotFoundException, BadQueryParametersException {
@@ -176,10 +176,10 @@ public class EventResource {
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        if(comment.length() > DB_COLUMN_SIZE.COMMENT) {
+        if(comment.length() > DbColumnSize.COMMENT) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'comment' is too long max expected: " + DB_COLUMN_SIZE.COMMENT + " characters but got :" + comment.length())
+                    .detail("Param 'comment' is too long max expected: " + DbColumnSize.COMMENT + " characters but got :" + comment.length())
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }

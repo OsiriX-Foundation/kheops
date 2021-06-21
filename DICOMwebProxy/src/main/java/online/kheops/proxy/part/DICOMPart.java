@@ -19,6 +19,6 @@ class DICOMPart extends DICOMMetadataPart {
         final DicomInputStream dicomInputStream = new DicomInputStream(inputStream);
         dicomInputStream.setIncludeBulkData(DicomInputStream.IncludeBulkData.NO);
 
-        return dicomInputStream.readDataset(-1, -1);
+        return dicomInputStream.readDataset(-1, o -> false);
     }
 }

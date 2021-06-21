@@ -7,6 +7,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 public class UserQueries {
 
     private UserQueries() {
@@ -16,7 +18,7 @@ public class UserQueries {
     public static User findUserByUserId(String userId, EntityManager em) throws UserNotFoundException{
         try {
             TypedQuery<User> query = em.createNamedQuery("User.findById", User.class);
-            query.setParameter("userId", userId);
+            query.setParameter(USER_ID, userId);
             return query.getSingleResult();
         } catch (NoResultException e) {
             throw new UserNotFoundException();
@@ -26,7 +28,7 @@ public class UserQueries {
     public static User findUserByEmail(String email, EntityManager em) throws UserNotFoundException{
         try {
             TypedQuery<User> query = em.createNamedQuery("User.findByEmail", User.class);
-            query.setParameter("email", email);
+            query.setParameter(USER_EMAIL, email);
             return query.getSingleResult();
         } catch (NoResultException e) {
             throw new UserNotFoundException();
@@ -34,34 +36,34 @@ public class UserQueries {
     }
 
 
-    public static List<User> SearchUserByAlbumId(String search, String albumId, Integer limit, Integer offset, EntityManager em) {
+    public static List<User> searchUserByAlbumId(String search, String albumId, Integer limit, Integer offset, EntityManager em) {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailOrNameInAlbumId", User.class);
-        query.setParameter("albumId", albumId);
-        query.setParameter("searchmail", searchByMail(search));
-        query.setParameter("searchname", searchByName(search));
+        query.setParameter(ALBUM_ID, albumId);
+        query.setParameter(SEARCH_EMAIL, searchByMail(search));
+        query.setParameter(SEARCH_NAME, searchByName(search));
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();
     }
 
-    public static List<User> SearchUserByStudyUID(String search, String studyUID, Integer limit, Integer offset, EntityManager em) {
+    public static List<User> searchUserByStudyUID(String search, String studyUID, Integer limit, Integer offset, EntityManager em) {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailWithStudyAccess", User.class);
-        query.setParameter("studyUID", studyUID);
-        query.setParameter("searchmail", searchByMail(search));
-        query.setParameter("searchname", searchByName(search));
+        query.setParameter(STUDY_UID, studyUID);
+        query.setParameter(SEARCH_EMAIL, searchByMail(search));
+        query.setParameter(SEARCH_NAME, searchByName(search));
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();
     }
 
 
-    public static List<User> SearchUser(String search, Integer limit, Integer offset, EntityManager em) {
+    public static List<User> searchUser(String search, Integer limit, Integer offset, EntityManager em) {
 
         TypedQuery<User> query = em.createNamedQuery("User.searchByEmailOrName", User.class);
-        query.setParameter("searchmail", searchByMail(search));
-        query.setParameter("searchname", searchByName(search));
+        query.setParameter(SEARCH_EMAIL, searchByMail(search));
+        query.setParameter(SEARCH_NAME, searchByName(search));
         query.setFirstResult(offset);
         query.setMaxResults(limit);
         return query.getResultList();

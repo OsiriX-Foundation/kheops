@@ -6,6 +6,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
+
 class MetricsQueries {
 
     private MetricsQueries() { /*empty*/ }
@@ -36,7 +38,7 @@ class MetricsQueries {
     }
 
     static Long getNumberOfOrphanSeries(EntityManager em) {
-        return em.createQuery("SELECT COUNT(s.pk) FROM Series s LEFT JOIN s.albumsSeries als WHERE als.album = null", Long.class)
+        return em.createQuery("SELECT COUNT(s.pk) FROM AlbumSeries als RIGHT JOIN als.series s WHERE als.album = null", Long.class)
                 .getSingleResult();
     }
 
@@ -85,22 +87,22 @@ class MetricsQueries {
     }
 
     static Long getNumberOfToken(ScopeType scopeType, EntityManager em) {
-        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType", Long.class)
-                .setParameter("scopeType", scopeType)
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE, Long.class)
+                .setParameter(CAPABILITY_SCOPE_TYPE, scopeType)
                 .getSingleResult();
     }
 
     static Long getNumberOfActiveToken(ScopeType scopeType, EntityManager em) {
-        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType AND c.revokedTime = NULL AND c.expirationTime > :now AND c.notBeforeTime < :now", Long.class)
-                .setParameter("now", LocalDateTime.now(ZoneOffset.UTC))
-                .setParameter("scopeType", scopeType)
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE+" AND c.revokedTime = NULL AND c.expirationTime > :"+DATE_TIME_NOW+" AND c.notBeforeTime < :"+DATE_TIME_NOW, Long.class)
+                .setParameter(DATE_TIME_NOW, LocalDateTime.now(ZoneOffset.UTC))
+                .setParameter(CAPABILITY_SCOPE_TYPE, scopeType)
                 .getSingleResult();
     }
 
     static Long getNumberOfUnactiveToken(ScopeType scopeType, EntityManager em) {
-        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :scopeType AND (c.revokedTime <> NULL OR c.expirationTime < :now OR c.notBeforeTime > :now)", Long.class)
-                .setParameter("now", LocalDateTime.now(ZoneOffset.UTC))
-                .setParameter("scopeType", scopeType)
+        return em.createQuery("SELECT COUNT(c) FROM Capability c WHERE c.scopeType = :"+CAPABILITY_SCOPE_TYPE+" AND (c.revokedTime <> NULL OR c.expirationTime < :"+DATE_TIME_NOW+" OR c.notBeforeTime > :"+DATE_TIME_NOW+")", Long.class)
+                .setParameter(DATE_TIME_NOW, LocalDateTime.now(ZoneOffset.UTC))
+                .setParameter(CAPABILITY_SCOPE_TYPE, scopeType)
                 .getSingleResult();
     }
 

@@ -196,8 +196,8 @@ public class WebhookResource {
     public Response triggerWebhook(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
                                    @SuppressWarnings("RSReferenceInspection") @PathParam("webhook") String webhookId,
                                    @FormParam("event") String event,
-                                   @FormParam(SeriesInstanceUID) List<String> seriesUID,
-                                   @FormParam(StudyInstanceUID) @UIDValidator String studyUID,
+                                   @FormParam(SERIES_INSTANCE_UID) List<String> seriesUID,
+                                   @FormParam(STUDY_INSTANCE_UID) @UIDValidator String studyUID,
                                    @FormParam("user") String user)
             throws AlbumNotFoundException, WebhookNotFoundException, UserNotMemberException, SeriesNotFoundException, StudyNotFoundException, UserNotFoundException {
 
@@ -215,7 +215,7 @@ public class WebhookResource {
                 (user != null && studyUID != null)) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Use only '"+StudyInstanceUID+"' xor 'user' not both")
+                    .detail("Use only '"+ STUDY_INSTANCE_UID +"' xor 'user' not both")
                     .build();
             return Response.status(BAD_REQUEST).entity(errorResponse).build();
         }
@@ -224,7 +224,7 @@ public class WebhookResource {
             if (studyUID == null || seriesUID.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("'" + StudyInstanceUID + "' and '" + StudyInstanceUID + "' must be set")
+                        .detail("'" + STUDY_INSTANCE_UID + "' and '" + SERIES_INSTANCE_UID + "' must be set")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }

@@ -6,7 +6,6 @@ import online.kheops.auth_server.entity.Series;
 import online.kheops.auth_server.entity.Study;
 import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.token.TokenProvenance;
-import online.kheops.auth_server.util.Consts;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 
@@ -29,6 +28,7 @@ import java.util.logging.Logger;
 
 import static online.kheops.auth_server.series.SeriesQueries.findSeriesBySeriesUID;
 import static online.kheops.auth_server.util.Consts.INCLUDE_FIELD;
+import static online.kheops.auth_server.util.JPANamedQueryConstants.STUDY_UID;
 
 public abstract class Fetcher {
     private static final Logger LOG = Logger.getLogger(Fetcher.class.getName());
@@ -71,7 +71,7 @@ public abstract class Fetcher {
             logResponseProcessingException(e, studyInstanceUID);
             return result;
         } catch (ProcessingException | WebApplicationException e) {
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyInstanceUID, e);
+            LOG.log(Level.SEVERE, String.format("Unable to fetch QIDO data for StudyInstanceUID:%s", studyInstanceUID), e);
             return result;
         }
 
@@ -81,15 +81,15 @@ public abstract class Fetcher {
         try {
             tx.begin();
 
-            TypedQuery<Study> queryStudy = em.createQuery("select s from Study s where s.studyInstanceUID = :StudyInstanceUID", Study.class);
-            queryStudy.setParameter(Consts.StudyInstanceUID, studyInstanceUID);
+            TypedQuery<Study> queryStudy = em.createNamedQuery("Study.findByUID", Study.class);
+            queryStudy.setParameter(STUDY_UID, studyInstanceUID);
             queryStudy.setLockMode(LockModeType.PESSIMISTIC_WRITE);
             final Study study = queryStudy.getSingleResult();
             study.mergeAttributes(attributes);
             study.setPopulated(true);
 
-            final TypedQuery<String> query = em.createQuery("select s.seriesInstanceUID from Series s where s.study.studyInstanceUID = :studyInstanceUID", String.class);
-            query.setParameter("studyInstanceUID", studyInstanceUID);
+            final TypedQuery<String> query = em.createNamedQuery("Series.findSeriesUIDByStudyUID", String.class);
+            query.setParameter(STUDY_UID, studyInstanceUID);
             seriesUIDList = query.getResultList();
 
             tx.commit();
@@ -126,7 +126,7 @@ public abstract class Fetcher {
             logResponseProcessingException(e, studyUID, seriesUID);
             return result;
         } catch (ProcessingException | WebApplicationException e) {
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID, e);
+            LOG.log(Level.SEVERE, String.format("Unable to fetch QIDO data for StudyInstanceUID:%s SeriesInstanceUID: %s", studyUID, seriesUID), e);
             return result;
         }
 
@@ -143,7 +143,7 @@ public abstract class Fetcher {
 
             tx.commit();
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "Error while storing series: " + seriesUID, e);
+            LOG.log(Level.SEVERE, String.format("Error while storing series: %s", seriesUID), e);
         } finally {
             if (tx.isActive()) {
                 tx.rollback();
@@ -156,10 +156,9 @@ public abstract class Fetcher {
         final Response response = e.getResponse();
         try {
             String responseString = e.getResponse().readEntity(String.class);
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " status:" + response.getStatus() +
-                    " response:\n" + responseString, e);
+            LOG.log(Level.SEVERE, String.format("Unable to fetch QIDO data for StudyInstanceUID:%s status:%d response:%n%s", studyUID, response.getStatus(), responseString), e);
         } catch (ProcessingException | IllegalStateException exception) {
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " status:" + response.getStatus(), e);
+            LOG.log(Level.SEVERE, String.format("Unable to fetch QIDO data for StudyInstanceUID:%s status:%d", studyUID, response.getStatus()), e);
             LOG.log(Level.SEVERE, "Error while getting the response string", exception);
         }
     }
@@ -168,11 +167,9 @@ public abstract class Fetcher {
         final Response response = e.getResponse();
         try {
             String responseString = e.getResponse().readEntity(String.class);
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID +
-                    " status:" + response.getStatus() + " response:\n" + responseString, e);
+            LOG.log(Level.SEVERE, String.format("Unable to fetch QIDO data for StudyInstanceUID:%s SeriesInstanceUID: %s status:%d response:%n%s", studyUID, seriesUID, response.getStatus(), responseString), e);
         } catch (ProcessingException | IllegalStateException exception) {
-            LOG.log(Level.SEVERE, "Unable to fetch QIDO data for StudyInstanceUID:" + studyUID + " SeriesInstanceUID: " + seriesUID +
-                    " status:" + response.getStatus(), e);
+            LOG.log(Level.SEVERE, String.format("Unable to fetch QIDO data for StudyInstanceUID:%s SeriesInstanceUID: %s status:%d", studyUID, seriesUID, response.getStatus()), e);
             LOG.log(Level.SEVERE, "Error while getting the response string", exception);
         }
     }

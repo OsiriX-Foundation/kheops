@@ -1,20 +1,20 @@
 package online.kheops.auth_server.album;
 
+import online.kheops.auth_server.entity.Album;
 import online.kheops.auth_server.entity.AlbumUser;
+import online.kheops.auth_server.entity.UserPermission;
 import online.kheops.auth_server.user.UserResponse;
-import org.jooq.Record;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
 
 public class AlbumResponseBuilder {
 
     private String id;
     private String name;
     private String description;
-    private String[] modalities;
+    private SortedSet<String> modalities;
     private LocalDateTime createdTime;
     private LocalDateTime lastEventTime;
     private Integer numberOfUsers;
@@ -38,62 +38,46 @@ public class AlbumResponseBuilder {
         users = new ArrayList<>();
     }
 
-    public AlbumResponseBuilder setAlbumFromUser(Record r) {
-        this.id = r.getValue("album_id").toString();
-        this.name = r.getValue("album_name").toString();
-        this.description = r.getValue("album_description").toString();
-        this.createdTime = (LocalDateTime) r.getValue("album_created_time");
-        this.lastEventTime = (LocalDateTime) r.getValue("album_last_event_time");
-        this.numberOfUsers = (Integer) r.getValue("number_of_users");
-        this.numberOfStudies = (Integer) r.getValue("number_of_studies");
-        this.numberOfSeries = (Integer) r.getValue("number_of_series");
-        try {
-            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
-        } catch(NullPointerException e) {
-            this.numberOfInstances = 0;
-        }
+    public AlbumResponseBuilder(String albumId, String albumName, String albumDescription, LocalDateTime albumCreatedTime, LocalDateTime albumLastEventTime, UserPermission userPermission, boolean albumUserAdmin, boolean albumUserFavorite, boolean albumUserNewCommentNotifications, boolean albumUserNewSeriesNotifications, long nbStudy, long nbSeries, long nbInstance, long nbUsers, long nbComment, String modalitiesLst) {
+        users = new ArrayList<>();
+        this.id = albumId;
+        this.name = albumName;
+        this.description = albumDescription;
+        this.createdTime = albumCreatedTime;
+        this.lastEventTime = albumLastEventTime;
+        this.numberOfUsers = ((Long)nbUsers).intValue();
+        this.numberOfStudies = ((Long) nbStudy).intValue();
+        this.numberOfSeries = ((Long)nbSeries).intValue();
+        this.numberOfInstances = ((Long) nbInstance).intValue();
+        this.addSeries = userPermission.isAddSeries();
+        this.addUser = userPermission.isAddUser();
+        this.deleteSeries = userPermission.isDeleteSeries();
+        this.downloadSeries = userPermission.isDownloadSeries();
+        this.sendSeries = userPermission.isSendSeries();
+        this.writeComments = userPermission.isWriteComments();
+        this.numberOfComments = ((Long)nbComment).intValue();
+        this.isFavorite = albumUserFavorite;
+        this.notificationNewComment = albumUserNewCommentNotifications;
+        this.notificationNewSeries = albumUserNewSeriesNotifications;
+        this.isAdmin = albumUserAdmin;
 
-        this.addSeries = (boolean) (r.getValue("add_series_permission"));
-        this.addUser = ((boolean) r.getValue("add_user_permission"));
-        this.deleteSeries = ((boolean) r.getValue("delete_series_permision"));
-        this.downloadSeries = ((boolean) r.getValue("download_user_permission"));
-        this.sendSeries = ((boolean) r.getValue("send_series_permission"));
-        this.writeComments = ((boolean) r.getValue("write_comment_permission"));
-        this.numberOfComments = (Integer) r.getValue("number_of_comments");
-        this.isFavorite = ((boolean) r.getValue("favorite"));
-        this.notificationNewComment = ((boolean) r.getValue("new_comment_notifications"));
-        this.notificationNewSeries = ((boolean) r.getValue("new_series_notifications"));
-        this.isAdmin = ((boolean) r.getValue("admin"));
-        if(r.getValue("modalities") != null) {
-            this.modalities = r.getValue("modalities").toString().split(",");
-        } else {
-            this.modalities = new String[0];
-        }
-        return this;
+        this.modalities = new TreeSet<>();
+        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
+        this.modalities.remove("NULL");
     }
 
-    public AlbumResponseBuilder setAlbumFromCapabilityToken(Record r) {
-        this.id = r.getValue("album_id").toString();
-        this.name = r.getValue("album_name").toString();
-        this.description = r.getValue("album_description").toString();
-        this.numberOfStudies = (Integer) r.getValue("number_of_studies");
-        this.numberOfSeries = (Integer) r.getValue("number_of_series");
-        try {
-            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
-        } catch(NullPointerException e) {
-            this.numberOfInstances = 0;
-        }
-        if(r.getValue("modalities") != null) {
-            this.modalities = r.getValue("modalities").toString().split(",");
-        } else {
-            this.modalities = new String[0];
-        }
-        try {
-            this.numberOfInstances = ((BigDecimal) r.getValue("number_of_instances")).intValue();
-        } catch(NullPointerException e) {
-            this.numberOfInstances = 0;
-        }
-        return this;
+    public AlbumResponseBuilder(Album album, long nbStudy, long nbSeries, long nbInstance, String modalitiesLst) {
+        users = new ArrayList<>();
+        this.id = album.getId();
+        this.name = album.getName();
+        this.description = album.getDescription();
+        this.numberOfStudies = ((Long) nbStudy).intValue();
+        this.numberOfSeries = ((Long)nbSeries).intValue();
+        this.numberOfInstances = ((Long) nbInstance).intValue();
+
+        this.modalities = new TreeSet<>();
+        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
+        this.modalities.remove("NULL");
     }
 
     public AlbumResponseBuilder addUser(AlbumUser albumUser) {
@@ -116,7 +100,7 @@ public class AlbumResponseBuilder {
         return description;
     }
 
-    public String[] getModalities() {
+    public SortedSet<String> getModalities() {
         return modalities;
     }
 

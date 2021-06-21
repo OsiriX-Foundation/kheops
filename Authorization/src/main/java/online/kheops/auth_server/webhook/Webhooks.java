@@ -36,8 +36,7 @@ import static online.kheops.auth_server.util.Consts.VALID_SCHEMES_WEBHOOK_URL;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_FORM_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.util.KheopsLogBuilder.ActionType.*;
-import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookById;
-import static online.kheops.auth_server.webhook.WebhookQueries.findWebhookTriggerById;
+import static online.kheops.auth_server.webhook.WebhookQueries.*;
 
 public class Webhooks {
 
@@ -65,7 +64,7 @@ public class Webhooks {
             final Mutation mutation = Events.albumPostMutation(callingUser, album, CREATE_WEBHOOK);
             em.persist(mutation);
 
-            webhookResponse = new WebhookResponse(newWebhook);
+            webhookResponse = new WebhookResponse(newWebhook, em);
             kheopsLogBuilder.action(NEW_WEBHOOK)
                     .album(webhookPostParameters.getAlbumId())
                     .webhookID(newWebhook.getId())
@@ -112,16 +111,9 @@ public class Webhooks {
             final Mutation mutation = Events.albumPostMutation(callingUser, album, EDIT_WEBHOOK);
             em.persist(mutation);
 
-            webhookResponse = new WebhookResponse(webhook);
+            webhookResponse = new WebhookResponse(webhook, em);
 
-            int maxHistory = 5;
-            for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                webhookResponse.addTrigger(webhookTrigger);
-                maxHistory--;
-                if(maxHistory == 0) {
-                    break;
-                }
-            }
+            getWebhookTriggers(webhook, 5, 0, em).forEach(webhookResponse::addTrigger);
 
             kheopsLogBuilder.action(KheopsLogBuilder.ActionType.EDIT_WEBHOOK)
                     .album(webhookPatchParameters.getAlbumId())
@@ -173,16 +165,8 @@ public class Webhooks {
     }
 
     public static void deleteWebhook(Webhook webhook, EntityManager em) {
-        for (WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-            for(WebhookAttempt webhookAttempt:webhookTrigger.getWebhookAttempts()) {
-                em.remove(webhookAttempt);
-            }
-            webhookTrigger.removeAllSeries();
-            em.remove(webhookTrigger);
-        }
         em.remove(webhook);
     }
-
 
     public static WebhookResponse getWebhook(String webhookID, String albumId, Integer triggerLimit, Integer triggerOffset, KheopsInstance kheopsInstance, KheopsLogBuilder kheopsLogBuilder)
             throws AlbumNotFoundException, WebhookNotFoundException {
@@ -202,19 +186,9 @@ public class Webhooks {
                     .webhookID(webhookID)
                     .log();
 
-            webhookResponse = new WebhookResponse(webhook);
+            webhookResponse = new WebhookResponse(webhook, em);
+            getWebhookTriggers(webhook, triggerLimit, triggerOffset, em).forEach(webhookTrigger ->  webhookResponse.addFullTriggers(webhookTrigger, kheopsInstance));
 
-            for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                if (triggerOffset > 0) {
-                    triggerOffset--;
-                } else {
-                    webhookResponse.addFullTriggers(webhookTrigger, kheopsInstance);
-                    triggerLimit--;
-                    if (triggerLimit == 0) {
-                        break;
-                    }
-                }
-            }
 
             tx.commit();
         } finally {
@@ -225,6 +199,7 @@ public class Webhooks {
         }
         return webhookResponse;
     }
+
     public static PairListXTotalCount<WebhookResponse> getWebhooks(String albumId, String url, Integer limit, Integer offset)
             throws AlbumNotFoundException {
 
@@ -247,16 +222,9 @@ public class Webhooks {
             }
 
             for(Webhook webhook:webhookList) {
-                final WebhookResponse webhookResponse = new WebhookResponse(webhook);
+                final WebhookResponse webhookResponse = new WebhookResponse(webhook, em);
                 webhookResponseList.add(webhookResponse);
-                int maxHistory = 5;
-                for(WebhookTrigger webhookTrigger:webhook.getWebhookTriggers()) {
-                    webhookResponse.addTrigger(webhookTrigger);
-                    maxHistory--;
-                    if(maxHistory == 0) {
-                        break;
-                    }
-                }
+                getWebhookTriggers(webhook, 5, 0, em).forEach(webhookResponse::addTrigger);
             }
 
         } finally {
@@ -381,10 +349,10 @@ public class Webhooks {
     }
 
     public static void validName(String name) throws BadQueryParametersException {
-        if(name.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_NAME) {
+        if(name.length() > Consts.DbColumnSize.WEBHOOK_NAME) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'name' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_NAME + " characters but got :" + name.length())
+                    .detail("Param 'name' is too long max expected: " + Consts.DbColumnSize.WEBHOOK_NAME + " characters but got :" + name.length())
                     .build();
             throw new  BadQueryParametersException(errorResponse);
         } else if (name.length() == 0) {
@@ -397,10 +365,10 @@ public class Webhooks {
     }
 
     public static void validSecret(String secret) throws BadQueryParametersException {
-        if (secret != null && secret.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET) {
+        if (secret != null && secret.length() > Consts.DbColumnSize.WEBHOOK_SECRET) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'secret' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_SECRET + " characters but got :" + secret.length())
+                    .detail("Param 'secret' is too long max expected: " + Consts.DbColumnSize.WEBHOOK_SECRET + " characters but got :" + secret.length())
                     .build();
             throw new  BadQueryParametersException(errorResponse);
         } else if (secret != null && secret.length() == 0) {
@@ -413,10 +381,10 @@ public class Webhooks {
     }
 
     public static void validUrl(String url) throws BadQueryParametersException {
-        if(url.length() > Consts.DB_COLUMN_SIZE.WEBHOOK_URL) {
+        if(url.length() > Consts.DbColumnSize.WEBHOOK_URL) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(BAD_FORM_PARAMETER)
-                    .detail("Param 'url' is too long max expected: " + Consts.DB_COLUMN_SIZE.WEBHOOK_URL + " characters but got :" + url.length())
+                    .detail("Param 'url' is too long max expected: " + Consts.DbColumnSize.WEBHOOK_URL + " characters but got :" + url.length())
                     .build();
             throw new  BadQueryParametersException(errorResponse);
         }

@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlElement;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.SortedSet;
 
 public class AlbumResponse {
 
@@ -17,7 +18,7 @@ public class AlbumResponse {
     @XmlElement(name = "description")
     private String description;
     @XmlElement(name = "modalities")
-    private String[] modalities;
+    private SortedSet<String> modalities;
     @XmlElement(name = "created_time")
     private LocalDateTime createdTime;
     @XmlElement(name = "last_event_time")

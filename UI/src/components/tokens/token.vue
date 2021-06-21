@@ -27,6 +27,12 @@
     >
       {{ $t('token.thistokenrevoked') }}
     </p>
+    <p
+      v-if="tokenStatus(token) === 'expired'"
+      class="py-3 text-danger"
+    >
+      {{ $t('token.thistokenexpired') }}
+    </p>
     <div>
       <div class="row">
         <div class="col-xs-12 col-sm-3">
@@ -106,7 +112,9 @@
           </dt>
         </div>
         <div class="col-xs-12 col-sm-3">
-          <dd>
+          <dd
+            :class="tokenStatus(token) === 'expired' ?'text-danger':''"
+          >
             {{ token.expiration_time|formatDateTime }}
           </dd>
         </div>
@@ -165,13 +173,28 @@
           </dd>
         </div>
       </div>
+      <div
+        v-if="token.revoked_by"
+        class="row"
+      >
+        <div class="col-xs-12 col-sm-3">
+          <dt class="token-title">
+            {{ $t('token.revokedby') }}
+          </dt>
+        </div>
+        <div class="col-xs-12 col-sm-3">
+          <dd class="text-danger">
+            {{ token.revoked_by|getUsername }}
+          </dd>
+        </div>
+      </div>
       <done-delete-button
         v-if="tokenStatus(token) !== 'revoked' && tokenStatus(token) !== 'expired'"
         class-row="mt-2"
         class-col="offset-md-3 col-sm-12 col-md-4 col-lg-2 d-block"
         class-col-warning-remove="offset-md-3 col-12 col-md-9"
         :text-warning-remove="$t('token.warningrevoke')"
-        :text-button-remove="$t('disable')"
+        :text-button-remove="$t('revoke')"
         :show-done="false"
         :loading="onloading"
         @remove="revoke"
@@ -201,9 +224,8 @@ export default {
     }),
     permissions() {
       const perms = [];
-
       Object.keys(this.token).forEach((key) => {
-        if (key.indexOf('permission') > -1) {
+        if (key.indexOf('permission') > -1 && this.token[key] === true) {
           perms.push(this.$t(`token.${key.replace('_permission', '')}`));
         }
       });

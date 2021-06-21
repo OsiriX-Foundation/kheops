@@ -17,6 +17,7 @@
 		"delete": "Delete album",
 		"id": "Album ID",
 		"lastadmin": "You are the last data steward, you can assign a new one or leave the album without one.",
+		"lastadmintoken": "Warning ! Once the album is quit, the tokens you created below will be revoked.",
 		"lastuser": "You are the last user in the album, if you leave it, the album will be deleted.",
 		"quit": "Leave album",
 		"quitalbum": "Are you sure you want to leave the album?"
@@ -34,7 +35,8 @@
 		"changeroleuser": "change role to user",
 		"remove": "Remove user",
 		"username": "User name",
-		"warningtoggleadmin": "Warning! Do you really want to revoke your data steward role? ",
+		"revokeadmintoken": "Warning ! The following tokens will be revoked",
+		"warningtoggleadmin": "Warning! Do you really want to revoke the data steward role? ",
 		"warningtoggledelete": "Do you really want to delete this user ?"
 	},
 	"albumusersettings": {
@@ -110,7 +112,7 @@
 	"copysuccess": "Successfully copied",
 	"create": "Create",
 	"delete": "Delete",
-	"disable": "Revoke",
+	"revoke": "Revoke",
 	"doctitle": {
 		"album": "{appTitle} - Album",
 		"albums": "{appTitle} - Albums",
@@ -261,12 +263,14 @@
 		"permission": "Permission",
 		"read": "read",
 		"revoked": "revoked",
-		"revokeddate": "revoke date",
+		"revokeddate": "Revoke date",
+		"revokedby": "Revoked by",
 		"scope": "Scope",
 		"showinvalidtoken": "Show invalid tokens",
 		"startdate": "Start date",
 		"status": "Status",
 		"thistokenrevoked": "this token is revoked",
+		"thistokenexpired": "this token is expired",
 		"tokenid": "ID",
 		"tokenvalue": "Token value",
 		"urlvalue": "Access data url",

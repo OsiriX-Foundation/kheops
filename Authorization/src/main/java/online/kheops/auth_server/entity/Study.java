@@ -7,8 +7,8 @@ import org.dcm4che3.data.VR;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Set;
+
+import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
@@ -16,13 +16,13 @@ import static online.kheops.auth_server.study.Studies.safeAttributeSetString;
 
 @NamedQueries({
         @NamedQuery(name = "Study.findByUID",
-        query = "SELECT s FROM Study s WHERE s.studyInstanceUID = :StudyInstanceUID"),
+        query = "SELECT s FROM Study s WHERE s.studyInstanceUID = :"+STUDY_UID),
         @NamedQuery(name = "Study.findByUIDAndUser",
-        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:user AND st = :study"),
+        query = "SELECT st FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE u=:"+USER+" AND st = :"+STUDY),
         @NamedQuery(name = "Study.findByStudyAndAlbum",
-        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:album AND st = :study"),
+        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:"+ALBUM+" AND st = :"+STUDY),
         @NamedQuery(name = "Study.findByUIDAndAlbum",
-        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:album AND st.studyInstanceUID = :studyUID")
+        query = "SELECT st FROM Album a JOIN a.albumSeries alS JOIN alS.series s JOIN s.study st WHERE a=:"+ALBUM+" AND st.studyInstanceUID = :"+STUDY_UID)
 })
 
 @Entity
@@ -82,12 +82,6 @@ public class Study {
     @Basic(optional = false)
     @Column(name = "populated")
     private boolean populated = false;
-
-    @OneToMany(mappedBy = "study")
-    private Set<Series> series = new HashSet<>();
-
-    @OneToMany(mappedBy = "study")
-    private Set<Event> events = new HashSet<>();
 
     @PrePersist
     public void onPrePersist() {
@@ -250,7 +244,6 @@ public class Study {
     }
 
     public void addSeries (Series series) {
-        this.series.add(series);
         series.setStudy(this);
     }
 
@@ -261,12 +254,6 @@ public class Study {
     public LocalDateTime getUpdatedTime() {
         return updatedTime;
     }
-
-    public Set<Event> getEvents() { return events; }
-
-    public void setEvents(Set<Event> events) { this.events = events; }
-
-    public void addEvents(Event event) { this.events.add(event); }
 
     @Override
     public boolean equals(Object o) {
