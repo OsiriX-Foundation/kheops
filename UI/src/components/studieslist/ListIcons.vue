@@ -287,7 +287,7 @@ export default {
         } else if (viewer === 'default' && openWindow.ohif !== undefined) {
           const queryparams = {
             url: `${process.env.VUE_APP_URL_API}/link/${viewerToken}/ohifservermetadata`,
-            studyInstanceUids: StudyInstanceUID,
+            studyInstanceUIDs: StudyInstanceUID,
           };
           url = this.openOhif(queryparams);
           openWindow.ohif.location.href = url;

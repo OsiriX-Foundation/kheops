@@ -221,8 +221,8 @@ export default {
         } else if (windowProps.id === 'OHIF') {
           const queryparams = {
             url: `${process.env.VUE_APP_URL_API}/link/${viewerToken}/ohifservermetadata`,
-            studyInstanceUids: this.studyInstanceUID,
-            seriesInstanceUids: this.seriesInstanceUID,
+            studyInstanceUIDs: this.studyInstanceUID,
+            seriesInstanceUIDs: this.seriesInstanceUID,
           };
           url = this.openOhif(queryparams);
         }
