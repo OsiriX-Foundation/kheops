@@ -225,7 +225,7 @@ public class VerifyInstanceResource {
                 isSamePN(study.getReferringPhysicianName(), studyParam.referringPhysicianName) &&
                 isSamePN(study.getPatientName(), studyParam.patientName) &&
                 (study.getPatientID() == null ? studyParam.patientId == null : studyParam.patientId == null || (study.getPatientID().equals(studyParam.patientId))) &&
-                (study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null :  == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))) &&
+                (study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : studyParam.patientBirthDate == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))) &&
                 (study.getPatientSex() == null ? studyParam.patientSex == null : studyParam.patientSex == null || (study.getPatientSex().equals(studyParam.patientSex))) &&
                 (study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId));
     }
