@@ -8,4 +8,6 @@ COPY lua $NGINX_PREFIX/lua/
 COPY nginx_conf/nginx.conf /usr/local/openresty/nginx/conf/nginx.conf
 COPY script.sh $NGINX_PREFIX/script.sh
 
+RUN mkdir /var/log/nginx
+
 CMD . $NGINX_PREFIX/script.sh
