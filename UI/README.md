@@ -2,10 +2,6 @@
 
 ## Docker environment variables
 
-#### `KHEOPS_ROOT_OIDC`
-
-The root URL of the OIDC/OAuth2 provider. Use the following example to avoid any problem. `https://keycloak.kheops.online`
-
 #### `KHEOPS_OIDC_PROVIDER`
 
 The full URL of the OIDC/OAuth2 provider.

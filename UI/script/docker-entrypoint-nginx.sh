@@ -16,11 +16,6 @@ if [ -z "$KHEOPS_OIDC_PROVIDER" ]; then
     missing_env_var_secret=true
 fi
 
-if [ -z "$KHEOPS_ROOT_OIDC" ]; then
-    echo "Missing KHEOPS_ROOT_OIDC environment variable"
-    missing_env_var_secret=true
-fi
-
 if [ -z "$KHEOPS_ROOT_URL" ]; then
     echo "Missing KHEOPS_ROOT_URL environment variable"
     missing_env_var_secret=true
@@ -73,3 +68,22 @@ sed -i "s|\%{kheops_ui_user_management}|$KHEOPS_UI_USER_MANAGEMENT_URL|g" $FILEN
 sed -i "s|\%{kheops_ui_disable_upload}|$KHEOPS_UI_DISABLE_UPLOAD|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_autocomplet}|$KHEOPS_UI_DISABLE_AUTOCOMPLET|g" $FILENAME
 
+NGINX_FILENAME=/etc/nginx/templates/default.conf.template
+
+# extract the protocol
+proto="$(echo $KHEOPS_OIDC_PROVIDER | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+# remove the protocol
+url="$(echo ${KHEOPS_OIDC_PROVIDER/$proto/})"
+# extract the user (if any)
+user="$(echo $url | grep @ | cut -d@ -f1)"
+# extract the host and port
+hostport="$(echo ${url/$user@/} | cut -d/ -f1)"
+# by request host without port    
+host="$(echo $hostport | sed -e 's,:.*,,g')"
+# by request - try to extract the port
+port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+[[ ! -z ${port} ]] && port=":$port";
+
+KHEOPS_ROOT_OIDC=$proto$host$port
+
+sed -i "s|\%{kheops_root_oidc}|$KHEOPS_ROOT_OIDC|g" $NGINX_FILENAME
