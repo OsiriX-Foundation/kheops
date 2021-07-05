@@ -471,9 +471,24 @@ export default {
       }
     },
     errorDicomize(file, err = undefined) {
-      const status = err !== undefined ? err.status : undefined;
-      this.generateErrorNonDicom([file], status);
+      const data = err !== undefined && err.response !== undefined && err.response.data !== undefined ? err.response.data : {};
+      const result = this.getErrorsDicomFromResponse(data);
+      if (result < 0) {
+        const status = this.getStatus(err);
+        this.generateErrorNonDicom([file], status);
+      }
       this.$store.dispatch('removeFileId', { id: file.id });
+    },
+    getStatus(resp) {
+      if (resp !== undefined) {
+        if (resp.status !== undefined) {
+          return resp.status;
+        }
+        if (resp.response !== undefined && resp.response.status !== undefined) {
+          return resp.response.status;
+        }
+      }
+      return undefined;
     },
     sendDicomizeFiles(files, dicomValue) {
       let promiseSequential = Promise.resolve();
