@@ -217,22 +217,22 @@ public class VerifyInstanceResource {
     }
 
     private static boolean isSameStudy(Study study, StudyParam studyParam) {
-        return (study.getStudyDate() == null ? studyParam.studyDate == null : study.getStudyDate().equals(studyParam.studyDate)) &&
-                (study.getStudyTime() == null ? studyParam.studyTime == null : study.getStudyTime().equals(studyParam.studyTime)) &&
-                (study.getStudyDescription() == null ? studyParam.studyDescription == null : study.getStudyDescription().equals(studyParam.studyDescription)) &&
-                (study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc)) &&
-                (study.getAccessionNumber() == null ? studyParam.accessionNumber == null : study.getAccessionNumber().equals(studyParam.accessionNumber)) &&
+        return (study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate)))) &&
+                (study.getStudyTime() == null ? studyParam.studyTime == null : studyParam.studyTime == null || (study.getStudyTime().equals(studyParam.studyTime))) &&
+                (study.getStudyDescription() == null ? studyParam.studyDescription == null : studyParam.studyDescription == null || (study.getStudyDescription().equals(studyParam.studyDescription))) &&
+                (study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : studyParam.timzoneOffsetFromUtc == null || (study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc))) &&
+                (study.getAccessionNumber() == null ? studyParam.accessionNumber == null : studyParam.accessionNumber == null || (study.getAccessionNumber().equals(studyParam.accessionNumber))) &&
                 isSamePN(study.getReferringPhysicianName(), studyParam.referringPhysicianName) &&
                 isSamePN(study.getPatientName(), studyParam.patientName) &&
-                (study.getPatientID() == null ? studyParam.patientId == null : study.getPatientID().equals(studyParam.patientId)) &&
-                (study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : study.getPatientBirthDate().equals(studyParam.patientBirthDate)) &&
-                (study.getPatientSex() == null ? studyParam.patientSex == null : study.getPatientSex().equals(studyParam.patientSex)) &&
+                (study.getPatientID() == null ? studyParam.patientId == null : studyParam.patientId == null || (study.getPatientID().equals(studyParam.patientId))) &&
+                (study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null :  == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))) &&
+                (study.getPatientSex() == null ? studyParam.patientSex == null : studyParam.patientSex == null || (study.getPatientSex().equals(studyParam.patientSex))) &&
                 (study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId));
     }
 
     private static boolean isSamePN(final String personNameA, final String personNameB) {
         String pna = personNameA == null ? "" : personNameA.replace("^", "").replace("=", "");
         String pnb = personNameB == null ? "" : personNameB.replace("^", "").replace("=", "");
-        return pna.equals(pnb);
+        return pna.equals("") ? pnb.equals("") : pnb.equals("") || pna.equals(pnb);
     }
 }
