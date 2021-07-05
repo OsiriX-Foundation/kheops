@@ -217,7 +217,7 @@ public class VerifyInstanceResource {
     }
 
     private static boolean isSameStudy(Study study, StudyParam studyParam) {
-        return (study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate)))) &&
+        return (study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate))) &&
                 (study.getStudyTime() == null ? studyParam.studyTime == null : studyParam.studyTime == null || (study.getStudyTime().equals(studyParam.studyTime))) &&
                 (study.getStudyDescription() == null ? studyParam.studyDescription == null : studyParam.studyDescription == null || (study.getStudyDescription().equals(studyParam.studyDescription))) &&
                 (study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : studyParam.timzoneOffsetFromUtc == null || (study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc))) &&
