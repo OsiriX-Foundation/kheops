@@ -25,7 +25,7 @@ public class InboxResource {
     @UserAccessSecured
     @Path("inboxinfo")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response removeStudyFromFavorites() {
+    public Response inboxInfo() {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
         final InboxInfoResponse inboxInfoResponse;
