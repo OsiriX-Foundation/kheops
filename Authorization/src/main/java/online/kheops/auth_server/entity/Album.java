@@ -21,7 +21,7 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
                 "WHERE w.newSeries = true AND w.enabled = true AND st.studyInstanceUID = :"+STUDY_UID),
         @NamedQuery(name = "Albums.getInboxInfoByUserPk",
         query = "SELECT NEW online.kheops.auth_server.inbox.InboxInfoResponse(COUNT(DISTINCT st.pk), " +
-                "COUNT(DISTINCT s.pk), SUM(s.numberOfSeriesRelatedInstances), FUNCTION('array_agg', s.modality) ) " +
+                "COUNT(DISTINCT s.pk), COALESCE(SUM(s.numberOfSeriesRelatedInstances),0), FUNCTION('array_agg', s.modality) ) " +
                 "FROM User u JOIN u.inbox i LEFT OUTER JOIN i.albumSeries alS LEFT OUTER JOIN alS.series s LEFT OUTER JOIN s.study st " +
                 "WHERE u.pk = :"+USER_PK+" AND s.populated = true AND st.populated = true"),
         @NamedQuery(name = "Albums.getAlbumInfoByAlbumId",
