@@ -23,10 +23,9 @@ public class InboxInfoResponse {
         this.numberOfSeries = ((Long) nbSeries).intValue();
         this.numberOfInstances = ((Long) nbInstances).intValue();
         this.modalities = new TreeSet<>();
-        if (modalitiesLst == null) {
-            modalitiesLst = "";
+        if (modalitiesLst != null) {
+            this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length() - 1).split(",")));
         }
-        this.modalities.addAll(Arrays.asList(modalitiesLst.substring(1, modalitiesLst.length()-1).split(",")));
     }
 
 }
