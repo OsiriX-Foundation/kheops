@@ -1,4 +1,4 @@
-FROM gradle:6.7.1-jdk11 AS build
+FROM gradle:7.1.1-jdk11 AS build
 WORKDIR /home/gradle/zipper
 COPY --chown=gradle:gradle build.gradle /home/gradle/zipper/build.gradle
 COPY --chown=gradle:gradle src /home/gradle/zipper/src
@@ -14,14 +14,5 @@ COPY --from=build /home/gradle/zipper/build/libs/zipper.war /usr/local/tomcat/we
 COPY context.xml /usr/local/tomcat/conf/context.xml
 COPY replaceSecretsAndRun.sh replaceSecretsAndRun.sh
 RUN chmod +x replaceSecretsAndRun.sh
-
-
-#FILEBEAT
-COPY --from=osirixfoundation/kheops-beat:latest /install/deb/filebeat-amd64.deb .
-RUN dpkg -i filebeat-amd64.deb && \
- rm filebeat-amd64.deb && \
- rm /etc/filebeat/filebeat.reference.yml && \
- rm /etc/filebeat/modules.d/*
-
 
 CMD ["./replaceSecretsAndRun.sh"]
