@@ -123,7 +123,7 @@ public final class DicomDirGenerator implements Closeable {
         LOG.log(INFO, "Tag SpecificCharacterSet : " + dataset.getString(Tag.SpecificCharacterSet, null));
         LOG.log(INFO, "Get Specific CharacterSet : " + Arrays.toString(dataset.getSpecificCharacterSet().toCodes()));
 
-        LOG.log(INFO, "Dataset : " + dataset);
+        LOG.log(INFO, "Dataset : " + dataset.toString(10000, 1000));
         LOG.log(INFO, "FMI : " + fmi);
         LOG.log(INFO, "FileIDs : " + dicomDirWriter.getFileMetaInformation().toString());
 
