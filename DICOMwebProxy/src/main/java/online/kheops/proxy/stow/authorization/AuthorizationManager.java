@@ -3,6 +3,7 @@ package online.kheops.proxy.stow.authorization;
 import online.kheops.proxy.id.ContentLocation;
 import online.kheops.proxy.id.InstanceID;
 import online.kheops.proxy.id.SeriesID;
+import online.kheops.proxy.marshaller.VerifyResponse;
 import online.kheops.proxy.part.Part;
 import online.kheops.proxy.stow.GatewayException;
 import online.kheops.proxy.tokens.AuthorizationToken;
@@ -45,6 +46,7 @@ public final class AuthorizationManager {
     private final Set<SeriesID> authorizedSeriesIDs = new HashSet<>();
     private final Set<SeriesID> forbiddenSeriesIDs = new HashSet<>();
     private final Set<InstanceID> forbiddenInstanceIDs = new HashSet<>();
+    private final HashMap<InstanceID, String> conflictMetadataInstanceIDs = new HashMap<>();
     private final Set<ContentLocation> authorizedContentLocations = new HashSet<>();
     private final UriBuilder authorizationUriBuilder;
     private final UriBuilder verifyUriBuilder;
@@ -137,8 +139,9 @@ public final class AuthorizationManager {
         }
 
         Sequence failedSOPs = attributes.getSequence(Tag.FailedSOPSequence);
-        if (failedSOPs == null && !forbiddenInstanceIDs.isEmpty()) {
-            failedSOPs = attributes.newSequence(Tag.FailedSOPSequence, forbiddenInstanceIDs.size());
+        int size = forbiddenInstanceIDs.size() + conflictMetadataInstanceIDs.size();
+        if (failedSOPs == null && size != 0) {
+            failedSOPs = attributes.newSequence(Tag.FailedSOPSequence, size);
         }
 
         for (InstanceID forbiddenInstance: forbiddenInstanceIDs) {
@@ -147,6 +150,23 @@ public final class AuthorizationManager {
             failedAttributes.setString(Tag.ReferencedSOPInstanceUID, VR.UI, forbiddenInstance.getSOPInstanceUID());
             failedAttributes.setString(Tag.ReferencedSOPClassUID, VR.UI, forbiddenInstance.getSOPClassUID());
             failedAttributes.setInt(Tag.FailureReason, VR.US, Status.NotAuthorized);
+
+            if (fileIDMap.containsKey(sopInstanceUID) && !fileIDMap.get(sopInstanceUID).isEmpty()) {
+                final String fileID = fileIDMap.getFirst(sopInstanceUID);
+                fileIDMap.get(sopInstanceUID).remove(0);
+                failedAttributes.setString(Tag.ReferencedFileID, VR.CS, fileID);
+            }
+
+            failedSOPs.add(failedAttributes);
+        }
+
+        for (InstanceID conflictMetadataInstance: conflictMetadataInstanceIDs.keySet()) {
+            final String sopInstanceUID = conflictMetadataInstance.getSOPInstanceUID();
+            Attributes failedAttributes = new Attributes(3);
+            failedAttributes.setString(Tag.ReferencedSOPInstanceUID, VR.UI, conflictMetadataInstance.getSOPInstanceUID());
+            failedAttributes.setString(Tag.ReferencedSOPClassUID, VR.UI, conflictMetadataInstance.getSOPClassUID());
+            failedAttributes.setInt(Tag.FailureReason, VR.US, Status.InvalidAttributeValue);
+            failedAttributes.setString(Tag.AttributeIdentifierList, VR.LO, conflictMetadataInstanceIDs.get(conflictMetadataInstance));
 
             if (fileIDMap.containsKey(sopInstanceUID) && !fileIDMap.get(sopInstanceUID).isEmpty()) {
                 final String fileID = fileIDMap.getFirst(sopInstanceUID);
@@ -183,9 +203,11 @@ public final class AuthorizationManager {
                 break;
         }
 
-        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || !processingFailures.isEmpty())) {
+        if (status == OK.getStatusCode() && (!forbiddenInstanceIDs.isEmpty() || !processingFailures.isEmpty() || !conflictMetadataInstanceIDs.isEmpty())) {
             responseStatus = ACCEPTED;
         }
+
+        //TODO si un seul processing failure 202 .... 409
 
         return Response.status(responseStatus).entity(attributes).build();
     }
@@ -221,11 +243,23 @@ public final class AuthorizationManager {
                 .header(HEADER_X_LINK_AUTHORIZATION, headerXLinkAuthorization)
                 .post(seriesID.getEntity())) {
 
-            if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
-                LOG.log(WARNING, () -> "Instances verification rejected for series:" + seriesID);
-                forbiddenInstanceIDs.add(instanceID);
-                return false;
+            if (response.getStatusInfo().getFamily() == SUCCESSFUL) {
+                VerifyResponse verifyResponse = response.readEntity(VerifyResponse.class);
+                if (!verifyResponse.isValid()) {
+                    if (verifyResponse.getHasSeriesAddAccess()) {
+                        LOG.log(WARNING, () -> "Instances verification rejected for series:" + seriesID);
+                        conflictMetadataInstanceIDs.put(instanceID, verifyResponse.getReason());
+                        return false;
+                    } else {
+                        LOG.log(WARNING, () -> "Instances verification rejected for series:" + seriesID);
+                        forbiddenInstanceIDs.add(instanceID);
+                        return false;
+                    }
+                }
+            } else {
+                addProcessingFailure(fileIDMap.getFirst(instanceID.getSOPInstanceUID()));
             }
+
 
         } catch (ProcessingException e) {
             forbiddenInstanceIDs.add(instanceID);
