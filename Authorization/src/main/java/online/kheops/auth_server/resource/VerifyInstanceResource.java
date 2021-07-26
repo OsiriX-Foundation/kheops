@@ -247,17 +247,17 @@ public class VerifyInstanceResource {
     private static String getReason(Series series, SeriesParam seriesParam) {
         final List reason = new ArrayList<String>();
         if (!(series.getModality() == null ? seriesParam.modality == null : series.getModality().equals(seriesParam.modality)))
-            reason.add(Tag.Modality);
+            reason.add(String.valueOf(Tag.Modality));
         if (!(series.getSeriesDescription() == null ? seriesParam.seriesDescription == null : series.getSeriesDescription().equals(seriesParam.seriesDescription)))
-            reason.add(Tag.SeriesDescription);
+            reason.add(String.valueOf(Tag.SeriesDescription));
         if (!(series.getSeriesNumber() == seriesParam.seriesNumber))
-            reason.add(Tag.SeriesNumber);
+            reason.add(String.valueOf(Tag.SeriesNumber));
         if (!(series.getBodyPartExamined() == null ? seriesParam.bodyPartExamined == null : series.getBodyPartExamined().equals(seriesParam.bodyPartExamined)))
-            reason.add(Tag.BodyPartExamined);
+            reason.add(String.valueOf(Tag.BodyPartExamined));
         if (!(series.getTimezoneOffsetFromUTC() == null ? seriesParam.timzoneOffsetFromUtc == null : series.getTimezoneOffsetFromUTC().equals(seriesParam.timzoneOffsetFromUtc)))
-            reason.add(Tag.TimezoneOffsetFromUTC);
+            reason.add(String.valueOf(Tag.TimezoneOffsetFromUTC));
         if (!(series.getStudy().getStudyInstanceUID() == null ? seriesParam.studyInstanceUID == null : series.getStudy().getStudyInstanceUID().equals(seriesParam.studyInstanceUID)))
-            reason.add(Tag.StudyInstanceUID);
+            reason.add(String.valueOf(Tag.StudyInstanceUID));
 
         return String.join(",", reason);
     }
@@ -265,27 +265,27 @@ public class VerifyInstanceResource {
     private static String getReason(Study study, StudyParam studyParam) {
         final List reason = new ArrayList<String>();
         if (!(study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate))))
-            reason.add(Tag.StudyDate);
+            reason.add(String.valueOf(Tag.StudyDate));
         if (!(study.getStudyTime() == null ? studyParam.studyTime == null : studyParam.studyTime == null || (study.getStudyTime().equals(studyParam.studyTime))))
-            reason.add(Tag.StudyTime);
+            reason.add(String.valueOf(Tag.StudyTime));
         if (!(study.getStudyDescription() == null ? studyParam.studyDescription == null : studyParam.studyDescription == null || (study.getStudyDescription().equals(studyParam.studyDescription))))
-            reason.add(Tag.StudyDescription);
+            reason.add(String.valueOf(Tag.StudyDescription));
         if (!(study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : studyParam.timzoneOffsetFromUtc == null || (study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc))))
-            reason.add(Tag.TimezoneOffsetFromUTC);
+            reason.add(String.valueOf(Tag.TimezoneOffsetFromUTC));
         if (!(study.getAccessionNumber() == null ? studyParam.accessionNumber == null : studyParam.accessionNumber == null || (study.getAccessionNumber().equals(studyParam.accessionNumber))))
-            reason.add(Tag.AccessionNumber);
+            reason.add(String.valueOf(Tag.AccessionNumber));
         if (!(isSamePN(study.getReferringPhysicianName(), studyParam.referringPhysicianName)))
-            reason.add(Tag.ReferringPhysicianName);
+            reason.add(String.valueOf(Tag.ReferringPhysicianName));
         if (!(isSamePN(study.getPatientName(), studyParam.patientName)))
-            reason.add(Tag.PatientName);
+            reason.add(String.valueOf(Tag.PatientName));
         if (!(study.getPatientID() == null ? studyParam.patientId == null : studyParam.patientId == null || (study.getPatientID().equals(studyParam.patientId))))
-            reason.add(Tag.PatientID);
+            reason.add(String.valueOf(Tag.PatientID));
         if (!(study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : studyParam.patientBirthDate == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))))
-            reason.add(Tag.PatientBirthDate);
+            reason.add(String.valueOf(Tag.PatientBirthDate));
         if (!(study.getPatientSex() == null ? studyParam.patientSex == null : studyParam.patientSex == null || (study.getPatientSex().equals(studyParam.patientSex))))
-            reason.add(Tag.PatientSex);
+            reason.add(String.valueOf(Tag.PatientSex));
         if (!(study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId)))
-            reason.add(Tag.StudyID);
+            reason.add(String.valueOf(Tag.StudyID));
 
         return String.join(",", reason);
     }
