@@ -21,6 +21,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.getSeries;
 import static online.kheops.auth_server.study.Studies.getStudy;
@@ -84,7 +88,14 @@ public class VerifyInstanceResource {
 
         final KheopsPrincipal kheopsPrincipal = (KheopsPrincipal) securityContext.getUserPrincipal();
 
+        KheopsLogBuilder kheopsLogBuilder = kheopsPrincipal.getKheopsLogBuilder()
+                .action(KheopsLogBuilder.ActionType.VERIFY_INSTANCE)
+                .study(studyInstanceUID)
+                .series(seriesInstanceUID);
+
         if (!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
+            kheopsLogBuilder.reason("unauthorezed to upload this series")
+                    .log();
             return Response.status(UNAUTHORIZED).build();
         }
 
@@ -122,12 +133,20 @@ public class VerifyInstanceResource {
             study = getStudy(studyInstanceUID, em);
 
             if (!isSameStudy(study, studyParam)) {
+                final String reason = getReason(study, studyParam);
+                kheopsLogBuilder.isValid(false)
+                        .reason(reason)
+                        .log();
                 return Response.status(UNAUTHORIZED).build();
             }
 
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
             if (!isSameSeries(series, seriesParam)) {
+                final String reason = getReason(series, seriesParam);
+                kheopsLogBuilder.isValid(false)
+                        .reason(reason)
+                        .log();
                 return Response.status(UNAUTHORIZED).build();
             }
 
@@ -171,7 +190,6 @@ public class VerifyInstanceResource {
             em.persist(series);
 
             tx.commit();
-            return Response.status(NO_CONTENT).build();
         } catch (SeriesNotFoundException e) {
             tx.begin();
 
@@ -191,19 +209,15 @@ public class VerifyInstanceResource {
             em.persist(series);
 
             tx.commit();
-            return Response.status(NO_CONTENT).build();
         } finally {
-            kheopsPrincipal.getKheopsLogBuilder()
-                    .action(KheopsLogBuilder.ActionType.VERIFY_INSTANCE)
-                    .study(studyInstanceUID)
-                    .series(seriesInstanceUID)
-                    .log();
             if (tx.isActive()) {
                 tx.rollback();
             }
             em.close();
         }
 
+        kheopsLogBuilder.isValid(true)
+                .log();
         return Response.status(NO_CONTENT).build();
     }
 
@@ -228,6 +242,52 @@ public class VerifyInstanceResource {
                 (study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : studyParam.patientBirthDate == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))) &&
                 (study.getPatientSex() == null ? studyParam.patientSex == null : studyParam.patientSex == null || (study.getPatientSex().equals(studyParam.patientSex))) &&
                 (study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId));
+    }
+
+    private static String getReason(Series series, SeriesParam seriesParam) {
+        final List reason = new ArrayList<String>();
+        if (!(series.getModality() == null ? seriesParam.modality == null : series.getModality().equals(seriesParam.modality)))
+            reason.add("modality");
+        if (!(series.getSeriesDescription() == null ? seriesParam.seriesDescription == null : series.getSeriesDescription().equals(seriesParam.seriesDescription)))
+            reason.add("seriesDescription");
+        if (!(series.getSeriesNumber() == seriesParam.seriesNumber))
+            reason.add("seriesNumber");
+        if (!(series.getBodyPartExamined() == null ? seriesParam.bodyPartExamined == null : series.getBodyPartExamined().equals(seriesParam.bodyPartExamined)))
+            reason.add("bodyPartExamined");
+        if (!(series.getTimezoneOffsetFromUTC() == null ? seriesParam.timzoneOffsetFromUtc == null : series.getTimezoneOffsetFromUTC().equals(seriesParam.timzoneOffsetFromUtc)))
+            reason.add("timzoneOffsetFromUtc");
+        if (!(series.getStudy().getStudyInstanceUID() == null ? seriesParam.studyInstanceUID == null : series.getStudy().getStudyInstanceUID().equals(seriesParam.studyInstanceUID)))
+            reason.add("studyInstanceUID");
+
+        return String.join(", ", reason);
+    }
+
+    private static String getReason(Study study, StudyParam studyParam) {
+        final List reason = new ArrayList<String>();
+        if (!(study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate))))
+            reason.add("studyDate");
+        if (!(study.getStudyTime() == null ? studyParam.studyTime == null : studyParam.studyTime == null || (study.getStudyTime().equals(studyParam.studyTime))))
+            reason.add("studyTime");
+        if (!(study.getStudyDescription() == null ? studyParam.studyDescription == null : studyParam.studyDescription == null || (study.getStudyDescription().equals(studyParam.studyDescription))))
+            reason.add("studyDescription");
+        if (!(study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : studyParam.timzoneOffsetFromUtc == null || (study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc))))
+            reason.add("timzoneOffsetFromUtc");
+        if (!(study.getAccessionNumber() == null ? studyParam.accessionNumber == null : studyParam.accessionNumber == null || (study.getAccessionNumber().equals(studyParam.accessionNumber))))
+            reason.add("accessionNumber");
+        if (!(isSamePN(study.getReferringPhysicianName(), studyParam.referringPhysicianName)))
+            reason.add("referringPhysicianName");
+        if (!(isSamePN(study.getPatientName(), studyParam.patientName)))
+            reason.add("patientName");
+        if (!(study.getPatientID() == null ? studyParam.patientId == null : studyParam.patientId == null || (study.getPatientID().equals(studyParam.patientId))))
+            reason.add("patientId");
+        if (!(study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : studyParam.patientBirthDate == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))))
+            reason.add("patientBirthDate");
+        if (!(study.getPatientSex() == null ? studyParam.patientSex == null : studyParam.patientSex == null || (study.getPatientSex().equals(studyParam.patientSex))))
+            reason.add("patientSex");
+        if (!(study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId)))
+            reason.add("studyId");
+
+        return String.join(", ", reason);
     }
 
     private static boolean isSamePN(final String personNameA, final String personNameB) {

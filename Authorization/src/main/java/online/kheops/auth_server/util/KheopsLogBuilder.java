@@ -121,6 +121,14 @@ public class KheopsLogBuilder {
         logEntry.add(new LogEntry("seriesUID", seriesUID));
         return this;
     }
+    public KheopsLogBuilder isValid(boolean isValid) {
+        logEntry.add(new LogEntry("isValid", String.valueOf(isValid)));
+        return this;
+    }
+    public KheopsLogBuilder reason(String reason) {
+        logEntry.add(new LogEntry("reason", reason));
+        return this;
+    }
 
     public void log() {
         StringBuilder logString = new StringBuilder();
