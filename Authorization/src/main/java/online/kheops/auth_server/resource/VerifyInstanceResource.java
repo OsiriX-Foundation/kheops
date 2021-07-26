@@ -9,6 +9,7 @@ import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.series.SeriesNotFoundException;
 import online.kheops.auth_server.study.StudyNotFoundException;
 import online.kheops.auth_server.util.KheopsLogBuilder;
+import online.kheops.auth_server.util.VerifyResponse;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.VR;
@@ -23,7 +24,6 @@ import javax.ws.rs.core.SecurityContext;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.*;
 import static online.kheops.auth_server.series.Series.getSeries;
@@ -94,9 +94,9 @@ public class VerifyInstanceResource {
                 .series(seriesInstanceUID);
 
         if (!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
-            kheopsLogBuilder.reason("unauthorezed to upload this series")
+            kheopsLogBuilder.reason("unauthorized to upload this series")
                     .log();
-            return Response.status(UNAUTHORIZED).build();
+            return Response.status(OK).entity(new VerifyResponse(false, false, null)).build();
         }
 
         final StudyParam studyParam = new StudyParam();
@@ -137,7 +137,7 @@ public class VerifyInstanceResource {
                 kheopsLogBuilder.isValid(false)
                         .reason(reason)
                         .log();
-                return Response.status(UNAUTHORIZED).build();
+                return Response.status(OK).entity(new VerifyResponse(false, true, reason)).build();
             }
 
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
@@ -147,7 +147,7 @@ public class VerifyInstanceResource {
                 kheopsLogBuilder.isValid(false)
                         .reason(reason)
                         .log();
-                return Response.status(UNAUTHORIZED).build();
+                return Response.status(OK).entity(new VerifyResponse(false, true, reason)).build();
             }
 
         } catch (StudyNotFoundException e) {
@@ -218,7 +218,7 @@ public class VerifyInstanceResource {
 
         kheopsLogBuilder.isValid(true)
                 .log();
-        return Response.status(NO_CONTENT).build();
+        return Response.status(OK).entity(new VerifyResponse(true, true, null)).build();
     }
 
     private static boolean isSameSeries(Series series, SeriesParam seriesParam) {
@@ -259,7 +259,7 @@ public class VerifyInstanceResource {
         if (!(series.getStudy().getStudyInstanceUID() == null ? seriesParam.studyInstanceUID == null : series.getStudy().getStudyInstanceUID().equals(seriesParam.studyInstanceUID)))
             reason.add("studyInstanceUID");
 
-        return String.join(", ", reason);
+        return String.join(",", reason);
     }
 
     private static String getReason(Study study, StudyParam studyParam) {
@@ -287,7 +287,7 @@ public class VerifyInstanceResource {
         if (!(study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId)))
             reason.add("studyId");
 
-        return String.join(", ", reason);
+        return String.join(",", reason);
     }
 
     private static boolean isSamePN(final String personNameA, final String personNameB) {
