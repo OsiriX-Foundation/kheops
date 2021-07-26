@@ -261,7 +261,7 @@ public final class AuthorizationManager {
             forbiddenInstanceIDs.add(instanceID);
             throw new GatewayException("Error while getting the access token", e);
         }  catch (WebApplicationException e) {
-            LOG.log(WARNING, e, () -> "Unable to get access to to a series using " + e.getResponse().getLocation());
+            LOG.log(WARNING, e, () -> "Unable to get access to a series using " + e.getResponse().getLocation());
             forbiddenSeriesIDs.add(seriesID);
             forbiddenInstanceIDs.add(instanceID);
             return false;
