@@ -125,8 +125,12 @@ public class KheopsLogBuilder {
         logEntry.add(new LogEntry("isValid", String.valueOf(isValid)));
         return this;
     }
-    public KheopsLogBuilder reason(String reason) {
-        logEntry.add(new LogEntry("reason", reason));
+    public KheopsLogBuilder authorized(boolean authorized) {
+        logEntry.add(new LogEntry("authorized", String.valueOf(authorized)));
+        return this;
+    }
+    public KheopsLogBuilder invalidTags(String invalidTags) {
+        logEntry.add(new LogEntry("invalidTags", invalidTags));
         return this;
     }
 
