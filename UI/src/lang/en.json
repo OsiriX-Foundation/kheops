@@ -299,6 +299,7 @@
 		"locationSend": ". | in an",
 		"notmatchsop": "Error: Data Set does not match SOP Class",
 		"processingfailure": "Processing failure",
+		"invalidfields": "Invalid attribute value",
 		"refused": "Refused out of Resources",
 		"reload": "Reload erroneous files",
 		"showError": "Show errors",
