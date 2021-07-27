@@ -245,12 +245,12 @@ public class VerifyInstanceResource {
     }
 
     private static List<String> getReason(Series series, SeriesParam seriesParam) {
-        final List unmatchingTags = new ArrayList<String>();
+        final List<String> unmatchingTags = new ArrayList<>();
         if (!(series.getModality() == null ? seriesParam.modality == null : series.getModality().equals(seriesParam.modality)))
             unmatchingTags.add(String.valueOf(Tag.Modality));
         if (!(series.getSeriesDescription() == null ? seriesParam.seriesDescription == null : series.getSeriesDescription().equals(seriesParam.seriesDescription)))
             unmatchingTags.add(String.valueOf(Tag.SeriesDescription));
-        if (!(series.getSeriesNumber() == seriesParam.seriesNumber))
+        if (series.getSeriesNumber() != seriesParam.seriesNumber)
             unmatchingTags.add(String.valueOf(Tag.SeriesNumber));
         if (!(series.getBodyPartExamined() == null ? seriesParam.bodyPartExamined == null : series.getBodyPartExamined().equals(seriesParam.bodyPartExamined)))
             unmatchingTags.add(String.valueOf(Tag.BodyPartExamined));
@@ -263,7 +263,7 @@ public class VerifyInstanceResource {
     }
 
     private static List<String> getReason(Study study, StudyParam studyParam) {
-        final List unmatchingTags = new ArrayList<String>();
+        final List<String> unmatchingTags = new ArrayList<>();
         if (!(study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate))))
             unmatchingTags.add(String.valueOf(Tag.StudyDate));
         if (!(study.getStudyTime() == null ? studyParam.studyTime == null : studyParam.studyTime == null || (study.getStudyTime().equals(studyParam.studyTime))))
