@@ -134,7 +134,7 @@ public class VerifyInstanceResource {
 
             if (!isSameStudy(study, studyParam)) {
                 final List<String> unmatchingTags = getReason(study, studyParam);
-                kheopsLogBuilder.isValid(false)
+                kheopsLogBuilder.isVerificationValid(false)
                         .reason("some tags are different : " + String.join(",", unmatchingTags))
                         .log();
                 return Response.status(OK).entity(new VerifyResponse(false, true, "some tags are different : see 'unmatching_tags'", unmatchingTags)).build();
@@ -144,7 +144,7 @@ public class VerifyInstanceResource {
 
             if (!isSameSeries(series, seriesParam)) {
                 final List<String> unmatchingTags = getReason(series, seriesParam);
-                kheopsLogBuilder.isValid(false)
+                kheopsLogBuilder.isVerificationValid(false)
                         .reason("some tags are different : " + String.join(",", unmatchingTags))
                         .log();
                 return Response.status(OK).entity(new VerifyResponse(false, true, "some tags are different : see 'unmatching_tags'", unmatchingTags)).build();
@@ -216,7 +216,7 @@ public class VerifyInstanceResource {
             em.close();
         }
 
-        kheopsLogBuilder.isValid(true)
+        kheopsLogBuilder.isVerificationValid(true)
                 .log();
         return Response.status(OK).entity(new VerifyResponse(true, true, null, null)).build();
     }
