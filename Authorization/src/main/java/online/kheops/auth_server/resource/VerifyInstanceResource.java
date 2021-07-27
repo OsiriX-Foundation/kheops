@@ -96,7 +96,7 @@ public class VerifyInstanceResource {
         if (!kheopsPrincipal.hasSeriesAddAccess(studyInstanceUID, seriesInstanceUID)) {
             kheopsLogBuilder.reason("unauthorized to upload this series")
                     .log();
-            return Response.status(OK).entity(new VerifyResponse(false, false, null)).build();
+            return Response.status(OK).entity(new VerifyResponse(false, false, null, null)).build();
         }
 
         final StudyParam studyParam = new StudyParam();
@@ -133,21 +133,21 @@ public class VerifyInstanceResource {
             study = getStudy(studyInstanceUID, em);
 
             if (!isSameStudy(study, studyParam)) {
-                final String reason = getReason(study, studyParam);
+                final List<String> unmatchingTags = getReason(study, studyParam);
                 kheopsLogBuilder.isValid(false)
-                        .reason(reason)
+                        .reason("some tags are different : " + String.join(",", unmatchingTags))
                         .log();
-                return Response.status(OK).entity(new VerifyResponse(false, true, reason)).build();
+                return Response.status(OK).entity(new VerifyResponse(false, true, "some tags are different : see 'unmatching_tags'", unmatchingTags)).build();
             }
 
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
             if (!isSameSeries(series, seriesParam)) {
-                final String reason = getReason(series, seriesParam);
+                final List<String> unmatchingTags = getReason(series, seriesParam);
                 kheopsLogBuilder.isValid(false)
-                        .reason(reason)
+                        .reason("some tags are different : " + String.join(",", unmatchingTags))
                         .log();
-                return Response.status(OK).entity(new VerifyResponse(false, true, reason)).build();
+                return Response.status(OK).entity(new VerifyResponse(false, true, "some tags are different : see 'unmatching_tags'", unmatchingTags)).build();
             }
 
         } catch (StudyNotFoundException e) {
@@ -218,7 +218,7 @@ public class VerifyInstanceResource {
 
         kheopsLogBuilder.isValid(true)
                 .log();
-        return Response.status(OK).entity(new VerifyResponse(true, true, null)).build();
+        return Response.status(OK).entity(new VerifyResponse(true, true, null, null)).build();
     }
 
     private static boolean isSameSeries(Series series, SeriesParam seriesParam) {
@@ -244,50 +244,50 @@ public class VerifyInstanceResource {
                 (study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId));
     }
 
-    private static String getReason(Series series, SeriesParam seriesParam) {
-        final List reason = new ArrayList<String>();
+    private static List<String> getReason(Series series, SeriesParam seriesParam) {
+        final List unmatchingTags = new ArrayList<String>();
         if (!(series.getModality() == null ? seriesParam.modality == null : series.getModality().equals(seriesParam.modality)))
-            reason.add(String.valueOf(Tag.Modality));
+            unmatchingTags.add(String.valueOf(Tag.Modality));
         if (!(series.getSeriesDescription() == null ? seriesParam.seriesDescription == null : series.getSeriesDescription().equals(seriesParam.seriesDescription)))
-            reason.add(String.valueOf(Tag.SeriesDescription));
+            unmatchingTags.add(String.valueOf(Tag.SeriesDescription));
         if (!(series.getSeriesNumber() == seriesParam.seriesNumber))
-            reason.add(String.valueOf(Tag.SeriesNumber));
+            unmatchingTags.add(String.valueOf(Tag.SeriesNumber));
         if (!(series.getBodyPartExamined() == null ? seriesParam.bodyPartExamined == null : series.getBodyPartExamined().equals(seriesParam.bodyPartExamined)))
-            reason.add(String.valueOf(Tag.BodyPartExamined));
+            unmatchingTags.add(String.valueOf(Tag.BodyPartExamined));
         if (!(series.getTimezoneOffsetFromUTC() == null ? seriesParam.timzoneOffsetFromUtc == null : series.getTimezoneOffsetFromUTC().equals(seriesParam.timzoneOffsetFromUtc)))
-            reason.add(String.valueOf(Tag.TimezoneOffsetFromUTC));
+            unmatchingTags.add(String.valueOf(Tag.TimezoneOffsetFromUTC));
         if (!(series.getStudy().getStudyInstanceUID() == null ? seriesParam.studyInstanceUID == null : series.getStudy().getStudyInstanceUID().equals(seriesParam.studyInstanceUID)))
-            reason.add(String.valueOf(Tag.StudyInstanceUID));
+            unmatchingTags.add(String.valueOf(Tag.StudyInstanceUID));
 
-        return String.join(",", reason);
+        return unmatchingTags;
     }
 
-    private static String getReason(Study study, StudyParam studyParam) {
-        final List reason = new ArrayList<String>();
+    private static List<String> getReason(Study study, StudyParam studyParam) {
+        final List unmatchingTags = new ArrayList<String>();
         if (!(study.getStudyDate() == null ? studyParam.studyDate == null : studyParam.studyDate == null || (study.getStudyDate().equals(studyParam.studyDate))))
-            reason.add(String.valueOf(Tag.StudyDate));
+            unmatchingTags.add(String.valueOf(Tag.StudyDate));
         if (!(study.getStudyTime() == null ? studyParam.studyTime == null : studyParam.studyTime == null || (study.getStudyTime().equals(studyParam.studyTime))))
-            reason.add(String.valueOf(Tag.StudyTime));
+            unmatchingTags.add(String.valueOf(Tag.StudyTime));
         if (!(study.getStudyDescription() == null ? studyParam.studyDescription == null : studyParam.studyDescription == null || (study.getStudyDescription().equals(studyParam.studyDescription))))
-            reason.add(String.valueOf(Tag.StudyDescription));
+            unmatchingTags.add(String.valueOf(Tag.StudyDescription));
         if (!(study.getTimezoneOffsetFromUTC() == null ? studyParam.timzoneOffsetFromUtc == null : studyParam.timzoneOffsetFromUtc == null || (study.getTimezoneOffsetFromUTC().equals(studyParam.timzoneOffsetFromUtc))))
-            reason.add(String.valueOf(Tag.TimezoneOffsetFromUTC));
+            unmatchingTags.add(String.valueOf(Tag.TimezoneOffsetFromUTC));
         if (!(study.getAccessionNumber() == null ? studyParam.accessionNumber == null : studyParam.accessionNumber == null || (study.getAccessionNumber().equals(studyParam.accessionNumber))))
-            reason.add(String.valueOf(Tag.AccessionNumber));
+            unmatchingTags.add(String.valueOf(Tag.AccessionNumber));
         if (!(isSamePN(study.getReferringPhysicianName(), studyParam.referringPhysicianName)))
-            reason.add(String.valueOf(Tag.ReferringPhysicianName));
+            unmatchingTags.add(String.valueOf(Tag.ReferringPhysicianName));
         if (!(isSamePN(study.getPatientName(), studyParam.patientName)))
-            reason.add(String.valueOf(Tag.PatientName));
+            unmatchingTags.add(String.valueOf(Tag.PatientName));
         if (!(study.getPatientID() == null ? studyParam.patientId == null : studyParam.patientId == null || (study.getPatientID().equals(studyParam.patientId))))
-            reason.add(String.valueOf(Tag.PatientID));
+            unmatchingTags.add(String.valueOf(Tag.PatientID));
         if (!(study.getPatientBirthDate() == null ? studyParam.patientBirthDate == null : studyParam.patientBirthDate == null || (study.getPatientBirthDate().equals(studyParam.patientBirthDate))))
-            reason.add(String.valueOf(Tag.PatientBirthDate));
+            unmatchingTags.add(String.valueOf(Tag.PatientBirthDate));
         if (!(study.getPatientSex() == null ? studyParam.patientSex == null : studyParam.patientSex == null || (study.getPatientSex().equals(studyParam.patientSex))))
-            reason.add(String.valueOf(Tag.PatientSex));
+            unmatchingTags.add(String.valueOf(Tag.PatientSex));
         if (!(study.getStudyID() == null ? studyParam.studyId == null : study.getStudyID().equals(studyParam.studyId)))
-            reason.add(String.valueOf(Tag.StudyID));
+            unmatchingTags.add(String.valueOf(Tag.StudyID));
 
-        return String.join(",", reason);
+        return unmatchingTags;
     }
 
     private static boolean isSamePN(final String personNameA, final String personNameB) {
