@@ -187,7 +187,7 @@ public class Capabilities {
         return new PairListXTotalCount<>(totalCount, capabilityResponses);
     }
 
-    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(String albumId, String userEmail, boolean valid, Integer limit, Integer offset)
+    public static PairListXTotalCount<CapabilitiesResponse> getCapabilities(String albumId, String userEmailOrSub, boolean valid, Integer limit, Integer offset)
             throws UserNotFoundException {
 
         final List<CapabilitiesResponse> capabilityResponses = new ArrayList<>();
@@ -199,8 +199,8 @@ public class Capabilities {
         try {
 
             User user = null;
-            if (userEmail != null) {
-                user = getUser(userEmail.toLowerCase().trim(), em);
+            if (userEmailOrSub != null) {
+                user = getUser(userEmailOrSub, em);
             }
 
             capabilities = findAllCapabilitiesByAlbum(albumId, user, limit, offset, valid, em);

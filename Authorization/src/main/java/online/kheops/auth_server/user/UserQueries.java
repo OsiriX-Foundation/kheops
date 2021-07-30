@@ -28,7 +28,7 @@ public class UserQueries {
     public static User findUserByEmail(String email, EntityManager em) throws UserNotFoundException{
         try {
             TypedQuery<User> query = em.createNamedQuery("User.findByEmail", User.class);
-            query.setParameter(USER_EMAIL, email);
+            query.setParameter(USER_EMAIL, email.toLowerCase().trim());
             return query.getSingleResult();
         } catch (NoResultException e) {
             throw new UserNotFoundException();
