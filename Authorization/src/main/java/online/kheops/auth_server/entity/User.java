@@ -14,7 +14,7 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "User.findById",
                 query = "SELECT u FROM User u WHERE u.sub = :"+USER_ID),
         @NamedQuery(name = "User.findByEmail",
-                query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:"+USER_EMAIL),
+                query = "SELECT u FROM User u WHERE LOWER(u.email) LIKE LOWER(:"+USER_EMAIL+")"),
         @NamedQuery(name = "User.searchByEmailOrNameInAlbumId",
                 query = "SELECT u FROM User u JOIN u.albumUser au JOIN au.album a WHERE a.id = :"+ALBUM_ID+" AND (LOWER(u.email) LIKE LOWER(:"+SEARCH_EMAIL+") OR LOWER(u.name) LIKE LOWER(:"+SEARCH_NAME+"))"),
         @NamedQuery(name = "User.searchByEmailWithStudyAccess",
