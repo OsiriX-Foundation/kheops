@@ -11,7 +11,6 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 
 ENV SECRET_FILE_PATH=/run/secrets \
     REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
-ENV JAVA_TOOL_OPTIONS -Xdebug -agentlib:jdwp=transport=dt_socket,address=*:5005,server=y,suspend=n
 
 COPY --from=build /home/gradle/authorization/build/libs/authorization.war /usr/local/tomcat/webapps/authorization.war
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
