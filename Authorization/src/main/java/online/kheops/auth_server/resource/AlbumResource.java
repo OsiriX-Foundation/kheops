@@ -187,7 +187,7 @@ public class AlbumResource {
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
         }
-        if(description != null) {
+        if (description != null) {
             description = description.trim();
             if (description.length() > DbColumnSize.ALBUM_DESCRIPTION) {
                 final ErrorResponse errorResponse = new ErrorResponseBuilder()
@@ -199,10 +199,12 @@ public class AlbumResource {
             if (description.isEmpty()) {
                 final ErrorResponse errorResponse = new ErrorResponseBuilder()
                         .message(BAD_FORM_PARAMETER)
-                        .detail("Param 'description' can not be empty max expected: " + DbColumnSize.ALBUM_DESCRIPTION + " characters but got 0")
+                        .detail("Param 'description' can either be empty or must contain non-space characters")
                         .build();
                 return Response.status(BAD_REQUEST).entity(errorResponse).build();
             }
+        } else {
+            description = "";
         }
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
