@@ -26,7 +26,6 @@
                   type="text"
                   class="form-control"
                   required
-                  input="height: 100%;"
                   maxlength="255"
                 >
                 <field-obligatory
@@ -36,6 +35,7 @@
               <div
                 v-if="onloading === false"
                 class="input-group-append"
+                style="height: 100%;"
               >
                 <button
                   :disabled="disabledUpdateAlbumName"
