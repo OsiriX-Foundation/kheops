@@ -25,14 +25,20 @@
                   v-focus
                   type="text"
                   class="form-control"
+                  required
+                  input="height: 100%;"
                   maxlength="255"
                 >
+                <field-obligatory
+                  :state="edit.name !== ''"
+                />
               </div>
               <div
                 v-if="onloading === false"
                 class="input-group-append"
               >
                 <button
+                  :disabled="disabledUpdateAlbumName"
                   class="btn btn-primary"
                   type="submit"
                 >
@@ -145,10 +151,11 @@
 import { mapGetters } from 'vuex';
 import AlbumButtons from '@/components/albumsettings/AlbumButtons';
 import KheopsClipLoader from '@/components/globalloading/KheopsClipLoader';
+import FieldObligatory from '@/components/globals/FieldObligatory';
 
 export default {
   name: 'AlbumSettingsGeneral',
-  components: { AlbumButtons, KheopsClipLoader },
+  components: { AlbumButtons, KheopsClipLoader, FieldObligatory },
   props: {
     album: {
       type: Object,
@@ -174,6 +181,9 @@ export default {
         return this.album.description.split('\n');
       }
       return '';
+    },
+    disabledUpdateAlbumName() {
+      return (this.edit.name === '');
     },
   },
   created() {
