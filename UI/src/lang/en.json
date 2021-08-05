@@ -327,7 +327,7 @@
 		"sub": "Sub",
 		"usersettings": "User settings",
 		"userunknown": "Sorry, unknown user",
-		"usernotfound": "Sorry, user not found"
+		"usernotfound": "Sorry, user not found - the user must first register"
 	},
 	"valid": "Valid",
 	"viewer": {
