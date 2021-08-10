@@ -310,7 +310,7 @@
 		"nouser": "Aucun utilisateur spécifié",
 		"sub": "Sub",
 		"usersettings": "Préférences utilisateur",
-		"usernotfound": "Désolé, utilisateur pas trouvé"
+		"usernotfound": "Désolé, utilisateur pas trouvé - l'utilisateur doit créer un compte"
 	},
 	"valid": "Valider",
 	"viewer": {
