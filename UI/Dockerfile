@@ -9,7 +9,6 @@ RUN npm run build
 
 FROM nginx:1.19.9-alpine as production-stage
 
-ENV KHEOPS_UI_ROOT_URI=
 ENV KHEOPS_UI_ADDITIONAL_OIDC_OPTIONS={}
 
 RUN mkdir /etc/nginx/templates
