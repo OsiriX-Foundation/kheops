@@ -347,6 +347,7 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteStudyFromInbox(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
+                                         @QueryParam("adminPassword") String adminPassword,
                                          @Context HttpServletRequest request,
                                          @Context HttpServletResponse response)
             throws AlbumNotFoundException, SeriesNotFoundException {
@@ -381,7 +382,17 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        // Permanentely delete here
+        if ( adminPassword != null) {
+            LOG.log(WARNING, "Admin password != null");
+            final String environmentAdminPassword = System.getenv("DICOMWEB_PROXY_SECRET");
+
+            if (environmentAdminPassword.equals(adminPassword)) {
+                LOG.log(WARNING, "Admin access in here");
+            }
+        } else {
+            Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        }
         return Response.status(NO_CONTENT).build();
     }
 
