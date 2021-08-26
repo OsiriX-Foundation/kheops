@@ -27,19 +27,19 @@ dependencies {
     api group: 'org.glassfish.jersey.media', name: 'jersey-media-moxy', version: '2.31'
     api group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '2.31'
 
-    compile (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.22.6') {
+    implementation (group: 'org.dcm4che', name: 'dcm4che-dcmr', version: '5.23.2') {
         exclude module: 'slf4j-log4j12'
     }
-    compile (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.22.6') {
+    implementation (group: 'org.dcm4che', name: 'dcm4che-json', version: '5.23.2') {
         exclude module: 'slf4j-log4j12'
     }
-    compile (group: 'org.dcm4che', name: 'dcm4che-net', version: '5.22.6') {
+    implementation (group: 'org.dcm4che', name: 'dcm4che-net', version: '5.23.1') {
         exclude module: 'slf4j-log4j12'
     }
-    compile (group: 'org.dcm4che', name: 'dcm4che-ws-rs', version: '5.22.6') {
+    implementation (group: 'org.dcm4che', name: 'dcm4che-ws-rs', version: '5.23.2') {
         exclude module: 'slf4j-log4j12'
     }
-    compile (group: 'org.dcm4che', name: 'dcm4che-mime', version: '5.22.6') {
+    implementation (group: 'org.dcm4che', name: 'dcm4che-mime', version: '5.23.2') {
         exclude module: 'slf4j-log4j12'
     }
 

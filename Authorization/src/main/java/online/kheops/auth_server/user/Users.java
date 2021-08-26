@@ -66,13 +66,14 @@ public class Users {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
+        final String emailString = email.toLowerCase().trim();
 
         try {
             tx.begin();
 
             try {
                 final User user = getUser(sub, em);
-                user.setEmail(email);
+                user.setEmail(emailString);
                 user.setName(name);
                 tx.commit();
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);
@@ -81,7 +82,7 @@ public class Users {
             } catch (UserNotFoundException unused) { /*empty*/ }
 
             final User user = new User(sub);
-            user.setEmail(email);
+            user.setEmail(emailString);
             user.setName(name);
             final Album inbox = new Album();
             inbox.setName("inbox");
@@ -114,7 +115,7 @@ public class Users {
                     LOG.log(INFO, "About to try to share with the welcomebot");
                     CLIENT.target(welcomebotWebhook)
                             .queryParam("user", user.getSub())
-                            .queryParam("email", email)
+                            .queryParam("email", emailString)
                             .queryParam("name", name)
                             .request()
                             .post(Entity.text(""));
@@ -130,7 +131,7 @@ public class Users {
                 tx.rollback();
                 tx.begin();
                 final User user = getUser(sub, em);
-                user.setEmail(email);
+                user.setEmail(emailString);
                 user.setName(name);
                 tx.commit();
                 kheopsLogBuilder.action(KheopsLogBuilder.ActionType.UPDATE_USER);

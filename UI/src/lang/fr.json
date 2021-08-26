@@ -283,6 +283,7 @@
 		"locationSend": ". | dans un",
 		"notmatchsop": "Erreur: L'ensemble de données ne correspond pas à la classe SOP",
 		"processingfailure": "Echec de traitement",
+		"invalidfields": "Valeur d'attribut non valide",
 		"refused": "Refusé: Plus de ressources",
 		"reload": "Recharger les fichiers erronés",
 		"showError": "Montrer les erreurs",
@@ -309,7 +310,7 @@
 		"nouser": "Aucun utilisateur spécifié",
 		"sub": "Sub",
 		"usersettings": "Préférences utilisateur",
-		"usernotfound": "Désolé, utilisateur pas trouvé"
+		"usernotfound": "Désolé, utilisateur pas trouvé - l'utilisateur doit créer un compte"
 	},
 	"valid": "Valider",
 	"viewer": {

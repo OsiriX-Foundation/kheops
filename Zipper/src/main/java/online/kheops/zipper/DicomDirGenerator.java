@@ -13,9 +13,16 @@ import org.dcm4che3.util.UIDUtils;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
 
+import static java.util.logging.Level.INFO;
+
 public final class DicomDirGenerator implements Closeable {
+
+    private static final Logger LOG = Logger.getLogger(DicomDirGenerator.class.getName());
+
     private static final String DICOMDIR_FILENAME = "DICOMDIR";
     private static final String DEFAULT_FILESET_ID = "KHEOPS_ZIP";
 
@@ -111,7 +118,18 @@ public final class DicomDirGenerator implements Closeable {
             dicomDirWriter.addLowerDirectoryRecord(studyRecord, seriesRecord);
         }
 
+        LOG.log(INFO, "SeriesInstanceUID : " + dataset.getString(Tag.SeriesInstanceUID, null));
+        LOG.log(INFO, "SOPInstanceUID : " + dataset.getString(Tag.SOPInstanceUID, null));
+        LOG.log(INFO, "Tag SpecificCharacterSet : " + dataset.getString(Tag.SpecificCharacterSet, null));
+        LOG.log(INFO, "Get Specific CharacterSet : " + Arrays.toString(dataset.getSpecificCharacterSet().toCodes()));
+
+        LOG.log(INFO, "Dataset : " + dataset.toString(10000, 1000));
+        LOG.log(INFO, "FMI : " + fmi);
+        LOG.log(INFO, "FileIDs : " + dicomDirWriter.getFileMetaInformation().toString());
+
+        // This will crash
         final Attributes instanceRecord = recordFactory.createRecord(dataset, fmi, fileIDs);
+
         dicomDirWriter.addLowerDirectoryRecord(seriesRecord, instanceRecord);
     }
 

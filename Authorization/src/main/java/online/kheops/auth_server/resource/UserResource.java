@@ -144,7 +144,9 @@ public class UserResource {
             kheopsLogBuilder.action(ActionType.TEST_USER);
 
             try {
-                final User user = getUser(reference);
+                final String referenceString = reference.toLowerCase().trim();
+
+                final User user = getUser(referenceString);
                 userResponseBuilder = new UserResponseBuilder().setName(user.getName())
                         .setSub(user.getSub())
                         .setEmail(user.getEmail());

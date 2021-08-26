@@ -345,6 +345,7 @@ export default {
         292: 'upload.authorizationerror',
         290: 'upload.sopnotsupported',
         272: 'upload.processingfailure',
+        262: 'upload.invalidfields',
         0: 'upload.unknownerror',
       },
       hexErrorValues: [
