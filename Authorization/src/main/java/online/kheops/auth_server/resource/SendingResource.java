@@ -11,6 +11,7 @@ import online.kheops.auth_server.annotation.*;
 import online.kheops.auth_server.capability.ScopeType;
 import online.kheops.auth_server.entity.Capability;
 import online.kheops.auth_server.entity.User;
+import online.kheops.auth_server.marshaller.JSONAttributesListMarshaller;
 import online.kheops.auth_server.principal.CapabilityPrincipal;
 import online.kheops.auth_server.principal.KheopsPrincipal;
 import online.kheops.auth_server.report_provider.ClientIdNotFoundException;
@@ -27,8 +28,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -49,6 +54,7 @@ public class SendingResource
 {
 
     private static final Logger LOG = Logger.getLogger(SendingResource.class.getName());
+    private static final Client CLIENT = ClientBuilder.newClient().register(JSONAttributesListMarshaller.class);
 
     @Context
     private ServletContext context;
@@ -347,10 +353,12 @@ public class SendingResource
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}")
     @Produces("application/dicom+json")
     public Response deleteStudyFromInbox(@PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
-                                         @QueryParam("adminPassword") String adminPassword,
                                          @Context HttpServletRequest request,
                                          @Context HttpServletResponse response)
-            throws AlbumNotFoundException, SeriesNotFoundException {
+            throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException {
+
+        // Sanitize this? Or not needed
+        final String adminPassword = request.getHeader("adminPassword");
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
@@ -382,18 +390,40 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        // Permanentely delete here
+        // Permanently delete here
         if ( adminPassword != null) {
             LOG.log(WARNING, "Admin password != null");
-            final String environmentAdminPassword = System.getenv("DICOMWEB_PROXY_SECRET");
+            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
                 LOG.log(WARNING, "Admin access in here");
+//                deleteDataFromPacs(studyInstanceUID);
+                Sending.permanentlydeleteStudy(kheopsPrincipal.getUser(), studyInstanceUID);
+                LOG.log(WARNING, "Finish admin access");
             }
-        } else {
-            Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         }
+
+        Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
+    }
+
+    private void deleteDataFromPacs(final String studyInstanceUID) {
+        /*// TODO: Delete from dcm4chee docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
+//                Use QIDO resource ?
+        final URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
+
+        Response upstreamResponse = null;
+        try {
+            upstreamResponse = CLIENT.target(uri).request("application/dicom+json").get();
+        } catch (ProcessingException e) {
+            LOG.log(WARNING, "unable to reach upstream", e);
+//            return Response.status(BAD_GATEWAY).build();
+        }
+        if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+            LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
+//            return Response.status(BAD_GATEWAY).build();
+        }*/
+
     }
 
     @DELETE
@@ -635,5 +665,13 @@ public class SendingResource
         final User user = getUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);
+    }
+
+    private URI getDicomWebURI() {
+        try {
+            return new URI(context.getInitParameter("online.kheops.pacs.uri"));
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("online.kheops.pacs.uri is not a valid URI", e);
+        }
     }
 }

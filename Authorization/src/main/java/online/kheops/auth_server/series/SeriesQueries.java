@@ -256,4 +256,10 @@ public class SeriesQueries {
             throw new StudyNotFoundException(errorResponse);
         }
     }
+
+    public static void deleteSeries(final List<Series> seriesToDelete, final EntityManager em) {
+        for (Series series : seriesToDelete) {
+            em.remove(series);
+        }
+    }
 }

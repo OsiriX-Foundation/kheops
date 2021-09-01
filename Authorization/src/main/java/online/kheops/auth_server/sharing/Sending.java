@@ -26,7 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeries;
 import static online.kheops.auth_server.album.Albums.*;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventSeriesBySeries;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventsByStudy;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
@@ -35,6 +38,8 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
+import static online.kheops.auth_server.webhook.WebhookQueries.deleteAllWebhookTriggerSeriesBySeries;
+import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
 
 public class Sending {
 
@@ -654,4 +659,38 @@ public class Sending {
         }
         return availableSeries;
     }
+
+    public static void permanentlydeleteStudy(final User user, final String studyInstanceUID) throws StudyNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+            final Study study = getStudy(studyInstanceUID, em);
+            final List<Series> series = findSeriesListByStudyUIDFromInbox(user, study.getStudyInstanceUID(), em);
+
+            deleteAllEventSeriesBySeries(series, em);
+            deleteAllEventsByStudy(study, em);
+
+            // TODO: Get list of WEBHOOK_TRIGGER_FK, then delete attemps, then trigger_series?
+            final List<WebhookTrigger> webhookTriggers = getWebhookTriggersBySeries(series, em);
+            deleteAllWebhookTriggerSeriesBySeries(series, em);
+            // TODO: Delete webhook_attempts
+            // TODO: Delete webhook_trigger_series
+            // Test webhook_triggers - done above
+
+            deleteAllAlbumSeriesBySeries(series, em);
+            deleteSeries(series, em);
+            em.remove(study);
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+
 }

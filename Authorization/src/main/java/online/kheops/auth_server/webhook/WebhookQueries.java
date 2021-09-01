@@ -1,8 +1,6 @@
 package online.kheops.auth_server.webhook;
 
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.Webhook;
-import online.kheops.auth_server.entity.WebhookTrigger;
+import online.kheops.auth_server.entity.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -84,6 +82,11 @@ public class WebhookQueries {
     }
 
 
+    public static List<WebhookTrigger> getWebhookTriggersBySeries(final List<Series> series, final EntityManager em) {
+        return em.createNamedQuery("Webhook.findAllBySeries", WebhookTrigger.class)
+                .setParameter(SERIES, series)
+                .getResultList();
+    }
 
     public static Long getNumberOfWebhooks(Album album, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbum", Long.class)
@@ -96,5 +99,13 @@ public class WebhookQueries {
                 .setParameter(ALBUM, album)
                 .setParameter(WEBHOOK_URL, url)
                 .getSingleResult();
+    }
+
+    public static void deleteAllWebhookTriggerSeriesBySeries(final List<Series> seriesToDelete, final EntityManager em) {
+        for (Series series : seriesToDelete) {
+            em.createNamedQuery("WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries")
+                    .setParameter(SERIES, series)
+                    .executeUpdate();
+        }
     }
 }

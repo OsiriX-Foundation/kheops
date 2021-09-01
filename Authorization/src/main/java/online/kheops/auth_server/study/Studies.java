@@ -30,14 +30,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeries;
 import static online.kheops.auth_server.album.Albums.getAlbum;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventSeriesBySeries;
+import static online.kheops.auth_server.event.EventQueries.deleteAllEventsByStudy;
 import static online.kheops.auth_server.series.Series.editSeriesFavorites;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
+import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
+import static online.kheops.auth_server.webhook.WebhookQueries.deleteAllWebhookTriggerSeriesBySeries;
+import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
 
 public class Studies {
 
