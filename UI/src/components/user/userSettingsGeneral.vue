@@ -14,7 +14,7 @@
               English
             </option>
             <option value="fr">
-              Fançais
+              Français
             </option>
           </select>
         </div>
