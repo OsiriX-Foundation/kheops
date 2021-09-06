@@ -397,33 +397,29 @@ public class SendingResource
 
             if (environmentAdminPassword.equals(adminPassword)) {
                 LOG.log(WARNING, "Admin access in here");
-//                deleteDataFromPacs(studyInstanceUID);
-                Sending.permanentlydeleteStudy(kheopsPrincipal.getUser(), studyInstanceUID);
+
+                // TODO: Delete from dcm4chee docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
+                final URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}").build(studyInstanceUID);
+
+                final Response upstreamResponse;
+                try {
+                    upstreamResponse = CLIENT.target(uri).request("application/dicom+json").delete();
+                } catch (ProcessingException e) {
+                    LOG.log(WARNING, "unable to reach upstream", e);
+                    return Response.status(BAD_GATEWAY).build();
+                }
+                if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+                    LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
+                    return Response.status(BAD_GATEWAY).build();
+                }
+
+                Sending.deleteStudy(kheopsPrincipal.getUser(), studyInstanceUID);
                 LOG.log(WARNING, "Finish admin access");
             }
         }
 
         Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
-    }
-
-    private void deleteDataFromPacs(final String studyInstanceUID) {
-        /*// TODO: Delete from dcm4chee docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
-//                Use QIDO resource ?
-        final URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}/series").build(studyInstanceUID);
-
-        Response upstreamResponse = null;
-        try {
-            upstreamResponse = CLIENT.target(uri).request("application/dicom+json").get();
-        } catch (ProcessingException e) {
-            LOG.log(WARNING, "unable to reach upstream", e);
-//            return Response.status(BAD_GATEWAY).build();
-        }
-        if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-            LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
-//            return Response.status(BAD_GATEWAY).build();
-        }*/
-
     }
 
     @DELETE

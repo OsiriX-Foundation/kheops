@@ -41,7 +41,7 @@ import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.STUDY_NOT_FOUND;
 import static online.kheops.auth_server.webhook.WebhookQueries.deleteAllWebhookTriggerSeriesBySeries;
-import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
+//import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
 
 public class Studies {
 

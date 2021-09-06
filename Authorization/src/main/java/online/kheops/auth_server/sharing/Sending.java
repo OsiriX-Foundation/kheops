@@ -1,5 +1,6 @@
 package online.kheops.auth_server.sharing;
 
+import liquibase.pro.packaged.I;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
@@ -22,10 +23,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.logging.Level.WARNING;
 import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeries;
 import static online.kheops.auth_server.album.Albums.*;
 import static online.kheops.auth_server.event.EventQueries.deleteAllEventSeriesBySeries;
@@ -39,7 +44,7 @@ import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
 import static online.kheops.auth_server.webhook.WebhookQueries.deleteAllWebhookTriggerSeriesBySeries;
-import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
+//import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
 
 public class Sending {
 
@@ -660,7 +665,7 @@ public class Sending {
         return availableSeries;
     }
 
-    public static void permanentlydeleteStudy(final User user, final String studyInstanceUID) throws StudyNotFoundException {
+    public static void deleteStudy(final User user, final String studyInstanceUID) throws StudyNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -674,8 +679,8 @@ public class Sending {
             deleteAllEventsByStudy(study, em);
 
             // TODO: Get list of WEBHOOK_TRIGGER_FK, then delete attemps, then trigger_series?
-            final List<WebhookTrigger> webhookTriggers = getWebhookTriggersBySeries(series, em);
-            deleteAllWebhookTriggerSeriesBySeries(series, em);
+//            final List<WebhookTrigger> webhookTriggers = getWebhookTriggersBySeries(series, em);
+//            deleteAllWebhookTriggerSeriesBySeries(series, em);
             // TODO: Delete webhook_attempts
             // TODO: Delete webhook_trigger_series
             // Test webhook_triggers - done above
@@ -693,4 +698,11 @@ public class Sending {
         }
     }
 
-}
+    public static void deleteStudyFromPacs(final String studyInstanceUID) throws StudyNotFoundException, ProcessingException {
+
+
+
+    }
+
+
+    }

@@ -82,11 +82,11 @@ public class WebhookQueries {
     }
 
 
-    public static List<WebhookTrigger> getWebhookTriggersBySeries(final List<Series> series, final EntityManager em) {
+    /*public static List<WebhookTrigger> getWebhookTriggersBySeries(final List<Series> series, final EntityManager em) {
         return em.createNamedQuery("Webhook.findAllBySeries", WebhookTrigger.class)
                 .setParameter(SERIES, series)
                 .getResultList();
-    }
+    }*/
 
     public static Long getNumberOfWebhooks(Album album, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbum", Long.class)
