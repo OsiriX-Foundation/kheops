@@ -1,9 +1,9 @@
 plugins {
     id "org.sonarqube" version "3.0"
+    id "org.gretty" version "3.0.6"
 }
 
 apply plugin: 'java-library'
-apply from: 'https://raw.github.com/gretty-gradle-plugin/gretty/master/pluginScripts/gretty.plugin'
 apply plugin: 'war'
 
 repositories {
