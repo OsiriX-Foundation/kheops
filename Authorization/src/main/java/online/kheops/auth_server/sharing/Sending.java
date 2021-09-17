@@ -671,7 +671,7 @@ public class Sending {
         try {
             tx.begin();
             final Study study = getStudy(studyInstanceUID, em);
-            final List<Series> series = findSeriesListByStudyUIDFromAlbumAndInbox(user, study.getStudyInstanceUID(), em);
+            final List<Series> series = findSeriesListByStudyUID(study.getStudyInstanceUID(), em);
 
             deleteAllEventSeriesBySeriesList(series, em);
 

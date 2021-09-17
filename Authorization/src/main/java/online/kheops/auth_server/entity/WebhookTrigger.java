@@ -16,7 +16,7 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "WebhookTrigger.countAllByWebhookPk",
                 query = "SELECT count(wt) FROM Webhook w JOIN w.webhookTriggers wt WHERE :"+WEBHOOK_PK+" = w.pk"),
         @NamedQuery(name = "WebhookTrigger.GetAllByWebhookPk",
-                query = "SELECT wt FROM Webhook w JOIN w.webhookTriggers wt WHERE :"+WEBHOOK_PK+" = w.pk ORDER BY wt.pk desc"),
+                query = "SELECT wt FROM Webhook w JOIN w.webhookTriggers wt WHERE :"+WEBHOOK_PK+" = w.pk ORDER BY wt.pk desc")
 //        @NamedQuery(name = "WebhookTrigger.deleteAllWebhookTriggersByWebhookPk",
 //                query = "DELETE FROM Webhook w WHERE w.pk = :"+WEBHOOK_PK)
 })

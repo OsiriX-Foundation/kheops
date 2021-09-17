@@ -389,9 +389,9 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
+        Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         Sending.permanentDeleteStudy(request.getHeader("adminPassword"), studyInstanceUID, context, kheopsPrincipal);
 
-        Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -435,9 +435,9 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
+        Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         Sending.permanentDeleteSeries(request.getHeader("adminPassword"), studyInstanceUID, seriesInstanceUID, kheopsPrincipal);
 
-        Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -607,9 +607,9 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
+        Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         Sending.permanentDeleteStudy(request.getHeader("adminPassword"), studyInstanceUID, context, kheopsPrincipal);
 
-        Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 
@@ -626,9 +626,9 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
+        Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         Sending.permanentDeleteSeries(request.getHeader("adminPassword"), studyInstanceUID, seriesInstanceUID, kheopsPrincipal);
 
-        Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
 

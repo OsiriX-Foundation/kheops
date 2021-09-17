@@ -6,7 +6,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 @NamedQueries({
         @NamedQuery(name = "WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries",
-                query = "DELETE FROM WebhookTriggerSeries wt WHERE wt.series = :"+SERIES)
+                query = "DELETE FROM WebhookTriggerSeries wt WHERE wt.series = :"+SERIES),
+        @NamedQuery(name = "WebhookTriggerSeries.findAllBySeries",
+                query = "SELECT webhookTrigger FROM WebhookTriggerSeries wts WHERE :"+SERIES+" = wts.series"),
 })
 
 @Entity

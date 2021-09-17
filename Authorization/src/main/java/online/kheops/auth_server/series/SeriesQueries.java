@@ -42,6 +42,12 @@ public class SeriesQueries {
         return query.getResultList();
     }
 
+    public static List<Series> findSeriesListByStudyUID(String studyInstanceUID, EntityManager em) {
+        TypedQuery<Series> query = em.createNamedQuery("Series.findSeriesByStudyUID", Series.class);
+        query.setParameter(STUDY_UID,studyInstanceUID);
+        return query.getResultList();
+    }
+
     public static Series findSeriesByStudyUIDandSeriesUIDFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em)
             throws SeriesNotFoundException {
 

@@ -4,6 +4,7 @@ import online.kheops.auth_server.entity.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
@@ -82,14 +83,19 @@ public class WebhookQueries {
     }
 
 
-    public static List<WebhookTrigger> getWebhookTriggersBySeriesList(final List<Series> series, final EntityManager em) {
-        return em.createNamedQuery("Webhook.findAllBySeries", WebhookTrigger.class)
-                .setParameter(SERIES, series)
-                .getResultList();
+    public static List<WebhookTrigger> getWebhookTriggersBySeriesList(final List<Series> seriesList, final EntityManager em) {
+        List<WebhookTrigger> webhookTriggerList = new ArrayList<>();
+        for (Series series : seriesList) {
+            webhookTriggerList.addAll(em.createNamedQuery("WebhookTriggerSeries.findAllBySeries", WebhookTrigger.class)
+                    .setParameter(SERIES, series)
+                    .getResultList());
+        }
+
+        return webhookTriggerList;
     }
 
     public static List<WebhookTrigger> getWebhookTriggersBySeries(final Series series, final EntityManager em) {
-        return em.createNamedQuery("Webhook.findAllBySeries", WebhookTrigger.class)
+        return em.createNamedQuery("WebhookTriggerSeries.findAllBySeries", WebhookTrigger.class)
                 .setParameter(SERIES, series)
                 .getResultList();
     }
@@ -131,11 +137,7 @@ public class WebhookQueries {
 
     public static void deleteAllWebHookTriggersByWebhookPk(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
         for (WebhookTrigger webhookTrigger : webhookTriggers) {
-//            em.createNamedQuery("WebhookTrigger.deleteAllWebhookTriggersByWebhookPk")
-//                    .setParameter(WEBHOOK_PK, webhookTrigger.getWebhook().getPk())
-//                    .executeUpdate();
             em.remove(webhookTrigger.getWebhook());
         }
     }
-
 }

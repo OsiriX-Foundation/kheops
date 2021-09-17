@@ -36,6 +36,8 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
                 query = "SELECT s FROM Series s WHERE s.seriesInstanceUID = :"+SERIES_UID),
         @NamedQuery(name = "Series.findSeriesUIDByStudyUID",
                 query = "SELECT s.seriesInstanceUID FROM Series s WHERE s.study.studyInstanceUID = :"+STUDY_UID),
+        @NamedQuery(name = "Series.findSeriesByStudyUID",
+                query = "SELECT s FROM Series s WHERE s.study.studyInstanceUID = :"+STUDY_UID),
         @NamedQuery(name = "Series.findBySeriesFromInbox",
                 query = "SELECT s FROM User u JOIN u.albumUser au JOIN au.album a JOIN a.albumSeries alS JOIN alS.series s WHERE u=:"+USER+" AND s = :"+SERIES+" AND a = u.inbox"),
         @NamedQuery(name = "Series.isOrphan",
