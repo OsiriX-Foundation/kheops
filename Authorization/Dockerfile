@@ -17,4 +17,4 @@ COPY --from=build /home/gradle/authorization/build/libs/authorization.war /usr/l
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
 COPY logging.properties /usr/local/tomcat/conf/logging.properties
 COPY context.xml /usr/local/tomcat/conf/context.xml
-RUN sed -i '/\/Host/i\\t<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" />' /usr/local/tomcat/conf/server.xml
+RUN #sed -i '/\/Host/i\\t<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" />' /usr/local/tomcat/conf/server.xml

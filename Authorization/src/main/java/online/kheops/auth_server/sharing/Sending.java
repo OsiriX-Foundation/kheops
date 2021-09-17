@@ -798,7 +798,7 @@ public class Sending {
     }
 
 
-        private static URI getDicomWebURI(final ServletContext context) {
+    private static URI getDicomWebURI(final ServletContext context) {
         try {
             return new URI(context.getInitParameter("online.kheops.pacs.uri"));
         } catch (URISyntaxException e) {
