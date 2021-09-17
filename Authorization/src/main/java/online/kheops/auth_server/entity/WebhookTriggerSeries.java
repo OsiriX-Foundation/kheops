@@ -3,7 +3,6 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
-import static online.kheops.auth_server.util.JPANamedQueryConstants.WEBHOOK_PK;
 
 @NamedQueries({
         @NamedQuery(name = "WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries",

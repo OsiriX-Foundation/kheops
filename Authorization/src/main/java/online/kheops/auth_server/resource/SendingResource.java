@@ -1,6 +1,7 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.NotAlbumScopeTypeException;
+import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.io.IOException;
 import java.net.URI;
@@ -357,9 +359,6 @@ public class SendingResource
                                          @Context HttpServletResponse response)
             throws AlbumNotFoundException, SeriesNotFoundException, StudyNotFoundException {
 
-        // Sanitize this? Or not needed
-        final String adminPassword = request.getHeader("adminPassword");
-
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
         if (kheopsPrincipal.getScope() == ScopeType.ALBUM) {
@@ -390,33 +389,7 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        // Permanently delete here
-        if ( adminPassword != null) {
-            LOG.log(WARNING, "Admin password != null");
-            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
-
-            if (environmentAdminPassword.equals(adminPassword)) {
-                LOG.log(WARNING, "Admin access in here");
-
-                // TODO: Delete from dcm4chee docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
-                final URI uri = UriBuilder.fromUri(getDicomWebURI()).path("studies/{StudyInstanceUID}").build(studyInstanceUID);
-
-                final Response upstreamResponse;
-                try {
-                    upstreamResponse = CLIENT.target(uri).request("application/dicom+json").delete();
-                } catch (ProcessingException e) {
-                    LOG.log(WARNING, "unable to reach upstream", e);
-                    return Response.status(BAD_GATEWAY).build();
-                }
-                if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-                    LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
-                    return Response.status(BAD_GATEWAY).build();
-                }
-
-                Sending.deleteStudy(kheopsPrincipal.getUser(), studyInstanceUID);
-                LOG.log(WARNING, "Finish admin access");
-            }
-        }
+        Sending.permanentDeleteStudy(request.getHeader("adminPassword"), studyInstanceUID, context, kheopsPrincipal);
 
         Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
@@ -462,9 +435,13 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
+        Sending.permanentDeleteSeries(request.getHeader("adminPassword"), studyInstanceUID, seriesInstanceUID, kheopsPrincipal);
+
         Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
     }
+
+
 
     @PUT
     @Secured
@@ -624,10 +601,13 @@ public class SendingResource
     @AlbumPermissionSecured(permission = DELETE_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteStudyFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                         @Context HttpServletRequest request,
                                          @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID)
-            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
+            throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException, StudyNotFoundException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
+
+        Sending.permanentDeleteStudy(request.getHeader("adminPassword"), studyInstanceUID, context, kheopsPrincipal);
 
         Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
@@ -639,11 +619,14 @@ public class SendingResource
     @AlbumPermissionSecured(permission = DELETE_SERIES, context = PATH_PARAM)
     @Path("studies/{StudyInstanceUID:([0-9]+[.])*[0-9]+}/series/{SeriesInstanceUID:([0-9]+[.])*[0-9]+}/albums/{"+ALBUM+":"+AlbumId.ID_PATTERN+"}")
     public Response deleteSeriesFromAlbum(@SuppressWarnings("RSReferenceInspection") @PathParam(ALBUM) String albumId,
+                                          @Context HttpServletRequest request,
                                           @PathParam(STUDY_INSTANCE_UID) @UIDValidator String studyInstanceUID,
                                           @PathParam(SERIES_INSTANCE_UID) @UIDValidator String seriesInstanceUID)
             throws AlbumNotFoundException, SeriesNotFoundException, UserNotMemberException {
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
+
+        Sending.permanentDeleteSeries(request.getHeader("adminPassword"), studyInstanceUID, seriesInstanceUID, kheopsPrincipal);
 
         Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         return Response.status(NO_CONTENT).build();
@@ -661,13 +644,5 @@ public class SendingResource
         final User user = getUser(accessToken.getSubject());
 
         return accessToken.newPrincipal(context, user);
-    }
-
-    private URI getDicomWebURI() {
-        try {
-            return new URI(context.getInitParameter("online.kheops.pacs.uri"));
-        } catch (URISyntaxException e) {
-            throw new IllegalStateException("online.kheops.pacs.uri is not a valid URI", e);
-        }
     }
 }

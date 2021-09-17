@@ -374,11 +374,17 @@ public class AlbumQueries {
 
     }
 
-    public static void deleteAllAlbumSeriesBySeries(final List<Series> seriesToDelete, final EntityManager em) {
+    public static void deleteAllAlbumSeriesBySeriesList(final List<Series> seriesToDelete, final EntityManager em) {
         for (Series series : seriesToDelete) {
             em.createNamedQuery("AlbumSeries.deleteAllBySeries")
                     .setParameter(SERIES, series)
                     .executeUpdate();
         }
     }
+
+    public static void deleteAllAlbumSeriesBySeries(final Series seriesToDelete, final EntityManager em) {
+        em.createNamedQuery("AlbumSeries.deleteAllBySeries")
+                .setParameter(SERIES, seriesToDelete)
+                .executeUpdate();
+        }
 }

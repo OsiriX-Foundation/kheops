@@ -82,11 +82,17 @@ public class WebhookQueries {
     }
 
 
-    /*public static List<WebhookTrigger> getWebhookTriggersBySeries(final List<Series> series, final EntityManager em) {
+    public static List<WebhookTrigger> getWebhookTriggersBySeriesList(final List<Series> series, final EntityManager em) {
         return em.createNamedQuery("Webhook.findAllBySeries", WebhookTrigger.class)
                 .setParameter(SERIES, series)
                 .getResultList();
-    }*/
+    }
+
+    public static List<WebhookTrigger> getWebhookTriggersBySeries(final Series series, final EntityManager em) {
+        return em.createNamedQuery("Webhook.findAllBySeries", WebhookTrigger.class)
+                .setParameter(SERIES, series)
+                .getResultList();
+    }
 
     public static Long getNumberOfWebhooks(Album album, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbum", Long.class)
@@ -101,11 +107,35 @@ public class WebhookQueries {
                 .getSingleResult();
     }
 
-    public static void deleteAllWebhookTriggerSeriesBySeries(final List<Series> seriesToDelete, final EntityManager em) {
+    public static void deleteAllWebhookTriggerSeriesBySeriesList(final List<Series> seriesToDelete, final EntityManager em) {
         for (Series series : seriesToDelete) {
             em.createNamedQuery("WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries")
                     .setParameter(SERIES, series)
                     .executeUpdate();
         }
     }
+
+    public static void deleteAllWebhookTriggerSeriesBySeriesList(final Series seriesToDelete, final EntityManager em) {
+        em.createNamedQuery("WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries")
+                .setParameter(SERIES, seriesToDelete)
+                .executeUpdate();
+    }
+
+    public static void deleteAllWebHookAttemptsByWebhookTriggers(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
+        for (WebhookTrigger webhookTrigger : webhookTriggers) {
+            em.createNamedQuery("WebhookAttempt.deleteAllWebhookAttemptsByWebhookTrigger")
+                    .setParameter(WEBHOOK_TRIGGER_ID, webhookTrigger)
+                    .executeUpdate();
+        }
+    }
+
+    public static void deleteAllWebHookTriggersByWebhookPk(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
+        for (WebhookTrigger webhookTrigger : webhookTriggers) {
+//            em.createNamedQuery("WebhookTrigger.deleteAllWebhookTriggersByWebhookPk")
+//                    .setParameter(WEBHOOK_PK, webhookTrigger.getWebhook().getPk())
+//                    .executeUpdate();
+            em.remove(webhookTrigger.getWebhook());
+        }
+    }
+
 }

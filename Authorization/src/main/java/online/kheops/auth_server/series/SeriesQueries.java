@@ -257,7 +257,7 @@ public class SeriesQueries {
         }
     }
 
-    public static void deleteSeries(final List<Series> seriesToDelete, final EntityManager em) {
+    public static void deleteSeriesList(final List<Series> seriesToDelete, final EntityManager em) {
         for (Series series : seriesToDelete) {
             em.remove(series);
         }

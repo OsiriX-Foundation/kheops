@@ -144,12 +144,18 @@ public class EventQueries {
 
     }
 
-    public static void deleteAllEventSeriesBySeries(final List<Series> seriesToDelete, final EntityManager em) {
+    public static void deleteAllEventSeriesBySeriesList(final List<Series> seriesToDelete, final EntityManager em) {
         for(Series series : seriesToDelete) {
             em.createNamedQuery("Event.deleteAllEventSeriesBySeries")
                     .setParameter(SERIES, series)
                     .executeUpdate();
         }
+    }
+
+    public static void deleteAllEventSeriesBySeries(final Series seriesToDelete, final EntityManager em) {
+        em.createNamedQuery("Event.deleteAllEventSeriesBySeries")
+                .setParameter(SERIES, seriesToDelete)
+                .executeUpdate();
     }
 
     public static void deleteAllEventsByStudy(Study study, EntityManager em) {

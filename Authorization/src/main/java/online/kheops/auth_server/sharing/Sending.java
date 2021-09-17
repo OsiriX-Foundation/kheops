@@ -1,6 +1,5 @@
 package online.kheops.auth_server.sharing;
 
-import liquibase.pro.packaged.I;
 import online.kheops.auth_server.EntityManagerListener;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
@@ -24,17 +23,17 @@ import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.logging.Level.WARNING;
 import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeries;
+import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeriesList;
 import static online.kheops.auth_server.album.Albums.*;
-import static online.kheops.auth_server.event.EventQueries.deleteAllEventSeriesBySeries;
-import static online.kheops.auth_server.event.EventQueries.deleteAllEventsByStudy;
+import static online.kheops.auth_server.event.EventQueries.*;
 import static online.kheops.auth_server.report_provider.ReportProviderQueries.getReportProviderWithClientId;
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
@@ -43,8 +42,7 @@ import static online.kheops.auth_server.study.Studies.getStudy;
 import static online.kheops.auth_server.user.Users.getUser;
 import static online.kheops.auth_server.util.Consts.HOST_ROOT_PARAMETER;
 import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FOUND;
-import static online.kheops.auth_server.webhook.WebhookQueries.deleteAllWebhookTriggerSeriesBySeries;
-//import static online.kheops.auth_server.webhook.WebhookQueries.getWebhookTriggersBySeries;
+import static online.kheops.auth_server.webhook.WebhookQueries.*;
 
 public class Sending {
 
@@ -73,7 +71,7 @@ public class Sending {
                 throw new SeriesNotFoundException(errorResponse);
             }
 
-            for (final Series series: seriesList) {
+            for (final Series series : seriesList) {
                 callingUser.getInbox().removeSeries(series, em);
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
             }
@@ -161,7 +159,7 @@ public class Sending {
             removeSeriesWebhookBuilder.isAdmin(callingAlbumUser.isAdmin());
 
             removeSeriesWebhookBuilder.study(study);
-            for(Series series : availableSeries) {
+            for (Series series : availableSeries) {
                 callingAlbum.removeSeries(series, em);
                 removeSeriesWebhookBuilder.addSeries(series);
                 kheopsLogBuilder.series(series.getSeriesInstanceUID());
@@ -317,7 +315,7 @@ public class Sending {
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
             delayedWebhook.addWebhookData(availableSeries.getStudy(), availableSeries, targetAlbum, false,
-                     0, source, true, true);
+                    0, source, true, true);
 
             tx.commit();
         } finally {
@@ -348,12 +346,12 @@ public class Sending {
             final List<Series> seriesListEvent = new ArrayList<>();
 
             boolean allSeriesAlreadyExist = true;
-            for (Series series: availableSeries) {
+            for (Series series : availableSeries) {
                 if (!targetAlbum.containsSeries(series, em)) {
                     final AlbumSeries albumSeries = new AlbumSeries(targetAlbum, series);
                     em.persist(albumSeries);
                     allSeriesAlreadyExist = false;
-                    if(series.isPopulated() && series.getStudy().isPopulated()) {
+                    if (series.isPopulated() && series.getStudy().isPopulated()) {
                         seriesListWebhook.add(series);
                     }
                     seriesListEvent.add(series);
@@ -362,7 +360,7 @@ public class Sending {
             }
 
             if (allSeriesAlreadyExist) {
-                if(fromAlbumId != null) {
+                if (fromAlbumId != null) {
                     kheopsLogBuilder.fromAlbum(fromAlbumId);
                 } else {
                     kheopsLogBuilder.fromAlbum("inbox");
@@ -386,7 +384,7 @@ public class Sending {
 
             targetAlbum.updateLastEventTime();
 
-            if(fromAlbumId != null) {
+            if (fromAlbumId != null) {
                 kheopsLogBuilder.fromAlbum(fromAlbumId);
             } else {
                 kheopsLogBuilder.fromAlbum("inbox");
@@ -400,7 +398,7 @@ public class Sending {
             final Source source = new Source(kheopsPrincipal.getUser());
             kheopsPrincipal.getCapability().ifPresent(source::setCapabilityToken);
             kheopsPrincipal.getClientId().ifPresent(clienrtId -> source.setReportProviderClientId(getReportProviderWithClientId(clienrtId, em)));
-            for(Series s : seriesListWebhook) {
+            for (Series s : seriesListWebhook) {
                 delayedWebhook.addWebhookData(s.getStudy(), s, targetAlbum, false,
                         0, source, true, true);
             }
@@ -425,7 +423,7 @@ public class Sending {
             final User targetUser = getUser(targetUsername, em);
 
             if (callingUser == targetUser) {
-                if(fromAlbumId != null) {
+                if (fromAlbumId != null) {
                     appropriateStudy(callingUser, studyInstanceUID, fromAlbumId, kheopsLogBuilder);
                     return;
                 }
@@ -444,7 +442,7 @@ public class Sending {
             }
 
             tx.commit();
-            if(fromAlbumId != null) {
+            if (fromAlbumId != null) {
                 kheopsLogBuilder.fromAlbum(fromAlbumId);
             } else {
                 kheopsLogBuilder.fromAlbum("inbox");
@@ -485,7 +483,7 @@ public class Sending {
 
             final Series series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             final Album inbox = targetUser.getInbox();
-            if(inbox.containsSeries(series, em)) {
+            if (inbox.containsSeries(series, em)) {
                 //target user has already access to the series
 
                 kheopsLogBuilder.log();
@@ -562,7 +560,7 @@ public class Sending {
 
             final Series storedSeries = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-            if(isSeriesInInbox(callingUser, storedSeries, em)) {
+            if (isSeriesInInbox(callingUser, storedSeries, em)) {
                 kheopsLogBuilder.log();
                 return;
             }
@@ -598,7 +596,7 @@ public class Sending {
             final List<Series> seriesLst = findSeriesListByStudyUIDFromAlbum(album, studyInstanceUID, em);
 
             for (Series series : seriesLst) {
-                if(!inbox.containsSeries(series, em)) {
+                if (!inbox.containsSeries(series, em)) {
                     final AlbumSeries inboxSeries = new AlbumSeries(inbox, series);
                     em.persist(inboxSeries);
                 }
@@ -642,8 +640,8 @@ public class Sending {
         return availableSeriesUIDs;
     }
 
-    public static  List<Series> getSeriesList(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, EntityManager em)
-            throws AlbumNotFoundException , SeriesNotFoundException{
+    public static List<Series> getSeriesList(User callingUser, String studyInstanceUID, String fromAlbumId, Boolean fromInbox, EntityManager em)
+            throws AlbumNotFoundException, SeriesNotFoundException {
         final List<Series> availableSeries;
 
         if (fromAlbumId != null) {
@@ -665,7 +663,7 @@ public class Sending {
         return availableSeries;
     }
 
-    public static void deleteStudy(final User user, final String studyInstanceUID) throws StudyNotFoundException {
+    public static void deleteStudyFromKheops(final User user, final String studyInstanceUID) throws StudyNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -673,20 +671,20 @@ public class Sending {
         try {
             tx.begin();
             final Study study = getStudy(studyInstanceUID, em);
-            final List<Series> series = findSeriesListByStudyUIDFromInbox(user, study.getStudyInstanceUID(), em);
+            final List<Series> series = findSeriesListByStudyUIDFromAlbumAndInbox(user, study.getStudyInstanceUID(), em);
 
-            deleteAllEventSeriesBySeries(series, em);
+            deleteAllEventSeriesBySeriesList(series, em);
+
+            final List<WebhookTrigger> webhookTriggers = getWebhookTriggersBySeriesList(series, em);
+
+            deleteAllWebHookAttemptsByWebhookTriggers(webhookTriggers, em);
+            deleteAllWebhookTriggerSeriesBySeriesList(series, em);
+            deleteAllWebHookTriggersByWebhookPk(webhookTriggers, em);
+
+            deleteAllAlbumSeriesBySeriesList(series, em);
+            deleteSeriesList(series, em);
+
             deleteAllEventsByStudy(study, em);
-
-            // TODO: Get list of WEBHOOK_TRIGGER_FK, then delete attemps, then trigger_series?
-//            final List<WebhookTrigger> webhookTriggers = getWebhookTriggersBySeries(series, em);
-//            deleteAllWebhookTriggerSeriesBySeries(series, em);
-            // TODO: Delete webhook_attempts
-            // TODO: Delete webhook_trigger_series
-            // Test webhook_triggers - done above
-
-            deleteAllAlbumSeriesBySeries(series, em);
-            deleteSeries(series, em);
             em.remove(study);
 
             tx.commit();
@@ -698,11 +696,113 @@ public class Sending {
         }
     }
 
+    public static void permanentDeleteStudy(final String adminPassword, final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal)
+            throws StudyNotFoundException {
+        if (adminPassword != null) {
+            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
+
+            if (environmentAdminPassword.equals(adminPassword)) {
+                deleteStudyFromKheops(kheopsPrincipal.getUser(), studyInstanceUID);
+                deleteStudyFromPacs(studyInstanceUID);
+            }
+        }
+    }
+
     public static void deleteStudyFromPacs(final String studyInstanceUID) throws StudyNotFoundException, ProcessingException {
+        // TODO: Delete from dcm4chee docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
 
+        final Response upstreamResponse;
+        final Response upstreamResponse1;
 
+        /*final URI uri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject/113039%5EDCM").build(studyInstanceUID);
+        String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
+                .withStudyUID(studyInstanceUID)
+                .withAllSeries()
+                .withSubject(kheopsPrincipal.getUser().getSub())
+                .build();
+
+        // Delete from PACS
+                try {
+                    upstreamResponse = ClientBuilder.newClient().target(uri).request().header("Authorization", "Bearer " + authToken).post(null);
+                } catch (ProcessingException e) {
+                    LOG.log(WARNING, "unable to reach upstream", e);
+                    return Response.status(BAD_GATEWAY).build();
+                }
+
+                if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+                    LOG.log(WARNING, "uri " + uri);
+                    LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
+                    return Response.status(BAD_GATEWAY).build();
+                }
+
+                final URI uri1 = UriBuilder.fromUri(getDicomWebURI()).path("/reject/113039%5EDCM").build(studyInstanceUID);
+
+                try {
+                    upstreamResponse1 = ClientBuilder.newClient().target(uri1).request().header("Authorization", "Bearer " + authToken).delete();
+                } catch (ProcessingException e) {
+                    LOG.log(WARNING, "unable to reach upstream", e);
+                    return Response.status(BAD_GATEWAY).build();
+                }
+
+                if (upstreamResponse1.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+                    LOG.log(WARNING, "uri " + uri);
+                    LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse1.getStatus() + "\n" + upstreamResponse1);
+                    return Response.status(BAD_GATEWAY).build();
+                }*/
+
+    }
+
+    public static void permanentDeleteSeries(final String adminPassword, final String studyInstanceUID,
+                                       final String seriesInstanceUID, final KheopsPrincipal kheopsPrincipal) throws SeriesNotFoundException {
+        if (adminPassword != null) {
+            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
+
+            if (environmentAdminPassword.equals(adminPassword)) {
+                deleteSeriesFromKheops(kheopsPrincipal.getUser(), seriesInstanceUID);
+                deleteSeriesFromPacs(seriesInstanceUID);
+            }
+        }
+    }
+
+    public static void deleteSeriesFromKheops(final User user, final String seriesInstanceUID) throws SeriesNotFoundException {
+
+        final EntityManager em = EntityManagerListener.createEntityManager();
+        final EntityTransaction tx = em.getTransaction();
+
+        try {
+            tx.begin();
+            final Series series = getSeries(seriesInstanceUID, em);
+
+            deleteAllEventSeriesBySeries(series, em);
+
+            final List<WebhookTrigger> webhookTriggers = getWebhookTriggersBySeries(series, em);
+
+            deleteAllWebHookAttemptsByWebhookTriggers(webhookTriggers, em);
+            deleteAllWebhookTriggerSeriesBySeriesList(series, em);
+            deleteAllWebHookTriggersByWebhookPk(webhookTriggers, em);
+
+            deleteAllAlbumSeriesBySeries(series, em);
+            em.remove(series);
+
+            tx.commit();
+        } finally {
+            if (tx.isActive()) {
+                tx.rollback();
+            }
+            em.close();
+        }
+    }
+
+    public static void deleteSeriesFromPacs(final String seriesInstanceUID) {
 
     }
 
 
+        private static URI getDicomWebURI(final ServletContext context) {
+        try {
+            return new URI(context.getInitParameter("online.kheops.pacs.uri"));
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("online.kheops.pacs.uri is not a valid URI", e);
+        }
     }
+}
