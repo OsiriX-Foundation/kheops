@@ -3,12 +3,9 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-import static online.kheops.auth_server.util.JPANamedQueryConstants.SERIES;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.WEBHOOK_TRIGGER_ID;
 
 @NamedQueries({
-        @NamedQuery(name = "WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries",
-                query = "DELETE FROM WebhookTriggerSeries wt WHERE wt.series = :"+SERIES),
         @NamedQuery(name = "WebhookAttempt.deleteAllWebhookAttemptsByWebhookTrigger",
                 query = "DELETE FROM WebhookAttempt wt WHERE wt.webhookTrigger = :"+WEBHOOK_TRIGGER_ID)
 })
