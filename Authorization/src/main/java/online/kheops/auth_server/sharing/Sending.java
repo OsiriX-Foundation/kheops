@@ -671,7 +671,7 @@ public class Sending {
         return availableSeries;
     }
 
-    public static void deleteStudyFromKheops(final String studyInstanceUID, final User user) throws StudyNotFoundException {
+    public static void deleteStudyFromKheops(final String studyInstanceUID) throws StudyNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -710,59 +710,23 @@ public class Sending {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
-                deleteStudyFromKheops(studyInstanceUID, kheopsPrincipal.getUser());
+                deleteStudyFromKheops(studyInstanceUID);
                 deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
             }
         }
     }
 
-    public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException, ProcessingException {
-        final Response upstreamResponse;
-
+    public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws ProcessingException {
         final URI postUri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject").build(studyInstanceUID);
-        String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
+        final String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
-
-            try {
-                upstreamResponse = ClientBuilder.newClient().target(postUri).request().header("Authorization", "Bearer " + authToken).post(null);
-            } catch (ProcessingException e) {
-                // TODO: Change with
-//                kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
-//                        .album("inbox")
-//                        .study(studyInstanceUID)
-//                        .series(seriesInstanceUID)
-//                        .log();
-                LOG.log(WARNING, "unable to reach upstream", e);
-                return Response.status(BAD_GATEWAY).build();
-            }
-
-            if (upstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-                LOG.log(WARNING, "uri " + postUri);
-                LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
-                return Response.status(BAD_GATEWAY).build();
-            }
-
-        final URI deleteUri = UriBuilder.fromUri(getDicomWebURI(context)).path("/reject").build(studyInstanceUID);
-        final Response upstreamResponse1;
-
-            try {
-                upstreamResponse1 = ClientBuilder.newClient().target(deleteUri).request().header("Authorization", "Bearer " + authToken).delete();
-            } catch (ProcessingException e) {
-                LOG.log(WARNING, "unable to reach upstream", e);
-                return Response.status(BAD_GATEWAY).build();
-            }
-
-            if (upstreamResponse1.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-                LOG.log(WARNING, "uri " + deleteUri);
-                LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse1.getStatus() + "\n" + upstreamResponse1);
-                return Response.status(BAD_GATEWAY).build();
-            }
-
         // TODO: return upstreamResponse or upstreamResponse1 ?
-        return upstreamResponse1;
+
+        postDataToPacs(postUri , authToken);
+        return rejectDataFromPacs(context, authToken);
     }
 
     public static void permanentDeleteSeries(final String adminPassword, final String studyInstanceUID,
@@ -771,13 +735,13 @@ public class Sending {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
-                deleteSeriesFromKheops(kheopsPrincipal.getUser(), seriesInstanceUID);
-                deleteSeriesFromPacs(seriesInstanceUID, context, kheopsPrincipal);
+                deleteSeriesFromKheops(seriesInstanceUID);
+                deleteSeriesFromPacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
             }
         }
     }
 
-    public static void deleteSeriesFromKheops(final User user, final String seriesInstanceUID) throws SeriesNotFoundException {
+    public static void deleteSeriesFromKheops(final String seriesInstanceUID) throws SeriesNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -806,10 +770,57 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromPacs(final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) {
+    public static Response deleteSeriesFromPacs(final String studyInstanceUID, final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) {
+        final URI postUri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/reject").build(studyInstanceUID, seriesInstanceUID);
+        final String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
+                .withStudyUID(studyInstanceUID)
+                .withSeriesUID(seriesInstanceUID)
+                .withSubject(kheopsPrincipal.getUser().getSub())
+                .build();
 
+        // TODO: return upstreamResponse or upstreamResponse1 ?
+        postDataToPacs(postUri , authToken);
+        return rejectDataFromPacs(context, authToken);
     }
 
+    private static Response postDataToPacs(final URI postUri, final String authToken) {
+        final Response postUpstreamResponse;
+
+        try {
+            postUpstreamResponse = ClientBuilder.newClient().target(postUri).request().header("Authorization", "Bearer " + authToken).post(null);
+        } catch (ProcessingException e) {
+            LOG.log(WARNING, "unable to reach upstream", e);
+            return Response.status(BAD_GATEWAY).build();
+        }
+
+        if (postUpstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+            LOG.log(WARNING, "uri " + postUri);
+            LOG.log(WARNING, () -> "bad response from upstream status = " + postUpstreamResponse.getStatus() + "\n" + postUpstreamResponse);
+            return Response.status(BAD_GATEWAY).build();
+        }
+        return postUpstreamResponse;
+    }
+
+    private static Response rejectDataFromPacs(final ServletContext context, final String authToken) {
+
+        final URI deleteUri = UriBuilder.fromUri(getDicomWebURI(context)).path("/reject").build();
+        final Response deleteUpstreamResponse;
+
+        try {
+            deleteUpstreamResponse = ClientBuilder.newClient().target(deleteUri).request().header("Authorization", "Bearer " + authToken).delete();
+        } catch (ProcessingException e) {
+            LOG.log(WARNING, "unable to reach upstream", e);
+            return Response.status(BAD_GATEWAY).build();
+        }
+
+        if (deleteUpstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+            LOG.log(WARNING, "uri " + deleteUri);
+            LOG.log(WARNING, () -> "bad response from upstream status = " + deleteUpstreamResponse.getStatus() + "\n" + deleteUpstreamResponse);
+            return Response.status(BAD_GATEWAY).build();
+        }
+
+        return deleteUpstreamResponse;
+    }
 
     private static URI getDicomWebURI(final ServletContext context) {
         try {
