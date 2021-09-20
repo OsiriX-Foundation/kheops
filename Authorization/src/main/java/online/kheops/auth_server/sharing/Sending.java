@@ -1,6 +1,7 @@
 package online.kheops.auth_server.sharing;
 
 import online.kheops.auth_server.EntityManagerListener;
+import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.album.AlbumNotFoundException;
 import online.kheops.auth_server.album.UserNotMemberException;
 import online.kheops.auth_server.capability.ScopeType;
@@ -23,13 +24,18 @@ import javax.persistence.EntityTransaction;
 import javax.servlet.ServletContext;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import static java.util.logging.Level.WARNING;
+import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeries;
 import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeriesList;
 import static online.kheops.auth_server.album.Albums.*;
@@ -45,6 +51,8 @@ import static online.kheops.auth_server.util.ErrorResponse.Message.SERIES_NOT_FO
 import static online.kheops.auth_server.webhook.WebhookQueries.*;
 
 public class Sending {
+
+    private static final Logger LOG = Logger.getLogger(Sending.class.getName());
 
     private Sending() {
         throw new IllegalStateException("Utility class");
@@ -663,7 +671,7 @@ public class Sending {
         return availableSeries;
     }
 
-    public static void deleteStudyFromKheops(final User user, final String studyInstanceUID) throws StudyNotFoundException {
+    public static void deleteStudyFromKheops(final String studyInstanceUID, final User user) throws StudyNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
@@ -702,19 +710,18 @@ public class Sending {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
-                deleteStudyFromKheops(kheopsPrincipal.getUser(), studyInstanceUID);
-                deleteStudyFromPacs(studyInstanceUID);
+                deleteStudyFromKheops(studyInstanceUID, kheopsPrincipal.getUser());
+                deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
             }
         }
     }
 
-    public static void deleteStudyFromPacs(final String studyInstanceUID) throws StudyNotFoundException, ProcessingException {
-        // TODO: Delete from dcm4chee docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
+    public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException, ProcessingException {
+        // docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
 
         final Response upstreamResponse;
-        final Response upstreamResponse1;
 
-        /*final URI uri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject/113039%5EDCM").build(studyInstanceUID);
+        final URI uri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject/113039%5EDCM").build(studyInstanceUID);
         String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
@@ -722,44 +729,53 @@ public class Sending {
                 .build();
 
         // Delete from PACS
-                try {
-                    upstreamResponse = ClientBuilder.newClient().target(uri).request().header("Authorization", "Bearer " + authToken).post(null);
-                } catch (ProcessingException e) {
-                    LOG.log(WARNING, "unable to reach upstream", e);
-                    return Response.status(BAD_GATEWAY).build();
-                }
+            try {
+                upstreamResponse = ClientBuilder.newClient().target(uri).request().header("Authorization", "Bearer " + authToken).post(null);
+            } catch (ProcessingException e) {
+                // TODO: Change with
+//                kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
+//                        .album("inbox")
+//                        .study(studyInstanceUID)
+//                        .series(seriesInstanceUID)
+//                        .log();
+                LOG.log(WARNING, "unable to reach upstream", e);
+                return Response.status(BAD_GATEWAY).build();
+            }
 
-                if (upstreamResponse.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-                    LOG.log(WARNING, "uri " + uri);
-                    LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
-                    return Response.status(BAD_GATEWAY).build();
-                }
+            if (upstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+                LOG.log(WARNING, "uri " + uri);
+                LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
+                return Response.status(BAD_GATEWAY).build();
+            }
 
-                final URI uri1 = UriBuilder.fromUri(getDicomWebURI()).path("/reject/113039%5EDCM").build(studyInstanceUID);
+        final URI uri1 = UriBuilder.fromUri(getDicomWebURI(context)).path("/reject/113039%5EDCM").build(studyInstanceUID);
+        final Response upstreamResponse1;
 
-                try {
-                    upstreamResponse1 = ClientBuilder.newClient().target(uri1).request().header("Authorization", "Bearer " + authToken).delete();
-                } catch (ProcessingException e) {
-                    LOG.log(WARNING, "unable to reach upstream", e);
-                    return Response.status(BAD_GATEWAY).build();
-                }
+            try {
+                upstreamResponse1 = ClientBuilder.newClient().target(uri1).request().header("Authorization", "Bearer " + authToken).delete();
+            } catch (ProcessingException e) {
+                LOG.log(WARNING, "unable to reach upstream", e);
+                return Response.status(BAD_GATEWAY).build();
+            }
 
-                if (upstreamResponse1.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-                    LOG.log(WARNING, "uri " + uri);
-                    LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse1.getStatus() + "\n" + upstreamResponse1);
-                    return Response.status(BAD_GATEWAY).build();
-                }*/
+            if (upstreamResponse1.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
+                LOG.log(WARNING, "uri " + uri);
+                LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse1.getStatus() + "\n" + upstreamResponse1);
+                return Response.status(BAD_GATEWAY).build();
+            }
 
+        // TODO: return upstreamResponse or upstreamResponse1 ?
+        return upstreamResponse1;
     }
 
     public static void permanentDeleteSeries(final String adminPassword, final String studyInstanceUID,
-                                       final String seriesInstanceUID, final KheopsPrincipal kheopsPrincipal) throws SeriesNotFoundException {
+                                       final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws SeriesNotFoundException {
         if (adminPassword != null) {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
                 deleteSeriesFromKheops(kheopsPrincipal.getUser(), seriesInstanceUID);
-                deleteSeriesFromPacs(seriesInstanceUID);
+                deleteSeriesFromPacs(seriesInstanceUID, context, kheopsPrincipal);
             }
         }
     }
@@ -793,7 +809,7 @@ public class Sending {
         }
     }
 
-    public static void deleteSeriesFromPacs(final String seriesInstanceUID) {
+    public static void deleteSeriesFromPacs(final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) {
 
     }
 
