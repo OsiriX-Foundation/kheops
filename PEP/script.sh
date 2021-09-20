@@ -44,7 +44,10 @@ if [ -z "$KHEOPS_PROXY_PACS_WADO_RS" ]; then
     echo "Missing KHEOPS_PROXY_PACS_WADO_RS environment variable"
     missing_env_var_secret=true
 fi
-
+if [ -z "KHEOPS_PROXY_PACS_DCM4CHEE_ARC" ]; then
+    echo "Missing KHEOPS_PROXY_PACS_DCM4CHEE_ARC environment variable"
+    missing_env_var_secret=true
+fi
 
 #if missing env var or secret => exit
 if [ "$missing_env_var_secret" = true ]; then
@@ -55,6 +58,7 @@ fi
 #set env var
 sed -i "s|\${pacs_wado_uri}|$KHEOPS_PROXY_PACS_WADO_URI|" /usr/local/openresty/nginx/conf/nginx.conf
 sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /usr/local/openresty/nginx/conf/nginx.conf
+sed -i "s|\${pacs_dcm4chee_arc}|$KHEOPS_PROXY_PACS_DCM4CHEE_ARC|" /usr/local/openresty/nginx/conf/nginx.conf
 
 
 #set secrets

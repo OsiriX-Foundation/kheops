@@ -717,20 +717,17 @@ public class Sending {
     }
 
     public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException, ProcessingException {
-        // docker exec -it pacsarc curl -XPOST http://127.0.0.1:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies/{STUDY_UID}/reject/113039%5EDCM
-
         final Response upstreamResponse;
 
-        final URI uri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject/113039%5EDCM").build(studyInstanceUID);
+        final URI postUri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject").build(studyInstanceUID);
         String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
 
-        // Delete from PACS
             try {
-                upstreamResponse = ClientBuilder.newClient().target(uri).request().header("Authorization", "Bearer " + authToken).post(null);
+                upstreamResponse = ClientBuilder.newClient().target(postUri).request().header("Authorization", "Bearer " + authToken).post(null);
             } catch (ProcessingException e) {
                 // TODO: Change with
 //                kheopsLogBuilder.action(ActionType.REMOVE_SERIES)
@@ -743,23 +740,23 @@ public class Sending {
             }
 
             if (upstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-                LOG.log(WARNING, "uri " + uri);
+                LOG.log(WARNING, "uri " + postUri);
                 LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse.getStatus() + "\n" + upstreamResponse);
                 return Response.status(BAD_GATEWAY).build();
             }
 
-        final URI uri1 = UriBuilder.fromUri(getDicomWebURI(context)).path("/reject/113039%5EDCM").build(studyInstanceUID);
+        final URI deleteUri = UriBuilder.fromUri(getDicomWebURI(context)).path("/reject").build(studyInstanceUID);
         final Response upstreamResponse1;
 
             try {
-                upstreamResponse1 = ClientBuilder.newClient().target(uri1).request().header("Authorization", "Bearer " + authToken).delete();
+                upstreamResponse1 = ClientBuilder.newClient().target(deleteUri).request().header("Authorization", "Bearer " + authToken).delete();
             } catch (ProcessingException e) {
                 LOG.log(WARNING, "unable to reach upstream", e);
                 return Response.status(BAD_GATEWAY).build();
             }
 
             if (upstreamResponse1.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-                LOG.log(WARNING, "uri " + uri);
+                LOG.log(WARNING, "uri " + deleteUri);
                 LOG.log(WARNING, () -> "bad response from upstream status = " + upstreamResponse1.getStatus() + "\n" + upstreamResponse1);
                 return Response.status(BAD_GATEWAY).build();
             }

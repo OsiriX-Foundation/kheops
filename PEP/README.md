@@ -14,6 +14,8 @@ Name : [osirixfoundation/pacs-authorization-proxy](https://hub.docker.com/r/osir
 
 `KHEOPS_PROXY_PACS_WADO_RS`
 
+`KHEOPS_PROXY_PACS_DCM4CHEE_ARC`
+
 ## Secrets
 
 `kheops_auth_hmasecret`
