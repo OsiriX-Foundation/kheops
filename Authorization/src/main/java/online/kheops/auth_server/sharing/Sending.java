@@ -702,19 +702,13 @@ public class Sending {
         }
     }
 
-    public static void permanentDeleteStudy(final String adminPassword, final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal)
-            throws StudyNotFoundException {
-        if (adminPassword != null) {
-            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
-
-            if (environmentAdminPassword.equals(adminPassword)) {
-                kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_STUDY)
-                        .study(studyInstanceUID)
-                        .log();
-                deleteStudyFromKheops(studyInstanceUID);
-                deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
-            }
-        }
+    public static void permanentDeleteStudy(final String studyInstanceUID,
+                                            final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException {
+        kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_STUDY)
+                .study(studyInstanceUID)
+                .log();
+        deleteStudyFromKheops(studyInstanceUID);
+        deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
     }
 
     public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws ProcessingException {
@@ -730,20 +724,15 @@ public class Sending {
         return rejectDataFromPacs(context, authToken);
     }
 
-    public static void permanentDeleteSeries(final String adminPassword, final String studyInstanceUID,
+    public static void permanentDeleteSeries(final String studyInstanceUID,
                                        final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws SeriesNotFoundException {
-        if (adminPassword != null) {
-            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
-            if (environmentAdminPassword.equals(adminPassword)) {
-                kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_SERIES)
-                        .study(studyInstanceUID)
-                        .series(seriesInstanceUID)
-                        .log();
-                deleteSeriesFromKheops(seriesInstanceUID);
-                deleteSeriesFromPacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
-            }
-        }
+        kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_SERIES)
+                .study(studyInstanceUID)
+                .series(seriesInstanceUID)
+                .log();
+        deleteSeriesFromKheops(seriesInstanceUID);
+        deleteSeriesFromPacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
     }
 
     public static void deleteSeriesFromKheops(final String seriesInstanceUID) throws SeriesNotFoundException {
@@ -827,5 +816,16 @@ public class Sending {
         } catch (URISyntaxException e) {
             throw new IllegalStateException("online.kheops.pacs.uri is not a valid URI", e);
         }
+    }
+
+    public static boolean hasAdminAccess(final String adminPassword) {
+        if (adminPassword != null) {
+            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
+
+            if (environmentAdminPassword.equals(adminPassword)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

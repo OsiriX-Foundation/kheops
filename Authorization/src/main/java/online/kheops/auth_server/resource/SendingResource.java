@@ -373,7 +373,9 @@ public class SendingResource
             }
         }
 
-        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID)) {
+        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID) && !hasAdminAccess) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have")
@@ -381,7 +383,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
-        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID)) {
+        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID) && !hasAdminAccess) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
                     .detail("You don't have access with the delete permission")
@@ -389,8 +391,11 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-        Sending.permanentDeleteStudy(request.getHeader("adminPassword"), studyInstanceUID, context, kheopsPrincipal);
+        if (hasAdminAccess) {
+            Sending.permanentDeleteStudy(studyInstanceUID, context, kheopsPrincipal);
+        } else {
+            Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        }
 
         return Response.status(NO_CONTENT).build();
     }
@@ -419,7 +424,9 @@ public class SendingResource
             }
         }
 
-        if (!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID)) {
+        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+
+        if (!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID) && !hasAdminAccess) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(SERIES_NOT_FOUND)
                     .detail("Series does not exist or you don't have access")
@@ -427,7 +434,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
-        if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID)) {
+        if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID) && !hasAdminAccess) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
                     .detail("The token not allow you to delete a series")
@@ -435,8 +442,11 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-        Sending.permanentDeleteSeries(request.getHeader("adminPassword"), studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+        if (hasAdminAccess) {
+            Sending.permanentDeleteSeries(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+        } else {
+            Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        }
 
         return Response.status(NO_CONTENT).build();
     }
@@ -607,8 +617,13 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-        Sending.permanentDeleteStudy(request.getHeader("adminPassword"), studyInstanceUID, context, kheopsPrincipal);
+        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+
+        if (hasAdminAccess) {
+            Sending.permanentDeleteStudy(studyInstanceUID, context, kheopsPrincipal);
+        } else {
+            Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        }
 
         return Response.status(NO_CONTENT).build();
     }
@@ -626,8 +641,13 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
-        Sending.permanentDeleteSeries(request.getHeader("adminPassword"), studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+
+        if (hasAdminAccess) {
+            Sending.permanentDeleteSeries(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+        } else {
+            Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
+        }
 
         return Response.status(NO_CONTENT).build();
     }
