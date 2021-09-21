@@ -52,8 +52,6 @@ import static online.kheops.auth_server.webhook.WebhookQueries.*;
 
 public class Sending {
 
-    private static final Logger LOG = Logger.getLogger(Sending.class.getName());
-
     private Sending() {
         throw new IllegalStateException("Utility class");
     }
@@ -710,6 +708,9 @@ public class Sending {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
+                kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_STUDY)
+                        .study(studyInstanceUID)
+                        .log();
                 deleteStudyFromKheops(studyInstanceUID);
                 deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
             }
@@ -735,6 +736,10 @@ public class Sending {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
 
             if (environmentAdminPassword.equals(adminPassword)) {
+                kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_SERIES)
+                        .study(studyInstanceUID)
+                        .series(seriesInstanceUID)
+                        .log();
                 deleteSeriesFromKheops(seriesInstanceUID);
                 deleteSeriesFromPacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
             }
@@ -789,13 +794,10 @@ public class Sending {
         try {
             postUpstreamResponse = ClientBuilder.newClient().target(postUri).request().header("Authorization", "Bearer " + authToken).post(null);
         } catch (ProcessingException e) {
-            LOG.log(WARNING, "unable to reach upstream", e);
             return Response.status(BAD_GATEWAY).build();
         }
 
         if (postUpstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-            LOG.log(WARNING, "uri " + postUri);
-            LOG.log(WARNING, () -> "bad response from upstream status = " + postUpstreamResponse.getStatus() + "\n" + postUpstreamResponse);
             return Response.status(BAD_GATEWAY).build();
         }
         return postUpstreamResponse;
@@ -809,13 +811,10 @@ public class Sending {
         try {
             deleteUpstreamResponse = ClientBuilder.newClient().target(deleteUri).request().header("Authorization", "Bearer " + authToken).delete();
         } catch (ProcessingException e) {
-            LOG.log(WARNING, "unable to reach upstream", e);
             return Response.status(BAD_GATEWAY).build();
         }
 
         if (deleteUpstreamResponse.getStatusInfo().getFamily() != Response.Status.Family.SUCCESSFUL) {
-            LOG.log(WARNING, "uri " + deleteUri);
-            LOG.log(WARNING, () -> "bad response from upstream status = " + deleteUpstreamResponse.getStatus() + "\n" + deleteUpstreamResponse);
             return Response.status(BAD_GATEWAY).build();
         }
 
