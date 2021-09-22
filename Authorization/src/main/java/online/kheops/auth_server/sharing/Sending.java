@@ -32,9 +32,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import static java.util.logging.Level.WARNING;
 import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeries;
 import static online.kheops.auth_server.album.AlbumQueries.deleteAllAlbumSeriesBySeriesList;
@@ -685,7 +683,7 @@ public class Sending {
 
             deleteAllWebHookAttemptsByWebhookTriggers(webhookTriggers, em);
             deleteAllWebhookTriggerSeriesBySeriesList(series, em);
-            deleteAllWebHookTriggersByWebhookPk(webhookTriggers, em);
+            deleteAllWebHookTriggers(webhookTriggers, em);
 
             deleteAllAlbumSeriesBySeriesList(series, em);
             deleteSeriesList(series, em);
@@ -750,7 +748,7 @@ public class Sending {
 
             deleteAllWebHookAttemptsByWebhookTriggers(webhookTriggers, em);
             deleteAllWebhookTriggerSeriesBySeriesList(series, em);
-            deleteAllWebHookTriggersByWebhookPk(webhookTriggers, em);
+            deleteAllWebHookTriggers(webhookTriggers, em);
 
             deleteAllAlbumSeriesBySeries(series, em);
             em.remove(series);

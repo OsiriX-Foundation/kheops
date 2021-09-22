@@ -135,9 +135,9 @@ public class WebhookQueries {
         }
     }
 
-    public static void deleteAllWebHookTriggersByWebhookPk(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
+    public static void deleteAllWebHookTriggers(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
         for (WebhookTrigger webhookTrigger : webhookTriggers) {
-            em.remove(webhookTrigger.getWebhook());
+            em.remove(webhookTrigger);
         }
     }
 }
