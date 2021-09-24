@@ -20,8 +20,6 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM+" ORDER BY w.creationTime desc"),
         @NamedQuery(name = "Webhook.findAllByAlbumAndUrl",
         query = "SELECT w FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM+" AND w.url = :"+WEBHOOK_URL+" ORDER BY w.creationTime desc"),
-        @NamedQuery(name = "Webhook.findAllBySeries",
-        query = "SELECT w FROM Album a JOIN a.albumSeries als JOIN als.series s JOIN s.study st JOIN a.webhooks w WHERE st.studyInstanceUID = :"+STUDY_UID+" AND w.enabled = true AND w.newSeries = true"),
         @NamedQuery(name = "Webhook.countByAlbum",
         query = "SELECT count(w) FROM Webhook w JOIN w.album a WHERE a = :"+ALBUM),
         @NamedQuery(name = "Webhook.countByAlbumAndUrl",

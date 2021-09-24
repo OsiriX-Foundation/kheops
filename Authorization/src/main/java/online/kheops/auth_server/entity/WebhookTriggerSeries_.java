@@ -15,6 +15,4 @@ public abstract class WebhookTriggerSeries_ {
     public static final String WEBHOOK_TRIGGER = "webhookTrigger";
     public static final String SERIES = "series";
     public static final String PK = "pk";
-
 }
-

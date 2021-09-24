@@ -667,6 +667,15 @@ public class Sending {
         return availableSeries;
     }
 
+    public static void permanentDeleteStudy(final String studyInstanceUID,
+                                            final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException {
+        kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_STUDY)
+                .study(studyInstanceUID)
+                .log();
+        deleteStudyFromKheops(studyInstanceUID);
+        deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
+    }
+
     public static void deleteStudyFromKheops(final String studyInstanceUID) throws StudyNotFoundException {
 
         final EntityManager em = EntityManagerListener.createEntityManager();
@@ -700,23 +709,14 @@ public class Sending {
         }
     }
 
-    public static void permanentDeleteStudy(final String studyInstanceUID,
-                                            final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException {
-        kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_STUDY)
-                .study(studyInstanceUID)
-                .log();
-        deleteStudyFromKheops(studyInstanceUID);
-        deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
-    }
-
-    public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws ProcessingException {
+    public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context,
+                                               final KheopsPrincipal kheopsPrincipal) throws ProcessingException {
         final URI postUri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject").build(studyInstanceUID);
         final String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
                 .withAllSeries()
                 .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
-        // TODO: return upstreamResponse or upstreamResponse1 ?
 
         postDataToPacs(postUri , authToken);
         return rejectDataFromPacs(context, authToken);
@@ -770,7 +770,6 @@ public class Sending {
                 .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
 
-        // TODO: return upstreamResponse or upstreamResponse1 ?
         postDataToPacs(postUri , authToken);
         return rejectDataFromPacs(context, authToken);
     }
@@ -819,10 +818,7 @@ public class Sending {
     public static boolean hasAdminAccess(final String adminPassword) {
         if (adminPassword != null) {
             final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
-
-            if (environmentAdminPassword.equals(adminPassword)) {
-                return true;
-            }
+            return environmentAdminPassword.equals(adminPassword);
         }
         return false;
     }
