@@ -12,9 +12,8 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
 ENV SECRET_FILE_PATH=/run/secrets \
     REPLACE_FILE_PATH=/usr/local/tomcat/conf/context.xml
 
-ENV JAVA_TOOL_OPTIONS -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 COPY --from=build /home/gradle/authorization/build/libs/authorization.war /usr/local/tomcat/webapps/authorization.war
 COPY setenv.sh $CATALINA_HOME/bin/setenv.sh
 COPY logging.properties /usr/local/tomcat/conf/logging.properties
 COPY context.xml /usr/local/tomcat/conf/context.xml
-RUN #sed -i '/\/Host/i\\t<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" />' /usr/local/tomcat/conf/server.xml
+RUN sed -i '/\/Host/i\\t<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" />' /usr/local/tomcat/conf/server.xml
