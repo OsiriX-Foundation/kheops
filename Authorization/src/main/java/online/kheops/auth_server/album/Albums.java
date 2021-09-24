@@ -121,6 +121,12 @@ public class Albums {
         }
     }
 
+    public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
+            throws BadQueryParametersException {
+
+        return findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
+    }
+
     public static void deleteAlbum(ServletContext context, User callingUser, String albumId)
             throws AlbumNotFoundException, UserNotMemberException {
 
@@ -165,12 +171,6 @@ public class Albums {
             }
             em.close();
         }
-    }
-
-    public static PairListXTotalCount<AlbumResponse> getAlbumList(AlbumQueryParams albumQueryParams)
-            throws BadQueryParametersException {
-
-        return findAlbumsByUserPk(albumQueryParams, EntityManagerListener.createEntityManager());
     }
 
     public static AlbumResponse getAlbum(User user, String albumId, boolean withUserAccess, boolean withUsersList)
