@@ -815,10 +815,11 @@ public class Sending {
         }
     }
 
-    public static boolean hasAdminAccess(final String adminPassword) {
-        if (adminPassword != null) {
-            final String environmentAdminPassword = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD");
-            return environmentAdminPassword.equals(adminPassword);
+    public static boolean isPermanentDeleteEnabled(final String adminAction, final String adminPassword) {
+        if (adminAction != null && adminPassword != null) {
+            final boolean isActionPermanentDelete = adminAction.equals("permanent");
+            final boolean isAdminPasswordCorrect = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD").equals(adminPassword);
+            return (isActionPermanentDelete && isAdminPasswordCorrect);
         }
         return false;
     }

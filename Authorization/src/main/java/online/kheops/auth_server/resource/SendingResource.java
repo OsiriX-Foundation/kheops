@@ -1,7 +1,6 @@
 package online.kheops.auth_server.resource;
 
 import online.kheops.auth_server.NotAlbumScopeTypeException;
-import online.kheops.auth_server.PepAccessTokenBuilder;
 import online.kheops.auth_server.accesstoken.AccessToken;
 import online.kheops.auth_server.accesstoken.AccessTokenVerificationException;
 import online.kheops.auth_server.accesstoken.AccessTokenVerifier;
@@ -31,11 +30,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.*;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -373,9 +369,9 @@ public class SendingResource
             }
         }
 
-        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
-        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID) && !hasAdminAccess) {
+        if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID) && !isPermanentDeleteEnabled) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(STUDY_NOT_FOUND)
                     .detail("The study does not exist or you don't have")
@@ -383,7 +379,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
-        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID) && !hasAdminAccess) {
+        if (!kheopsPrincipal.hasStudyDeleteAccess(studyInstanceUID) && !isPermanentDeleteEnabled) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
                     .detail("You don't have access with the delete permission")
@@ -391,7 +387,7 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        if (hasAdminAccess) {
+        if (isPermanentDeleteEnabled) {
             Sending.permanentDeleteStudy(studyInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
@@ -424,9 +420,9 @@ public class SendingResource
             }
         }
 
-        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
-        if (!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID) && !hasAdminAccess) {
+        if (!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID) && !isPermanentDeleteEnabled) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(SERIES_NOT_FOUND)
                     .detail("Series does not exist or you don't have access")
@@ -434,7 +430,7 @@ public class SendingResource
             return Response.status(NOT_FOUND).entity(errorResponse).build();
         }
 
-        if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID) && !hasAdminAccess) {
+        if (!kheopsPrincipal.hasSeriesDeleteAccess(studyInstanceUID, seriesInstanceUID) && !isPermanentDeleteEnabled) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
                     .message(AUTHORIZATION_ERROR)
                     .detail("The token not allow you to delete a series")
@@ -442,7 +438,7 @@ public class SendingResource
             return Response.status(FORBIDDEN).entity(errorResponse).build();
         }
 
-        if (hasAdminAccess) {
+        if (isPermanentDeleteEnabled) {
             Sending.permanentDeleteSeries(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
@@ -617,9 +613,9 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
-        if (hasAdminAccess) {
+        if (isPermanentDeleteEnabled) {
             Sending.permanentDeleteStudy(studyInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
@@ -641,9 +637,9 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final boolean hasAdminAccess = Sending.hasAdminAccess(request.getHeader("adminPassword"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
-        if (hasAdminAccess) {
+        if (isPermanentDeleteEnabled) {
             Sending.permanentDeleteSeries(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
