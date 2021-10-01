@@ -388,7 +388,7 @@ public class SendingResource
         }
 
         if (isPermanentDeleteEnabled) {
-            Sending.permanentDeleteStudy(studyInstanceUID, context, kheopsPrincipal);
+            Sending.permanentDeleteStudyFromKheopsAndDcm4cheePacs(studyInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteStudyFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         }
@@ -439,7 +439,7 @@ public class SendingResource
         }
 
         if (isPermanentDeleteEnabled) {
-            Sending.permanentDeleteSeries(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+            Sending.permanentDeleteSeriesFromKheopsAndDcm4cheePacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteSeriesFromInbox(kheopsPrincipal.getUser(), studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         }
@@ -616,7 +616,7 @@ public class SendingResource
         final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
         if (isPermanentDeleteEnabled) {
-            Sending.permanentDeleteStudy(studyInstanceUID, context, kheopsPrincipal);
+            Sending.permanentDeleteStudyFromKheopsAndDcm4cheePacs(studyInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteStudyFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         }
@@ -640,7 +640,7 @@ public class SendingResource
         final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
         if (isPermanentDeleteEnabled) {
-            Sending.permanentDeleteSeries(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+            Sending.permanentDeleteSeriesFromKheopsAndDcm4cheePacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
         } else {
             Sending.deleteSeriesFromAlbum(context, kheopsPrincipal, albumId, studyInstanceUID, seriesInstanceUID, kheopsPrincipal.getKheopsLogBuilder());
         }

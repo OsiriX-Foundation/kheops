@@ -667,13 +667,13 @@ public class Sending {
         return availableSeries;
     }
 
-    public static void permanentDeleteStudy(final String studyInstanceUID,
-                                            final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException {
+    public static void permanentDeleteStudyFromKheopsAndDcm4cheePacs(final String studyInstanceUID,
+                                                                     final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws StudyNotFoundException {
         kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_STUDY)
                 .study(studyInstanceUID)
                 .log();
         deleteStudyFromKheops(studyInstanceUID);
-        deleteStudyFromPacs(studyInstanceUID, context, kheopsPrincipal);
+        deleteStudyFromDcm4cheePacs(studyInstanceUID, context, kheopsPrincipal);
     }
 
     public static void deleteStudyFromKheops(final String studyInstanceUID) throws StudyNotFoundException {
@@ -709,8 +709,8 @@ public class Sending {
         }
     }
 
-    public static Response deleteStudyFromPacs(final String studyInstanceUID, final ServletContext context,
-                                               final KheopsPrincipal kheopsPrincipal) throws ProcessingException {
+    public static Response deleteStudyFromDcm4cheePacs(final String studyInstanceUID, final ServletContext context,
+                                                       final KheopsPrincipal kheopsPrincipal) throws ProcessingException {
         final URI postUri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/reject").build(studyInstanceUID);
         final String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
@@ -718,19 +718,19 @@ public class Sending {
                 .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
 
-        postDataToPacs(postUri , authToken);
-        return rejectDataFromPacs(context, authToken);
+        postDataToDcm4cheePacs(postUri , authToken);
+        return rejectDataFromDcm4cheePacs(context, authToken);
     }
 
-    public static void permanentDeleteSeries(final String studyInstanceUID,
-                                       final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws SeriesNotFoundException {
+    public static void permanentDeleteSeriesFromKheopsAndDcm4cheePacs(final String studyInstanceUID,
+                                                                      final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) throws SeriesNotFoundException {
 
         kheopsPrincipal.getKheopsLogBuilder().action(ActionType.ADMIN_REMOVE_SERIES)
                 .study(studyInstanceUID)
                 .series(seriesInstanceUID)
                 .log();
         deleteSeriesFromKheops(seriesInstanceUID);
-        deleteSeriesFromPacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
+        deleteSeriesFromDcm4cheePacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);
     }
 
     public static void deleteSeriesFromKheops(final String seriesInstanceUID) throws SeriesNotFoundException {
@@ -762,7 +762,7 @@ public class Sending {
         }
     }
 
-    public static Response deleteSeriesFromPacs(final String studyInstanceUID, final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) {
+    public static Response deleteSeriesFromDcm4cheePacs(final String studyInstanceUID, final String seriesInstanceUID, final ServletContext context, final KheopsPrincipal kheopsPrincipal) {
         final URI postUri = UriBuilder.fromUri(getDicomWebURI(context)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}/reject").build(studyInstanceUID, seriesInstanceUID);
         final String authToken = PepAccessTokenBuilder.newBuilder(kheopsPrincipal)
                 .withStudyUID(studyInstanceUID)
@@ -770,11 +770,11 @@ public class Sending {
                 .withSubject(kheopsPrincipal.getUser().getSub())
                 .build();
 
-        postDataToPacs(postUri , authToken);
-        return rejectDataFromPacs(context, authToken);
+        postDataToDcm4cheePacs(postUri , authToken);
+        return rejectDataFromDcm4cheePacs(context, authToken);
     }
 
-    private static Response postDataToPacs(final URI postUri, final String authToken) {
+    private static Response postDataToDcm4cheePacs(final URI postUri, final String authToken) {
         final Response postUpstreamResponse;
 
         try {
@@ -789,7 +789,7 @@ public class Sending {
         return postUpstreamResponse;
     }
 
-    private static Response rejectDataFromPacs(final ServletContext context, final String authToken) {
+    private static Response rejectDataFromDcm4cheePacs(final ServletContext context, final String authToken) {
 
         final URI deleteUri = UriBuilder.fromUri(getDicomWebURI(context)).path("/reject").build();
         final Response deleteUpstreamResponse;
@@ -816,7 +816,7 @@ public class Sending {
     }
 
     public static boolean isPermanentDeleteEnabled(final String adminAction, final String adminPassword) {
-        if (adminAction != null && adminPassword != null) {
+        if (adminAction != null && adminPassword != null && System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD") != null) {
             final boolean isActionPermanentDelete = adminAction.equals("permanent");
             final boolean isAdminPasswordCorrect = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD").equals(adminPassword);
             return (isActionPermanentDelete && isAdminPasswordCorrect);
