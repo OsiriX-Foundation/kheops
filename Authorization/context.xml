@@ -25,4 +25,6 @@
                override="false"/>
     <Parameter name="online.kheops.welcomebot.webhook" value="${kheops_welcomebot_webhook}"
                override="false"/>
+    <Parameter name="online.kheops.auth.adminpassword" value="${kheops_auth_admin_password}"
+               override="false"/>
 </Context>

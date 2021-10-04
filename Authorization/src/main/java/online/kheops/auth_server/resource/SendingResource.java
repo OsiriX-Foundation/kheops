@@ -369,7 +369,7 @@ public class SendingResource
             }
         }
 
-        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(context, request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
         if (!kheopsPrincipal.hasStudyViewAccess(studyInstanceUID) && !isPermanentDeleteEnabled) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -420,7 +420,7 @@ public class SendingResource
             }
         }
 
-        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(context, request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
         if (!kheopsPrincipal.hasSeriesViewAccess(studyInstanceUID, seriesInstanceUID) && !isPermanentDeleteEnabled) {
             final ErrorResponse errorResponse = new ErrorResponse.ErrorResponseBuilder()
@@ -613,7 +613,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(context, request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
         if (isPermanentDeleteEnabled) {
             Sending.permanentDeleteStudyFromKheopsAndDcm4cheePacs(studyInstanceUID, context, kheopsPrincipal);
@@ -637,7 +637,7 @@ public class SendingResource
 
         final KheopsPrincipal kheopsPrincipal = ((KheopsPrincipal)securityContext.getUserPrincipal());
 
-        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
+        final boolean isPermanentDeleteEnabled = Sending.isPermanentDeleteEnabled(context, request.getHeader("Admin-Action"), request.getHeader("Admin-Password"));
 
         if (isPermanentDeleteEnabled) {
             Sending.permanentDeleteSeriesFromKheopsAndDcm4cheePacs(studyInstanceUID, seriesInstanceUID, context, kheopsPrincipal);

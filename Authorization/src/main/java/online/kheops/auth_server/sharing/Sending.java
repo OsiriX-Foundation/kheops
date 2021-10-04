@@ -815,10 +815,12 @@ public class Sending {
         }
     }
 
-    public static boolean isPermanentDeleteEnabled(final String adminAction, final String adminPassword) {
-        if (adminAction != null && adminPassword != null && System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD") != null) {
+    public static boolean isPermanentDeleteEnabled(final ServletContext context, final String adminAction, final String adminPassword) {
+        if (adminAction != null && adminPassword != null
+                && context.getInitParameter("online.kheops.auth.adminpassword") != null) {
             final boolean isActionPermanentDelete = adminAction.equals("permanent");
-            final boolean isAdminPasswordCorrect = System.getenv("KHEOPS_AUTHORIZATION_ADMIN_PASSWORD").equals(adminPassword);
+            final boolean isAdminPasswordCorrect = context.getInitParameter("online.kheops.auth.adminpassword").equals(adminPassword)
+                    && !(context.getInitParameter("online.kheops.auth.adminpassword").equals("${kheops_auth_admin_password}"));
             return (isActionPermanentDelete && isAdminPasswordCorrect);
         }
         return false;
