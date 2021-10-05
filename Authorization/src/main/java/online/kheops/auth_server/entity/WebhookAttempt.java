@@ -3,6 +3,13 @@ package online.kheops.auth_server.entity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static online.kheops.auth_server.util.JPANamedQueryConstants.WEBHOOK_TRIGGER_ID;
+
+@NamedQueries({
+        @NamedQuery(name = "WebhookAttempt.deleteAllWebhookAttemptsByWebhookTrigger",
+                query = "DELETE FROM WebhookAttempt wt WHERE wt.webhookTrigger = :"+WEBHOOK_TRIGGER_ID)
+})
+
 @Entity
 @Table(name = "webhook_attempts")
 public class WebhookAttempt {

@@ -32,8 +32,7 @@ import java.util.function.Supplier;
 
 import static online.kheops.auth_server.album.Albums.getAlbum;
 import static online.kheops.auth_server.series.Series.editSeriesFavorites;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromAlbum;
-import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
+import static online.kheops.auth_server.series.SeriesQueries.*;
 import static online.kheops.auth_server.study.StudyQueries.findStudyByStudyUID;
 import static online.kheops.auth_server.user.UserQueries.findUserByUserId;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
