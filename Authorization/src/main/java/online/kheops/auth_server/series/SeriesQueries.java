@@ -42,6 +42,12 @@ public class SeriesQueries {
         return query.getResultList();
     }
 
+    public static List<Series> findSeriesListByStudyUID(final String studyInstanceUID, final EntityManager em) {
+        TypedQuery<Series> query = em.createNamedQuery("Series.findSeriesByStudyUID", Series.class);
+        query.setParameter(STUDY_UID,studyInstanceUID);
+        return query.getResultList();
+    }
+
     public static Series findSeriesByStudyUIDandSeriesUIDFromInbox(User callingUser, String studyInstanceUID, String seriesInstanceUID, EntityManager em)
             throws SeriesNotFoundException {
 
@@ -254,6 +260,12 @@ public class SeriesQueries {
                     .detail("Study does not exist or you don't have access")
                     .build();
             throw new StudyNotFoundException(errorResponse);
+        }
+    }
+
+    public static void deleteSeriesList(final List<Series> seriesToDelete, final EntityManager em) {
+        for (Series series : seriesToDelete) {
+            em.remove(series);
         }
     }
 }

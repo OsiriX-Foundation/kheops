@@ -1,11 +1,10 @@
 package online.kheops.auth_server.webhook;
 
-import online.kheops.auth_server.entity.Album;
-import online.kheops.auth_server.entity.Webhook;
-import online.kheops.auth_server.entity.WebhookTrigger;
+import online.kheops.auth_server.entity.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
@@ -84,6 +83,22 @@ public class WebhookQueries {
     }
 
 
+    public static List<WebhookTrigger> getWebhookTriggersBySeriesList(final List<Series> seriesList, final EntityManager em) {
+        List<WebhookTrigger> webhookTriggerList = new ArrayList<>();
+        for (Series series : seriesList) {
+            webhookTriggerList.addAll(em.createNamedQuery("WebhookTriggerSeries.findAllBySeries", WebhookTrigger.class)
+                    .setParameter(SERIES, series)
+                    .getResultList());
+        }
+
+        return webhookTriggerList;
+    }
+
+    public static List<WebhookTrigger> getWebhookTriggersBySeries(final Series series, final EntityManager em) {
+        return em.createNamedQuery("WebhookTriggerSeries.findAllBySeries", WebhookTrigger.class)
+                .setParameter(SERIES, series)
+                .getResultList();
+    }
 
     public static Long getNumberOfWebhooks(Album album, EntityManager em) {
         return em.createNamedQuery("Webhook.countByAlbum", Long.class)
@@ -96,5 +111,33 @@ public class WebhookQueries {
                 .setParameter(ALBUM, album)
                 .setParameter(WEBHOOK_URL, url)
                 .getSingleResult();
+    }
+
+    public static void deleteAllWebhookTriggerSeriesBySeriesList(final List<Series> seriesToDelete, final EntityManager em) {
+        for (Series series : seriesToDelete) {
+            em.createNamedQuery("WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries")
+                    .setParameter(SERIES, series)
+                    .executeUpdate();
+        }
+    }
+
+    public static void deleteAllWebhookTriggerSeriesBySeriesList(final Series seriesToDelete, final EntityManager em) {
+        em.createNamedQuery("WebhookTriggerSeries.deleteAllWebhookTriggerSeriesBySeries")
+                .setParameter(SERIES, seriesToDelete)
+                .executeUpdate();
+    }
+
+    public static void deleteAllWebHookAttemptsByWebhookTriggers(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
+        for (WebhookTrigger webhookTrigger : webhookTriggers) {
+            em.createNamedQuery("WebhookAttempt.deleteAllWebhookAttemptsByWebhookTrigger")
+                    .setParameter(WEBHOOK_TRIGGER_ID, webhookTrigger)
+                    .executeUpdate();
+        }
+    }
+
+    public static void deleteAllWebHookTriggers(final List<WebhookTrigger> webhookTriggers, final EntityManager em) {
+        for (WebhookTrigger webhookTrigger : webhookTriggers) {
+            em.remove(webhookTrigger);
+        }
     }
 }

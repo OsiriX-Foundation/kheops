@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.util.ErrorResponse.Message.BAD_QUERY_PARAMETER;
 import static online.kheops.auth_server.util.QueryParamTools.checkDate;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
@@ -372,4 +373,18 @@ public class AlbumQueries {
                 .executeUpdate();
 
     }
+
+    public static void deleteAllAlbumSeriesBySeriesList(final List<Series> seriesToDelete, final EntityManager em) {
+        for (Series series : seriesToDelete) {
+            em.createNamedQuery("AlbumSeries.deleteAllBySeries")
+                    .setParameter(SERIES, series)
+                    .executeUpdate();
+        }
+    }
+
+    public static void deleteAllAlbumSeriesBySeries(final Series seriesToDelete, final EntityManager em) {
+        em.createNamedQuery("AlbumSeries.deleteAllBySeries")
+                .setParameter(SERIES, seriesToDelete)
+                .executeUpdate();
+        }
 }

@@ -8,6 +8,7 @@ import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static online.kheops.auth_server.series.SeriesQueries.findSeriesListByStudyUIDFromInbox;
 import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
 
 
@@ -141,5 +142,25 @@ public class EventQueries {
                 .setParameter(ALBUM, album)
                 .executeUpdate();
 
+    }
+
+    public static void deleteAllEventSeriesBySeriesList(final List<Series> seriesToDelete, final EntityManager em) {
+        for(Series series : seriesToDelete) {
+            em.createNamedQuery("Event.deleteAllEventSeriesBySeries")
+                    .setParameter(SERIES, series)
+                    .executeUpdate();
+        }
+    }
+
+    public static void deleteAllEventSeriesBySeries(final Series seriesToDelete, final EntityManager em) {
+        em.createNamedQuery("Event.deleteAllEventSeriesBySeries")
+                .setParameter(SERIES, seriesToDelete)
+                .executeUpdate();
+    }
+
+    public static void deleteAllEventsByStudy(Study study, EntityManager em) {
+        em.createNamedQuery("Event.deleteAllByStudy")
+                .setParameter(STUDY, study)
+                .executeUpdate();
     }
 }

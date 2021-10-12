@@ -14,7 +14,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "Event.countAllByAlbumAndUser",
         query = "SELECT count(e) FROM Event e WHERE :"+ALBUM+" = e.album AND (e.privateTargetUser = null OR e.privateTargetUser = :"+USER+" OR e.user = :"+USER+")"),
         @NamedQuery(name = "Event.deleteAllByAlbum",
-        query = "DELETE FROM Event e WHERE e.album = :"+ALBUM)
+        query = "DELETE FROM Event e WHERE e.album = :"+ALBUM),
+        @NamedQuery(name = "Event.deleteAllByStudy",
+        query = "DELETE FROM Event e WHERE e.study = :"+STUDY),
 })
 
 @Entity

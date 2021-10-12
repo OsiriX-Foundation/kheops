@@ -11,12 +11,12 @@ if [ -f /run/secrets/kheops_auth_hmasecret ]; then
     line_count=$(wc -l $filename | cut -f1 -d" ")
 
     if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
-        echo Error with secret $filename. He contains $word_count word and $line_count line
+        echo Error with secret $filename. It contains $word_count word and $line_count line
         missing_env_var_secret=true
     fi
     kheops_auth_hmasecret=$(head -n 1 $filename)
 else
-    echo "Missing auth_hmasecret secret"
+    echo "Missing kheops_auth_hmasecret secret"
     missing_env_var_secret=true
 fi
 
@@ -26,12 +26,12 @@ if [ -f /run/secrets/kheops_auth_hmasecret_post ]; then
     line_count=$(wc -l $filename | cut -f1 -d" ")
 
     if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
-        echo Error with secret $filename. He contains $word_count word and $line_count line
+        echo Error with secret $filename. It contains $word_count word and $line_count line
         missing_env_var_secret=true
     fi
     kheops_auth_hmasecret_post=$(head -n 1 $filename)
 else
-    echo "Missing auth_hmasecret_post secret"
+    echo "Missing kheops_auth_hmasecret_post secret"
     missing_env_var_secret=true
 fi
 
@@ -44,7 +44,9 @@ if [ -z "$KHEOPS_PROXY_PACS_WADO_RS" ]; then
     echo "Missing KHEOPS_PROXY_PACS_WADO_RS environment variable"
     missing_env_var_secret=true
 fi
-
+if [ -z "$KHEOPS_PROXY_PACS_DCM4CHEE_ARC" ]; then
+    echo "Missing KHEOPS_PROXY_PACS_DCM4CHEE_ARC optional environment variable"
+fi
 
 #if missing env var or secret => exit
 if [ "$missing_env_var_secret" = true ]; then
@@ -55,12 +57,16 @@ fi
 #set env var
 sed -i "s|\${pacs_wado_uri}|$KHEOPS_PROXY_PACS_WADO_URI|" /usr/local/openresty/nginx/conf/nginx.conf
 sed -i "s|\${pacs_wado_rs}|$KHEOPS_PROXY_PACS_WADO_RS|" /usr/local/openresty/nginx/conf/nginx.conf
+if [ -n "$KHEOPS_PROXY_PACS_DCM4CHEE_ARC" ]; then
+    sed -i "s|\${pacs_dcm4chee_arc}|$KHEOPS_PROXY_PACS_DCM4CHEE_ARC|" /usr/local/openresty/nginx/conf/nginx.conf
+else
+    sed -i "s|\${pacs_dcm4chee_arc}|$KHEOPS_PROXY_PACS_WADO_URI|" /usr/local/openresty/nginx/conf/nginx.conf
+fi
 
 
 #set secrets
 export JWT_SECRET=$kheops_auth_hmasecret
 export JWT_POST_SECRET=$kheops_auth_hmasecret_post
-
 
 echo "Ending setup PEP secrets and env var"
 

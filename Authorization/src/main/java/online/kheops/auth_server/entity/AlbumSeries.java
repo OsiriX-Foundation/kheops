@@ -11,7 +11,9 @@ import static online.kheops.auth_server.util.JPANamedQueryConstants.*;
         @NamedQuery(name = "AlbumSeries.findByAlbumAndSeries",
                 query = "SELECT alS from AlbumSeries alS where :"+SERIES+" = alS.series and :"+ALBUM+" = alS.album"),
         @NamedQuery(name = "AlbumSeries.deleteAllByAlbum",
-                query = "DELETE FROM AlbumSeries aSe WHERE aSe.album = :"+ALBUM)
+                query = "DELETE FROM AlbumSeries aSe WHERE aSe.album = :"+ALBUM),
+        @NamedQuery(name = "AlbumSeries.deleteAllBySeries",
+                query = "DELETE FROM AlbumSeries aSe WHERE aSe.series = :"+SERIES),
 
 })
 
