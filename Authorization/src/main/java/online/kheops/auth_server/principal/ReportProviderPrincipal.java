@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static online.kheops.auth_server.report_provider.ReportProviders.getReportProvider;
 import static online.kheops.auth_server.series.Series.*;
+import static online.kheops.auth_server.series.SeriesQueries.isOrphan;
 import static online.kheops.auth_server.study.Studies.canAccessStudy;
 
 public class ReportProviderPrincipal implements KheopsPrincipal {
@@ -128,14 +129,15 @@ public class ReportProviderPrincipal implements KheopsPrincipal {
             }
 
             //find if the series exist
+            final Series series;
             try {
-                getSeries(studyInstanceUID, seriesInstanceUID, em);
+                series = getSeries(studyInstanceUID, seriesInstanceUID, em);
             } catch (SeriesNotFoundException e) {
                 return true;
             }
 
             // we need to check here if the series that was found is in the right album
-            if(canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em)) {
+            if (canAccessSeries(album, studyInstanceUID, seriesInstanceUID, em) || (isOrphan(series, em))) {
                 return true;
             }
         } finally {
