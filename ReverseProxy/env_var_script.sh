@@ -12,6 +12,15 @@ remplace_in_file() {
 
   sed -i "s|\${server_name}|$roothost|" $1
   sed -i "s|\${keycloak_url}|$proto$hostport|g" $1
+
+  if [ "$KHEOPS_RP_BLOCK_DRAG_AND_DROP" = true ]; then
+    sed -i "s|\${kheops_block_drag_and_drop}|set \$dragAndDropBlocked 1;|" $1
+    ip_addresses=$(cat /run/secrets/kheops_rp_block_drag_and_drop_ip_addresses | tr -d '\n')
+    sed -i "s|\${kheops_block_drag_and_drop_ip_addresses};|$ip_addresses|" $1
+  else
+    sed -i "s|\${kheops_block_drag_and_drop}|set \$dragAndDropBlocked 0;|" $1
+    sed -i "s|\${kheops_block_drag_and_drop_ip_addresses};||" $1
+  fi
 }
 
 missing_env_var_secret=false
