@@ -282,6 +282,7 @@ export default {
           class: 'd-none d-sm-table-cell word-break',
           thStyle: {
             width: '200px',
+            zIndex: 11,
           },
         },
         {
@@ -292,6 +293,7 @@ export default {
           class: 'd-none d-lg-table-cell word-break',
           thStyle: {
             width: '200px',
+            zIndex: 10,
           },
         },
         {

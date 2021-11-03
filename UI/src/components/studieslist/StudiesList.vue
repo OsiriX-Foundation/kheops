@@ -378,6 +378,7 @@ export default {
           thStyle: {
             width: '150px',
             top: this.topstyle,
+            zIndex: 10,
           },
         },
         {
