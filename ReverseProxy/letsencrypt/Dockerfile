@@ -20,6 +20,7 @@ COPY kheops_rp_block_drag_and_drop_ip_addresses.txt /run/kheops_rp_block_drag_an
 
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
-RUN apt-get install -y logrotate
+
+RUN apt-get update && apt-get install -y logrotate
 
 CMD ["nginx", "-g", "daemon off;"]
