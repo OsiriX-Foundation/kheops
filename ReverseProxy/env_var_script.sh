@@ -14,8 +14,7 @@ remplace_in_file() {
   sed -i "s|\${keycloak_url}|$proto$hostport|g" $1
 
   if [ "$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP" = true ]; then
-    ip_addresses=$(cat /run/kheops_rp_block_drag_and_drop_ip_addresses.txt | tr -d '\n')
-    sed -i "s|\${kheops_block_post_ip_addresses};|$ip_addresses|" $1
+    sed -i "s|\${kheops_block_post_ip_addresses};|$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES|" $1
   else
     sed -i "s|\${kheops_block_post_ip_addresses};||" $1
   fi
