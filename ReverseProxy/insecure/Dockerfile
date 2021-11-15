@@ -14,6 +14,8 @@ COPY logcrontab.sh /logcrontab.sh
 COPY nginxday /etc/logrotate.d/nginxday
 COPY nginxsize /etc/logrotate.d/nginxsize
 
+COPY kheops_rp_block_drag_and_drop_ip_addresses.txt /run/kheops_rp_block_drag_and_drop_ip_addresses.txt
+
 RUN rm /var/log/nginx/access.log /var/log/nginx/error.log && \
     rm /etc/nginx/conf.d/default.conf
     

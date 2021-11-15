@@ -13,13 +13,11 @@ remplace_in_file() {
   sed -i "s|\${server_name}|$roothost|" $1
   sed -i "s|\${keycloak_url}|$proto$hostport|g" $1
 
-  if [ "$KHEOPS_RP_BLOCK_DRAG_AND_DROP" = true ]; then
-    sed -i "s|\${kheops_block_drag_and_drop}|set \$dragAndDropBlocked 1;|" $1
-    ip_addresses=$(cat /run/secrets/kheops_rp_block_drag_and_drop_ip_addresses | tr -d '\n')
-    sed -i "s|\${kheops_block_drag_and_drop_ip_addresses};|$ip_addresses|" $1
+  if [ "$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP" = true ]; then
+    ip_addresses=$(cat /run/kheops_rp_block_drag_and_drop_ip_addresses.txt | tr -d '\n')
+    sed -i "s|\${kheops_block_post_ip_addresses};|$ip_addresses|" $1
   else
-    sed -i "s|\${kheops_block_drag_and_drop}|set \$dragAndDropBlocked 0;|" $1
-    sed -i "s|\${kheops_block_drag_and_drop_ip_addresses};||" $1
+    sed -i "s|\${kheops_block_post_ip_addresses};||" $1
   fi
 }
 
@@ -150,5 +148,8 @@ if /usr/bin/find "/etc/nginx/kheops/" -mindepth 1 -maxdepth 1 -type f -print -qu
 fi
 
 remplace_in_file /etc/nginx/conf.d/kheops.conf
+
+remplace_in_file /etc/nginx/nginx.conf
+
 
 echo "Ending setup NGINX env var"
