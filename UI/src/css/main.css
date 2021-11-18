@@ -1,6 +1,6 @@
 body{
 	min-height: 100vh;
-	position: relative;	
+	position: relative;
 	padding-bottom: 50px;
 	border: 1px solid #343434;
 	top: 0;
@@ -204,7 +204,7 @@ input.search-calendar{
 ::-webkit-scrollbar {
 	width: 10px;
 }
-  
+
 /* Track */
 ::-webkit-scrollbar-track {
 	background: #f1f1f1;
@@ -214,7 +214,7 @@ input.search-calendar{
 ::-webkit-scrollbar-thumb {
 	background: #888;
 }
-  
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
 	background: #555;
@@ -269,7 +269,7 @@ div.seriesSummaryContainer{
 	top: 70px;
     background: #06162c;
     opacity: 1;
-    z-index: 3;
+    z-index: 11;
 }
 
 .table-header {
@@ -520,7 +520,7 @@ table.tableAddUserNewAlbum tbody {
 	max-height: 175px;
 	overflow-y: scroll;
   }
-  
+
 table.tableAddUserNewAlbum thead ,
 table.tableAddUserNewAlbum tr {
 	display: table;
