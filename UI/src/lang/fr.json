@@ -197,6 +197,7 @@
 	"study": {
 		"Modality": "Modalité",
 		"NumberOfStudyRelatedSeries": "Nombre de séries",
+		"NumberOfStudyRelatedInstances": "Nombre d'instances",
 		"PatientBirthdate": "Année de naissance",
 		"PatientID": "Patient ID",
 		"PatientName": "Nom du patient",

@@ -58,6 +58,10 @@
               <th>{{ $t('study.NumberOfStudyRelatedSeries') }}</th>
               <td>{{ metadata.NumberOfStudyRelatedSeries.Value[0] }}</td>
             </tr>
+            <tr v-if="checkUndefined(metadata, 'NumberOfStudyRelatedInstances') && matchNumbers(metadata.NumberOfStudyRelatedInstances.Value[0])">
+              <th>{{ $t('study.NumberOfStudyRelatedInstances') }}</th>
+              <td>{{ metadata.NumberOfStudyRelatedInstances.Value[0] }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
