@@ -7,6 +7,6 @@ module.exports = merge(prodEnv, {
   URL_KEYCLOAK: '"https://keycloak.kheops.online"',
   REALM_KEYCLOAK: '"StaticLoginConnect"',
   CLIENTID: '"loginConnect"',
-  URL_API: '"https://test.kheops.online"',
+  URL_API: '"https://demo.kheops.online"',
   URL_VIEWER: '"https://ohif.kheops.online"'
 })

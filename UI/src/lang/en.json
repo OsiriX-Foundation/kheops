@@ -213,6 +213,7 @@
 	"study": {
 		"Modality": "Modality",
 		"NumberOfStudyRelatedSeries": "Number of series",
+		"NumberOfStudyRelatedInstances": "Number of instances",
 		"PatientBirthdate": "Birth date",
 		"PatientID": "Patient ID",
 		"PatientName": "Patient Name",
