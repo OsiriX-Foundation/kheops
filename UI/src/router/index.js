@@ -11,6 +11,7 @@ import Inbox from '@/components/inbox/Inbox';
 import ViewWithoutLogin from '@/components/withoutlogin/ViewWithoutLogin';
 import OidcCallback from '@/components/oidc/OidcCallback';
 import OidcCallbackError from '@/components/oidc/OidcCallbackError';
+import OidcInitiateLogin from '@/components/oidc/OidcInitiateLogin';
 import OidcLogout from '@/components/oidc/OidcLogout';
 
 Vue.use(Router);
@@ -20,6 +21,14 @@ const router = new Router({
   routes: [{
     path: '/',
     redirect: '/inbox',
+  },
+  {
+    path: '/login',
+    name: 'oidcInitiateLogin',
+    component: OidcInitiateLogin,
+    meta: {
+      header: false,
+    },
   },
   {
     path: '/oidc-logout',
