@@ -15,8 +15,11 @@ remplace_in_file() {
 
   if [ "$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP" = true ]; then
     sed -i "s|\${kheops_block_post_ip_addresses};|$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES|" $1
+    echo "KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP true"
+    echo "kheops_block_post_ip_addresses replaced with $KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES"
   else
     sed -i "s|\${kheops_block_post_ip_addresses};||" $1
+    echo "KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP false"
   fi
 }
 
