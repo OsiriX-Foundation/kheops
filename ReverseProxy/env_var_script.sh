@@ -153,5 +153,6 @@ remplace_in_file /etc/nginx/conf.d/kheops.conf
 
 remplace_in_file /etc/nginx/nginx.conf
 
-
 echo "Ending setup NGINX env var"
+
+cat /etc/nginx/nginx.conf
