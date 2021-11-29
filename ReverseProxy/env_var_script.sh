@@ -12,15 +12,17 @@ remplace_in_file() {
 
   sed -i "s|\${server_name}|$roothost|" $1
   sed -i "s|\${keycloak_url}|$proto$hostport|g" $1
+}
 
-  if [ "$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP" = true ]; then
-    sed -i "s|\${kheops_block_post_ip_addresses};|$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES|" $1
-    echo "KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP true"
-    echo "kheops_block_post_ip_addresses replaced with $KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES"
-  else
-    sed -i "s|\${kheops_block_post_ip_addresses};||" $1
-    echo "KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP false"
-  fi
+replace_in_file_block_post() {
+    if [ "$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP" = true ]; then
+      sed -i "s|\${kheops_block_post_ip_addresses};|$KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES|" $1
+      echo "KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP true"
+      echo "kheops_block_post_ip_addresses replaced with $KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP_IP_ADDRESSES"
+    else
+      sed -i "s|\${kheops_block_post_ip_addresses};||" $1
+      echo "KHEOPS_REVERSE_PROXY_BLOCK_POST_DRAG_AND_DROP false"
+    fi
 }
 
 missing_env_var_secret=false
@@ -151,8 +153,6 @@ fi
 
 remplace_in_file /etc/nginx/conf.d/kheops.conf
 
-remplace_in_file /etc/nginx/nginx.conf
+replace_in_file_block_post /etc/nginx/nginx.conf
 
 echo "Ending setup NGINX env var"
-
-cat /etc/nginx/nginx.conf
