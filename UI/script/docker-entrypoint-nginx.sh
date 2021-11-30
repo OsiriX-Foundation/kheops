@@ -64,7 +64,7 @@ if [ -z "$KHEOPS_UI_DISABLE_AUTOCOMPLET" ]; then
 fi
 
 if [ -z "$KHEOPS_UI_DELETE_CONTACT" ]; then
-    $KHEOPS_UI_DELETE_CONTACT=false
+    KHEOPS_UI_DELETE_CONTACT=false
 fi
 
 sed -i "s|\%{kheops_ui_viewer_url}|$KHEOPS_UI_VIEWER_URL|g" $FILENAME
