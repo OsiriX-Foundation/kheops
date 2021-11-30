@@ -6,7 +6,7 @@
           {{ text }}
           <span v-if="deleteContactEmail">
             <br>
-            {{ textDeleteContact }}
+            <b>{{ textDeleteContact }}</b>
           </span>
         </p>
         <div class="col-auto col-sm-auto mb-1">
