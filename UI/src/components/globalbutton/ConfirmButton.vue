@@ -67,6 +67,6 @@ export default {
       required: true,
       default: () => -1,
     },
-  }
+  },
 };
 </script>
