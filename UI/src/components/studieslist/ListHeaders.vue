@@ -131,7 +131,7 @@
       :btn-danger-text="$t('delete')"
       :btn-primary-text="$t('cancel')"
       :text="$tc('study.confirmDelete', selectedStudiesNb, {countStudies: selectedStudiesNb, countSeries: selectedSeriesNb})"
-      :text-delete-contact="$t('study.confirmDeleteContact', {deleteContactEmail: 'avcdef@sdasd.fr'})"
+      :text-delete-contact="$t('study.confirmDeleteContact', {deleteContactEmail: deleteContactEmail})"
       :method-confirm="() => confirmDelete=false"
       :method-cancel="deleteStudies"
     />
