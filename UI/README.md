@@ -34,6 +34,10 @@ User management URL. (optional, default is false)
 
 Set this variable to true, to disable the user autocomplete from the UI (optional, default is false)
 
+#### `KHEOPS_UI_DELETE_CONTACT`
+
+If you set this variable to an email address: when a user is deleting a study, he will be notified to contact this email address if he wants to permanently delete it. (optional, default is false)
+
 ### API
 
 There are two ways to define the API URL. One must be used.

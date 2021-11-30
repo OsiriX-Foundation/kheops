@@ -63,10 +63,15 @@ if [ -z "$KHEOPS_UI_DISABLE_AUTOCOMPLET" ]; then
     KHEOPS_UI_DISABLE_AUTOCOMPLET=false
 fi
 
+if [ -z "$KHEOPS_UI_DELETE_CONTACT" ]; then
+    $KHEOPS_UI_DELETE_CONTACT=false
+fi
+
 sed -i "s|\%{kheops_ui_viewer_url}|$KHEOPS_UI_VIEWER_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_user_management}|$KHEOPS_UI_USER_MANAGEMENT_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_upload}|$KHEOPS_UI_DISABLE_UPLOAD|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_autocomplet}|$KHEOPS_UI_DISABLE_AUTOCOMPLET|g" $FILENAME
+sed -i "s|\%{kheops_ui_delete_contact}|$KHEOPS_UI_DELETE_CONTACT|g" $FILENAME
 
 NGINX_FILENAME=/etc/nginx/templates/default.conf.template
 
@@ -78,7 +83,7 @@ url="$(echo ${KHEOPS_OIDC_PROVIDER/$proto/})"
 user="$(echo $url | grep @ | cut -d@ -f1)"
 # extract the host and port
 hostport="$(echo ${url/$user@/} | cut -d/ -f1)"
-# by request host without port    
+# by request host without port
 host="$(echo $hostport | sed -e 's,:.*,,g')"
 # by request - try to extract the port
 port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
