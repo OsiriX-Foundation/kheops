@@ -68,14 +68,5 @@ export default {
       default: () => -1,
     },
   },
-  computed: {
-    deleteContactEmail() {
-      let deleteContactEmail = false;
-      if (process.env.VUE_APP_DELETE_CONTACT !== undefined) {
-        deleteContactEmail = !process.env.VUE_APP_DELETE_CONTACT.includes('false');
-      }
-      return deleteContactEmail;
-    },
-  },
 };
 </script>
