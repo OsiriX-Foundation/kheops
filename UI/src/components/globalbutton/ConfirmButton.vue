@@ -4,7 +4,7 @@
       <div class="row align-items-center">
         <p class="col-xl-auto mb-1">
           {{ text }}
-          <span v-if="deleteContactEmail != false">
+          <span v-if="deleteContactEmail !== false">
             <br>
             <b>{{ textDeleteContact }}</b>
           </span>
@@ -72,7 +72,7 @@ export default {
     deleteContactEmail() {
       let deleteContactEmail = false;
       if (process.env.VUE_APP_DELETE_CONTACT !== undefined) {
-        deleteContactEmail = process.env.VUE_APP_DELETE_CONTACT;
+        deleteContactEmail = !process.env.VUE_APP_DELETE_CONTACT.includes('false');
       }
       return deleteContactEmail;
     },

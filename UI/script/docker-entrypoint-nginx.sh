@@ -73,6 +73,9 @@ sed -i "s|\%{kheops_ui_disable_upload}|$KHEOPS_UI_DISABLE_UPLOAD|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_autocomplet}|$KHEOPS_UI_DISABLE_AUTOCOMPLET|g" $FILENAME
 sed -i "s|\%{kheops_ui_delete_contact}|$KHEOPS_UI_DELETE_CONTACT|g" $FILENAME
 
+echo "KHEOPS_UI_DELETE_CONTACT"
+echo $KHEOPS_UI_DELETE_CONTACT
+
 NGINX_FILENAME=/etc/nginx/templates/default.conf.template
 
 # extract the protocol
