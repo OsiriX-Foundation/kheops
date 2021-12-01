@@ -63,15 +63,19 @@ if [ -z "$KHEOPS_UI_DISABLE_AUTOCOMPLET" ]; then
     KHEOPS_UI_DISABLE_AUTOCOMPLET=false
 fi
 
-if [ -z "$KHEOPS_UI_DELETE_CONTACT" ]; then
-    KHEOPS_UI_DELETE_CONTACT=false
+if [ -z "$SHOW_KHEOPS_UI_DELETE_CONTACT" ]; then
+    SHOW_KHEOPS_UI_DELETE_CONTACT=false
 fi
 
 sed -i "s|\%{kheops_ui_viewer_url}|$KHEOPS_UI_VIEWER_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_user_management}|$KHEOPS_UI_USER_MANAGEMENT_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_upload}|$KHEOPS_UI_DISABLE_UPLOAD|g" $FILENAME
 sed -i "s|\%{kheops_ui_disable_autocomplet}|$KHEOPS_UI_DISABLE_AUTOCOMPLET|g" $FILENAME
+sed -i "s|\%{kheops_ui_show_delete_contact}|$KHEOPS_UI_SHOW_DELETE_CONTACT|g" $FILENAME
 sed -i "s|\%{kheops_ui_delete_contact}|$KHEOPS_UI_DELETE_CONTACT|g" $FILENAME
+
+echo "KHEOPS_UI_SHOW_DELETE_CONTACT"
+echo $KHEOPS_UI_SHOW_DELETE_CONTACT
 
 echo "KHEOPS_UI_DELETE_CONTACT"
 echo $KHEOPS_UI_DELETE_CONTACT
