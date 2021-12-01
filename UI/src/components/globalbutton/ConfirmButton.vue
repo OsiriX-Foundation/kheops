@@ -72,7 +72,7 @@ export default {
     showDeleteContactEmail() {
       let showDeleteContactEmail = false;
       if (process.env.VUE_APP_SHOW_DELETE_CONTACT !== undefined) {
-        showDeleteContactEmail = process.env.VUE_APP_SHOW_DELETE_CONTACT;
+        showDeleteContactEmail = process.env.VUE_APP_SHOW_DELETE_CONTACT.includes('true');
       }
       return showDeleteContactEmail;
     },
