@@ -4,7 +4,7 @@
       <div class="row align-items-center">
         <p class="col-xl-auto mb-1">
           {{ text }}
-          <span v-if="showDeleteContactEmail">
+          <span v-if="showDeleteContactEmail === true">
             <br>
             <b>{{ textDeleteContact }}</b>
           </span>
