@@ -42,7 +42,7 @@ Use together with the next variable, KHEOPS_UI_DELETE_CONTACT.
 #### `KHEOPS_UI_DELETE_CONTACT`
 
 If you set this variable to an email address: when a user is deleting a study, he will be notified to contact this email address if he wants to permanently delete it.
-Only set this together when the prevous variable KHEOPS_UI_SHOW_DELETE_CONTACT, is set to true.
+Only set this when the previous variable KHEOPS_UI_SHOW_DELETE_CONTACT, is set to true.
 
 ### API
 
