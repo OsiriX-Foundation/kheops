@@ -1,5 +1,5 @@
-FROM node:10-alpine as build-stage
-RUN apk update && apk add yarn python g++ make && rm -rf /var/cache/apk/*
+FROM node:16-alpine as build-stage
+RUN apk update && apk add yarn python3 g++ make && rm -rf /var/cache/apk/*
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
@@ -7,7 +7,7 @@ COPY . .
 COPY .env.prod .env
 RUN npm run build
 
-FROM nginx:1.19.9-alpine as production-stage
+FROM nginx:1.21.4-alpine as production-stage
 
 ENV KHEOPS_UI_ADDITIONAL_OIDC_OPTIONS={}
 
