@@ -1,4 +1,4 @@
-FROM openresty/openresty:1.19.3.2-1-alpine
+FROM openresty/openresty:1.19.9.1-4-alpine
 
 ENV NGINX_PREFIX /opt/openresty/nginx
 

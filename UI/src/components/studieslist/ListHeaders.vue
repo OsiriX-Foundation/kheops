@@ -131,6 +131,7 @@
       :btn-danger-text="$t('delete')"
       :btn-primary-text="$t('cancel')"
       :text="$tc('study.confirmDelete', selectedStudiesNb, {countStudies: selectedStudiesNb, countSeries: selectedSeriesNb})"
+      :text-delete-contact="$t('study.confirmDeleteContact', {deleteContactEmail: deleteContactEmail})"
       :method-confirm="() => confirmDelete=false"
       :method-cancel="deleteStudies"
     />
@@ -248,6 +249,13 @@ export default {
     },
     allSelectedStudies() {
       return _.filter(this.studies, (s) => (s.flag.is_selected === true || s.flag.is_indeterminate === true));
+    },
+    deleteContactEmail() {
+      let deleteContactEmail = '';
+      if (process.env.VUE_APP_DELETE_CONTACT !== undefined) {
+        deleteContactEmail = process.env.VUE_APP_DELETE_CONTACT;
+      }
+      return deleteContactEmail;
     },
   },
 

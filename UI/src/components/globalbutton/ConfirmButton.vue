@@ -4,6 +4,10 @@
       <div class="row align-items-center">
         <p class="col-xl-auto mb-1">
           {{ text }}
+          <span v-if="showDeleteContactEmail === true">
+            <br>
+            <b>{{ textDeleteContact }}</b>
+          </span>
         </p>
         <div class="col-auto col-sm-auto mb-1">
           <button
@@ -38,6 +42,11 @@ export default {
       required: true,
       default: '',
     },
+    textDeleteContact: {
+      type: String,
+      required: false,
+      default: '',
+    },
     btnPrimaryText: {
       type: String,
       required: true,
@@ -57,6 +66,15 @@ export default {
       type: Function,
       required: true,
       default: () => -1,
+    },
+  },
+  computed: {
+    showDeleteContactEmail() {
+      let showDeleteContactEmail = false;
+      if (process.env.VUE_APP_SHOW_DELETE_CONTACT !== undefined) {
+        showDeleteContactEmail = process.env.VUE_APP_SHOW_DELETE_CONTACT.includes('true');
+      }
+      return showDeleteContactEmail;
     },
   },
 };
