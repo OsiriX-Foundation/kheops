@@ -109,7 +109,7 @@ public final class ZipStudyResource {
                                 Integer.toString(partNumber/1000),
                                 Integer.toString(partNumber));
                         zipStream.putNextEntry(new ZipEntry(path.toString()));
-                        dicomDirGenerator.add(teeInputStream, path);
+//                        dicomDirGenerator.add(teeInputStream, path);
                         teeInputStream.finish();
                         zipStream.closeEntry();
                     }
@@ -118,9 +118,9 @@ public final class ZipStudyResource {
                 final String boundary = MediaType.valueOf(upstreamResponse.getHeaderString(CONTENT_TYPE)).getParameters().get(BOUNDARY_PARAMETER);
                 new MultipartParser(boundary).parse(inputStream, handler);
 
-                zipStream.putNextEntry(new ZipEntry("DICOMDIR"));
-                dicomDirGenerator.write(zipStream);
-                zipStream.closeEntry();
+//                zipStream.putNextEntry(new ZipEntry("DICOMDIR"));
+//                dicomDirGenerator.write(zipStream);
+//                zipStream.closeEntry();
                 zipStream.flush();
             } finally {
                 upstreamResponse.close();
