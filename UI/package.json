@@ -10,7 +10,7 @@
     "reinstall": "npm run clean && npm install"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.25.0",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.15.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -36,9 +36,9 @@
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.5.0",
-    "@vue/cli-plugin-babel": "^4.5.13",
-    "@vue/cli-plugin-eslint": "^4.5.13",
-    "@vue/cli-service": "^4.5.13",
+    "@vue/cli-plugin-babel": "^4.5.15",
+    "@vue/cli-plugin-eslint": "^4.5.15",
+    "@vue/cli-service": "^4.5.15",
     "@vue/eslint-config-standard": "^6.0.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.29.0",
