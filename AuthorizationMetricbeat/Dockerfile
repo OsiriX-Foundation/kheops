@@ -1,4 +1,4 @@
-FROM docker.elastic.co/beats/metricbeat:7.16.1
+FROM docker.elastic.co/beats/metricbeat:7.17.0
 
 COPY metricbeat.yml /metricbeattmp/metricbeat.yml
 COPY http.yml /metricbeattmp/http.yml
