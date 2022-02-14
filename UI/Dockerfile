@@ -7,7 +7,7 @@ COPY . .
 COPY .env.prod .env
 RUN npm run build
 
-FROM nginx:1.21.4-alpine as production-stage
+FROM nginx:1.21.6-alpine as production-stage
 
 ENV KHEOPS_UI_ADDITIONAL_OIDC_OPTIONS={}
 
