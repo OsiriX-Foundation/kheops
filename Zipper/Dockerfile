@@ -1,10 +1,10 @@
-FROM gradle:7.3.2-jdk11 AS build
+FROM gradle:7.4.0-jdk11 AS build
 WORKDIR /home/gradle/zipper
 COPY --chown=gradle:gradle build.gradle /home/gradle/zipper/build.gradle
 COPY --chown=gradle:gradle src /home/gradle/zipper/src
 RUN gradle war --no-daemon --info
 
-FROM tomcat:9.0.56-jdk11
+FROM tomcat:9.0.58-jdk11
 
 
 ENV SECRET_FILE_PATH=/run/secrets
