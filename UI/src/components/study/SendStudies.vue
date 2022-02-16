@@ -549,6 +549,7 @@ export default {
       const headers = {};
       if (this.getCurrentuserAccessToken(this.oidcIsAuthenticated) !== '') {
         headers.Authorization = `Bearer ${this.getCurrentuserAccessToken(this.oidcIsAuthenticated)}`;
+        headers.FrontEnd = 'true';
       }
       return headers;
     },
