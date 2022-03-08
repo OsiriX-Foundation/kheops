@@ -48,7 +48,6 @@ import static online.kheops.auth_server.user.Users.*;
 import static online.kheops.auth_server.util.Consts.*;
 import static online.kheops.auth_server.util.ErrorResponse.Message.*;
 import static online.kheops.auth_server.util.HttpHeaders.X_FORWARDED_FOR;
-import static online.kheops.auth_server.util.HttpHeaders.X_REAL_IP;
 
 @Path("/")
 public class UserResource {
@@ -82,9 +81,6 @@ public class UserResource {
 
     @HeaderParam(X_FORWARDED_FOR)
     private String headerXForwardedFor;
-
-    @HeaderParam(X_REAL_IP)
-    private String headerXRealIp;
 
     @GET
     @Secured
@@ -256,8 +252,8 @@ public class UserResource {
             final UserResponse userResponse = new UserResponseBuilder().setUser(user).build();
 
             logBuilder.tokenType(KEYCLOAK_TOKEN);
-            if (headerXRealIp != null) {
-                logBuilder.ip(headerXRealIp);
+            if (headerXForwardedFor != null) {
+                logBuilder.ip(headerXForwardedFor);
             }
             logBuilder.provenance(accessToken);
             logBuilder.log();
