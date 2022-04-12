@@ -90,6 +90,6 @@ host="$(echo $hostport | sed -e 's,:.*,,g')"
 port="$(echo $hostport | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
 [[ ! -z ${port} ]] && port=":$port";
 
-KHEOPS_ROOT_OIDC=$proto$host$port
+KHEOPS_ROOT_OIDC=$proto$host
 
 sed -i "s|\%{kheops_root_oidc}|$KHEOPS_ROOT_OIDC|g" $NGINX_FILENAME
