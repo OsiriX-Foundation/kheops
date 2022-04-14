@@ -183,6 +183,8 @@ public final class Resource {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies").build();
         }
 
+        LOG.log(Level.SEVERE, String.valueOf(stowServiceURI));
+
         MultipartStreamingOutput multipartStreamingOutput = output -> {
             try {
                 proxy.processStream(output);
