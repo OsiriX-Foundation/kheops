@@ -200,6 +200,8 @@ public final class Resource {
                     .header(AUTHORIZATION, "Bearer " + getPostBearerToken(introspectResponse))
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, getGatewayContentType()));
+
+             LOG.log(Level.SEVERE, "Token " + getPostBearerToken(introspectResponse);
              final InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
             if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
                 LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
