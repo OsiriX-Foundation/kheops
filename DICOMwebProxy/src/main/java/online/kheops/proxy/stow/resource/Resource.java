@@ -175,6 +175,8 @@ public final class Resource {
     private Response processProxy(Proxy proxy, AuthorizationManager authorizationManager, String studyInstanceUID, Introspect.Response introspectResponse) {
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
+        LOG.log(Level.SEVERE, String.valueOf(stowServiceURI));
+
         if (studyInstanceUID != null) {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);
         } else {
