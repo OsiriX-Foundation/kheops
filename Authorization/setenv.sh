@@ -50,7 +50,8 @@ check_env "KHEOPS_AUTHDB_USER" \
           "KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID" \
           "KHEOPS_CLIENT_ZIPPERCLIENTID"
 
-check_secrets "/run/secrets/kheops_auth_hmasecret" \
+check_secrets "/run/secrets/kheops_authdb_pass" \
+              "/run/secrets/kheops_auth_hmasecret" \
               "/run/secrets/kheops_client_dicomwebproxysecret" \
               "/run/secrets/kheops_client_zippersecret"
 
@@ -63,14 +64,14 @@ if [ -z "$KHEOPS_OAUTH_SCOPE" ]; then
 fi
 
 #get secrets and verify content
-#for f in ${SECRET_FILE_PATH}/*
-#do
-#  filename=$(basename "$f")
-#
-#  if [ "$filename" = "kubernetes.io" ]; then
-#    continue
-#  fi
-#
+for f in ${SECRET_FILE_PATH}/*
+do
+  filename=$(basename "$f")
+
+  if [ "$filename" = "kubernetes.io" ]; then
+    continue
+  fi
+
 #  word_count=$(wc -w $f | cut -f1 -d" ")
 #  line_count=$(wc -l $f | cut -f1 -d" ")
 #
@@ -78,10 +79,10 @@ fi
 #    echo Error with secret $filename. He contains $word_count word and $line_count line
 #    exit 1
 #  fi
-#
-#  value=$(cat ${f})
-#  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
-#done
+
+  value=$(cat ${f})
+  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
+done
 
 
 #get env var
