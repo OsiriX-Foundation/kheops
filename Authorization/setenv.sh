@@ -63,25 +63,25 @@ if [ -z "$KHEOPS_OAUTH_SCOPE" ]; then
 fi
 
 #get secrets and verify content
-for f in ${SECRET_FILE_PATH}/*
-do
-  filename=$(basename "$f")
-
-  if [ "$filename" = "kubernetes.io" ]; then
-    continue
-  fi
-
-  word_count=$(wc -w $f | cut -f1 -d" ")
-  line_count=$(wc -l $f | cut -f1 -d" ")
-
-  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
-    echo Error with secret $filename. He contains $word_count word and $line_count line
-    exit 1
-  fi
-
-  value=$(cat ${f})
-  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
-done
+#for f in ${SECRET_FILE_PATH}/*
+#do
+#  filename=$(basename "$f")
+#
+#  if [ "$filename" = "kubernetes.io" ]; then
+#    continue
+#  fi
+#
+#  word_count=$(wc -w $f | cut -f1 -d" ")
+#  line_count=$(wc -l $f | cut -f1 -d" ")
+#
+#  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
+#    echo Error with secret $filename. He contains $word_count word and $line_count line
+#    exit 1
+#  fi
+#
+#  value=$(cat ${f})
+#  sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
+#done
 
 
 #get env var
