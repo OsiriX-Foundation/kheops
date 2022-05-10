@@ -76,15 +76,16 @@ do
     continue
   fi
 
-  word_count=$(wc -w $f | cut -f1 -d" ")
-  line_count=$(wc -l $f | cut -f1 -d" ")
-
-  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
-    echo Error with secret $filename. He contains $word_count word and $line_count line
-    exit 1
-  fi
+#  word_count=$(wc -w $f | cut -f1 -d" ")
+#  line_count=$(wc -l $f | cut -f1 -d" ")
+#
+#  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
+#    echo Error with secret $filename. He contains $word_count word and $line_count line
+#    exit 1
+#  fi
 
   value=$(cat ${f})
+  echo $value
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
 done
 
