@@ -1,8 +1,8 @@
 #! /bin/bash
 
 # Kubernetes only test
-echo "$(cat /run/secrets/kheops_authdb_pass)" > /run/secrets/kheops_authdb_pass
-echo "kheops_authdb_pass modified"
+#echo "$(cat /run/secrets/kheops_authdb_pass)" > /run/secrets/kheops_authdb_pass
+#echo "kheops_authdb_pass modified"
 
 check_env() {
   local missing_env_var=false
@@ -54,10 +54,10 @@ check_env "KHEOPS_AUTHDB_USER" \
           "KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID" \
           "KHEOPS_CLIENT_ZIPPERCLIENTID"
 
-check_secrets "/run/secrets/kheops_authdb_pass" \
-              "/run/secrets/kheops_auth_hmasecret" \
-              "/run/secrets/kheops_client_dicomwebproxysecret" \
-              "/run/secrets/kheops_client_zippersecret"
+#check_secrets "/run/secrets/kheops_authdb_pass" \
+#              "/run/secrets/kheops_auth_hmasecret" \
+#              "/run/secrets/kheops_client_dicomwebproxysecret" \
+#              "/run/secrets/kheops_client_zippersecret"
 
 if [ -z "$KHEOPS_WELCOMEBOT_WEBHOOK" ]; then
     echo "No KHEOPS_WELCOMEBOT_WEBHOOK environment variable, welcomebot is disabled"
