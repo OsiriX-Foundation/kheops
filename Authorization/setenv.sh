@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# Kubernetes only test
+echo "$(cat kheops_authdb_pass)" > kheops_authdb_pass
+
 check_env() {
   local missing_env_var=false
 
@@ -50,10 +53,10 @@ check_env "KHEOPS_AUTHDB_USER" \
           "KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID" \
           "KHEOPS_CLIENT_ZIPPERCLIENTID"
 
-#check_secrets "/run/secrets/kheops_authdb_pass" \
-#              "/run/secrets/kheops_auth_hmasecret" \
-#              "/run/secrets/kheops_client_dicomwebproxysecret" \
-#              "/run/secrets/kheops_client_zippersecret"
+check_secrets "/run/secrets/kheops_authdb_pass" \
+              "/run/secrets/kheops_auth_hmasecret" \
+              "/run/secrets/kheops_client_dicomwebproxysecret" \
+              "/run/secrets/kheops_client_zippersecret"
 
 if [ -z "$KHEOPS_WELCOMEBOT_WEBHOOK" ]; then
     echo "No KHEOPS_WELCOMEBOT_WEBHOOK environment variable, welcomebot is disabled"
@@ -72,13 +75,13 @@ do
     continue
   fi
 
-#  word_count=$(wc -w $f | cut -f1 -d" ")
-#  line_count=$(wc -l $f | cut -f1 -d" ")
-#
-#  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
-#    echo Error with secret $filename. He contains $word_count word and $line_count line
-#    exit 1
-#  fi
+  word_count=$(wc -w $f | cut -f1 -d" ")
+  line_count=$(wc -l $f | cut -f1 -d" ")
+
+  if [ ${word_count} != 1 ] || [ ${line_count} != 1 ]; then
+    echo Error with secret $filename. He contains $word_count word and $line_count line
+    exit 1
+  fi
 
   value=$(cat ${f})
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
