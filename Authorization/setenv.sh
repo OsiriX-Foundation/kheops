@@ -1,7 +1,8 @@
 #! /bin/bash
 
 # Kubernetes only test
-echo "$(cat kheops_authdb_pass)" > kheops_authdb_pass
+echo "$(cat /run/secrets/kheops_authdb_pass)" > /run/secrets/kheops_authdb_pass
+echo "kheops_authdb_pass modified"
 
 check_env() {
   local missing_env_var=false
