@@ -175,15 +175,11 @@ public final class Resource {
     private Response processProxy(Proxy proxy, AuthorizationManager authorizationManager, String studyInstanceUID, Introspect.Response introspectResponse) {
         URI stowServiceURI = getParameterURI("online.kheops.pacs.uri");
 
-        LOG.log(Level.SEVERE, String.valueOf(stowServiceURI));
-
         if (studyInstanceUID != null) {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies/{StudyInstanceUID}").build(studyInstanceUID);
         } else {
             stowServiceURI = UriBuilder.fromUri(stowServiceURI).path("/studies").build();
         }
-
-        LOG.log(Level.SEVERE, String.valueOf(stowServiceURI));
 
         MultipartStreamingOutput multipartStreamingOutput = output -> {
             try {
@@ -203,8 +199,6 @@ public final class Resource {
                     .header(ACCEPT, MediaTypes.APPLICATION_DICOM_XML)
                     .post(Entity.entity(multipartStreamingOutput, getGatewayContentType()));
              final InputStream responseStream = gatewayResponse.readEntity(InputStream.class)) {
-
-            LOG.log(Level.SEVERE, "Token " + getPostBearerToken(introspectResponse));
 
             if (gatewayResponse.getStatusInfo().getFamily() != SUCCESSFUL && gatewayResponse.getStatus() != CONFLICT.getStatusCode()) {
                 LOG.log(Level.SEVERE, () -> "Gateway response was unsuccessful, Status: " + gatewayResponse.getStatus());
