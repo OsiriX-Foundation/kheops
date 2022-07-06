@@ -98,7 +98,17 @@ sed -i "s|\${kheops_pacs_url}|http://$KHEOPS_PACS_PEP_HOST:$KHEOPS_PACS_PEP_PORT
 
 sed -i "s|\${kheops_client_dicomwebproxyclientid}|$KHEOPS_CLIENT_DICOMWEBPROXYCLIENTID|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_client_zipperclientid}|$KHEOPS_CLIENT_ZIPPERCLIENTID|" ${REPLACE_FILE_PATH}
-sed -i "s|\${kheops_oidc_provider}|$KHEOPS_AUTH_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
+
+# Kubernetes: use $KHEOPS_AUTH_OIDC_PROVIDER instead of KHEOPS_OIDC_PROVIDER
+
+if [ -n "$KHEOPS_AUTH_OIDC_PROVIDER" ]; then
+  echo "Using KHEOPS_AUTH_OIDC_PROVIDER"
+  sed -i "s|\${kheops_oidc_provider}|$KHEOPS_AUTH_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
+else
+  echo "Using KHEOPS_OIDC_PROVIDER"
+  sed -i "s|\${kheops_oidc_provider}|$KHEOPS_OIDC_PROVIDER|" ${REPLACE_FILE_PATH}
+fi
+
 sed -i "s|\${kheops_oauth_scope}|$KHEOPS_OAUTH_SCOPE|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_welcomebot_webhook}|$KHEOPS_WELCOMEBOT_WEBHOOK|" ${REPLACE_FILE_PATH}
 
