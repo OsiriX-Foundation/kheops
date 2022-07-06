@@ -19,7 +19,7 @@ check_env() {
 check_secrets() {
   local missing_secret=false;
 
-    while [[ -n $1 ]]; do
+  while [[ -n $1 ]]; do
     local var="$1"
     if [[ -f $var ]]; then
         word_count=$(wc -w "$var" | cut -f1 -d" ")
@@ -34,12 +34,13 @@ check_secrets() {
       missing_secret=true
     fi
     shift
-
-    echo "Finished checking secrets"
   done
-#  if [[ $missing_secret = true ]]; then
-#    exit 1
-#  fi
+
+  if [[ $missing_secret = true ]]; then
+    exit 1
+  fi
+
+  echo "Finished checking secrets, none missing"
 }
 
 check_env "KHEOPS_AUTHDB_USER" \
