@@ -84,7 +84,6 @@ do
   fi
 
   value=$(cat ${f})
-  echo $value
   sed -i "s|\${$filename}|$value|" ${REPLACE_FILE_PATH}
 done
 
