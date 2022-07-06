@@ -34,6 +34,8 @@ check_secrets() {
       missing_secret=true
     fi
     shift
+
+    echo "Finished checking secrets"
   done
 #  if [[ $missing_secret = true ]]; then
 #    exit 1
