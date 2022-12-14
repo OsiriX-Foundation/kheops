@@ -128,11 +128,14 @@ public class VerifyInstanceResource {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
+        // Verification of matching tags can be disabled via environment variable
+        final boolean verificationDisabled = Boolean.parseBoolean(System.getenv("KHEOPS_AUTHORIZATION_DISABLE_VERIFICATION"));
+
         try {
 
             study = getStudy(studyInstanceUID, em);
 
-            if (!isSameStudy(study, studyParam)) {
+            if (!verificationDisabled && !isSameStudy(study, studyParam)) {
                 final List<String> unmatchingTags = getReason(study, studyParam);
                 kheopsLogBuilder.isValid(false)
                         .authorized(true)
@@ -143,7 +146,7 @@ public class VerifyInstanceResource {
 
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-            if (!isSameSeries(series, seriesParam)) {
+            if (!verificationDisabled && !isSameSeries(series, seriesParam)) {
                 final List<String> unmatchingTags = getReason(series, seriesParam);
                 kheopsLogBuilder.isValid(false)
                         .authorized(true)
