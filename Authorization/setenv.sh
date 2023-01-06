@@ -111,6 +111,7 @@ fi
 
 sed -i "s|\${kheops_oauth_scope}|$KHEOPS_OAUTH_SCOPE|" ${REPLACE_FILE_PATH}
 sed -i "s|\${kheops_welcomebot_webhook}|$KHEOPS_WELCOMEBOT_WEBHOOK|" ${REPLACE_FILE_PATH}
+sed -i "s|\${kheops_auth_disable_verification}|$KHEOPS_AUTHORIZATION_DISABLE_VERIFICATION|" ${REPLACE_FILE_PATH}
 
 export UMASK=022
 

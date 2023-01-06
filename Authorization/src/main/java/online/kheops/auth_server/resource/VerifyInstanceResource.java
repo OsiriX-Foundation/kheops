@@ -16,6 +16,7 @@ import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +35,9 @@ public class VerifyInstanceResource {
 
     @Context
     private SecurityContext securityContext;
+
+    @Context
+    private ServletContext servletContext;
 
     private static class StudyParam {
         String studyInstanceUID;
@@ -129,7 +133,7 @@ public class VerifyInstanceResource {
         final EntityTransaction tx = em.getTransaction();
 
         // Verification of matching tags can be disabled via environment variable
-        final boolean verificationDisabled = Boolean.parseBoolean(System.getenv("KHEOPS_AUTHORIZATION_DISABLE_VERIFICATION"));
+        final boolean verificationDisabled = Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.auth.disableverification"));
 
         try {
 
