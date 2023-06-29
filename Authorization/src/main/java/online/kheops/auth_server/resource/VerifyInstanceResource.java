@@ -16,6 +16,7 @@ import org.dcm4che3.data.VR;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.servlet.ServletContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -34,6 +35,9 @@ public class VerifyInstanceResource {
 
     @Context
     private SecurityContext securityContext;
+
+    @Context
+    private ServletContext servletContext;
 
     private static class StudyParam {
         String studyInstanceUID;
@@ -128,11 +132,14 @@ public class VerifyInstanceResource {
         final EntityManager em = EntityManagerListener.createEntityManager();
         final EntityTransaction tx = em.getTransaction();
 
+        // Verification of matching tags can be disabled via environment variable
+        final boolean verificationDisabled = Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.auth.disableverification"));
+
         try {
 
             study = getStudy(studyInstanceUID, em);
 
-            if (!isSameStudy(study, studyParam)) {
+            if (!verificationDisabled && !isSameStudy(study, studyParam)) {
                 final List<String> unmatchingTags = getReason(study, studyParam);
                 kheopsLogBuilder.isValid(false)
                         .authorized(true)
@@ -143,7 +150,7 @@ public class VerifyInstanceResource {
 
             series = getSeries(studyInstanceUID, seriesInstanceUID, em);
 
-            if (!isSameSeries(series, seriesParam)) {
+            if (!verificationDisabled && !isSameSeries(series, seriesParam)) {
                 final List<String> unmatchingTags = getReason(series, seriesParam);
                 kheopsLogBuilder.isValid(false)
                         .authorized(true)
