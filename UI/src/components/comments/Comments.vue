@@ -47,11 +47,11 @@
 </template>
 
 <script>
+import InfiniteLoading from 'vue-infinite-loading';
 import { CurrentUser } from '@/mixins/currentuser.js';
 import UserComments from '@/components/comments/UserComments';
 import Notifications from '@/components/comments/Notifications';
 import Loading from '@/components/globalloading/Loading';
-import InfiniteLoading from 'vue-infinite-loading';
 
 export default {
   name: 'Comments',
