@@ -27,7 +27,7 @@ export const Viewer = {
     },
     openOhif(queryparams) {
       const queryparamsString = httpoperations.getQueriesParameters(queryparams);
-      return `${process.env.VUE_APP_URL_VIEWER}/viewer${queryparamsString}`;
+      return `${process.env.VUE_APP_URL_VIEWER}${queryparamsString}`;
     },
     openWSI(StudyInstanceUID, token) {
       const url = `${process.env.VUE_APP_URL_API}`
