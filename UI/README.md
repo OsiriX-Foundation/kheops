@@ -16,7 +16,7 @@ User interface URL. Use the following example to avoid any problem. `https://dem
 
 #### `KHEOPS_UI_VIEWER_URL`
 
-Viewer URL by default. (optional, default is `https://ohif.kheops.online`)
+Viewer URL by default. (optional, default is `https://ohif.kheops.online/viewer`)
 
 #### `KHEOPS_UI_VIEWER_SM_URL`
 
