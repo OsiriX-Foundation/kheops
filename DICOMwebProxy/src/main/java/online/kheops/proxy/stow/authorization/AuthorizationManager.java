@@ -69,11 +69,15 @@ public final class AuthorizationManager {
         }
     }
 
-    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId, String headerXLinkAuthorization) {
+    public AuthorizationManager(URI authorizationServerRoot, AuthorizationToken authorizationToken, String albumId, String headerXLinkAuthorization, boolean skipVerify) {
         this.bearerToken = Objects.requireNonNull(authorizationToken);
         this.headerXLinkAuthorization = headerXLinkAuthorization;
         authorizationUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("studies/{StudyInstanceUID}/series/{SeriesInstanceUID}");
         verifyUriBuilder = UriBuilder.fromUri(Objects.requireNonNull(authorizationServerRoot)).path("verifyInstance");
+        if( skipVerify ) {
+            LOG.fine("Skipping verification on study going to album " + albumId);
+            verifyUriBuilder.queryParam("skipVerify", "true");
+        }
         if (albumId != null) {
             authorizationUriBuilder.path("/albums/" + albumId);
         }

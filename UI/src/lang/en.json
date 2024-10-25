@@ -304,6 +304,7 @@
 		"invalidfields": "Invalid attribute value",
 		"refused": "Refused out of Resources",
 		"reload": "Reload erroneous files",
+		"reloadSkipVerify": "Reload erroneous files without verification",
 		"showError": "Show errors",
 		"sopnotsupported": "Referenced SOP Class not supported",
 		"titleBoxDicomize": "Waiting for your input",

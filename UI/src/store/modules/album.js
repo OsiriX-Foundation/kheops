@@ -1,5 +1,5 @@
-import { HTTP } from '@/router/http';
-import httpoperations from '@/mixins/httpoperations';
+import { HTTP, apiMap } from "@/router/http";
+import httpoperations from "@/mixins/httpoperations";
 // initial state
 const state = {
   album: {},
@@ -19,24 +19,30 @@ const getters = {
 // actions
 const actions = {
   getAlbum({ commit }, params) {
-    const request = `albums/${params.album_id}`;
+    const request = `${apiMap.get('albums')}/${params.album_id}`;
     return HTTP.get(request, { headers: { Accept: 'application/json' } }).then((res) => {
       commit('SET_ALBUM', res.data);
       return res;
     }).catch((err) => Promise.reject(err));
   },
   createAlbum({ commit }, params) {
-    const request = 'albums';
-    let formData = '';
-    if (params.formData !== undefined) {
-      formData = httpoperations.getFormData(params.formData);
-    }
-    return HTTP.post(request, formData, { headers: { Accept: 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' } }).then((res) => {
-      if (res.status === 201) {
-        commit('SET_ALBUM', res.data);
-      }
-      return res;
-    }).catch((err) => Promise.reject(err));
+    console.debug("Creating album", params.formData);
+    const request = apiMap.get("albums");
+    const formData = params.formData !== undefined
+      ? httpoperations.getFormData(params.formData)
+      : "";
+    return HTTP.post(request, formData, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    })
+      .then((res) => {
+        if (res.status === 201) {
+          commit('SET_ALBUM', res.data);
+        }
+        return res;
+      }).catch((err) => Promise.reject(err));
   },
   removeStudyInAlbum({ commit }, params) {
     const request = `studies/${params.StudyInstanceUID}/albums/${params.album_id}`;
@@ -70,7 +76,7 @@ const actions = {
     }).catch((err) => Promise.reject(err));
   },
   editAlbum({ commit }, params) {
-    const request = `albums/${params.album_id}`;
+    const request = `${apiMap.get('albums')}/${params.album_id}`;
     let queries = '';
     if (params.queries !== undefined) {
       queries = httpoperations.getQueriesParameters(params.queries);
@@ -92,7 +98,7 @@ const actions = {
     }).catch((err) => Promise.reject(err));
   },
   addAlbumUser({ dispatch }, params) {
-    const request = `albums/${params.album_id}/users/${params.user}`;
+    const request = `${apiMap.get('albums')}/${params.album_id}/users/${params.user}`;
     return HTTP.put(request).then((res) => {
       if (res.status === 201) {
         dispatch('getUsersAlbum', { album_id: params.album_id });
@@ -114,7 +120,7 @@ const actions = {
     return HTTP.delete(request).then((res) => res).catch((err) => Promise.reject(err));
   },
   removeAlbumUser({ dispatch }, params) {
-    const request = `albums/${params.album_id}/users/${params.user}`;
+    const request = `${apiMap.get('albums')}/${params.album_id}/users/${params.user}`;
     return HTTP.delete(request).then((res) => {
       if (res.status === 204) {
         dispatch('getUsersAlbum', { album_id: params.album_id });
@@ -123,7 +129,7 @@ const actions = {
     }).catch((err) => Promise.reject(err));
   },
   manageAlbumUserAdmin({ dispatch }, params) {
-    const request = `albums/${params.album_id}/users/${params.user_name}/admin`;
+    const request = `${apiMap.get('albums')}/${params.album_id}/users/${params.user_name}/admin`;
     const method = (params.user_is_admin) ? 'put' : 'delete';
     return HTTP[method](request).then((res) => {
       if (res.status === 204) {

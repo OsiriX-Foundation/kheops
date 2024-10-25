@@ -70,7 +70,7 @@ public class VerifyInstanceResource {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyInstance(
-
+            @QueryParam("skipVerify") String skipVerify,
             @FormParam("studyInstanceUID") @UIDValidator String studyInstanceUID,
             @FormParam("studyDate") String studyDate,
             @FormParam("studyTime") String studyTime,
@@ -133,7 +133,7 @@ public class VerifyInstanceResource {
         final EntityTransaction tx = em.getTransaction();
 
         // Verification of matching tags can be disabled via environment variable
-        final boolean verificationDisabled = Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.auth.disableverification"));
+        final boolean verificationDisabled = skipVerify!=null || Boolean.parseBoolean(servletContext.getInitParameter("online.kheops.auth.disableverification"));
 
         try {
 

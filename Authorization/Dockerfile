@@ -1,7 +1,10 @@
 FROM gradle:6.9.2-jdk11 AS build
-WORKDIR /home/gradle/authorization
-COPY --chown=gradle:gradle build.gradle /home/gradle/authorization/build.gradle
-COPY --chown=gradle:gradle src /home/gradle/authorization/src
+ENV APP_HOME=/home/gradle/authorization
+WORKDIR $APP_HOME
+COPY --chown=gradle:gradle build.gradle gradlew $APP_HOME
+COPY gradle $APP_HOME/gradle
+RUN ./gradlew build || return 0 
+COPY --chown=gradle:gradle src ${APP_HOME}/src
 RUN gradle war --no-daemon --info
 
 FROM tomcat:9.0.58-jdk11
