@@ -100,7 +100,6 @@ public class OHIFMetadataResource {
                 "            \"enableStudyLazyLoad\": true,\n" +
                 "            \"staticWado\": true,\n" +
                 "            \"omitQuotationForMultipartRequest\": false,\n" +
-                "            \"acceptHeader\": [\"*/*\"],\n" +
                 "            \"bulkDataURI\": {\n" +
                 "               \"enabled\": true,\n" +
                 "               \"relativeResolution\": \"studies\"\n" +
