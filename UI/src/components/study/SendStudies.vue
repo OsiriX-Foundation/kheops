@@ -242,6 +242,16 @@
                 {{ $t('upload.reload') }}
               </a>
             </div>
+            <div
+              class="mb-1"
+            >
+              <a
+                class="text-center text-neutral"
+                @click="retrySkipVerify"
+              >
+                {{ $t('upload.reloadSkipVerify') }}
+              </a>
+            </div>
             <a
               class="text-center text-warning"
               @click="UI.showErrors=!UI.showErrors"
@@ -370,6 +380,7 @@ export default {
         '00081198': '00041500',
       },
       dicomTagError: '00081197',
+      attributeErrorList: '00001005',
       listErrorUnknownFiles: {},
       totalUnknownFilesError: 0,
       progress: 0,
@@ -421,6 +432,16 @@ export default {
     retry() {
       this.$store.dispatch('setSending', { sending: true });
       this.$store.dispatch('setFiles', { files: this.error });
+    },
+    retrySkipVerify() {
+      this.$store.dispatch('setSending', { sending: true });
+      const skipVerifyFiles = [];
+      for (let i = 0; i < this.error.length; i += 1) {
+        const file = this.error[i];
+        file.skipVerify = true;
+        skipVerifyFiles.push(file);
+      }
+      this.$store.dispatch('setFiles', { files: skipVerifyFiles });
     },
     closeWindow() {
       this.UI.show = !this.UI.show;
@@ -602,7 +623,11 @@ export default {
           this.currentFilesLength = files.length;
           const headers = this.setAuthorizationHeader();
           this.config.formData.headers = { ...this.config.formData.headers, ...headers };
-          const request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
+          let request = `/studies${this.sourceIsAlbum ? `?${this.sourceSending.key}=${this.sourceSending.value}` : ''}`;
+          if (files[0].skipVerify) {
+            const hasQuery = request.indexOf('?') !== -1;
+            request = `${request}${hasQuery ? '&' : '?'}skipVerify=true`;
+          }
           HTTP.post(request, formData, this.config.formData).then((res) => {
             this.manageResult(files, res.data, res.status);
             resolve(res);
@@ -655,11 +680,12 @@ export default {
       this.createListError(map);
     },
     createListError(error) {
-      error.forEach((errorCode, id) => {
+      error.forEach((errorItem, id) => {
+        const { errorCode, attributes } = errorItem;
         const fileError = this.copyFiles.find((file) => file.id === id);
         if (fileError) {
           const textError = this.errorValues[errorCode] !== undefined ? `${this.$t(this.errorValues[errorCode])} (${errorCode})` : `${this.$t('upload.errorcode')}: ${errorCode}`;
-          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError) });
+          this.$store.dispatch('setErrorFiles', { error: this.createObjErrors(fileError, textError, attributes) });
         } else {
           this.updateListUnknownError(errorCode);
         }
@@ -684,7 +710,7 @@ export default {
     generateTextError(errorCode) {
       const code = parseInt(errorCode, 10);
       if (this.errorValues[code] !== undefined) {
-        return `${this.$t(this.errorValues[code])} (${code})`;
+        return `${this.$t(this.errorValues[code])} (${code.toString(16)})`;
       }
       let errorText = '';
       this.hexErrorValues.forEach((error) => {
@@ -703,15 +729,31 @@ export default {
       dicom.forEach((x) => {
         if (Object.prototype.hasOwnProperty.call(x, dicomTagFile)) {
           const errorCode = x[this.dicomTagError].Value[0];
+          const attributes = x[this.attributeErrorList]?.Value;
           const idFile = x[dicomTagFile].Value[0];
-          map.set(idFile, errorCode);
+          map.set(idFile,
+            {
+              errorCode,
+              attributes,
+            });
         }
       });
       return map;
     },
-    createObjErrors(file, value) {
+    createObjErrors(file, value, attributes) {
       const objError = file;
       objError.value = value;
+      if (attributes && attributes.length) {
+        objError.value += ' (';
+        for (let i = 0; i < attributes.length; i += 1) {
+          const tag = attributes[i];
+          if (i > 0) {
+            objError.value += ', ';
+          }
+          objError.value += Number(tag).toString(16);
+        }
+        objError.value += ')';
+      }
       return objError;
     },
     setShowErrors(value) {

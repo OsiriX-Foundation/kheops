@@ -91,19 +91,23 @@ public final class Resource {
     @Path("/password/dicomweb/studies")
     @Consumes({CONSUMED_TYPES})
     @Produces({PRODUCED_TYPES})
-    public Response stow(@HeaderParam("Authorization") String authorizationHeader, @QueryParam("album") String albumId) {
-        return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null);
+    public Response stow(
+      @HeaderParam("Authorization") String authorizationHeader, 
+      @QueryParam("album") String albumId, 
+      @QueryParam("skipVerify") boolean skipVerify) 
+    {
+        return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, null, skipVerify);
     }
 
     @POST
     @Path("/password/dicomweb/studies/{studyInstanceUID}")
     @Consumes({CONSUMED_TYPES})
     @Produces({PRODUCED_TYPES})
-    public Response stowStudy(@HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId) {
-        return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID);
+    public Response stowStudy(@HeaderParam("Authorization") String authorizationHeader, @PathParam("studyInstanceUID") String studyInstanceUID, @QueryParam("album") String albumId, @QueryParam("skipVerify") boolean skipVerify) {
+        return store(AuthorizationToken.fromAuthorizationHeader(authorizationHeader), albumId, studyInstanceUID, skipVerify);
     }
 
-    private Response store(AuthorizationToken authorizationToken, String albumId, String studyInstanceUID) {
+    private Response store(AuthorizationToken authorizationToken, String albumId, String studyInstanceUID, boolean skipVerify) {
         final URI authorizationURI = getParameterURI("online.kheops.auth_server.uri");
 
         final URI introspectionURI = UriBuilder.fromUri(authorizationURI).path("/token/introspect").build();
@@ -124,7 +128,7 @@ public final class Resource {
         }
 
         final FetchRequester fetchRequester = FetchRequester.newFetchRequester(authorizationURI, authorizationToken, albumId);
-        final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId, headerXLinkAuthorization);
+        final AuthorizationManager authorizationManager = new AuthorizationManager(authorizationURI, authorizationToken, albumId, headerXLinkAuthorization, skipVerify);
 
         try (InputStream requestInputStream = request.getInputStream();
              InputStream inputStream = getConvertedInputStream(requestInputStream)) {

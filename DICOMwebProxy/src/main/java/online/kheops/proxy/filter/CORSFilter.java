@@ -14,7 +14,7 @@ public class CORSFilter implements ContainerResponseFilter {
         MultivaluedMap<String, Object> headers = responseContext.getHeaders();
 
         headers.add("Access-Control-Allow-Origin", "*");
-        headers.add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, accept-charset");
+        headers.add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, accept-charset, frontend");
         headers.add("Access-Control-Allow-Credentials", "true");
         headers.add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
         headers.add("Access-Control-Max-Age", 86400);
