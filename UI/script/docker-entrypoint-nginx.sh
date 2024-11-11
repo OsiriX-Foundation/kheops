@@ -48,7 +48,7 @@ sed -i "s|\%{kheops_ui_viewer_sm_url}|$KHEOPS_UI_VIEWER_SM_URL|g" $FILENAME
 sed -i "s|\%{kheops_ui_root_url}|$KHEOPS_ROOT_URL|g" $FILENAME
 
 if [ -z "$KHEOPS_UI_VIEWER_URL" ]; then
-    KHEOPS_UI_VIEWER_URL=https://ohif.kheops.online
+    KHEOPS_UI_VIEWER_URL=https://ohif.kheops.online/viewer
 fi
 
 if [ -z "$KHEOPS_UI_DISABLE_UPLOAD" ]; then

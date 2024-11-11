@@ -92,18 +92,23 @@ public class OHIFMetadataResource {
                 "      \"dicomWeb\": [\n" +
                 "         {\n" +
                 "            \"name\": \"DCM4CHEE\",\n" +
-                "            \"wadoUriRoot\": \"%s/wado\",\n" +
                 "            \"qidoRoot\": \"%s\",\n" +
                 "            \"wadoRoot\": \"%s\",\n" +
                 "            \"qidoSupportsIncludeField\": true,\n" +
                 "            \"imageRendering\": \"wadors\",\n" +
                 "            \"thumbnailRendering\": \"wadors\",\n" +
-                "            \"enableStudyLazyLoad\": true\n" +
+                "            \"enableStudyLazyLoad\": true,\n" +
+                "            \"staticWado\": true,\n" +
+                "            \"omitQuotationForMultipartRequest\": false,\n" +
+                "            \"bulkDataURI\": {\n" +
+                "               \"enabled\": true,\n" +
+                "               \"relativeResolution\": \"studies\"\n" +
+                "            }\n" +
                 "         }\n" +
                 "      ]\n" +
                 "   }\n" +
                 "}\n" +
-                "\n", dicomWebURI, dicomWebURI, dicomWebURI);
+                "\n", dicomWebURI, dicomWebURI);
     }
 
     private MetadataDTO ohifMetadata(String studyInstanceUID, String firstSeriesInstanceUID, AuthorizationToken authorizationToken, Boolean inbox, String album) {
@@ -172,3 +177,4 @@ public class OHIFMetadataResource {
         }
     }
 }
+
