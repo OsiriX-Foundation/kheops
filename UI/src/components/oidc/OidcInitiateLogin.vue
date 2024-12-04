@@ -5,27 +5,25 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-import Loading from '@/components/globalloading/Loading';
+import { mapActions } from "vuex";
+import Loading from "@/components/globalloading/Loading";
 
 export default {
-  name: 'OidcInitiateLogin',
+  name: "OidcInitiateLogin",
   components: { Loading },
   mounted() {
     const payload = {
       redirectPath: this.$route.query.target_link_uri,
       login_hint: this.$route.query.login_hint,
     };
-    if (process.env.VUE_APP_AUTHROITY === this.$route.query.iss) {
+    if (process.env.VUE_APP_AUTHORITY === this.$route.query.iss) {
       this.authenticateOidc(payload);
     } else {
-      this.$snotify.error(this.$t('sorryerror'));
+      this.$snotify.error(this.$t("sorryerror"));
     }
   },
   methods: {
-    ...mapActions('oidcStore', [
-      'authenticateOidc',
-    ]),
+    ...mapActions("oidcStore", ["authenticateOidc"]),
   },
 };
 </script>
