@@ -1,1 +1,5 @@
 .DS_Store
+*.code-workspace
+Authorization/bin/
+DICOMwebProxy/bin/
+Zipper/bin/ 
