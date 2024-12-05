@@ -1,4 +1,4 @@
-FROM gradle:6.9.2-jdk11 AS build
+FROM gradle:7.6.4-jdk17 AS build
 ENV APP_HOME=/home/gradle/authorization
 WORKDIR $APP_HOME
 COPY --chown=gradle:gradle build.gradle gradlew $APP_HOME
@@ -7,7 +7,7 @@ RUN ./gradlew build || return 0
 COPY --chown=gradle:gradle src ${APP_HOME}/src
 RUN gradle war --no-daemon --info
 
-FROM tomcat:9.0.58-jdk11
+FROM tomcat:9-jdk17-corretto
 ARG VCS_REF
 LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/OsiriX-Foundation/KheopsAuthorization"
