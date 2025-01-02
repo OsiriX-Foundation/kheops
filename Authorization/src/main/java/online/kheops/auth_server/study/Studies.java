@@ -58,7 +58,7 @@ public class Studies {
 
     private static void setOrderBy(CriteriaBuilder cb, CriteriaQuery<StudyResponseDICOM> c, Path<Study> study, int orderBy, boolean isDescending) {
 
-        Expression orderByColumn = null;
+        Expression<String> orderByColumn = null;
 
         if (orderBy == Tag.StudyDate)
             orderByColumn = study.get(Study_.studyDate);
