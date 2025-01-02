@@ -42,7 +42,7 @@ dependencies {
     api group: 'com.auth0', name: 'java-jwt', version: '3.14.0'
     api group: 'com.auth0', name: 'jwks-rsa', version: '0.17.0'
 
-    api group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.7.6'
+    api group: 'org.bitbucket.b_c', name: 'jose4j', version: '0.7.9'
 
     api group: 'org.ehcache', name: 'ehcache', version: '3.9.2'
 
