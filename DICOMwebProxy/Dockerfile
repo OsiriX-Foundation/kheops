@@ -1,4 +1,4 @@
-FROM gradle:7.6.4-jdk11 AS build
+FROM gradle:7.6.4-jdk17 AS build
 ENV APP_HOME=/home/gradle/capabilities
 WORKDIR $APP_HOME
 COPY --chown=gradle:gradle build.gradle $APP_HOME

@@ -4,7 +4,7 @@ COPY --chown=gradle:gradle build.gradle /home/gradle/authorization/build.gradle
 COPY --chown=gradle:gradle src /home/gradle/authorization/src
 RUN gradle war --no-daemon --info
 
-FROM tomcat:9.0.52-jdk11
+FROM tomcat:9-jdk17-corretto
 ARG VCS_REF
 LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="https://github.com/OsiriX-Foundation/KheopsAuthorization"
